@@ -12,8 +12,8 @@
  - Echo command (both reply and non reply version)
  - 8ball command (never gives good answers, for fun only, good for having a conversation with the bot)
  - Rock Paper Scissors game (play with the bot)
- - More to come later on!
  - Ability to display neofetch of server bot is running on, as well as network usage stats (requires additional setup)
+ - More to come later on!
 
 **Setup**
 
