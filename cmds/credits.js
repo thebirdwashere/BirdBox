@@ -11,7 +11,7 @@ module.exports = {
 			.setDescription('Credits to the people who work/worked on this bot.')
 			.addFields(
 				{ name: 'Owner', value: 'TheBirdWasHere' },
-				{ name: 'Host', value: 'Kieran@TheJasperHouse' },
+				{ name: 'Host', value: 'TheBirdWasHere' },
 				{ name: 'Contributors', value: 'Bisly, AgentNebulator' }
 			)
 			.setFooter({ text: 'Special thanks to users like you!' });
