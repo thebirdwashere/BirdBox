@@ -1,4 +1,8 @@
-# BirdBox
+<h1 align="center">
+  <img src=https://github.com/grumpzalt/BirdBox/assets/59405169/5e50b03c-e574-41f0-b5b1-4417e74d1e4e>
+  <br>
+  BirdBox
+</h1>
 
 **BirdBox** is a Discord Bot made using discord.js, mainly designed for my own use in a server I am in, however is fairly easy to self-host, and contains some features useful outside of my servers.
 
