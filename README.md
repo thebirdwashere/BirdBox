@@ -42,6 +42,18 @@ To add your token, create a ".env" file in the root directory of the bot (where 
 
 To download BirdBox, you can either clone this repository, or download the latest release from the Releases section, both contain the same files, as Releases is mainly being used to keep track of versions, but if you want an old version, go there.
 
+**Configuration**
+
+To change BirdBox's status, edit line 61 of main.js (under client.user.setPresence) with your chosen status message.
+You can also change ActivityType to Competing, Custom (the default), Listening, Playing, Streaming and Watching.
+
+For the neofetch command to work, you will need to have neofetch installed on your system.
+
+To make the netstats command work, you will need ifconfig installed (should be by default) and you will probably need to change the network interface BirdBox is checking.
+
+To do so, go to the netstats.js file in the cmds file, and edit line 9 [begins with exec("ifconfig enp5s0 ] to show your actual network interface instead of the default "enp5s0" which is set for my server. To check network interfactes, type "ip a" into your terminal and look for something beginning with "enp" if using Ethernet or "wlp" if using WiFi. Take the name of the interface you found and use it to replace the default.
+
+Other configuration changes can be made using the e;config command built into BirdBox.
 
 
 
