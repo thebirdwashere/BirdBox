@@ -1,4 +1,4 @@
 .env
-node-modules/
+node_modules/**
 json.sqlite
 birdbox-discord-bot.code-workspace
