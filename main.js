@@ -1,7 +1,7 @@
 // BirdBox Unified
 // Developed by TheBirdWasHere (with help from others as well)
 
-              //bird                //bailey              //agent
+              //bird                //bisly               //agent
 const devs = ['747501068631670835', '904868840511524885', '742843630120730701']
 
 const Discord = require('discord.js');
