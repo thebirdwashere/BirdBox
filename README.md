@@ -4,17 +4,16 @@
   BirdBox
 </h1>
 
-**BirdBox** is a Discord Bot made using discord.js, mainly designed for my own use in a server I am in, however is fairly easy to self-host, and contains some features useful outside of my servers.
+**BirdBox** is a Discord Bot made using discord.js, mainly designed for my own use in a server I am in. However, it is fairly easy to self-host, and contains some features useful outside of my servers.
 
-BirdBox was created in late January 2021, originally using Zapier and BotGhost, and was rewritten in November 2021 using discord.js, and we have recently decided to open source the bot, mainly to make it easier to collaborate, as well as for anyone who may want to take inspiration from the bot, or would find it useful.
-
+The original project was created in late January 2021, originally using Zapier and BotGhost, and was rewritten in November 2021 using discord.js. We've recently decided to open source the bot, mainly to make it easier to collaborate. Hopefully you'll find it useful for inspiration or even functionality!
 
 ## Features
 
 - Snipe support (opt-in, restores deleted messages in forums/channels)
 - Pinning/unpinning messages for owners of forum threads/channels (For users who don't have permissions but want to pin messages in their channels)
 - Translate command (translate between languages using Google Translate)
-- Message responses (currently only modifiable by BirdBox Devs, replies with images or lyrics depending on message content)
+- Message responses (currently only modifiable by BirdBox devs, replies with images or lyrics depending on message content)
 - Echo command (both reply and non reply version)
 - 8ball command (never gives good answers, for fun only, good for having a conversation with the bot)
 - Rock Paper Scissors game (play with the bot)
@@ -34,7 +33,7 @@ To set up BirdBox you will need
 - bindings
 All of these packages are available using NPM.
 
-BirdBox will run on pretty much any Linux system (I have used both Arch Linux and Ubuntu Server), as for other operating systems you may or may not be able to get it working (I know Windows works with some tweaking according to one of my friends who uses Windows for developing the bot. not sure about MacOS but I'm sure it's the same)
+BirdBox will run on pretty much any Linux system (I have used both Arch Linux and Ubuntu Server). Other operating systems may work with some testing (Windows has been confirmed to work by a fellow developer with some tweaking)
 
 Install instructions might be coming at a later date, but you pretty much just need to install those packages, add your token to the .env file, and run main.js.
 
@@ -47,11 +46,13 @@ To download BirdBox, you can either clone this repository, or download the lates
 To change BirdBox's status, edit line 61 of main.js (under client.user.setPresence) with your chosen status message.
 You can also change ActivityType to Competing, Custom (the default), Listening, Playing, Streaming and Watching.
 
+If you want to be considered a dev (for modifying the maybepile and responses), add your User ID to the array at the top of main.js. Details for how to acquire a User ID can be found online.
+
 For the neofetch command to work, you will need to have neofetch installed on your system.
 
 To make the netstats command work, you will need ifconfig installed (should be by default) and you will probably need to change the network interface BirdBox is checking.
 
-To do so, go to the netstats.js file in the cmds file, and edit line 9 [begins with exec("ifconfig enp5s0 ] to show your actual network interface instead of the default "enp5s0" which is set for my server. To check network interfactes, type "ip a" into your terminal and look for something beginning with "enp" if using Ethernet or "wlp" if using WiFi. Take the name of the interface you found and use it to replace the default.
+To do so, go to the netstats.js file in the cmds file, and edit line 9 [begins with exec("ifconfig enp5s0 ] to show your actual network interface instead of the default "enp5s0" which is set for my server. To check network interfaces, type "ip a" into your terminal and look for something beginning with "enp" if using Ethernet or "wlp" if using WiFi. Take the name of the interface you found and use it to replace the default.
 
 Other configuration changes can be made using the e;config command built into BirdBox.
 
