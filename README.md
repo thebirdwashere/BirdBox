@@ -39,7 +39,7 @@ Install instructions might be coming at a later date, but you pretty much just n
 
 To add your token, create a ".env" file in the root directory of the bot (where main.js is), and inside the file, put DISCORD_TOKEN="YOUR-TOKEN-HERE" in it, and replace YOUR-TOKEN-HERE with the token you got from the Discord Developer Portal for your bot account. Instructions for creating a bot account can be found online or on YouTube.
 
-To download BirdBox, you can either clone this repository, or download the latest release from the Releases section, both contain the same files, as Releases is mainly being used to keep track of versions, but if you want an old version, go there.
+To download BirdBox, download the latest release from the Releases section, this will get you the latest tested and complete version, you can also clone the repository, however this will get you the latest potentially unstable/in development version.
 
 **Configuration**
 
