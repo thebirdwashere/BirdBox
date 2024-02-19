@@ -280,9 +280,6 @@ async function modernMode(message, vars, {mode, setting, change}) {
     
     let sent = await sendConfigMessage(message, vars, {mode, setting, change}, row)
 
-    let devjfdlkjflkadajdlks = []
-    devjfdlkjflkadajdlks.map(item => item.name).join(", ")
-
     //collector for the selector responses
     const interactcollector = sent.createMessageComponentCollector({ time: 30000 });
 
