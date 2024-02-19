@@ -287,7 +287,7 @@ module.exports = {
 
         selectcollector.on('collect', async i => {
             message.content = `${vars.prefix}maybepile view ${i.values[0]}`;                 //so over here, because i had no better ideas, we bootstrap paradox ourselves into running maybepile again
-            args = message.content.slice(vars.prefix.length).trim().split(/ +/g).splice(1);    //with new message and args. then it sends it back, where we can edit our inital message with the recived content.
+            args = message.content.slice(vars.prefix.length).trim().split(/ +/g).splice(1);  //with new message and args. then it sends it back, where we can edit our inital message with the recived content.
             require('./cmds/maybepile').execute(message, args, vars, "", sent);              //this is so janky. if anyone other than me comes in to edit this i owe them a heartfelt apology. 
             rowArray.forEach(item => {item.components[0].setDisabled(true)})
             sent.edit({ components: rowArray }); i.deferUpdate().catch(err => {console.error(err)});
@@ -297,139 +297,6 @@ module.exports = {
             //disable the selector
             rowArray.forEach(item => {item.components[0].setDisabled(true)})
             sent.edit({ components: rowArray })});},
-    config: async (message, args, vars) => {
-        const settings = require("./cmds/config").settingsText(vars.prefix)
-        const userSettings = require("./cmds/config").userSettings
-        const serverSettings = require("./cmds/config").serverSettings
-
-        let mode = args[0]
-        if (!mode) {mode = "user"}
-
-        let setting = args[1]
-        let change = args[2]
-
-        const db = vars.db;
-
-        function embedTemplate(mode) {
-            const embed = new EmbedBuilder()
-                .setColor(0xcbe1ec)
-                .setTitle(`${mode[0].toUpperCase()}${mode.slice(1)} Settings`)
-                .setFooter({text: 'Made by TheBirdWasHere, with help from friends.'});
-
-            return embed}
-
-        function selectorTemplate(mode) {
-            const select = new StringSelectMenuBuilder()
-            .setCustomId(`settings-${mode}`)
-            .setPlaceholder(`Select a setting`);
-            for (let item of Object.keys(settings[mode])) {
-                select.addOptions(
-                    new StringSelectMenuOptionBuilder()
-                        .setLabel(settings[mode][item].title)
-                        .setDescription(settings[mode][item].desc)
-                        .setValue(item)
-            )}
-
-            return select}
-        
-        async function displaySetting(mode, setting, change) {
-            let selectedOption
-            if (mode == "user") {selectedOption = await db.get(`setting_${setting}_${message.author.id}`);}
-            else {selectedOption = await db.get(`setting_${setting}_${message.guildId}`);}
-            return new Promise((res, rej) => {
-                const settingText = settings[mode][setting]
-                settingText.name = settingText.title; //name uses classic interface, title more appropriate here
-                const embed = new embedTemplate(mode).addFields(settingText);
-
-                if (!selectedOption && selectedOption !== false) {selectedOption = settingText.default};
-
-                const settingsArray = []
-                settingsArray[0] = new ActionRowBuilder()
-                if (Array.isArray(settingText.options)) { //array means button options
-                    settingText.options.forEach(opt => {
-                        const capsOpt = `${opt[0].toUpperCase()}${opt.slice(1)}`
-                        const button = new ButtonBuilder()
-                        .setLabel(capsOpt)
-                        .setCustomId(`${setting}-${opt}`)
-                        .setDisabled(false)
-                        if (opt === selectedOption) {button.setDisabled(true)}
-                        if (opt == "enable") { button.setStyle(ButtonStyle.Success)
-                        } else if (opt == "disable") { button.setStyle(ButtonStyle.Danger)
-                        } else { button.setStyle(ButtonStyle.Primary) }
-
-                        settingsArray[0].addComponents(button)
-                })} else if (settingText.options == "channel") { //channel means channel selector
-                    const channelSelect = new ChannelSelectMenuBuilder()
-                    .setCustomId(`${setting}-channel`)
-                    .setChannelTypes(ChannelType.GuildText)
-                    .setPlaceholder("Choose a channel")
-
-                    const disableButton = new ButtonBuilder()
-                    .setLabel("Disable")
-                    .setCustomId(`${setting}-disable`)
-                    .setDisabled(false)
-                    .setStyle(ButtonStyle.Danger)
-
-                    if (selectedOption === false) {disableButton.setDisabled(true)}
-
-                    settingsArray[1] = new ActionRowBuilder()
-                    settingsArray[0].addComponents(channelSelect)
-                    settingsArray[1].addComponents(disableButton)
-                }
-
-                res([embed, settingsArray])
-            })}
-        
-        let select = new selectorTemplate(mode);
-        const row = new ActionRowBuilder().addComponents(select)
-        
-        let sent
-        let newEmbed
-        if (!setting) {
-            newEmbed = new embedTemplate(mode);
-            newEmbed.setDescription('Use the menu below to select a setting!')
-            sent = await message.reply({ components: [row], embeds: [newEmbed] }).catch(err => console.error(err));}
-        else if (!settings[mode][setting]) {
-            newEmbed = new embedTemplate(mode);
-            newEmbed.setDescription(':x: Invalid setting, use the menu below to select a valid one!')
-            sent = await message.reply({ components: [row], embeds: [newEmbed] }).catch(err => console.error(err));}
-        else {
-            let options
-            [newEmbed, options] = await displaySetting(mode, setting, change); //i am baffled by this syntax working, but it does
-            options.unshift(row)
-            sent = await message.reply({ components: options, embeds: [newEmbed]}).catch(err => console.error(err))
-        }
-        
-        //collector for the selector responses
-        const interactcollector = sent.createMessageComponentCollector({ time: 30000 });
-
-        interactcollector.on('collect', async i => {
-            if (i.member.id !== message.author.id) { return; }
-
-            if (i.values && !Number(i.values[0])) {setting = i.values[0]}    //simple logic: either it is a number, or it isn't,
-            else if (i.values && Number(i.values[0])) {change = i.values[0]} //or it doesn't exist. this checks all three cases
-            else if (!i.values) {change = false}
-            
-            if (i.isButton() || i.isChannelSelectMenu()) { //either means a setting was changed
-                if (mode == "user") {await userSettings(message, args, vars, setting, i.customId.replace(`${setting}-`, ""), false);}
-                else {await serverSettings(message, args, vars, setting, change, false)}};
-
-            await db.get(`setting_${setting}_${message.guildlId}`) //this. this right here fixed an issue where buttons
-                                                                   //would wait until another setting is changed to properly update.
-                                                                   //it's messy, it's unnecessary, it's impossible to understand, but it works. and so, i leave it.
-            let updatedEmbed, options
-            [updatedEmbed, options] = await displaySetting(mode, setting, change);
-            options.unshift(row);
-            
-            sent.edit({ embeds: [updatedEmbed], components: options });
-            i.deferUpdate();
-        });
-
-        interactcollector.on('end', () => {
-            //disable the selector and remove buttons
-            row.components[0].setDisabled(true)
-            sent.edit({ components: [row] })
-        });}, 
     help: async (message, args, vars, basicEmbed, embed, sent) => {
         const select = new StringSelectMenuBuilder()
             .setCustomId(`help`)
