@@ -275,6 +275,8 @@ async function sendConfigMessage(message, vars, {mode, setting, change}, row) {
 async function modernMode(message, vars, {mode, setting, change}) {
     const db = vars.db;
 
+    if (!mode) {mode = "user"}
+
     let select = selectorTemplate(mode, settingsText(vars.prefix));
     const row = new ActionRowBuilder().addComponents(select)
     
