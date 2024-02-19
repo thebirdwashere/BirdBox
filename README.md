@@ -37,12 +37,7 @@ BirdBox will run on pretty much any Linux system (I have used both Arch Linux an
 
 Install instructions might be coming at a later date, but you pretty much just need to install those packages, add your token to the .env file, and run main.js.
 
-To add your token, create a ".env" file in the root directory of the bot (where main.js is), and inside the file, put DISCORD_TOKEN="YOUR-TOKEN-HERE" in it, and replace YOUR-TOKEN-HERE with the token you got from the Discord Developer Portal for your bot account. Instructions for creating a bot account can be found online or on YouTube.
-
-To download BirdBox, you can either clone this repository, or download the latest release from the Releases section, both contain the same files, as Releases is mainly being used to keep track of versions, but if you want an old version, go there.
-
-**Configuration**
-
+To add your token, create a ".env" file in the root directory of the bot (where main.js is), and inside the file, put DISCORD_TOKEN="YOUR-TOKEN-HERE" in it, and replace YOUR-TOKEN-HERE with the token you got from the Discordntain in progress 
 To change BirdBox's status, edit line 61 of main.js (under client.user.setPresence) with your chosen status message.
 You can also change ActivityType to Competing, Custom (the default), Listening, Playing, Streaming and Watching.
 
@@ -52,7 +47,7 @@ For the neofetch command to work, you will need to have neofetch installed on yo
 
 To make the netstats command work, you will need ifconfig installed (should be by default) and you will probably need to change the network interface BirdBox is checking.
 
-To do so, go to the netstats.js file in the cmds file, and edit line 9 [begins with exec("ifconfig enp5s0 ] to show your actual network interface instead of the default "enp5s0" which is set for my server. To check network interfaces, type "ip a" into your terminal and look for something beginning with "enp" if using Ethernet or "wlp" if using WiFi. Take the name of the interface you found and use it to replace the default.
+To do so, go to the netstats.js file in the cmds directory, and edit line 9 [begins with exec("ifconfig enp5s0 ] to show your actual network interface instead of the default "enp5s0" which is set for my server. To check network interfaces, type "ip a" into your terminal and look for something beginning with "enp" if using Ethernet or "wlp" if using WiFi. Take the name of the interface you found and use it to replace the default.
 
 Other configuration changes can be made using the e;config command built into BirdBox.
 
