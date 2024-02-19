@@ -1,0 +1,32 @@
+{
+    "host": [
+        {
+            "name": "thebirdwashere",
+            "user_id": "747501068631670835"
+        }
+    ],
+    "developer": [
+        {
+            "name": "bislij",
+            "user_id": "747501068631670835"
+        },
+        {
+            "name": "agentnebulator",
+            "user_id": "747501068631670835"
+        }
+    ],
+    "botTester": [
+        {
+            "name": "crisby_.",
+            "user_id": "668589151909838908"
+        },
+        {
+            "name": "helthy",
+            "user_id": "764597453810171984"
+        },
+        {
+            "name": "anpunekutewe",
+            "user_id": "764597453810171984"
+        }
+    ]
+}

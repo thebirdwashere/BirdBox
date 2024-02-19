@@ -30,6 +30,11 @@ module.exports = {
       .setColor('Green')
       .setFooter({text: randomfooters[Math.floor(Math.random() * randomfooters.length)]})
       .setTimestamp(messagedate);
+
+    if (snipe.attachment) {
+      newEmbed.setImage(snipe.attachment);
+    }
+    
     message.channel.trysend({embeds: [newEmbed]})
   }
 }

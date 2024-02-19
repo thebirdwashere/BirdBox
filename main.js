@@ -2,10 +2,14 @@
 // Developed by TheBirdWasHere (with help from others as well)
 
               //bird                //bisly               //agent
-const devs = ['747501068631670835', '904868840511524885', '742843630120730701']
+const devs = ['747501068631670835', '904868840511524885', '742843630120730701'];
+
+const devArray = require("./cmds/json_info/dev_array.json");
+
+console.log(devArray.developer[1].name);
 
 const Discord = require('discord.js');
-const { EmbedBuilder } = require("discord.js")
+const { EmbedBuilder } = require("discord.js");
 
 require('dotenv').config();
 const { Client, GatewayIntentBits , Message, MessageEmbed, DiscordAPIError, ActivityType } = require('discord.js');
@@ -30,7 +34,7 @@ const modal = require("./modernmode")
 
 let IS_CANARY = true
 let prefix;
-let vars = {db: db, EmbedBuilder: EmbedBuilder, devs: devs};
+let vars = {db: db, EmbedBuilder: EmbedBuilder, devs: devs, devArray: devArray};
 
 //new send functions to not crash when missing permissions
 Discord.BaseChannel.prototype.trysend = async function(content) {
@@ -68,7 +72,8 @@ client.on('messageDelete', async (message) => {
 	await db.set(`snipe_${message.channelId}`, {
 		content: message.content,
 		author: {tag: message.author.tag, id: message.author.id},
-        timestamp: message.createdAt
+        timestamp: message.createdAt,
+        attachment: message.attachments.first()?.url // Grabs the first attachment url out of the message, EXPERIMENTAL FEATURE
 	})
 })
 
