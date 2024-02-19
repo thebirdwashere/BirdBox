@@ -178,6 +178,47 @@ function modifyServerSetting(message, vars, {setting, change}) {
  * -------------------------------
 /*/
 
+async function modernMode(message, vars, {mode, setting, change}) {
+    const db = vars.db;
+
+    if (!mode) {mode = "user"}
+
+    let select = selectorTemplate(mode, settingsText(vars.prefix));
+    const row = new ActionRowBuilder().addComponents(select)
+    
+    let sent = await sendConfigMessage(message, vars, {mode, setting, change}, row)
+
+    //collector for the selector responses
+    const interactcollector = sent.createMessageComponentCollector({ time: 30000 });
+
+    interactcollector.on('collect', async i => {
+        if (i.member.id !== message.author.id) { return; }
+
+        if (typeof i.values?.[0] === "string") {setting = i.values[0]}       //this would be a selector
+        else if (!i.values) {change = i.customId.replace(`${setting}-`, "")} //and this would be a button
+        
+        if (i.isButton() || i.isChannelSelectMenu()) { //either means a setting was changed
+            if (mode == "user") {await modifyUserSetting(message, vars, {setting, change});}
+            else {await modifyServerSetting(message, vars, {setting, change})}};
+
+        await db.get(`setting_${setting}_${message.guildlId}`) //this. this right here fixed an issue where buttons
+                                                               //would wait until another setting is changed to properly update.
+                                                               //it's messy, it's unnecessary, it's impossible to understand, but it works. and so, i leave it.
+        let updatedEmbed, options
+        [updatedEmbed, options] = await displaySetting(message, vars, {mode, setting});
+        options.unshift(row);
+        
+        sent.edit({ embeds: [updatedEmbed], components: options });
+        i.deferUpdate();
+    });
+
+    interactcollector.on('end', () => {
+        //disable the selector and remove buttons
+        row.components[0].setDisabled(true)
+        sent.edit({ components: [row] })
+    })
+}
+
 function selectorTemplate(mode, settings) {
     const select = new StringSelectMenuBuilder()
     .setCustomId(`settings-${mode}`)
@@ -270,45 +311,4 @@ async function sendConfigMessage(message, vars, {mode, setting, change}, row) {
     }
 
     return sent
-}
-
-async function modernMode(message, vars, {mode, setting, change}) {
-    const db = vars.db;
-
-    if (!mode) {mode = "user"}
-
-    let select = selectorTemplate(mode, settingsText(vars.prefix));
-    const row = new ActionRowBuilder().addComponents(select)
-    
-    let sent = await sendConfigMessage(message, vars, {mode, setting, change}, row)
-
-    //collector for the selector responses
-    const interactcollector = sent.createMessageComponentCollector({ time: 30000 });
-
-    interactcollector.on('collect', async i => {
-        if (i.member.id !== message.author.id) { return; }
-
-        if (typeof i.values?.[0] === "string") {setting = i.values[0]}       //this would be a selector
-        else if (!i.values) {change = i.customId.replace(`${setting}-`, "")} //and this would be a button
-        
-        if (i.isButton() || i.isChannelSelectMenu()) { //either means a setting was changed
-            if (mode == "user") {await modifyUserSetting(message, vars, {setting, change});}
-            else {await modifyServerSetting(message, vars, {setting, change})}};
-
-        await db.get(`setting_${setting}_${message.guildlId}`) //this. this right here fixed an issue where buttons
-                                                               //would wait until another setting is changed to properly update.
-                                                               //it's messy, it's unnecessary, it's impossible to understand, but it works. and so, i leave it.
-        let updatedEmbed, options
-        [updatedEmbed, options] = await displaySetting(message, vars, {mode, setting});
-        options.unshift(row);
-        
-        sent.edit({ embeds: [updatedEmbed], components: options });
-        i.deferUpdate();
-    });
-
-    interactcollector.on('end', () => {
-        //disable the selector and remove buttons
-        row.components[0].setDisabled(true)
-        sent.edit({ components: [row] })
-    })
 }
