@@ -23,6 +23,7 @@ module.exports = {
         .setDescription(`Learn about this bot's capabilities. \n★ = ${prefix}help (command name) for more info.`)
         .addFields(
             {name: `${prefix}8ball`, value: 'Question the Box and never get a straight answer.', inline: true},
+            {name: `${prefix}coinflip`, value: 'It is a coin flip, what do you expect?', inline: true},
             {name: `${prefix}config` , value: "Change bot-related settings for the user and server.", inline: true},
             {name: `${prefix}credits` , value: "View the credits for this bot. It's pretty obvious what it does.", inline: true},
             {name: `${prefix}echo`, value: `Make the bot say dumb things. Use ${prefix}echo noreply for no message reply!`, inline: true},
