@@ -109,7 +109,7 @@ module.exports = {
                         
                     maybeArray[selectedMessage] = {author: interaction.fields.getTextInputValue('maybepile-author'), title: interaction.fields.getTextInputValue('maybepile-title'), desc: interaction.fields.getTextInputValue('maybepile-desc')}
                     await db.set("maybepile", maybeArray);
-                    interaction.channel.send(`${maybeArray[maybeArray.length - 1].title} has successfully been added!`);
+                    interaction.channel.send(`${maybeArray[selectedMessage].title} has successfully been edited!`);
                 break;}
             }
             interaction.deferUpdate();

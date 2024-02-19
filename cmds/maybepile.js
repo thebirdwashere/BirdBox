@@ -100,7 +100,7 @@ module.exports = {
             const descResponses = ["description", "desc", "d"]
             const authorResponses = ["suggester", "author", "s", "a"]
 
-            if (!selectedMessage && classic) {
+            if (!selectedMessage) {
                 //aborts edit because no selection
                 message.channel.trysend(`bruh, i need something to edit. please use the format ${vars.prefix}maybepile edit (item number) title/description`); return; }
             if (selectedMessage == 0) {
