@@ -1,4 +1,5 @@
-const { EmbedBuilder } = require("discord.js")
+const { EmbedBuilder } = require("discord.js");
+const { randomIntInRange } = require("./utils");
 
 module.exports = {
     keywords: async (db, string, guild, messages, lyrics, isTest) => { //function for message/lyric responses
