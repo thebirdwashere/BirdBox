@@ -1,3 +1,5 @@
+const { randomIntInRange } = require("../utils");
+
 module.exports = {
   name: 'snipe',
   description: 'fetches last deleted message and displays it',
@@ -27,7 +29,7 @@ module.exports = {
       .setTitle(`${message.channel.name}’s Snipe`)
       .setAuthor({name: snipe.author.tag, iconURL: sniped.displayAvatarURL()})
       .setColor('Green')
-      .setFooter({text: randomfooters[Math.floor(Math.random() * randomfooters.length)]})
+      .setFooter({text: randomfooters[randomIntInRange(0, randomfooters.length - 1)]})
       .setTimestamp(messagedate);
 
     if (snipe.content) {

@@ -132,7 +132,7 @@ module.exports = {
             .setDescription(`${desc} Take a look:`)
             .addFields({name: " ", value: " "})
             .setURL(message.url)
-            .setFooter({text: footers[Math.floor(Math.random() * footers.length)]})
+            .setFooter({text: footers[randomIntInRange(0, footers.length - 1)]})
 
         content_split.forEach(str => {
             newEmbed.addFields({name: " ", value: `\`${str}\``});}) //embed char limits once again

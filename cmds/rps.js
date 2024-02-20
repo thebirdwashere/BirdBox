@@ -2,6 +2,8 @@
  * AUTHORS: Matty, Bisly (Modifications)
  * DESCRIPTION: Play RPS against the computer! */
 
+const { randomIntInRange } = require("../utils");
+
 module.exports = {
 	name: 'rps',
 	description: 'Play a game of Rock Paper Scissors against the computer!',
@@ -10,8 +12,7 @@ module.exports = {
 		const playerChoice = args[0];
 
 		if(!validChoices.includes(playerChoice)) { message.channel.trysend('Invalid move. Try again and use \"rock\", \"paper\", or \"scissors\".'); return;}
-			const computerNumChoice =  Math.floor(Math.random() * 3);
-			if (computerNumChoice == 3) {computerNumChoice = 2;}
+			const computerNumChoice =  randomIntInRange(0, 2);
 
 			/*
 			 *	0 = rock

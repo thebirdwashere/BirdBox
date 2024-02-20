@@ -6,10 +6,10 @@ const devArray = require("./cmds/json_info/dev_array.json");
 const devs = devArray.host.map(item => item.userId).concat(devArray.developer.map(item => item.userId));
 
 const Discord = require('discord.js');
-const { EmbedBuilder } = require("discord.js");
+const { randomIntInRange } = require("./utils");
 
 require('dotenv').config();
-const { Client, GatewayIntentBits , Message, MessageEmbed, DiscordAPIError, ActivityType } = require('discord.js');
+const { Client, GatewayIntentBits , Message, MessageEmbed, DiscordAPIError, ActivityType, EmbedBuilder } = require('discord.js');
 const client = new Client({intents : [GatewayIntentBits.GuildMessages , GatewayIntentBits.DirectMessages, GatewayIntentBits.Guilds, GatewayIntentBits.MessageContent]});
 
 const fs = require('fs');
@@ -107,7 +107,7 @@ client.on('messageCreate', async (message) => {
 
     const alphabeticalness = tests.alphabetical(content)
     if (alphabeticalness) { //alphabetical order checker
-        const randomWord = alphabeticalness[Math.floor(Math.random() * alphabeticalness.length)]
+        const randomWord = alphabeticalness[randomIntInRange(0, alphabeticalness.length - 1)]
         const randomfooters = [
             `now i know my abc's, next time won't you sing with me`,
             `perfectly sorted, as all things should be`,
