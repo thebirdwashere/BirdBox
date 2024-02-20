@@ -37,11 +37,22 @@ BirdBox will run on pretty much any Linux system (I have used both Arch Linux an
 
 Install instructions might be coming at a later date, but you pretty much just need to install those packages, add your token to the .env file, and run main.js.
 
-To add your token, create a ".env" file in the root directory of the bot (where main.js is), and inside the file, put DISCORD_TOKEN="YOUR-TOKEN-HERE" in it, and replace YOUR-TOKEN-HERE with the token you got from the Discordntain in progress 
-To change BirdBox's status, edit line 61 of main.js (under client.user.setPresence) with your chosen status message.
+To add your token, create a ".env" file in the root directory of the bot (where main.js is), and inside the file, put DISCORD_TOKEN="YOUR-TOKEN-HERE" in it, and replace YOUR-TOKEN-HERE with the token you got from the Discord Developer Portal for your bot account. Instructions for creating a bot account can be found online or on YouTube.
+
+To download BirdBox, download the latest release from the Releases section, this will get you the latest tested and complete version, you can also clone the repository, however this will get you the latest potentially unstable/in development version.
+
+**Configuration**
+
+To change BirdBox's status, edit line 61 of main.js (under client.user.setPresence) with your chosen status message. (Note: command may be coming soon to make this process easier, stay tuned!)
 You can also change ActivityType to Competing, Custom (the default), Listening, Playing, Streaming and Watching.
 
 If you want to be considered a dev (for modifying the maybepile and responses), add your User ID to the array at the top of main.js. Details for how to acquire a User ID can be found online.
+
+Note: If you are creating a version of BirdBox for development/contribution purposes, you are legally obligated to change its profile picture to an image of Foof (the depicted rabbit) if at all possible. Other rabbits may be substituted, particularly if they are also owned by Bird, or another in-joke from the development team's members can suffice.
+
+**Command Setup**
+
+Some commands require additions to the SQLITE database. They should support an empty one without breaking, but you may have to conduct manual setup in some areas depending on what you want (particularly in responses).
 
 For the neofetch command to work, you will need to have neofetch installed on your system.
 
