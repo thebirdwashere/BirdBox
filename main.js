@@ -35,7 +35,8 @@ let vars = {
     db: db,
     EmbedBuilder: EmbedBuilder,
     devs: devs,
-    devArray: devArray
+    devArray: devArray,
+    client: client
 };
 
 //new send functions to not crash when missing permissions
