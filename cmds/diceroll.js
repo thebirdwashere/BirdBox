@@ -11,16 +11,24 @@ module.exports = {
     //calculate random roll
     const mainResult = randomIntInRange(1, numberOfFaces);
 
+    //secondary result is needed for some trolls
+    const secondaryResult = randomIntInRange(1, numberOfFaces);
+    while (secondaryResult == mainResult) { //ensure this is different from main
+      secondaryResult = randomIntInRange(1, numberOfFaces);}
+
     const trolls = [
-      "normal",
-      "badmath"
+      "normal", "normal",
+      "badmath",
+      "offtable",
+      "dogatemydie"
     ]
 
     const trollSelection = trolls[randomIntInRange(1, trolls.length - 1)];
-    if (trollSelection === "normal") {
-      message.tryreply(`:game_die: You rolled ${mainResult}!`);
-    } else if (trollSelection === "badmath") {
-      badMathTroll(message, numberOfFaces, mainResult)
+    switch (trollSelection) {
+      case "normal": message.tryreply(`:game_die: You rolled ${mainResult}!`); break;
+      case "offtable": message.tryreply(`:game_die: The die fell off the table! It landed on ${mainResult} though, if you think it counts.`); break;
+      case "dogatemydie": message.tryreply(`:game_die: A dog just ate the die before I got a good look at it! I think it was ${mainResult}, though... or maybe ${secondaryResult}...`); break;
+      case "badmath": badMathTroll(message, mainResult, secondaryResult); break;
     }
   }
 }
@@ -38,17 +46,12 @@ function getNumberOfFaces(message, args) {
     return null;
   }
 
-  return faces
+  return faces;
 }
 
-async function badMathTroll(message, facesNum, mainResult) {
+async function badMathTroll(message, mainResult, secondaryResult) {
   message.tryreply(`:game_die: You rolled ${mainResult}!`);
 
-  let correctedResult = randomIntInRange(1, facesNum);
-  while (correctedResult == mainResult) {
-    correctedResult = randomIntInRange(1, facesNum);
-  }
-
-  await sleepMs(randomIntInRange(2000, 6000))
-  message.tryreply(`:game_die: Wait no, that's ${correctedResult}. Not too good with numbers.`);
+  await sleepMs(randomIntInRange(2000, 8000)); //between two and eight seconds
+  message.tryreply(`:game_die: Wait no, that's ${secondaryResult}. Not too good with numbers.`);
 }
