@@ -12,15 +12,16 @@ module.exports = {
     const mainResult = randomIntInRange(1, numberOfFaces);
 
     //secondary result is needed for some trolls
-    const secondaryResult = randomIntInRange(1, numberOfFaces);
+    let secondaryResult = randomIntInRange(1, numberOfFaces);
     while (secondaryResult == mainResult) { //ensure this is different from main
       secondaryResult = randomIntInRange(1, numberOfFaces);}
 
     const trolls = [
-      "normal", "normal",
-      "badmath",
+      "normal", "normal",  "normal",
       "offtable",
-      "dogatemydie"
+      "dogatemydie",
+      "badmath",
+      "intenseshaking"
     ]
 
     const trollSelection = trolls[randomIntInRange(1, trolls.length - 1)];
@@ -29,6 +30,7 @@ module.exports = {
       case "offtable": message.tryreply(`:game_die: The die fell off the table! It landed on ${mainResult} though, if you think it counts.`); break;
       case "dogatemydie": message.tryreply(`:game_die: A dog just ate the die before I got a good look at it! I think it was ${mainResult}, though... or maybe ${secondaryResult}...`); break;
       case "badmath": badMathTroll(message, mainResult, secondaryResult); break;
+      case "intenseshaking": intenseShakingTroll(message, mainResult); break;
     }
   }
 }
@@ -54,4 +56,35 @@ async function badMathTroll(message, mainResult, secondaryResult) {
 
   await sleepMs(randomIntInRange(2000, 8000)); //between two and eight seconds
   message.tryreply(`:game_die: Wait no, that's ${secondaryResult}. Not too good with numbers.`);
+}
+
+async function intenseShakingTroll(message, mainResult) {
+  await message.reply(`:game_die: Hold on, let me shake them first.`)
+  .finally(() => message.channel.sendTyping()); //make birdbox show as typing
+
+  //some funny commentary
+  randomSayings = [
+    "*shaking noises*",
+    "*shaking continues*",
+    "*intense shaking*",
+    "*still shaking*",
+    "*how long will this shaking last*"
+  ]
+
+  //iterate an unpredictable number of times
+  iterations = randomIntInRange(0, 5)
+  for (let i = 0; i < iterations; i++) {
+    await sleepMs(randomIntInRange(2000, 10000)); //between two and ten seconds
+
+    //send a random saying
+    chosenSaying = randomSayings[randomIntInRange(1, randomSayings.length - 1)];
+    await message.channel.send(chosenSaying)
+    .finally(() => message.channel.sendTyping());  //make birdbox show as typing
+  }
+
+  //one last sleep
+  await sleepMs(randomIntInRange(2000, 10000)); //between two and ten seconds
+
+  //finally tell them what the result is
+  message.tryreply(`:game_die: You rolled ${mainResult}!`);
 }
