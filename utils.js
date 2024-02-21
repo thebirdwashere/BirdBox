@@ -14,5 +14,9 @@ module.exports = {
         //generate random stuff
         randomInteger = Math.floor(Math.random() * (max - min) + min);
         return randomInteger;
+    },
+    //Stop all processes for the designated time
+    sleepMs: (milliseconds) => {
+        return new Promise(resolve => setTimeout(resolve, milliseconds));
     }
 }
