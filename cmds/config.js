@@ -194,7 +194,8 @@ async function modernMode(message, vars, {mode, setting, change}) {
     interactcollector.on('collect', async i => {
         if (i.member.id !== message.author.id) { return; }
 
-        if (typeof i.values?.[0] === "string") {setting = i.values[0]}       //this would be a selector
+        if (Number(i.values?.[0])) {change = i.values[0]}                    //this would be a channel selector
+        else if (typeof i.values?.[0] === "string") {setting = i.values[0]}  //this would be a normal selector
         else if (!i.values) {change = i.customId.replace(`${setting}-`, "")} //and this would be a button
         
         if (i.isButton() || i.isChannelSelectMenu()) { //either means a setting was changed
