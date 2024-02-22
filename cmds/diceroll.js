@@ -8,13 +8,7 @@ module.exports = {
     const numberOfFaces = getNumberOfFaces(message, args)
     if (!numberOfFaces) {return;}
 
-    //calculate random roll
-    const mainResult = randomIntInRange(1, numberOfFaces);
-
-    //secondary result is needed for some trolls
-    let secondaryResult = randomIntInRange(1, numberOfFaces);
-    while (secondaryResult == mainResult) { //ensure this is different from main
-      secondaryResult = randomIntInRange(1, numberOfFaces);}
+    [mainNum, otherNum] = getRandomValues(numberOfFaces)
 
     const trolls = [
       "normal", "normal",  "normal",
@@ -26,11 +20,11 @@ module.exports = {
 
     const trollSelection = trolls[randomIntInRange(1, trolls.length - 1)];
     switch (trollSelection) {
-      case "normal": message.tryreply(`:game_die: You rolled ${mainResult}!`); break;
-      case "offtable": message.tryreply(`:game_die: The die fell off the table! It landed on ${mainResult} though, if you think it counts.`); break;
-      case "dogatemydie": message.tryreply(`:game_die: A dog just ate the die before I got a good look at it! I think it was ${mainResult}, though... or maybe ${secondaryResult}...`); break;
-      case "badmath": badMathTroll(message, mainResult, secondaryResult); break;
-      case "intenseshaking": intenseShakingTroll(message, mainResult); break;
+      case "normal": message.tryreply(`:game_die: You rolled ${mainNum}!`); break;
+      case "offtable": message.tryreply(`:game_die: The die fell off the table! It landed on ${mainNum} though, if you think it counts.`); break;
+      case "dogatemydie": message.tryreply(`:game_die: A dog just ate the die before I got a good look at it! I think it was ${mainNum}, though... or maybe ${otherNum}...`); break;
+      case "badmath": badMathTroll(message, mainNum, otherNum); break;
+      case "intenseshaking": intenseShakingTroll(message, mainNum); break;
     }
   }
 }
@@ -49,6 +43,18 @@ function getNumberOfFaces(message, args) {
   }
 
   return faces;
+}
+
+function getRandomValues(numberOfFaces) {
+  //calculate random roll
+  const mainResult = randomIntInRange(1, numberOfFaces);
+
+  //secondary result is needed for some trolls
+  let secondaryResult = randomIntInRange(1, numberOfFaces);
+  while (secondaryResult == mainResult) { //ensure this is different from main
+    secondaryResult = randomIntInRange(1, numberOfFaces);}
+  
+  return [mainResult, secondaryResult]
 }
 
 async function badMathTroll(message, mainResult, secondaryResult) {
@@ -72,9 +78,12 @@ async function intenseShakingTroll(message, mainResult) {
   ]
 
   //iterate an unpredictable number of times
-  iterations = randomIntInRange(0, 5)
+  const MIN_ITERATIONS = 2
+  const MAX_ITERATIONS = 7
+  iterations = randomIntInRange(MIN_ITERATIONS, MAX_ITERATIONS)
+  
   for (let i = 0; i < iterations; i++) {
-    await sleepMs(randomIntInRange(2000, 10000)); //between two and ten seconds
+    await sleepMs(randomIntInRange(2000, 8000)); //between two and eight seconds
 
     //send a random saying
     chosenSaying = randomSayings[randomIntInRange(1, randomSayings.length - 1)];
@@ -83,7 +92,7 @@ async function intenseShakingTroll(message, mainResult) {
   }
 
   //one last sleep
-  await sleepMs(randomIntInRange(2000, 10000)); //between two and ten seconds
+  await sleepMs(randomIntInRange(2000, 10000)); //between two and eight seconds
 
   //finally tell them what the result is
   message.tryreply(`:game_die: You rolled ${mainResult}!`);
