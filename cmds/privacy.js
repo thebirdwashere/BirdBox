@@ -1,4 +1,4 @@
-const { EmbedBuilder } = require("discord.js");s
+const { EmbedBuilder } = require("discord.js");
 
 module.exports = {
 	name: 'privacy',
