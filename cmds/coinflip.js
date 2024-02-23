@@ -20,7 +20,6 @@ module.exports = {
 
     const trollSelection = trolls[randomIntInRange(1, trolls.length - 1)];
 
-    console.log(trollSelection)
     switch (trollSelection) {
       case "normal": message.tryreply(`:coin: Your result is "${responses[mainNum]}"!`); break;
       case "offtable": message.tryreply(`:coin: Messy flip, and the coin fell on the ground! The result was "${responses[mainNum]}", unless you want to try again.`); break;
