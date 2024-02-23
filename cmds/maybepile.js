@@ -2,16 +2,14 @@
  * AUTHORS: Matty
  * DESCRIPTION: Take a look at and suggest potential features! */
 
+const { EmbedBuilder } = require("discord.js");
+
 module.exports = {
     name: 'maybepile',
     description: 'Take a look at and suggest potential features!',
-    async execute(message, args, vars, Discord, sent /*part of the jank that is modern mode; should be null ususally*/) {
-        const EmbedBuilder = vars.EmbedBuilder
+    async execute({message, args}, {prefix, devs, db}, sent /*part of the jank that is modern mode; should be null ususally*/) {
         const action = args[0]; //can be view, suggest, delete, or edit
         const filter = m => m.author.id == message.author.id //used in message awaits; just doing as stackoverflow guy says
-        const devs = vars.devs
-
-        const db = vars.db;
 
         let embedArray = []; //used to fix overflow
         let maybeArray = await db.get('maybepile') 
@@ -33,11 +31,11 @@ module.exports = {
         }
 
         if (action == "suggest" || action == "add") { //e;maybepile suggest
-            if (!classic) { require("../modernmode").maybepile_add(message, args, vars); return; } //redirect in case of modern mode
+            if (!classic) { require("../modernmode").maybepile_add(message, args, {prefix, devs, db}); return; } //redirect in case of modern mode
 
             //define array and get author
             const suggestion = {author: message.author.username};
-            const title = message.content.replace(`${vars.prefix}maybepile ${action}`, "")
+            const title = message.content.replace(`${prefix}maybepile ${action}`, "")
 
             //title
             if (!title) {
@@ -69,7 +67,7 @@ module.exports = {
 
             if (!selectedMessage) 
                 //aborts delete because no selection
-                {message.channel.trysend(`bruh, i need something to delete. please use the format ${vars.prefix}maybepile delete (item number)`); return;}
+                {message.channel.trysend(`bruh, i need something to delete. please use the format ${prefix}maybepile delete (item number)`); return;}
             if (!maybeArray[selectedMessage]) {
                 //aborts delete because nothing at the selection
                 message.channel.trysend(`can't find anything at index ${selectedMessage}`); return; }
@@ -102,7 +100,7 @@ module.exports = {
 
             if (!selectedMessage) {
                 //aborts edit because no selection
-                message.channel.trysend(`bruh, i need something to edit. please use the format ${vars.prefix}maybepile edit (item number) title/description`); return; }
+                message.channel.trysend(`bruh, i need something to edit. please use the format ${prefix}maybepile edit (item number) title/description`); return; }
             if (selectedMessage == 0) {
                 //aborts edit because the user chose table of contents
                 message.channel.trysend("sorry, you can't edit the table of contents"); return; }
@@ -113,7 +111,7 @@ module.exports = {
                 //aborts edit because user does not have perms to edit
                 message.channel.trysend("sorry, you must be a dev or the original poster to edit something"); return;}
             
-            if (!classic) { require("../modernmode").maybepile_edit(message, args, vars); return; } //redirect in case of modern mode
+            if (!classic) { require("../modernmode").maybepile_edit(message, args, {prefix, devs, db}); return; } //redirect in case of modern mode
             
             if (!selectedSection) {
                 message.channel.trysend("Are you editing the title, description, or author?");
@@ -187,7 +185,7 @@ module.exports = {
                         i++
                     });}
                     if (classic) {message.channel.trysend({embeds: embedArray});}
-                    else { require("../modernmode").maybepile_view(message, args, vars, embedArray, sent); } //redirect in case of modern mode}
+                    else { require("../modernmode").maybepile_view(message, args, {prefix, devs, db}, embedArray, sent); } //redirect in case of modern mode}
                 } else {
                     if (!maybeArray[pageNum]) {message.channel.trysend(`can't find anything at index ${pageNum}`); return; }
                     //specific maybepile item
@@ -200,13 +198,13 @@ module.exports = {
                     try {newEmbed.addFields({name: maybeArray[pageNum].title, value: maybeArray[pageNum].desc})} catch {console.error};
 
                     if (classic) {message.channel.trysend({embeds: [newEmbed]});}
-                    else { require("../modernmode").maybepile_view(message, args, vars, [newEmbed], sent); } //redirect in case of modern mode
+                    else { require("../modernmode").maybepile_view(message, args, {devs, db}, [newEmbed], sent); } //redirect in case of modern mode
                     
                 }
         } else if (action) {
-            message.channel.trysend(`please use ${vars.prefix}maybepile view/suggest/edit/delete cause idk what "${action}" is`);   
+            message.channel.trysend(`please use ${prefix}maybepile view/suggest/edit/delete cause idk what "${action}" is`);   
         } else {
-            message.channel.trysend(`please use ${vars.prefix}maybepile view/suggest/edit/delete cause idk what "" is`);   
+            message.channel.trysend(`please use ${prefix}maybepile view/suggest/edit/delete cause idk what "" is`);   
         }
 
         //console.log("array modified, new arrray:")

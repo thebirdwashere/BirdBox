@@ -1,11 +1,9 @@
+const { EmbedBuilder } = require("discord.js");
+
 module.exports = {
 	name: 'credits',
 	description: 'Credits to the people who work/worked on this bot.',
-	execute(message, args, vars) {
-		const devArray = vars.devArray;
-
-		const EmbedBuilder = vars.EmbedBuilder;
-
+	execute({message}, {devArray}) {
 		const creditsEmbed = new EmbedBuilder()
 			.setColor(0xAA00FF)
 			.setTitle('Credits')

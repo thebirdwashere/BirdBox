@@ -3,7 +3,7 @@ const { randomIntInRange } = require("../utils")
 module.exports = {
     name: '8ball',
     description: 'magic 8 ball command',
-    execute(message){
+    execute({message}){
     let responses = [
       'Ask again in Spanish.',
       'bruh im deaf you gotta type it again',

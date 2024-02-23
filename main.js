@@ -33,10 +33,10 @@ let IS_CANARY = true
 let prefix;
 let vars = {
     db: db,
-    EmbedBuilder: EmbedBuilder,
     devs: devs,
     devArray: devArray,
-    client: client
+    client: client,
+    Discord: Discord
 };
 
 //new send functions to not crash when missing permissions
@@ -84,7 +84,7 @@ client.on('messageDelete', async (message) => {
 	})
 })
 
-modal.modalHandler(client, vars); //handle modals for birdbox modern version
+modal.modalHandler(vars); //handle modals for birdbox modern version
 
 client.on('messageCreate', async (message) => {
     if (message.author.id == client.user.id) {return;} //birdbox check
@@ -99,7 +99,7 @@ client.on('messageCreate', async (message) => {
 
         const command = args.shift().toLowerCase();
         if (client.commands.has(command)) {
-            client.commands.get(command).execute(message, args, vars, Discord);}}
+            client.commands.get(command).execute({message, args}, vars);}}
 
     if (await tests.keywords(db, content, message.guildId, messageArray, lyricArray, true)) {//sticker/lyric responses
         message.tryreply(await tests.keywords(db, content, message.guildId, messageArray, lyricArray, false));} 

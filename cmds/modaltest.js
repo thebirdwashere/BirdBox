@@ -3,7 +3,7 @@ const { ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder, Button
 module.exports = {
     name: 'modaltest',
     description: "testing modals since these appear to exist and are cool",
-    async execute(message, args, vars){
+    async execute({message}) {
         //create a button row
         row = new ActionRowBuilder().addComponents(
             new ButtonBuilder()

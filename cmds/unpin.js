@@ -1,7 +1,7 @@
 module.exports = {
   name: 'unpin',
   description: "command to unpin a replied to message",
-  async execute(message){
+  async execute({message}){
         const messageAuthor = message.author.id
         let repliedMessage = null;
 

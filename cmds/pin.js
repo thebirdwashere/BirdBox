@@ -1,7 +1,7 @@
 module.exports = {
   name: 'pin',
   description: "command to pin a replied to message",
-  async execute(message){
+  async execute({message}){
         const messageAuthor = message.author.id
         let repliedMessage = null;
 

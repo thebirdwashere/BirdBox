@@ -1,15 +1,10 @@
 module.exports = {
   name: 'responses',
   description: "adds and deletes bot message responses",
-  async execute(message, args, vars){
+  async execute({message, args}, {prefix, devs, db}){
     const filter = m => m.author.id == message.author.id; //used in message awaits; just doing as stackoverflow guy says
-    const devs = vars.devs;
     const type = args[0];
     const action = args[1];
-
-    const prefix = vars.prefix
-
-    const db = vars.db;
 
     const classic = Boolean(await db.get(`setting_classic_${message.author.id}`) == "enable")
 
@@ -21,7 +16,7 @@ module.exports = {
                 //aborts addition because user does not have perms to add
                 message.channel.trysend("sorry, you must be a dev to add something"); return; }
 
-            if (!classic) { require("../modernmode").responses_add_message(message, args, vars); return; } //redirect in case of modern mode
+            if (!classic) { require("../modernmode").responses_add_message(message, args, {prefix, devs, db}); return; } //redirect in case of modern mode
 
             let messageArray = await db.get('messages')
             console.table(messageArray)
@@ -119,7 +114,7 @@ module.exports = {
                 //aborts addition because user does not have perms to add
                 message.channel.trysend("sorry, you must be a dev to add something"); return; }
 
-            if (!classic) { require("../modernmode").responses_add_lyric(message, args, vars); return; } //redirect in case of modern mode
+            if (!classic) { require("../modernmode").responses_add_lyric(message, args, {prefix, devs, db}); return; } //redirect in case of modern mode
         
             let lyricArray = await db.get('lyrics')
             console.table(lyricArray)

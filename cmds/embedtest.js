@@ -1,9 +1,9 @@
+const { EmbedBuilder } = require("discord.js");
+
 module.exports = {
     name: 'embedtest',
     description: 'this is a test of embeds',
-    execute(message, args, vars) {
-        const EmbedBuilder = vars.EmbedBuilder
-
+    execute({message}) {
         const newEmbed = new EmbedBuilder()
         .setColor('#d32e6b')
         .setTitle('Embed Test')

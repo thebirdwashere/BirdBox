@@ -1,6 +1,6 @@
-const { EmbedBuilder, ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder, ButtonBuilder, ButtonStyle, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, ChannelSelectMenuBuilder, ChannelType } = require("discord.js")
+const { ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder, ButtonBuilder, ButtonStyle, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, ChannelSelectMenuBuilder, ChannelType } = require("discord.js")
 
-async function newButtonModal(message, row, modal, vars) {
+async function newButtonModal(message, row, modal, {devs}) {
     //create the message with the button (variable declared for button disabling)
     const sent = await message.tryreply({ components: [row] }).catch(console.error);
     
@@ -8,7 +8,7 @@ async function newButtonModal(message, row, modal, vars) {
     const buttoncollector = sent.createMessageComponentCollector({ time: 15000 });
 
     buttoncollector.on('collect', async i => {
-        if (!vars.devs.includes(i.member.id)) { return; } //filters out non-devs
+        if (!devs.includes(i.member.id)) { return; } //filters out non-devs
         //show the popup
         await i.showModal(modal).catch(console.error);
 
@@ -25,9 +25,7 @@ async function newButtonModal(message, row, modal, vars) {
 }
 
 module.exports = {
-    modalHandler: (client, vars) => {
-        const db = vars.db
-
+    modalHandler: ({client, db}) => {
         client.on('interactionCreate', async (interaction) => {
             if (!interaction.isModalSubmit()) {return;}
             switch (interaction.customId) {
@@ -116,8 +114,8 @@ module.exports = {
         });
     },
 
-    responses_add_message: (message, args, vars) => {
-        let response = message.content.replace(`${vars.prefix}responses ${args[0]} ${args[1]}`, "")
+    responses_add_message: ({message, args}, {devs, prefix}) => {
+        let response = message.content.replace(`${prefix}responses ${args[0]} ${args[1]}`, "")
 
         newButtonModal(message,
             new ActionRowBuilder().addComponents(
@@ -142,9 +140,9 @@ module.exports = {
                         .setLabel('Keywords')
                         .setStyle(TextInputStyle.Paragraph)
                         .setPlaceholder(`The words to prompt Birdbox to respond. Separate keywords with commas, not spaces.`)
-                        .setRequired(true))]), vars)},
-    responses_add_lyric: (message, args, vars) => {
-        let response = message.content.replace(`${vars.prefix}responses ${args[0]} ${args[1]}`, "")
+                        .setRequired(true))]), {devs})},
+    responses_add_lyric: ({message, args}, {devs, prefix}) => {
+        let response = message.content.replace(`${prefix}responses ${args[0]} ${args[1]}`, "")
 
         newButtonModal(message,
             new ActionRowBuilder().addComponents(
@@ -169,10 +167,10 @@ module.exports = {
                         .setLabel('Lyrics')
                         .setStyle(TextInputStyle.Paragraph)
                         .setPlaceholder(`The series of responses Birdbox should use. Separate lyrics with linebreaks, \nlike this.`)
-                        .setRequired(true))]), vars)},
-    maybepile_add: (message, args, vars) => {
+                        .setRequired(true))]), {devs})},
+    maybepile_add: ({message, args}, {prefix, devs}) => {
         const suggester = message.author.username
-        const title = message.content.replace(`${vars.prefix}maybepile ${args[0]}`, "").trim()
+        const title = message.content.replace(`${prefix}maybepile ${args[0]}`, "").trim()
 
         newButtonModal(message,
             new ActionRowBuilder().addComponents(
@@ -205,10 +203,8 @@ module.exports = {
                         .setStyle(TextInputStyle.Short)
                         .setPlaceholder(`Person who suggested this item to be added. Credit where it's due!`)
                         .setValue(suggester)
-                        .setRequired(true))]), vars)},
-    maybepile_edit: async (message, args, vars) => {
-        const db = vars.db
-
+                        .setRequired(true))]), {devs})},
+    maybepile_edit: async ({message, args}, {devs, db}) => {
         const maybeArray = await db.get("maybepile")
         const item = maybeArray[args[1]]
 
@@ -252,8 +248,8 @@ module.exports = {
                         .setStyle(TextInputStyle.Short)
                         .setPlaceholder(`Which page is being modified.`)
                         .setValue(args[1])
-                        .setRequired(true))]), vars)},
-    maybepile_view: async (message, args, vars, embed, sent) => {
+                        .setRequired(true))]), {devs})},
+    maybepile_view: async ({message, args}, {prefix, devs, db}, embed, sent) => {
 
         if (embed[0].data.description !== "Take a look at and suggest potential features!") { //this indicates table of contents
             if (sent) { sent.edit({ embeds: embed }); }
@@ -286,9 +282,9 @@ module.exports = {
         const selectcollector = sent.createMessageComponentCollector({ time: 15000 });
 
         selectcollector.on('collect', async i => {
-            message.content = `${vars.prefix}maybepile view ${i.values[0]}`;                 //so over here, because i had no better ideas, we bootstrap paradox ourselves into running maybepile again
-            args = message.content.slice(vars.prefix.length).trim().split(/ +/g).splice(1);  //with new message and args. then it sends it back, where we can edit our inital message with the recived content.
-            require('./cmds/maybepile').execute(message, args, vars, "", sent);              //this is so janky. if anyone other than me comes in to edit this i owe them a heartfelt apology. 
+            message.content = `${prefix}maybepile view ${i.values[0]}`;                 //so over here, because i had no better ideas, we bootstrap paradox ourselves into running maybepile again
+            args = message.content.slice(prefix.length).trim().split(/ +/g).splice(1);  //with new message and args. then it sends it back, where we can edit our inital message with the recived content.            
+            require('./cmds/maybepile').execute({message, args}, {prefix, devs, db}, "", sent);            //this is so janky. if anyone other than me comes in to edit this i owe them a heartfelt apology. 
             rowArray.forEach(item => {item.components[0].setDisabled(true)})
             sent.edit({ components: rowArray }); i.deferUpdate().catch(err => {console.error(err)});
         });
@@ -297,7 +293,7 @@ module.exports = {
             //disable the selector
             rowArray.forEach(item => {item.components[0].setDisabled(true)})
             sent.edit({ components: rowArray })});},
-    help: async (message, args, vars, basicEmbed, embed, sent) => {
+    help: async (message, args, {prefix, db}, basicEmbed, embed, sent) => {
         const select = new StringSelectMenuBuilder()
             .setCustomId(`help`)
             .setPlaceholder(`Jump to ★ commands`)
@@ -322,9 +318,9 @@ module.exports = {
 
         interactcollector.on('collect', async i => {
             let newmessage = message; newmessage.content = i.values[0]
-            let newargs = args; newargs = message.content.slice(vars.prefix.length).trim().toLowerCase().split(/ +/g).shift();
+            let newargs = args; newargs = message.content.slice(prefix.length).trim().toLowerCase().split(/ +/g).shift();
 
-            require("./cmds/help").execute(newmessage, [newargs], vars, "", sent);
+            require("./cmds/help").execute(newmessage, [newargs], {prefix, db}, "", sent);
             i.deferUpdate();                  //this physically pains me to do, but it's the only way this runs and i'm tired of debugging.
         });                                   //i just want to push this update. i've done practically nothing but this all weekend. send help. -matty, 8:29 pm, 1/21/2024 (21/01/2024 for the brits)
 

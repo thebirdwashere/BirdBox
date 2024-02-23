@@ -1,9 +1,9 @@
+const { EmbedBuilder } = require("discord.js");s
+
 module.exports = {
     name: 'translatecodes',
     description: 'gives codes for translate command',
-    execute(message, args, vars) {
-        const EmbedBuilder = vars.EmbedBuilder
-
+    execute({message, args}) {
         const newEmbed = new EmbedBuilder()
         .setColor('#cbe1ec')
         .setTitle('Translate Codes')

@@ -1,11 +1,9 @@
+const { EmbedBuilder } = require("discord.js");s
+
 module.exports = {
 	name: 'privacy',
 	description: 'Privacy notice of information on data management.',
-	execute(message, args, vars) {
-		const devArray = vars.devArray;
-
-		const EmbedBuilder = vars.EmbedBuilder;
-
+	execute({message}) {
 		const creditsEmbed = new EmbedBuilder()
 			.setColor(0xAA00FF)
 			.setTitle('Privacy Policy')

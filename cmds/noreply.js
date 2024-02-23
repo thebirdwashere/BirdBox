@@ -1,7 +1,7 @@
 module.exports = {
     name: 'noreply',
     description: "noreply command",
-    execute(message, args, vars){
-        message.reply(message.content.replace(`${vars.prefix}noreply`, ''));
+    execute({message}, {prefix}){
+        message.reply(message.content.replace(`${prefix}noreply`, ''));
     }
 }

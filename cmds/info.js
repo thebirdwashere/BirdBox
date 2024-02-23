@@ -1,10 +1,9 @@
+const { EmbedBuilder } = require("discord.js");s
+
 module.exports = {
     name: 'info',
     description: `gives info about the bot's version and latest update`,
-    execute(message, args, vars) {
-        const EmbedBuilder = vars.EmbedBuilder;
-        const pre = vars.prefix;
-
+    execute({message, args}, {prefix}) {
         //I M P O R T A N T
         //If you are modifying this in the future,
         //HERE IS THE PART YOU NEED
@@ -14,17 +13,17 @@ module.exports = {
             version: `4.3.4`, date: `2/13/2024`, devs: `AgentNebulator`,
             notes: [
                 `User config can no longer be changed by any user during modification`,
-                `${pre}config now defaults to user as the initial mode`,
+                `${prefix}config now defaults to user as the initial mode`,
                 `Fixed occasional misspellings in periodic table notifications`,
                 `Fixed inconsistent placement of lyric responses`
             ]
         }, {
             version: `4.3.3`, date: `1/25/2023`, devs: `AgentNebulator`, contribs: `Crisby, TheBirdWasHere`,
             notes: [
-                `${pre}maybepile, ${pre}responses, ${pre}help, and ${pre}config now use modals/buttons`,
+                `${prefix}maybepile, ${prefix}responses, ${prefix}help, and ${prefix}config now use modals/buttons`,
                 `Added a new config setting, Birdbox Classic, to use old text interfaces`,
-                `Added ${pre}settings as an alternative name for ${pre}config`,
-                `${pre}config no longer shows server settings unless requested`,
+                `Added ${prefix}settings as an alternative name for ${prefix}config`,
+                `${prefix}config no longer shows server settings unless requested`,
                 `Reordered message detection with respect to canary status`,
                 `Merged noreply into echo as the inital argument`,
                 `Reduced the time window for jinx detection`,
@@ -45,14 +44,14 @@ module.exports = {
                 `Added jinx detector for two people saying the same thing at a similar time`,
                 `Added element detector for messages made of periodic table abbreviations`,
                 `Added a log system for detected messages to put them in their own channel`,
-                `Added ${pre}config command to configure user and server settings`,
-                `Added 8ball emoji to the beginning of ${pre}8ball responses`,
-                `Added randomized footer text to ${pre}snipe responses`,
-                `${pre}info now takes "all" after the command to see past patches`,
-                `Snipes are now opt-in rather than being required (use ${pre}config)`,
+                `Added ${prefix}config command to configure user and server settings`,
+                `Added 8ball emoji to the beginning of ${prefix}8ball responses`,
+                `Added randomized footer text to ${prefix}snipe responses`,
+                `${prefix}info now takes "all" after the command to see past patches`,
+                `Snipes are now opt-in rather than being required (use ${prefix}config)`,
                 `Moved message-parsing functions out of main.js and into their own file`,
                 `Removed useless variable declaration from translate help`,
-                `Removed useless function call from ${pre}maybepile`,
+                `Removed useless function call from ${prefix}maybepile`,
                 `Trimmed unnecessary data that was being stored by snipes`,
                 `Fixed bugged error message when a response keyword is already in use`,
                 `Fixed several edge cases with alphabetical detection, including emojis`,
@@ -63,25 +62,25 @@ module.exports = {
             notes: [
                 `Fixed bug where maybepile edits would call the title a desc or author`,
                 `Fixed bug where response additions would detect all keywords as duplicates`,
-                `Removed leftover code from ${pre}maybepile in ${pre}responses`,
-                `Added more descriptive error messages to ${pre}responses`,
-                `Fixed old ${pre}info notes having spaces in command names`,
+                `Removed leftover code from ${prefix}maybepile in ${prefix}responses`,
+                `Added more descriptive error messages to ${prefix}responses`,
+                `Fixed old ${prefix}info notes having spaces in command names`,
                 `Fixed undefined in patch notes when contribs is empty`
             ]
         },
         {
             version: `4.3.0`, date: `12/25/2023`, devs: `AgentNebulator`, contribs: `Crisby, TheBirdWasHere`,
             notes: [
-                `Added dates to ${pre}info patch notes`,
-                `Added 15 ${pre}8ball messages, bringing the total to 100`,
+                `Added dates to ${prefix}info patch notes`,
+                `Added 15 ${prefix}8ball messages, bringing the total to 100`,
                 `Made maybepile embeds inline for cleaner display`,
-                `Fixed ${pre}maybepile breaking if item count is over 25`,
+                `Fixed ${prefix}maybepile breaking if item count is over 25`,
                 `Replaced all instances of string concatenation with template literals`,
-                `Removed ${pre}db-test because it was useless`,
-                `Added ${pre}responses to manage stickers and lyrics`,
+                `Removed ${prefix}db-test because it was useless`,
+                `Added ${prefix}responses to manage stickers and lyrics`,
                 `Added lyric response functionality`,
                 `Removed hardcoded sticker responses`,
-                `Updated ${pre}help to reflect these changes`
+                `Updated ${prefix}help to reflect these changes`
             ]
         }]
 
@@ -119,7 +118,7 @@ module.exports = {
         let version = patchnotes[0].version
 
         let canary = true;
-        if(pre == `e;`) {canary = false};
+        if(prefix == `e;`) {canary = false};
         if (canary) {version = `${version} (Canary)`};
 
         const newEmbed = new EmbedBuilder()

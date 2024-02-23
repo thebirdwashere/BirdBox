@@ -3,9 +3,9 @@ const { randomIntInRange, sleepMs } = require("../utils")
 module.exports = {
     name: 'coinflip',
     description: 'its a coin flip my brother',
-    execute(message, args, vars){
+    execute({message}, {prefix}){
 
-    const providedOptions = getOptions(message, vars.prefix)
+    const providedOptions = getOptions(message, prefix)
     const responses = createResponsesFromOptions(providedOptions)
 
     const trolls = [

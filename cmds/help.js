@@ -1,12 +1,9 @@
+const { EmbedBuilder } = require("discord.js");
+
 module.exports = {
     name: 'help',
     description: 'tells users what the bot is and what it can do',
-    async execute(message, args, vars, Discord, sent /*part of the jank that is modern mode; should be null ususally*/) {
-        const EmbedBuilder = vars.EmbedBuilder
-        const prefix = vars.prefix
-
-        const db = vars.db;
-
+    async execute({message, args}, {prefix, db}, sent /*part of the jank that is modern mode; should be null ususally*/) {
         const classic = Boolean(await db.get(`setting_classic_${message.author.id}`) == "enable")
 
         let newEmbed = new EmbedBuilder()
@@ -41,7 +38,7 @@ module.exports = {
         ).setFooter({text: 'Made by TheBirdWasHere, with help from friends.'})
 
         //redirect to translatecodes.js
-        if (args[0] == 'translate' && args[1]) { require(`./translatecodes`).execute(message, args, vars); return; };
+        if (args[0] == 'translate' && args[1]) { require(`./translatecodes`).execute({message, args}, {prefix, db}); return; };
 
         if (args[0] == 'maybepile') {
             newEmbed.setTitle('Maybepile Comamnd')
@@ -85,6 +82,6 @@ module.exports = {
         if (newEmbed.data.title) {embed = newEmbed}
 
         if (classic) { message.tryreply({embeds: [embed]}); }
-        else { require("../modernmode").help(message, args, vars, basicEmbed, embed, sent); }
+        else { require("../modernmode").help(message, args, {prefix, db}, basicEmbed, embed, sent); }
     }
 }
