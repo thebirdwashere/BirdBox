@@ -31,7 +31,7 @@ module.exports = {
         }
 
         if (action == "suggest" || action == "add") { //e;maybepile suggest
-            if (!classic) { require("../modernmode").maybepile_add(message, args, {prefix, devs, db}); return; } //redirect in case of modern mode
+            if (!classic) { require("../modernmode").maybepile_add({message, args}, {prefix, devs, db}); return; } //redirect in case of modern mode
 
             //define array and get author
             const suggestion = {author: message.author.username};
@@ -111,7 +111,7 @@ module.exports = {
                 //aborts edit because user does not have perms to edit
                 message.channel.trysend("sorry, you must be a dev or the original poster to edit something"); return;}
             
-            if (!classic) { require("../modernmode").maybepile_edit(message, args, {prefix, devs, db}); return; } //redirect in case of modern mode
+            if (!classic) { require("../modernmode").maybepile_edit({message, args}, {prefix, devs, db}); return; } //redirect in case of modern mode
             
             if (!selectedSection) {
                 message.channel.trysend("Are you editing the title, description, or author?");
@@ -185,7 +185,7 @@ module.exports = {
                         i++
                     });}
                     if (classic) {message.channel.trysend({embeds: embedArray});}
-                    else { require("../modernmode").maybepile_view(message, args, {prefix, devs, db}, embedArray, sent); } //redirect in case of modern mode}
+                    else { require("../modernmode").maybepile_view({message, args}, {prefix, devs, db}, embedArray, sent); } //redirect in case of modern mode}
                 } else {
                     if (!maybeArray[pageNum]) {message.channel.trysend(`can't find anything at index ${pageNum}`); return; }
                     //specific maybepile item
@@ -198,7 +198,7 @@ module.exports = {
                     try {newEmbed.addFields({name: maybeArray[pageNum].title, value: maybeArray[pageNum].desc})} catch {console.error};
 
                     if (classic) {message.channel.trysend({embeds: [newEmbed]});}
-                    else { require("../modernmode").maybepile_view(message, args, {devs, db}, [newEmbed], sent); } //redirect in case of modern mode
+                    else { require("../modernmode").maybepile_view({message, args}, {devs, db}, [newEmbed], sent); } //redirect in case of modern mode
                     
                 }
         } else if (action) {

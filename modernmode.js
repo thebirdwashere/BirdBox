@@ -201,7 +201,7 @@ module.exports = {
                         .setCustomId('maybepile-author')
                         .setLabel(`Suggester`)
                         .setStyle(TextInputStyle.Short)
-                        .setPlaceholder(`Person who suggested this item to be added. Credit where it's due!`)
+                        .setPlaceholder(`Whoever suggested this item. Credit where it's due!`)
                         .setValue(suggester)
                         .setRequired(true))]), {devs})},
     maybepile_edit: async ({message, args}, {devs, db}) => {
