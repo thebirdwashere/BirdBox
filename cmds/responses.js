@@ -16,7 +16,7 @@ module.exports = {
                 //aborts addition because user does not have perms to add
                 message.channel.trysend("sorry, you must be a dev to add something"); return; }
 
-            if (!classic) { require("../modernmode").responses_add_message(message, args, {prefix, devs, db}); return; } //redirect in case of modern mode
+            if (!classic) { require("../modernmode").responses_add_message({message, args}, {prefix, devs, db}); return; } //redirect in case of modern mode
 
             let messageArray = await db.get('messages')
             console.table(messageArray)
@@ -114,7 +114,7 @@ module.exports = {
                 //aborts addition because user does not have perms to add
                 message.channel.trysend("sorry, you must be a dev to add something"); return; }
 
-            if (!classic) { require("../modernmode").responses_add_lyric(message, args, {prefix, devs, db}); return; } //redirect in case of modern mode
+            if (!classic) { require("../modernmode").responses_add_lyric({message, args}, {prefix, devs, db}); return; } //redirect in case of modern mode
         
             let lyricArray = await db.get('lyrics')
             console.table(lyricArray)
@@ -216,7 +216,8 @@ module.exports = {
                 message.channel.trysend(`can't find anything with the title of "${response}"`); return; }
     
             message.channel.trysend(`Are you SURE you want to delete response ${response}?`);    
-            message.channel.trysend('Confirm with "y" in the next ten seconds.');    
+            message.channel.trysend('Confirm with "y" in the next ten seconds.');   
+
             //await the user confirming with "y" or "Y"
             await message.channel.awaitMessages({filter, max: 1, time: 10_000,/* ten second timer */ errors: ['time']}).then(collected => {
                 if (collected.first().content.toUpperCase() == "Y") {

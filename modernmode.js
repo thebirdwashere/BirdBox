@@ -38,11 +38,11 @@ module.exports = {
                         await db.set('messages', defaultMessageArray); //default array if nothing is present
                         messageArray = defaultMessageArray
                     }
-        
+                    
                     let keystring = interaction.fields.getTextInputValue('message-keywords')
                     let response = interaction.fields.getTextInputValue('message-response')
                     
-                    let keys = keystring.split(",").forEach(str => str.trim());
+                    let keys = keystring.split(",").map(str => str.trim());
         
                     let failed = false
                     keys.forEach((item) => { 
