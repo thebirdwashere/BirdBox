@@ -293,7 +293,7 @@ module.exports = {
             //disable the selector
             rowArray.forEach(item => {item.components[0].setDisabled(true)})
             sent.edit({ components: rowArray })});},
-    help: async (message, args, {prefix, db}, basicEmbed, embed, sent) => {
+    help: async ({message, args}, {prefix, db}, {basicEmbed, embed}, sent) => {
         const select = new StringSelectMenuBuilder()
             .setCustomId(`help`)
             .setPlaceholder(`Jump to ★ commands`)
@@ -315,12 +315,11 @@ module.exports = {
         } else { sent = await message.reply({embeds: [embed], components: row}).catch(err => {console.error(err)}) }
 
         const interactcollector = sent.createMessageComponentCollector({ time: 30000 });
-
         interactcollector.on('collect', async i => {
             let newmessage = message; newmessage.content = i.values[0]
-            let newargs = args; newargs = message.content.slice(prefix.length).trim().toLowerCase().split(/ +/g).shift();
+            let newargs = [].concat(message.content.slice(prefix.length).trim().toLowerCase().split(/ +/g).shift());
 
-            require("./cmds/help").execute(newmessage, [newargs], {prefix, db}, "", sent);
+            require("./cmds/help").execute({message: newmessage, args: newargs}, {prefix, db}, sent);
             i.deferUpdate();                  //this physically pains me to do, but it's the only way this runs and i'm tired of debugging.
         });                                   //i just want to push this update. i've done practically nothing but this all weekend. send help. -matty, 8:29 pm, 1/21/2024 (21/01/2024 for the brits)
 

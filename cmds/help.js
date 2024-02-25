@@ -82,6 +82,6 @@ module.exports = {
         if (newEmbed.data.title) {embed = newEmbed}
 
         if (classic) { message.tryreply({embeds: [embed]}); }
-        else { require("../modernmode").help(message, args, {prefix, db}, basicEmbed, embed, sent); }
+        else { require("../modernmode").help({message, args}, {prefix, db}, {basicEmbed, embed}, sent); }
     }
 }
