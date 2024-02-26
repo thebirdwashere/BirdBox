@@ -3,7 +3,7 @@ module.exports = {
     description: 'how much garbage has the server sent',
 
 
-execute(message) {
+execute({message}) {
     const { exec } = require("child_process");
     function netCode(message){
     exec("ifconfig enp5s0 | grep bytes", (error, stdout, stderr) => {

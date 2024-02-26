@@ -3,10 +3,7 @@ const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, StringSelect
 module.exports = {
     name: 'config',
     description: "command to configure server and client settings",
-    async execute(message, args, vars){
-        const prefix = vars.prefix;
-        const db = vars.db;
-
+    async execute({message, args}, {prefix, db, devs}){
         if (args[0] && !["user", "server"].includes(args[0])) {
             args[2] = args[1]; args[1] = args[0]; args[0] = "user";} //effectively, insert "user" into the original message
         
@@ -15,14 +12,13 @@ module.exports = {
         const change = args[2];
 
         const classic = Boolean(await db.get(`setting_classic_${message.author.id}`) == "enable")
-        vars.classic = classic
         
         //reject server settings if not admin
-        if (mode == "server" && !vars.devs.includes(message.author.id)) {return message.channel.trysend("sorry, you must be a birdbox admin to modify server settings")};
+        if (mode == "server" && !devs.includes(message.author.id)) {return message.channel.trysend("sorry, you must be a birdbox admin to modify server settings")};
 
         //redirect in case of modern mode
-        if (!classic) {return modernMode(message, vars, {mode, setting, change});} 
-        else {return classicMode(message, vars, {mode, setting, change})}
+        if (!classic) {return modernMode(message, {prefix, db, classic}, {mode, setting, change});} 
+        else {return classicMode(message, {prefix, db, classic}, {mode, setting, change})}
     }
 }
 
@@ -32,9 +28,7 @@ module.exports = {
  * --------------------------------
 /*/
 
-function classicMode(message, vars, {mode, setting, change}) {
-    const prefix = vars.prefix;
-    
+function classicMode(message, {prefix, db, classic}, {mode, setting, change}) {    
     //if no mode, they must have done just e;config
     if (!mode) {return message.channel.trysend({embeds: [userEmbed]})};
 
@@ -62,13 +56,13 @@ function classicMode(message, vars, {mode, setting, change}) {
         if (!settingsText(prefix).user[setting]) {return message.channel.trysend({content: "invalid setting, try again"})};
 
         //previous returns mean this is guaranteed to work
-        modifyUserSetting(message, vars, {setting, change})
+        modifyUserSetting(message, {prefix, db, classic}, {setting, change})
     } else if (mode == "server") {
         if (!setting || !change) {return message.channel.trysend({embeds: [serverEmbed]})};
         if (!settingsText(prefix).server[setting]) {return message.channel.trysend({content: "invalid setting, try again"})};
 
         //previous returns mean this is guaranteed to work
-        modifyServerSetting(message, vars, {setting, change})
+        modifyServerSetting(message, {prefix, db, classic}, {setting, change})
     }
 }
 
@@ -99,35 +93,31 @@ function settingsText(prefix) { //everything here is funky because i wanted prop
     }}
 }
 
-async function updateDefaultUserSetting(message, vars, {setting, change}) {
-    const db = vars.db
-
-    if (!settingsText(vars.prefix).user[setting].options.includes(change)) {
-        return message.channel.trysend(`not sure what ${change} means but it sure isnt "${settingsText(vars.prefix).user[setting].options.join('" or "')}"`)}
+async function updateDefaultUserSetting(message, {prefix, db, classic}, {setting, change}) {
+    if (!settingsText(prefix).user[setting].options.includes(change)) {
+        return message.channel.trysend(`not sure what ${change} means but it sure isnt "${settingsText(prefix).user[setting].options.join('" or "')}"`)}
     
     await db.set(`setting_${setting}_${message.author.id}`, change)
     if (await db.get(`setting_${setting}_${message.author.id}`) === change) {
-        if (vars.classic) {message.channel.trysend(`Setting updated successfully!`);}}
+        if (classic) {message.channel.trysend(`Setting updated successfully!`);}}
     else {message.channel.trysend(`setting failed to update, try again`)};
 }
 
 const modifyUserSettingArray = {}; //futureproofing
 
-function modifyUserSetting(message, vars, {setting, change}) {
+function modifyUserSetting(message, {prefix, db, classic}, {setting, change}) {
     return new Promise((res) => {
-        if (modifyUserSettingArray[setting]) modifyUserSettingArray[setting](message, vars, change)
-        else updateDefaultUserSetting(message, vars, {setting, change})
+        if (modifyUserSettingArray[setting]) modifyUserSettingArray[setting](message, {prefix, db, classic}, change)
+        else updateDefaultUserSetting(message, {prefix, db, classic}, {setting, change})
 
         res(true)
     })
 }
 
 //futureproofing a default server setting (currently unused)
-async function updateDefaultServerSetting(message, vars, setting, change) {
-    const db = vars.db
-
-    if (!settingsText(vars.prefix).server[setting].options.includes(change)) {
-        return message.channel.trysend(`not sure what ${change} means but it sure isnt "${settingsText(vars.prefix).server[setting].options.join('" or "')}"`)}
+async function updateDefaultServerSetting(message, {prefix, db, classic}, {setting, change}) {
+    if (!settingsText(prefix).server[setting].options.includes(change)) {
+        return message.channel.trysend(`not sure what ${change} means but it sure isnt "${settingsText(prefix).server[setting].options.join('" or "')}"`)}
     
     await db.set(`setting_${setting}_${message.guildId}`, change)
     if (await db.get(`setting_${setting}_${message.guildId}`) === change) {
@@ -136,8 +126,7 @@ async function updateDefaultServerSetting(message, vars, setting, change) {
 }
 
 const modifyServerSettingArray = {
-    notif_channel: async (message, vars, change) => {
-        const db = vars.db
+    notif_channel: async (message, {db}, change) => {
         if (!Number(change)) {
             await db.set(`setting_notif_channel_${message.guildId}`, false); 
             return message.channel.trysend(`invalid id, notification logging disabled`)};
@@ -149,8 +138,7 @@ const modifyServerSettingArray = {
         await db.set(`setting_notif_channel_${message.guildId}`, change);
         await message.channel.trysend(`Notification channel set successfully!`);
 
-    }, announce_channel: async (message, vars, change) => {
-        const db = vars.db
+    }, announce_channel: async (message, {db}, change) => {
         if (!Number(change)) {
             await db.set(`setting_announce_channel_${message.guildId}`, false); 
             return message.channel.trysend(`invalid id, announcements disabled`)};
@@ -163,10 +151,10 @@ const modifyServerSettingArray = {
         await message.channel.trysend(`Announcement channel set successfully!`);
 }}
 
-function modifyServerSetting(message, vars, {setting, change}) {
+function modifyServerSetting(message, {prefix, db, classic}, {setting, change}) {
     return new Promise((res) => {
-        if (modifyServerSettingArray[setting]) modifyServerSettingArray[setting](message, vars, change)
-        else updateDefaultServerSetting(message, vars, setting, change)
+        if (modifyServerSettingArray[setting]) modifyServerSettingArray[setting](message, {prefix, db, classic}, change)
+        else updateDefaultServerSetting(message, {prefix, db, classic}, setting, change)
 
         res(true)
     })
@@ -178,15 +166,13 @@ function modifyServerSetting(message, vars, {setting, change}) {
  * -------------------------------
 /*/
 
-async function modernMode(message, vars, {mode, setting, change}) {
-    const db = vars.db;
-
+async function modernMode(message, {prefix, db}, {mode, setting, change}) {
     if (!mode) {mode = "user"}
 
-    let select = selectorTemplate(mode, settingsText(vars.prefix));
+    let select = selectorTemplate(mode, settingsText(prefix));
     const row = new ActionRowBuilder().addComponents(select)
     
-    let sent = await sendConfigMessage(message, vars, {mode, setting, change}, row)
+    let sent = await sendConfigMessage(message, {prefix, db}, {mode, setting, change}, row)
 
     //collector for the selector responses
     const interactcollector = sent.createMessageComponentCollector({ time: 30000 });
@@ -194,18 +180,19 @@ async function modernMode(message, vars, {mode, setting, change}) {
     interactcollector.on('collect', async i => {
         if (i.member.id !== message.author.id) { return; }
 
-        if (typeof i.values?.[0] === "string") {setting = i.values[0]}       //this would be a selector
+        if (Number(i.values?.[0])) {change = i.values[0]}                    //this would be a channel selector
+        else if (typeof i.values?.[0] === "string") {setting = i.values[0]}  //this would be a normal selector
         else if (!i.values) {change = i.customId.replace(`${setting}-`, "")} //and this would be a button
         
         if (i.isButton() || i.isChannelSelectMenu()) { //either means a setting was changed
-            if (mode == "user") {await modifyUserSetting(message, vars, {setting, change});}
-            else {await modifyServerSetting(message, vars, {setting, change})}};
+            if (mode == "user") {await modifyUserSetting(message, {prefix, db}, {setting, change});}
+            else {await modifyServerSetting(message, {prefix, db}, {setting, change})}};
 
         await db.get(`setting_${setting}_${message.guildlId}`) //this. this right here fixed an issue where buttons
                                                                //would wait until another setting is changed to properly update.
                                                                //it's messy, it's unnecessary, it's impossible to understand, but it works. and so, i leave it.
         let updatedEmbed, options
-        [updatedEmbed, options] = await displaySetting(message, vars, {mode, setting});
+        [updatedEmbed, options] = await displaySetting(message, {prefix, db}, {mode, setting});
         options.unshift(row);
         
         sent.edit({ embeds: [updatedEmbed], components: options });
@@ -242,14 +229,12 @@ function embedTemplate(mode) {
     return embed
 }
 
-async function displaySetting(message, vars, {mode, setting}) {
-    const db = vars.db
-
+async function displaySetting(message, {prefix, db}, {mode, setting}) {
     let selectedOption
     if (mode == "user") {selectedOption = await db.get(`setting_${setting}_${message.author.id}`);}
     else {selectedOption = await db.get(`setting_${setting}_${message.guildId}`);}
     return new Promise((res, rej) => {
-        const settingText = settingsText(vars.prefix)[mode][setting]
+        const settingText = settingsText(prefix)[mode][setting]
         settingText.name = settingText.title; //name uses classic interface, title more appropriate here
         const embed = embedTemplate(mode).addFields(settingText);
 
@@ -292,7 +277,7 @@ async function displaySetting(message, vars, {mode, setting}) {
         res([embed, settingsArray])
 })}
 
-async function sendConfigMessage(message, vars, {mode, setting, change}, row) {
+async function sendConfigMessage(message, {prefix, db}, {mode, setting}, row) {
     let sent, newEmbed
     if (!setting) {
         newEmbed = embedTemplate(mode);
@@ -304,8 +289,8 @@ async function sendConfigMessage(message, vars, {mode, setting, change}, row) {
         sent = await message.reply({ components: [row], embeds: [newEmbed] }).catch(err => console.error(err));}
     else {
         let options
-        [newEmbed, options] = await displaySetting(message, vars, {mode, setting}); //i am baffled by this syntax working, but it does 
-                                                                                    //(edit: used this syntax elsewhere now, this was written when i discovered it)
+        [newEmbed, options] = await displaySetting(message, {prefix, db}, {mode, setting}); //i am baffled by this syntax working, but it does 
+                                                                                            //(edit: used this syntax elsewhere now, this was written when i discovered it)
         options.unshift(row)
         sent = await message.reply({ components: options, embeds: [newEmbed]}).catch(err => console.error(err))
     }

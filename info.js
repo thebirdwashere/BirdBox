@@ -1,10 +1,9 @@
+const { EmbedBuilder } = require("discord.js");
+
 module.exports = {
     name: 'info',
     description: `gives info about the bot's version and latest update`,
-    execute(message, args, vars) {
-        const EmbedBuilder = vars.EmbedBuilder;
-        const prefix = vars.prefix ;
-
+    execute({message}, {prefix}) {
         //I M P O R T A N T
         //If you are modifying this in the future,
         //HERE IS THE PART YOU NEED

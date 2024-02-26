@@ -1,7 +1,9 @@
+const { randomIntInRange } = require("../utils")
+
 module.exports = {
     name: '8ball',
     description: 'magic 8 ball command',
-    execute(message){
+    execute({message}){
     let responses = [
       'Ask again in Spanish.',
       'bruh im deaf you gotta type it again',
@@ -101,11 +103,11 @@ module.exports = {
       'https://www.youtube.com/watch?v=DRSxqfisPGw'
     ]
 
-    const randomIndex = Math.floor(Math.random() * responses.length);
+    const randomIndex = randomIntInRange(0, responses.length - 1)
     if (typeof responses[randomIndex] === "string") {
       message.tryreply(":8ball: " + responses[randomIndex]);
     } else { //if you want rare response variants (like i did)
-      const randomRandomIndex = Math.floor(Math.random() * responses[randomIndex].length);
+      const randomRandomIndex = randomIntInRange(0, responses[randomIndex].length - 1)
       message.tryreply(":8ball: " + responses[randomIndex][randomRandomIndex]);
     }
     

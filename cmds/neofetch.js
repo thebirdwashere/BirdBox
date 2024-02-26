@@ -3,7 +3,7 @@ module.exports = {
     description: 'runs neofetch on server',
 
 
-execute(message) {
+execute({message}) {
     const { exec } = require("child_process");
     function neofetchCode(message){
     exec("neofetch --stdout", (error, stdout, stderr) => {

@@ -1,4 +1,5 @@
-const { EmbedBuilder } = require("discord.js")
+const { EmbedBuilder } = require("discord.js");
+const { randomIntInRange } = require("./utils");
 
 module.exports = {
     keywords: async (db, string, guild, messages, lyrics, isTest) => { //function for message/lyric responses
@@ -132,7 +133,7 @@ module.exports = {
             .setDescription(`${desc} Take a look:`)
             .addFields({name: " ", value: " "})
             .setURL(message.url)
-            .setFooter({text: footers[Math.floor(Math.random() * footers.length)]})
+            .setFooter({text: footers[randomIntInRange(0, footers.length - 1)]})
 
         content_split.forEach(str => {
             newEmbed.addFields({name: " ", value: `\`${str}\``});}) //embed char limits once again

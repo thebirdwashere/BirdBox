@@ -6,10 +6,10 @@ const devArray = require("./cmds/json_info/dev_array.json");
 const devs = devArray.host.map(item => item.userId).concat(devArray.developer.map(item => item.userId));
 
 const Discord = require('discord.js');
-const { EmbedBuilder } = require("discord.js");
+const { randomIntInRange } = require("./utils");
 
 require('dotenv').config();
-const { Client, GatewayIntentBits , Message, MessageEmbed, DiscordAPIError, ActivityType } = require('discord.js');
+const { Client, GatewayIntentBits , Message, MessageEmbed, DiscordAPIError, ActivityType, EmbedBuilder } = require('discord.js');
 const client = new Client({intents : [GatewayIntentBits.GuildMessages , GatewayIntentBits.DirectMessages, GatewayIntentBits.Guilds, GatewayIntentBits.MessageContent]});
 
 const fs = require('fs');
@@ -33,9 +33,10 @@ let IS_CANARY = true
 let prefix;
 let vars = {
     db: db,
-    EmbedBuilder: EmbedBuilder,
     devs: devs,
-    devArray: devArray
+    devArray: devArray,
+    client: client,
+    Discord: Discord
 };
 
 //new send functions to not crash when missing permissions
@@ -47,7 +48,7 @@ Discord.Message.prototype.tryreply = async function(content) {
     try { return await this.reply(content); } catch {
         console.warn(`Error sending message in ${this.guild.name}'s ${this.channel.name}; check if permissions are needed for that channel`);}}
 
-client.once('ready', () => {
+client.once('ready', async () => {
     console.log('BirdBox Unified is now online!');
     console.log('(developed by TheBirdWasHere) Logs will be shown in this terminal.');
     console.log('(better hope this stuff works and doesnt break)');
@@ -63,8 +64,12 @@ client.once('ready', () => {
     
     vars.prefix = prefix
     
+    let status = await db.get("status")
+    if (!status) {
+        status = `ah, the sweet smell of a fresh birdbox build - ${prefix}help`}
+
     client.user.setPresence({
-        activities: [{ name: `The only thing more eternal than love is our dev cycle - ${prefix}help`, type: ActivityType.Custom }]
+        activities: [{ name: status, type: ActivityType.Custom }]
     });
 });
 
@@ -79,7 +84,7 @@ client.on('messageDelete', async (message) => {
 	})
 })
 
-modal.modalHandler(client, vars); //handle modals for birdbox modern version
+modal.modalHandler(vars); //handle modals for birdbox modern version
 
 client.on('messageCreate', async (message) => {
     if (message.author.id == client.user.id) {return;} //birdbox check
@@ -94,7 +99,7 @@ client.on('messageCreate', async (message) => {
 
         const command = args.shift().toLowerCase();
         if (client.commands.has(command)) {
-            client.commands.get(command).execute(message, args, vars, Discord);}}
+            client.commands.get(command).execute({message, args}, vars);}}
 
     if (await tests.keywords(db, content, message.guildId, messageArray, lyricArray, true)) {//sticker/lyric responses
         message.tryreply(await tests.keywords(db, content, message.guildId, messageArray, lyricArray, false));} 
@@ -107,7 +112,7 @@ client.on('messageCreate', async (message) => {
 
     const alphabeticalness = tests.alphabetical(content)
     if (alphabeticalness) { //alphabetical order checker
-        const randomWord = alphabeticalness[Math.floor(Math.random() * alphabeticalness.length)]
+        const randomWord = alphabeticalness[randomIntInRange(0, alphabeticalness.length - 1)]
         const randomfooters = [
             `now i know my abc's, next time won't you sing with me`,
             `perfectly sorted, as all things should be`,

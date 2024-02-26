@@ -1,12 +1,10 @@
 module.exports = {
     name: 'debug',
     description: "grabs values from the database at request (may get more features one day)",
-    async execute(message, args, vars){
-        if (!vars.devs.includes(message.author.id)) {
+    async execute({message, args}, {devs, db}){
+        if (!devs.includes(message.author.id)) {
             //aborts because user does not have dev perms
             message.channel.trysend("sorry, you must be a dev to use the debug command"); return; }
-    
-        const db = vars.db
 
         const item = args[0]
         const database_item = await db.get(item)
