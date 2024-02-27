@@ -10,6 +10,20 @@ module.exports = {
         //vvvvvvvvvvvvvvvvvv
 
         const patchnotes = [{
+            version: `5.0.0`, date: `TBR`, devs: `AgentNebulator, Bislij`,
+            notes: [
+                `Added ${prefix}coinflip and ${prefix}diceroll commands`,
+                `Added ${prefix}setstatus to change bot status`,
+                `Added snipe image support for cached images`,
+                `Added privacy policy and ${prefix}privacy command`,
+                `Internally, added utils file for utility functions`,
+                `Changed dev storage to use a JSON file`,
+                `Changed the way arguments are passed to commands`,
+                `Changed pin/unpin so devs can pin in any channel`,
+                `Fixed message saying "added" when editing responses`,
+                `Actually actually deleted db-test and noreply`
+            ]
+        }, {
             version: `4.3.4`, date: `2/13/2024`, devs: `AgentNebulator`,
             notes: [
                 `User config can no longer be changed by any user during modification`,
