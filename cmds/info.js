@@ -16,7 +16,7 @@ module.exports = {
                 `Added ${prefix}setstatus to change bot status`,
                 `Added snipe image support for cached images`,
                 `Added privacy policy and ${prefix}privacy command`,
-                `Internally, added utils file for utility functions`,
+                `Added utils file for utility functions`,
                 `Changed dev storage to use a JSON file`,
                 `Changed the way arguments are passed to commands`,
                 `Changed pin/unpin so devs can pin in any channel`,
