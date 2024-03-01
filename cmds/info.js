@@ -10,7 +10,7 @@ module.exports = {
         //vvvvvvvvvvvvvvvvvv
 
         const patchnotes = [{
-            version: `5.0.0`, date: `TBR`, devs: `AgentNebulator, Bislij`,
+            version: `5.0.0`, date: `3/1/2024`, devs: `AgentNebulator, Bislij`,
             notes: [
                 `Added ${prefix}coinflip and ${prefix}diceroll commands`,
                 `Added ${prefix}setstatus to change bot status`,
