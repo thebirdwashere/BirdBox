@@ -104,7 +104,7 @@ client.on('messageCreate', async (message) => {
     if (await tests.keywords(db, content, message.guildId, messageArray, lyricArray, true)) {//sticker/lyric responses
         message.tryreply(await tests.keywords(db, content, message.guildId, messageArray, lyricArray, false));} 
 
-    //if (!IS_CANARY) {return;} //make sure none of this is duplicated on canary (EDIT: INVERTED BECAUSE CANARY IS BETTER AT THIS NOW) ((EDIT EDIT: COMMENTED OUT FOR NOW))
+    if (IS_CANARY) {return;} //make sure none of this is duplicated on canary
 
     let notifchannel = false //by default, do not log
     await message.guild.channels.fetch(await db.get(`setting_notif_channel_${message.guildId}`)).then(channel => {
