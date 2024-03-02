@@ -15,6 +15,7 @@
     "discord.js": "^14.14.1",
     "dotenv": "^10.0.0",
     "google-translate-api-x": "^10.5.4",
+    "path": "^0.12.7",
     "pm2": "^5.3.0",
     "quick-db": "^1.0.5",
     "quick.db": "^9.1.7",
