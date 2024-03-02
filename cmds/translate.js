@@ -13,7 +13,7 @@ module.exports = {
         translate(rawMessage, {from: langTypeFrom, to: langTypeTo}).then(res => {
 
             const translateEmbed = new EmbedBuilder()
-			.setColor(Ox5282EC)
+			.setColor(0x5282EC)
 			.setTitle('Translation Output')
 			.setAuthor({ name: 'Google Translate', iconURL: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Google_Translate_logo.svg/1024px-Google_Translate_logo.svg.png' })
             .addFields(
