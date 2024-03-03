@@ -1,6 +1,6 @@
 {
     "langs": [
-            {"value": "auto", "name": "Automatic"}, 
+            {"value": "auto", "name": "auto"}, 
             {"value": "af", "name": "Afrikaans"},
             {"value": "sq", "name": "Albanian"}, 
             {"value": "am", "name": "Amharic"}, 

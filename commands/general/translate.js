@@ -12,6 +12,7 @@ module.exports = {
 				.setDescription('Language to translate from')
                 .setMaxLength(24)
 				.setRequired(true)
+                .setAutocomplete(true)
         )
         .addStringOption(option =>
 			option
@@ -19,6 +20,7 @@ module.exports = {
 				.setDescription('Language to translate to')
                 .setMaxLength(24)
 				.setRequired(true)
+                .setAutocomplete(true)
         )
         .addStringOption(option =>
 			option
@@ -27,9 +29,25 @@ module.exports = {
                 .setMaxLength(1024)
 				.setRequired(true)
         ),
+    async autocomplete(interaction) {
+
+        const choices = langs.map(item => item.name);
+
+        const focusedOption = interaction.options.getFocused(true);
+        const value = focusedOption.value.charAt(0).toUpperCase() + focusedOption.value.slice(1)
+        let filtered = choices.filter(choice => choice.startsWith(value));
+        filtered = filtered.map(choice => ({ name: choice, value: choice }));
+        filtered = filtered.slice(0, 25);
+
+        console.log(filtered)
+
+        await interaction.respond(filtered);
+
+    },
     async execute(interaction, {embedColor}) {
 
         /* if (args[0] == "codes") { require(`./translatecodes`).execute({message, args}); return; } */ // add a subcommand for this in the future
+        // ...langs converts the array into function arguments
 
         let translateFrom = interaction.options.getString('from');
         let translateTo = interaction.options.getString('to');
