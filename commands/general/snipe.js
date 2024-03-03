@@ -34,7 +34,7 @@ module.exports = {
         if (snipe.content) { snipeEmbed.setDescription(snipe.content); }
         if (snipe.attachment) { snipeEmbed.setImage(snipe.attachment); }
 
-        interaction.reply({ embeds: [snipeEmbed] });
+        await interaction.reply({ embeds: [snipeEmbed] });
 
     }
 }

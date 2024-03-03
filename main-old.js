@@ -75,7 +75,7 @@ client.once('ready', async () => {
 
 client.on('messageDelete', async (message) => {
     if (await db.get(`setting_snipes_${message.author.id}`) !== "enable") {return;}; //don't log people who opted out
-    if (!message.author || !message.createdAt) {return;};               //don't store busted snipess
+    if (!message.author || !message.createdAt) {return;};               //don't store busted snipes
 	await db.set(`snipe_${message.channelId}`, {
 		content: message?.content,
 		author: {tag: message.author.tag, id: message.author.id},
