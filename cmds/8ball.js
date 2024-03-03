@@ -17,7 +17,7 @@ module.exports = {
       'https://www.youtube.com/watch?v=GSV5UDaTXDA - cassiel - r/unixporn discord - 11/21/21',
       'Are you single? Wake up and Meet up Your Princess https://cdn.discordapp.com/attachments/635625889249624095/912118990581682177/image0-2.png - jaamivstheworld - r/unixporn discord - 11/21/21',
       'Club Penguin Waving Emote https://cdn.discordapp.com/attachments/635625889249624095/912127620211159040/750340933526093965.png - Bleyom - r/unixporn discord - 11/21/21',
-      'Matty will have your head off by tommorow for this.',
+      'Matty will have your head off by tomorrow for this.',
       'HAVENT YOU LEARNED YOUR LESSON TO NOT BELIEVE ME BY NOW?',
       'I want the debt you people owe me, AND I WANT IT NOW!',
       'You know, you wouldn\'t need me if you were a bit smarter...',
