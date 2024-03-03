@@ -1,5 +1,5 @@
-const responsesObj = require('../../utils/json_info/8ball_responses.json');
 const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
+const { randomFooters, randomMsg } = require("../../utils/scripts/util_scripts.js");
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -14,17 +14,16 @@ module.exports = {
         ),
     async execute(interaction, {embedColor}) {
 
-        const responses = responsesObj.responses;
         const message = interaction.options.getString('message');
 
         const responseEmbed = new EmbedBuilder()
-            .setTitle(responses[Math.floor(Math.random() * responses.length)])
+            .setTitle(randomMsg())
             .setAuthor({ name: 'BirdBox', iconURL: 'https://cdn.discordapp.com/avatars/803811104953466880/5bce4f0ba438015ec65f5b9cac11c8e3.png?size=256' })
             .setColor(embedColor)
             .addFields(
 				{ name: 'You asked:', value: `"${message}"`}
 			)
-            .setFooter({ text: 'i be like that wise tree fr fr' });
+            .setFooter({ text: randomFooters('ball') });
 
         await interaction.reply({ embeds: [responseEmbed] });
 

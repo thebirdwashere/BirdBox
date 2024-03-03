@@ -1,4 +1,5 @@
 const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
+const { randomFooters } = require("../../utils/scripts/util_scripts.js");
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -14,21 +15,11 @@ module.exports = {
         const sniped = await interaction.guild.members.fetch(snipe.author.id);
         const messageDate = new Date(snipe.timestamp);
 
-        const randomFooters = [
-            "can't hide from me", "can't hide from me",
-            "can't hide from me", "can't hide from me",
-            "can't hide from me", "can't hide from me",
-            "lol get sniped", "lol get sniped",
-            "lol get sniped", "lol get sniped",
-            "lol get sniped", "lol get sniped",
-            "ripbozo" // Rare response.
-        ];
-
         const snipeEmbed = new EmbedBuilder()
             .setTitle(`Deleted from: #${interaction.channel.name}`)
             .setAuthor({ name: snipe.author.tag, iconURL: sniped.displayAvatarURL() })
             .setColor(embedColor)
-            .setFooter({ text: randomFooters[Math.floor(Math.random() * randomFooters.length)] })
+            .setFooter({ text: randomFooters('snipe') })
             .setTimestamp(messageDate);
 
         if (snipe.content) { snipeEmbed.setDescription(snipe.content); }

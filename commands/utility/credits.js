@@ -1,4 +1,4 @@
-const devArray = require('../../utils/json_info/dev_array.json');
+const devArray = require('../../utils/json/devs.json');
 const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
 
 module.exports = {
