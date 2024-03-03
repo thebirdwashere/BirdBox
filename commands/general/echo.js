@@ -24,8 +24,9 @@ module.exports = {
         if (reply) {
             await interaction.reply(message);
         } else {
-            await interaction.reply({ content: 'Echoed successfully.', ephemeral: true });
             await interaction.channel.send(message);
+            await interaction.reply({ content: 'echoing...', ephemeral: true });
+            await interaction.deleteReply(); // Janky but it's the best I can do, discord.js dosen't have an inbuilt interaction ender.
         }
 
     }
