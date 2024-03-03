@@ -5,6 +5,7 @@ module.exports = {
 		.setName('privacy')
 		.setDescription('Privacy notice of information on data management.'),
     async execute(interaction, {embedColor}) {
+
         const creditsEmbed = new EmbedBuilder()
 			.setColor(embedColor)
 			.setTitle('Privacy Policy')
@@ -13,5 +14,6 @@ module.exports = {
 			.setURL('https://thebirdwashere.thejasperhouse.net/birdbox/privacy.html');
 
         await interaction.reply({ embeds: [creditsEmbed] });
+        
     }
 }

@@ -24,6 +24,7 @@ const db = new QuickDB();
 
 let vars = {
     db: db,
+    client: client,
     embedColor: 0x5282EC //TODO: Add config option for setting color in database.
 };
 
@@ -57,7 +58,7 @@ client.once('ready', async () => {
     console.log(`Logged in as ${client.user.tag}!`);
     console.log('Logs will be shown in this terminal.');
 
-    let status = `SLASHING COMMANDS - EVERYTHING MUST GO!`;
+    let status = `SLASHING ALL COMMANDS - EVERYTHING MUST GO!`;
 
     client.user.setPresence({
         activities: [{ name: status, type: ActivityType.Custom }]
@@ -95,6 +96,18 @@ client.on('messageCreate', async (message) => {
     if (!message.content) {return;}
 });
 
+/* ON MESSAGE DELETION */
+
+client.on('messageDelete', async (message) => {
+    if (!message.author || !message.createdAt) {return;}; // Don't log broken messages.
+
+	await db.set(`snipe_${message.channelId}`, {
+		content: message?.content,
+		author: {tag: message.author.tag, id: message.author.id},
+        timestamp: message.createdAt,
+        attachment: message.attachments.first()?.url // Grabs the first attachment url out of the message.
+	})
+})
 
 /* here we go... */
 client.login();
