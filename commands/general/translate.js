@@ -8,7 +8,7 @@ module.exports = {
 		.setDescription('Uses the Google Translate API to convert text.')
         .addStringOption(option =>
 			option
-				.setName('from') // TODO: add autocomplete for language codes and names
+				.setName('from')
 				.setDescription('Language to translate from')
                 .setMaxLength(24)
 				.setRequired(true)
@@ -39,15 +39,12 @@ module.exports = {
         filtered = filtered.map(choice => ({ name: choice, value: choice }));
         filtered = filtered.slice(0, 25);
 
-        console.log(filtered)
-
         await interaction.respond(filtered);
 
     },
     async execute(interaction, {embedColor}) {
 
         /* if (args[0] == "codes") { require(`./translatecodes`).execute({message, args}); return; } */ // add a subcommand for this in the future
-        // ...langs converts the array into function arguments
 
         let translateFrom = interaction.options.getString('from');
         let translateTo = interaction.options.getString('to');
