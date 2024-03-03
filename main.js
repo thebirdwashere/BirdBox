@@ -49,9 +49,8 @@ Discord.Message.prototype.tryreply = async function(content) {
         console.warn(`Error sending message in ${this.guild.name}'s ${this.channel.name}; check if permissions are needed for that channel`);}}
 
 client.once('ready', async () => {
-    console.log('BirdBox Unified is now online!');
-    console.log('(developed by TheBirdWasHere) Logs will be shown in this terminal.');
-    console.log('(better hope this stuff works and doesnt break)');
+    console.log('BirdBox Unified is now online! (developed by TheBirdWasHere and friends)');
+    console.log('Logs will be shown in this terminal, better hope this stuff works and doesnt break');
     console.log(`Logged in as ${client.user.tag}!`);
 
     if (client.user.id == 803811104953466880) { //main
