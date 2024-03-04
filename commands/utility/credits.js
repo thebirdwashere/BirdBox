@@ -14,7 +14,9 @@ module.exports = {
 			.addFields(
 				{ name: 'Host', value: devArray.host[0].name },
 				{ name: 'Developers', value: devArray.developer.map(item => item.name).join(", ") },
-				{ name: 'Bot Testers', value: devArray.botTester.map(item => item.name).join(", ") }
+				{ name: 'Contributors', value: devArray.contributor.map(item => item.name).join(", ") },
+				{ name: 'Bot Testers', value: devArray.botTester.map(item => item.name).join(", ") },
+				{ name: 'Other', value: devArray.misc.map(item => item.name).join(", ") }
 			)
 			.setFooter({ text: 'Special thanks to users like you!' });
 
