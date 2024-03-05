@@ -25,7 +25,14 @@ const db = new QuickDB();
 let vars = {
     db: db,
     client: client,
-    embedColor: 0x5282EC //TODO: Add config option for setting color in database
+    embedColor: 0x5282EC, // temporary
+	embedColors: {
+		blue: 0x5282EC,
+		green: 0x03FC30,
+		red: 0xFF0000,
+		yellow: 0xFFE600
+	}
+	//TODO: Add config option for setting color in database
 };
 
 /* SLASH COMMAND HANDLER */

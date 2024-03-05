@@ -26,7 +26,7 @@ module.exports = {
         await interaction.respond(filtered);
 
     },
-    async execute(interaction, {embedColor}) {
+    async execute(interaction, { embedColors }) {
 
         const validMoves = ([].concat(...rps.map(item => item.names)));
         const moveNames = [].concat(rps.map(item => item.names[0]));
@@ -44,9 +44,9 @@ module.exports = {
         let playerMoveNum = moveNames.indexOf(playerMove);
         let computerMoveNum = moveNames.indexOf(computerMove);
 
-        if (playerMoveNum == computerMoveNum) {result = 'You Tied!'; footer = 'kinda mid game ngl'; color = 0xFFE600;}
-		else if (((playerMoveNum - computerMoveNum) + 3) % 3 == 1) {result = 'You Won!'; footer = 'decent job chump'; color = 0x03FC30;}
-		else {result = 'You Lost!'; footer = 'massive L';  color = 0xFF0000;}
+        if (playerMoveNum == computerMoveNum) {result = 'You Tied!'; footer = 'kinda mid game ngl'; color = embedColors.yellow;}
+		else if (((playerMoveNum - computerMoveNum) + 3) % 3 == 1) {result = 'You Won!'; footer = 'decent job chump'; color = embedColors.green;}
+		else {result = 'You Lost!'; footer = 'massive L';  color = embedColors.red;}
 
         const rpsEmbed = new EmbedBuilder()
             .setTitle(result)
