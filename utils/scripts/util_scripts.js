@@ -10,11 +10,16 @@ module.exports = {
             case 'ball':
                 return footers.ball[Math.floor(Math.random() * footers.ball.length)];
                 break;
-            default:
-
         }
     },
-    randomMsg: () => {
-        return responses.ball[Math.floor(Math.random() * responses.ball.length)];
+    randomMsg: (type) => {
+        switch (type) {
+            case 'rps':
+                return responses.rps[Math.floor(Math.random() * responses.rps.length)];
+                break;
+            case 'ball':
+                return responses.ball[Math.floor(Math.random() * responses.ball.length)];
+                break;
+        }
     }
 }
