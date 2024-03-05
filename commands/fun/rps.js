@@ -36,7 +36,7 @@ module.exports = {
         let computerMove = moveNames[Math.floor(Math.random() * moveNames.length)];
         let result, footer, color;
 
-        if(!validMoves.includes(playerMove)) return interaction.reply({ content: 'Invalid move. Try again and use "rock"/"r", "paper"/"p", or "scissors"/"s".', ephemeral: true });
+        if(!validMoves.includes(playerMove)) return interaction.reply({ content: 'bruh it\'s literally the title of the game, you gotta use "rock", "paper", or "scissors".', ephemeral: true });
 
         const abbvMoves = Object.fromEntries([].concat(rps.map(item => item.names[1])).map((key, index) => [key, [].concat(rps.map(item => item.names[0]))[index]]));
         if(abbvMoves[playerMove]) playerMove = abbvMoves[playerMove];
