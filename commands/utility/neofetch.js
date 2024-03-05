@@ -11,12 +11,12 @@ module.exports = {
 
             if (error) {
                 //console.log(`error: ${error.message}`);
-                interaction.reply("Could not run neofetch")
+                interaction.reply({ content: 'Could not run neofetch', ephemeral: true });
                 return;
             }
 
             if (stderr) {
-                interaction.reply(`There was an error: ${stderr}`)
+                interaction.reply({ content: `There was an error: ${stderr}`, ephemeral: true });
                 console.log(`stderr: ${stderr}`);
                 return;
             }
