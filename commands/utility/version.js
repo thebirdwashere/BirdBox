@@ -97,7 +97,7 @@ module.exports = {
         const selectCollector = response.createMessageComponentCollector({ componentType: ComponentType.StringSelect, time: 3_600_000, filter });
 
         selectCollector.on('collect', async (interaction) => {
-            const page = interaction.values[0];
+            const page = parseInt(interaction.values[0]);
             await interaction.message.edit({ embeds: updateEmbed(page), components: updateRow(page) });
             await interaction.deferUpdate();
         });
