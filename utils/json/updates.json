@@ -116,10 +116,10 @@
             "date": "11/30/2023",
             "devs": ["AgentNebulator"],
             "notes": [
-                "Reworked ${pre}info internally to allow for multiple patches",
-                "Fixed ${pre}maybepile bug where page numbers would not work if \"view\" is assumed",
+                "Reworked ${prefix}info internally to allow for multiple patches",
+                "Fixed ${prefix}maybepile bug where page numbers would not work if \"view\" is assumed",
                 "Leading spaces are no longer included in maybepile titles if created using the inital command",
-                "${pre}help maybepile now accurately reflects these changes"
+                "${prefix}help maybepile now accurately reflects these changes"
             ]
         },
         {
@@ -128,14 +128,14 @@
             "date": "11/24/2023",
             "devs": ["AgentNebulator"],
             "notes": [
-                "Added ${pre}info to display bot info, version, and patch notes",
-                "${pre}help is now reformatted to be shorter and easier to read",
-                "${pre}help can now take arguments for certain command-specific pages",
-                "Rewrote ${pre}maybepile to be modifiable with Discord commands",
+                "Added ${prefix}info to display bot info, version, and patch notes",
+                "${prefix}help is now reformatted to be shorter and easier to read",
+                "${prefix}help can now take arguments for certain command-specific pages",
+                "Rewrote ${prefix}maybepile to be modifiable with Discord commands",
                 "Reworked translation codes directory so pages are alphabetized",
-                "Translation codes are now found under ${pre}help translate (page) and ${pre}translate codes (page)",
-                "Added array of dev user ids, to be passed to commands like ${pre}maybepile for perm checks",
-                "${pre}command name are once again case-sensitive (this fixes bugs with echo-based commands)",
+                "Translation codes are now found under ${prefix}help translate (page) and ${prefix}translate codes (page)",
+                "Added array of dev user ids, to be passed to commands like ${prefix}maybepile for perm checks",
+                "${prefix}command name are once again case-sensitive (this fixes bugs with echo-based commands)",
                 "Fixed bug where pinning a pinned message would return sucessful (and likewise with unpinning)",
                 "Updated bot credits to be more accurate"
             ]
