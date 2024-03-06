@@ -19,18 +19,21 @@ const path = require('path');
 const token = process.env.DISCORD_TOKEN;
 const { QuickDB } = require("quick.db");
 const db = new QuickDB();
+const prefix = 'e;';
 
 /* VARS PASSED TO COMMANDS */
 
 let vars = {
     db: db,
     client: client,
+	prefix: prefix,
     embedColor: 0x5282EC, // temporary
 	embedColors: {
 		blue: 0x5282EC,
 		green: 0x03FC30,
 		red: 0xFF0000,
-		yellow: 0xFFE600
+		yellow: 0xFFE600,
+		white: 0xFFFFFF
 	}
 	//TODO: Add config option for setting color in database
 };
@@ -105,11 +108,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 			return;
 		}
 
-		try {
-			await command.autocomplete(interaction);
-		} catch (error) {
-			console.error(error);
-		}
+		try { await command.autocomplete(interaction); } catch (error) { console.error(error); }
 
 	}
 

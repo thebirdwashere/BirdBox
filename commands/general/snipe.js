@@ -22,8 +22,8 @@ module.exports = {
             .setFooter({ text: randomFooters('snipe') })
             .setTimestamp(messageDate);
 
-        if (snipe.content) { snipeEmbed.setDescription(snipe.content); }
-        if (snipe.attachment) { snipeEmbed.setImage(snipe.attachment); }
+        if (snipe.content) snipeEmbed.setDescription(snipe.content);
+        if (snipe.attachment) snipeEmbed.setImage(snipe.attachment);
 
         await interaction.reply({ embeds: [snipeEmbed] });
 
