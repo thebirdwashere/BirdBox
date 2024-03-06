@@ -10,7 +10,7 @@ module.exports = {
 				.setName('page')
 				.setDescription('Page to jump to.')
         ),
-    async execute(interaction, {embedColors, prefix}) {
+    async execute(interaction, {embedColors, prefix, pfp}) {
 
         let page = interaction.options?.getInteger('page') - 1; if(page < 0) page = 0;
         if(page + 1 > patchNotes.length) return interaction.reply({ content: 'bruh the pages dont even go that far back it up buddy', ephemeral: true });
@@ -19,7 +19,7 @@ module.exports = {
 
             const infoEmbed = new EmbedBuilder()
                 .setTitle(`${patchNotes[i].type} ${patchNotes[i].version}`)
-                .setAuthor({ name: 'BirdBox', iconURL: 'https://cdn.discordapp.com/avatars/803811104953466880/5bce4f0ba438015ec65f5b9cac11c8e3.webp'})
+                .setAuthor({ name: 'BirdBox', iconURL: 'https://cdn.discordapp.com/avatars/803811104953466880/5bce4f0ba438015ec65f5b9cac11c8e3.webp' })
                 .setColor(embedColors.white)
                 .addFields({ name: `Update by ${patchNotes[i].devs.join(', ')}`, value: patchNotes[i]?.contribs?.join(', ') ?? ' ' })
                 .addFields({ name: `v${patchNotes[i].version} Patch Notes`, value: `● ${patchNotes[i].notes.join('\n● ').replaceAll('${prefix}', prefix)}` })

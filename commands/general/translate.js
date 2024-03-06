@@ -42,7 +42,7 @@ module.exports = {
         await interaction.respond(filtered);
 
     },
-    async execute(interaction, {embedColor}) {
+    async execute(interaction, {embedColors}) {
 
         /* if (args[0] == "codes") { require(`./translatecodes`).execute({message, args}); return; } */ // add a subcommand for this in the future
 
@@ -62,7 +62,7 @@ module.exports = {
         translate(rawMessage, { from: translateFrom, to: translateTo }).then(res => {
 
             const translateEmbed = new EmbedBuilder()
-                .setColor(embedColor)
+                .setColor(embedColors.blue)
                 .setTitle('Translation Output')
                 .setAuthor({ name: 'Google Translate', iconURL: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Google_Translate_logo.svg/1024px-Google_Translate_logo.svg.png' })
                 .addFields(

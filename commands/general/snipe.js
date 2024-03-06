@@ -5,7 +5,7 @@ module.exports = {
     data: new SlashCommandBuilder()
 		.setName('snipe')
 		.setDescription('Fetches last deleted message in a channel and displays it.'),
-    async execute(interaction, {db, embedColor}) {
+    async execute(interaction, {db, embedColors}) {
 
         const snipe = await db.get(`snipe_${interaction.channel.id}`);
 
@@ -18,7 +18,7 @@ module.exports = {
         const snipeEmbed = new EmbedBuilder()
             .setTitle(`Deleted from: #${interaction.channel.name}`)
             .setAuthor({ name: snipe.author.tag, iconURL: sniped.displayAvatarURL() })
-            .setColor(embedColor)
+            .setColor(embedColors.blue)
             .setFooter({ text: randomFooters('snipe') })
             .setTimestamp(messageDate);
 

@@ -4,10 +4,10 @@ module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('ping')
 		.setDescription('Pinging command for birdbox.'),
-	async execute(interaction, {client, embedColor}) {
+	async execute(interaction, {client, embedColors}) {
 
 		const pingEmbed = new EmbedBuilder()
-			.setColor(embedColor)
+			.setColor(embedColors.blue)
 			.addFields(
 				{ name: 'Ping Time', value: `${client.ws.ping}ms`}
 			)

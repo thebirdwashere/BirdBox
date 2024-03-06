@@ -20,6 +20,7 @@ const token = process.env.DISCORD_TOKEN;
 const { QuickDB } = require("quick.db");
 const db = new QuickDB();
 const prefix = 'e;';
+const pfp = '../../utils/images/birdbox.webp';
 
 /* VARS PASSED TO COMMANDS */
 
@@ -27,14 +28,14 @@ let vars = {
     db: db,
     client: client,
 	prefix: prefix,
-    embedColor: 0x5282EC, // temporary
 	embedColors: {
 		blue: 0x5282EC,
 		green: 0x03FC30,
 		red: 0xFF0000,
 		yellow: 0xFFE600,
 		white: 0xFFFFFF
-	}
+	},
+	pfp: pfp
 	//TODO: Add config option for setting color in database
 };
 

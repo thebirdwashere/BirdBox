@@ -5,10 +5,10 @@ module.exports = {
     data: new SlashCommandBuilder()
 		.setName('credits')
 		.setDescription('Credits to the people who work/worked on this bot.'),
-    async execute(interaction, {embedColor}) {
+    async execute(interaction, {embedColors}) {
 
         const creditsEmbed = new EmbedBuilder()
-			.setColor(embedColor)
+			.setColor(embedColors.white)
 			.setTitle('Credits')
 			.setDescription('Credits to the people who work/worked on this bot.')
 			.addFields(
