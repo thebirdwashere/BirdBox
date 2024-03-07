@@ -20,7 +20,8 @@ const token = process.env.DISCORD_TOKEN;
 const { QuickDB } = require("quick.db");
 const db = new QuickDB();
 const prefix = 'e;';
-const pfp = '../../utils/images/birdbox.webp';
+const defaults = require('./utils/json/defaults.json');
+const devs = require('./utils/json/devs.json');
 
 /* VARS PASSED TO COMMANDS */
 
@@ -28,14 +29,14 @@ let vars = {
     db: db,
     client: client,
 	prefix: prefix,
+	devs: devs,
 	embedColors: {
 		blue: 0x5282EC,
 		green: 0x03FC30,
 		red: 0xFF0000,
 		yellow: 0xFFE600,
 		white: 0xFFFFFF
-	},
-	pfp: pfp
+	}
 	//TODO: Add config option for setting color in database
 };
 
@@ -69,7 +70,7 @@ client.once('ready', async () => {
     console.log(`Logged in as ${client.user.tag}!`);
     console.log('Logs will be shown in this terminal.');
 
-    let status = `SLASHING ALL COMMANDS - EVERYTHING MUST GO!`;
+    let status = await db.get("status") || defaults.status;
 
     client.user.setPresence({
         activities: [{ name: status, type: ActivityType.Custom }]
