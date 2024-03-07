@@ -14,7 +14,6 @@ module.exports = { // this is messy but i literally dont care at the moment
     async autocomplete(interaction) {
 
         const choices = patchNotes.map(item => item.version);
-        choices.push('all');
 
         const focusedOption = interaction.options.getFocused(true);
         const value = focusedOption.value.charAt(0).toUpperCase() + focusedOption.value.slice(1)
@@ -28,23 +27,6 @@ module.exports = { // this is messy but i literally dont care at the moment
     async execute(interaction, {embedColors, prefix}) {
 
         let version = interaction.options?.getString('version') ?? patchNotes[0].version;
-
-        if (version === 'all') {
-
-            let infoEmbed = new EmbedBuilder()
-                .setTitle(`All releases`)
-                .setAuthor({ name: 'BirdBox', iconURL: 'https://cdn.discordapp.com/avatars/803811104953466880/5bce4f0ba438015ec65f5b9cac11c8e3.webp' })
-                .setColor(embedColors.white);
-            
-            for (let f of patchNotes) {
-                infoEmbed.addFields({ name: `v${f.version} Patch Notes (Release Date: ${f.date})`, value: `● ${f.notes.join('\n● ').replaceAll('${prefix}', prefix)}` });
-            }
-
-            await interaction.reply({ embeds: [infoEmbed] });
-
-            return;
-
-        }
 
         if (!patchNotes.map(item => item.version).includes(version)) return interaction.reply({ content: 'Not a valid version number.', ephemeral: true });
         let page = patchNotes.map(item => item.version).indexOf(version);
