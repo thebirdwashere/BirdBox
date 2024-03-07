@@ -1,19 +1,55 @@
 const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, ComponentType } = require("discord.js");
 const { patchNotes } = require("../../utils/json/updates.json");
 
-module.exports = {
+module.exports = { // this is messy but i literally dont care at the moment
     data: new SlashCommandBuilder()
 		.setName('version')
 		.setDescription('Information on BirdBox patch notes.')
-        .addIntegerOption(option =>
+        .addStringOption(option =>
 			option
-				.setName('page')
-				.setDescription('Page to jump to.')
+				.setName('version')
+				.setDescription('Version to jump to.')
+                .setAutocomplete(true)
         ),
-    async execute(interaction, {embedColors, prefix, pfp}) {
+    async autocomplete(interaction) {
 
-        let page = interaction.options?.getInteger('page') - 1; if(page < 0) page = 0;
-        if(page + 1 > patchNotes.length) return interaction.reply({ content: 'bruh the pages dont even go that far back it up buddy', ephemeral: true });
+        const choices = patchNotes.map(item => item.version);
+        choices.push('all');
+
+        const focusedOption = interaction.options.getFocused(true);
+        const value = focusedOption.value.charAt(0).toUpperCase() + focusedOption.value.slice(1)
+        let filtered = choices.filter(choice => choice.startsWith(value));
+        filtered = filtered.map(choice => ({ name: choice, value: choice }));
+        filtered = filtered.slice(0, 25);
+
+        await interaction.respond(filtered);
+
+    },
+    async execute(interaction, {embedColors, prefix}) {
+
+        let version = interaction.options?.getString('version') ?? patchNotes[0].version;
+
+        if (version === 'all') {
+
+            let infoEmbed = new EmbedBuilder()
+                .setTitle(`All releases`)
+                .setAuthor({ name: 'BirdBox', iconURL: 'https://cdn.discordapp.com/avatars/803811104953466880/5bce4f0ba438015ec65f5b9cac11c8e3.webp' })
+                .setColor(embedColors.white);
+            
+            for (let f of patchNotes) {
+                infoEmbed.addFields({ name: `v${f.version} Patch Notes (Release Date: ${f.date})`, value: `● ${f.notes.join('\n● ').replaceAll('${prefix}', prefix)}` });
+            }
+
+            await interaction.reply({ embeds: [infoEmbed] });
+
+            return;
+
+        }
+
+        if (!patchNotes.map(item => item.version).includes(version)) return interaction.reply({ content: 'Not a valid version number.', ephemeral: true });
+        let page = patchNotes.map(item => item.version).indexOf(version);
+
+        if(page + 1 > patchNotes.length) return interaction.reply({ content: 'bruh the pages dont even go that far back it up buddy', ephemeral: true }); // how did you even trigger this
 
         function updateEmbed(i) {
             let infoEmbed;
@@ -26,7 +62,7 @@ module.exports = {
                     .setColor(embedColors.white)
                     .addFields({ name: `Update by ${patchNotes[i].devs.join(', ')}`, value: patchNotes[i]?.contribs?.join(', ') ?? ' ' })
                     .addFields({ name: `v${patchNotes[i].version} Patch Notes`, value: `● ${patchNotes[i].notes.join('\n● ').replaceAll('${prefix}', prefix)}` })
-                    .setFooter({ text: `Page ${i + 1} ● ${patchNotes[i].date}` });
+                    .setFooter({ text: `Release Date: ${patchNotes[i].date}` });
 
                 
             } catch(err) { // Failsafe, something triggered this so putting a catch in to be safe
