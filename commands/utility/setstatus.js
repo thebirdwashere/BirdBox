@@ -14,7 +14,7 @@ module.exports = {
     async execute(interaction, {embedColors, devs, db}) {
 
         const authorized = devs.developer.map(item => item.userId); authorized.push(devs.host[0].userId);
-        if (!authorized.includes(interaction.user.id)) interaction.reply({ content: 'Sorry, you must be a dev to use the setstatus command.', ephemeral: true });
+        if (!authorized.includes(interaction.user.id)) return interaction.reply({ content: 'Sorry, you must be a dev to use the setstatus command.', ephemeral: true });
 
         const status = interaction.options.getString('status');
         db.set("status", status);
