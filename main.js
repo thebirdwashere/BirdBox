@@ -123,7 +123,7 @@ client.on('messageCreate', async (message) => {
             `:capital_abcd: Your message is in perfect alphabetical order! \n\`${alpha_joined}\``, 
             `:capital_abcd:`, `is in alphabetical order!`, 
             0x3b88c3, alpha_joined)
-        if (notifchannel) {await notifchannel.send(notif)} //only send notif if there is a log channel
+        if (notifchannel) {await notifchannel.trysend(notif)} //only send notif if there is a log channel
     }
 
     jinx = await db.get(`jinx_${message.channelId}`) //jinx detector
