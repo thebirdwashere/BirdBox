@@ -19,7 +19,7 @@ const path = require('path');
 const token = process.env.DISCORD_TOKEN;
 const { QuickDB } = require("quick.db");
 const db = new QuickDB();
-const prefix = 'd;';
+const classicPrefix = 'd;';
 const defaults = require('./utils/json/defaults.json');
 const devs = require('./utils/json/devs.json');
 
@@ -28,7 +28,6 @@ const devs = require('./utils/json/devs.json');
 let vars = {
     db: db,
     client: client,
-	prefix: prefix,
 	devs: devs,
 	embedColors: {
 		blue: 0x5282EC,
@@ -64,13 +63,7 @@ for (const folder of commandFolders) {
 
 /* FOR HELP COMMAND */
 
-let commands = Array.from(client.commands.values());
-commands = commands.map(item => ({
-	name: `/${item.data.name}  ${item.data.options.map(item => `\`${item.name}\``).join(' ')}`,
-	value: item.data.description,
-	inline: true
-}));
-
+const commands = Array.from(client.commands.values());
 vars.commands = commands;
 
 /* ON READY */
@@ -101,6 +94,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 		}
 
 		try {
+			vars.prefix = '/';
 			await command.execute(interaction, vars);
 		} catch (error) {
 			console.error(error);
@@ -132,12 +126,13 @@ client.on('messageCreate', async (message) => {
     if (message.author.id == client.user.id) return;
     if (!message.content) return;
 
-	if (message.content.startsWith(prefix)) {
-		const args = message.content.slice(prefix.length).trim().split(/ +/g);
+	if (message.content.startsWith(classicPrefix)) {
+		const args = message.content.slice(classicPrefix.length).trim().split(/ +/g);
         const command = args.shift().toLowerCase();
 
         if (client.commands.has(command)) {
 			try {
+				vars.prefix = classicPrefix;
 				client.commands.get(command).executeClassic({message, args}, vars)
 			} catch (err) {
 				message.reply(`The command \`/${command}\` does not support Classic mode yet.`);

@@ -3,7 +3,7 @@ const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
 module.exports = {
     data: new SlashCommandBuilder()
         .setName('rr')
-        .setDescription('funny'),
+        .setDescription('I don\'t know what this command does, you should try it.'),
     async execute(interaction, {embedColors}) {
 
         const rrEmbed = new EmbedBuilder()
