@@ -127,18 +127,22 @@ client.on('messageCreate', async (message) => {
     if (!message.content) return;
 
 	if (message.content.startsWith(classicPrefix)) {
-		const args = message.content.slice(classicPrefix.length).trim().split(/ +/g);
+		
+		let commandFormatted = message.content;
+		const strings = message.content.match(/(?<=")(.*?)(?=")/g)?.filter(item => item.trim() != '') ?? [];
+		for (let i of strings) commandFormatted = commandFormatted.replaceAll(`"${i}"`, '');
+		const args = commandFormatted.slice(classicPrefix.length).trim().split(/ +/g);
         const command = args.shift().toLowerCase();
 
         if (client.commands.has(command)) {
 			try {
 				vars.prefix = classicPrefix;
-				client.commands.get(command).executeClassic({message, args}, vars)
+				client.commands.get(command).executeClassic({message, args, strings}, vars)
 			} catch (err) {
 				message.reply(`The command \`/${command}\` does not support Classic mode yet.`);
 			}
 		} else {
-			message.reply(`The command \`${prefix}${command}\` was not found.`);
+			message.reply(`The command \`${classicPrefix}${command}\` was not found.`);
 		};
 	}
 });

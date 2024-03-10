@@ -29,5 +29,14 @@ module.exports = {
             await interaction.deleteReply(); // Janky but it's the best I can do, discord.js dosen't have an inbuilt interaction ender.
         }
 
+    },
+    async executeClassic({message, args, strings}) {
+
+        if (args[0] != 'noreply') {
+            await message.reply(strings[0] || args[0] || 'You need to enter a message.');
+        } else {
+            await message.channel.send(strings[0] || args[1] || 'You need to enter a message.');
+        }
+
     }
 }
