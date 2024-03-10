@@ -64,8 +64,6 @@ for (const folder of commandFolders) {
 
 /* FOR HELP COMMAND */
 
-console.log(Array.from(client.commands.values())[0].data.options);
-
 let commands = Array.from(client.commands.values());
 commands = commands.map(item => ({
 	name: `/${item.data.name}  ${item.data.options.map(item => `\`${item.name}\``).join(', ')}`,

@@ -10,7 +10,7 @@ module.exports = {
             .setTitle('Commands and Info')
             .setAuthor({ name: 'BirdBox', iconURL: 'https://cdn.discordapp.com/avatars/803811104953466880/5bce4f0ba438015ec65f5b9cac11c8e3.webp'})
 			.setColor(embedColors.white)
-            .setDescription(`Learn about this bot's capabilities. \n★ = /help (command name) for more info.`)
+            .setDescription(`Learn about this bot's capabilities.`)
 			.addFields(...commands)
 			.setFooter({ text: 'Special thanks to users like you!' });
 
