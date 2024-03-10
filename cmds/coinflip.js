@@ -23,7 +23,7 @@ module.exports = {
     switch (trollSelection) {
       case "normal": message.tryreply(`:coin: Your result is "${responses[mainNum]}"!`); break;
       case "offtable": message.tryreply(`:coin: Messy flip, and the coin fell on the ground! The result was "${responses[mainNum]}", unless you want to try again.`); break;
-      case "dogatemycoin": message.tryreply(`:coin: A dog just ate the coin before I got a good look at it! I think it was "${responses[mainNum]}", though... or maybe ${responses[otherNum]}...`); break;
+      case "dogatemycoin": message.tryreply(`:coin: A dog just ate the coin before I got a good look at it! I think it was "${responses[mainNum]}", though... or maybe "${responses[otherNum]}"...`); break;
       case "badmemory": badMemoryTroll(message, responses[mainNum], responses[otherNum]); break;
     }
   }
