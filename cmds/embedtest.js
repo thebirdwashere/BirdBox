@@ -3,6 +3,7 @@ const { EmbedBuilder } = require("discord.js");
 module.exports = {
     name: 'embedtest',
     description: 'this is a test of embeds',
+    hidden: true,
     execute({message}) {
         const newEmbed = new EmbedBuilder()
         .setColor('#d32e6b')

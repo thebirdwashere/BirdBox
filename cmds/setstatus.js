@@ -3,6 +3,7 @@ const { ActivityType } = require('discord.js');
 module.exports = {
     name: 'setstatus',
     description: "sets the status of the bot",
+    hidden: true,
     execute({message}, {client, db, devs, prefix}){
         if (!devs.includes(message.author.id)) {
             //aborts because user does not have dev perms

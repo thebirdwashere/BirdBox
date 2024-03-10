@@ -3,6 +3,7 @@ const { EmbedBuilder } = require("discord.js");
 module.exports = {
     name: 'translatecodes',
     description: 'gives codes for translate command',
+    hidden: true,
     execute({message, args}) {
         const newEmbed = new EmbedBuilder()
         .setColor('#cbe1ec')

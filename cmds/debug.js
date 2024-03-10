@@ -1,6 +1,7 @@
 module.exports = {
     name: 'debug',
     description: "grabs values from the database at request (may get more features one day)",
+    hidden: true,
     async execute({message, args}, {devs, db}){
         if (!devs.includes(message.author.id)) {
             //aborts because user does not have dev perms
