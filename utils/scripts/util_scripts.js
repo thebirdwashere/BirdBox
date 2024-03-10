@@ -10,6 +10,9 @@ module.exports = {
             case 'ball':
                 return footers.ball[Math.floor(Math.random() * footers.ball.length)];
                 break;
+            default:
+                // Put code here for default footers to use across functions
+                break;
         }
     },
     randomMsg: (type) => {
@@ -21,5 +24,8 @@ module.exports = {
                 return responses.ball[Math.floor(Math.random() * responses.ball.length)];
                 break;
         }
+    },
+    sleep: (ms) => {
+        return new Promise(resolve => setTimeout(resolve, ms));
     }
 }

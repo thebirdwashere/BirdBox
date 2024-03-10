@@ -4,8 +4,8 @@ const { patchNotes } = require("../../utils/json/updates.json");
 module.exports = {
     data: new SlashCommandBuilder()
 		.setName('info')
-		.setDescription('Information about the bot'),
-    async execute(interaction, {embedColors, devs}) {
+		.setDescription('Information about the bot.'),
+    async execute(interaction, {embedColors}) {
 
         const infoEmbed = new EmbedBuilder()
 			.setColor(embedColors.white)

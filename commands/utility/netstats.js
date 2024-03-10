@@ -4,7 +4,7 @@ const { exec } = require("child_process");
 module.exports = {
     data: new SlashCommandBuilder()
 		.setName('netstats')
-		.setDescription('Runs ifconfig on the server that the bot is running off of.'),
+		.setDescription('Runs ifconfig on the server that the bot is hosted on.'),
     async execute(interaction) {
 
         exec("ifconfig enp5s0 | grep bytes", (error, stdout, stderr) => {

@@ -4,7 +4,7 @@ const { exec } = require("child_process");
 module.exports = {
     data: new SlashCommandBuilder()
 		.setName('neofetch')
-		.setDescription('Runs neofetch on the server that the bot is running off of.'),
+		.setDescription('Runs neofetch on the server that the bot is hosted on.'),
     async execute(interaction) {
 
         exec("neofetch --stdout", (error, stdout, stderr) => {
