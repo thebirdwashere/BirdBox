@@ -60,8 +60,8 @@ module.exports = {
     },
     async executeClassic({message, args, strings}) {
         
-        let heads = strings[0] || args[0];
-        let tails = strings[1] || args[1];
+        let heads = strings[0];
+        let tails = strings[1];
         let validOptions;
 
         if(heads && tails) {
