@@ -1,6 +1,6 @@
 module.exports = {
     name: 'neofetch',
-    description: 'Run neofetch on the host server.',
+    description: 'Run neofetch on the host server. Server info, very fun!',
 
 
 execute({message}) {

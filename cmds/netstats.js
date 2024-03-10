@@ -1,6 +1,6 @@
 module.exports = {
     name: 'netstats',
-    description: 'Run netstats on the host server.',
+    description: 'Run netstats on the host server. Network info, very fun!',
 
 
 execute({message}) {

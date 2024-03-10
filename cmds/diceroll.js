@@ -2,7 +2,7 @@ const { randomIntInRange, sleepMs } = require("../utils")
 
 module.exports = {
   name: 'diceroll',
-  description: 'command to roll a die and get a random result (with some fun birdbox twists)',
+  description: 'It is a dice roll. Add a number to configure how many sides!',
   execute({message, args}){
     //get the number of faces and return if invalid
     const numberOfFaces = getNumberOfFaces(message, args)

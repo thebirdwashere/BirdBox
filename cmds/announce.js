@@ -1,6 +1,6 @@
 module.exports = {
     name: 'announce',
-    description: "announce something to a designated channel",
+    description: "Announce to another channel. May be disabled depending on server.",
     async execute({message}, {db, prefix}){
         let announce_channel = await db.get(`setting_announce_channel_${message.guildId}`)
         

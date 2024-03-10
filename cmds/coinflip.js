@@ -2,7 +2,7 @@ const { randomIntInRange, sleepMs } = require("../utils")
 
 module.exports = {
     name: 'coinflip',
-    description: 'It is a coin flip, what do you expect?',
+    description: 'It is a coin flip. Use "" to add options to heads or tails!',
     execute({message}, {prefix}){
 
     const providedOptions = getOptions(message, prefix)

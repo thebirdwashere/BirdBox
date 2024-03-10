@@ -13,6 +13,7 @@ module.exports = {
             version: `5.0.1`, date: `TO BE RELEASED`, devs: `AgentNebulator, Bislij`,
             notes: [
                 `${prefix}translate and ${prefix}ping now use am embed`,
+                `Rewrote help command to import from command info`,
                 `Fixed issue with both canary and main responding to messages`,
                 `Fixed crashes due to missing message send perms`,
                 `Fixed typo in 8ball response`
