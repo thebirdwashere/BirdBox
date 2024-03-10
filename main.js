@@ -136,7 +136,7 @@ client.on('messageCreate', async (message) => {
 /* ON MESSAGE DELETION */
 
 client.on('messageDelete', async (message) => {
-    if (!message.author || !message.createdAt) {return;}; // Don't log broken messages.
+    if (!message.author || !message.createdAt) return; // Don't log broken messages.
 
 	await db.set(`snipe_${message.channelId}`, {
 		content: message?.content,
