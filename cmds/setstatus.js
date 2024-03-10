@@ -9,7 +9,7 @@ module.exports = {
             //aborts because user does not have dev perms
             message.channel.trysend("sorry, you must be a dev to use the setstatus command"); return; }
 
-        const status = message.content.replace(`${prefix}setstatus`, '')
+        const status = message.content.replace(`${prefix}setstatus `, '')
         db.set("status", status)
 
         client.user.setPresence({
