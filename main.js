@@ -43,7 +43,6 @@ let vars = {
 /* SLASH COMMAND HANDLER */
 
 client.commands = new Collection();
-const commands = [];
 const foldersPath = path.join(__dirname, 'commands');
 const commandFolders = fs.readdirSync(foldersPath);
 
@@ -62,6 +61,19 @@ for (const folder of commandFolders) {
 		}
 	}
 }
+
+/* FOR HELP COMMAND */
+
+console.log(Array.from(client.commands.values())[0].data.options);
+
+let commands = Array.from(client.commands.values());
+commands = commands.map(item => ({
+	name: `/${item.data.name}  ${item.data.options.map(item => `\`${item.name}\``).join(', ')}`,
+	value: item.data.description,
+	inline: true
+}));
+
+vars.commands = commands;
 
 /* ON READY */
 
