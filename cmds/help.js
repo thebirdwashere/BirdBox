@@ -1,41 +1,34 @@
 const { EmbedBuilder } = require("discord.js");
+const { hidden } = require("./translatecodes");
 
 module.exports = {
     name: 'help',
-    description: 'Returns commands for the bot and info about them. (you just used this)', //if they see this, they just used it anyway
-    async execute({message, args}, {prefix, db}, sent /*part of the jank that is modern mode; should be null ususally*/) {
+    description: 'Returns commands for the bot and info about them. (you just used this)', //at least if they see this, they did
+    async execute({message, args}, {client, prefix, db}, sent /*part of the jank that is modern mode; should be null ususally*/) {
         const classic = Boolean(await db.get(`setting_classic_${message.author.id}`) == "enable")
 
         let newEmbed = new EmbedBuilder()
         .setColor(0xcbe1ec).setFooter({text: 'Made by TheBirdWasHere, with help from friends.'})
         .setAuthor({ name: 'BirdBox', iconURL: 'https://cdn.discordapp.com/avatars/803811104953466880/5bce4f0ba438015ec65f5b9cac11c8e3.webp'})
 
-        //why do i constantly take on projects that involve writing
-        //i don't even like it that much
-        //at least programming is cool, but still
-
         const basicEmbed = new EmbedBuilder()
         .setTitle('Commands and Info').setColor(0xcbe1ec)
         .setAuthor({ name: 'BirdBox', iconURL: 'https://cdn.discordapp.com/avatars/803811104953466880/5bce4f0ba438015ec65f5b9cac11c8e3.webp'})
         .setDescription(`Learn about this bot's capabilities. \n★ = ${prefix}help (command name) for more info.`)
-        .addFields(
-            {name: `${prefix}8ball`, value: 'Question the Box and never get a straight answer.', inline: true},
-            {name: `${prefix}coinflip`, value: 'It is a coin flip, what do you expect?', inline: true},
-            {name: `${prefix}config` , value: "Change bot-related settings for the user and server.", inline: true},
-            {name: `${prefix}credits` , value: "View the credits for this bot. It's pretty obvious what it does.", inline: true},
-            {name: `${prefix}echo`, value: `Make the bot say dumb things. Use ${prefix}echo noreply for no message reply!`, inline: true},
-            {name: `${prefix}help`, value: 'Returns commands for the bot and info about them. (you just used this)', inline: true},
-            {name: `${prefix}info`, value: `Learn about the bot's latest updates. Use ${prefix}info full to see even more!`, inline: true},
-            {name: `${prefix}maybepile ★`, value: 'Take a look at pending features that may or may not happen.', inline: true},
-            {name: `${prefix}neofetch/netstats`, value: 'runs neofetch or ifconfig on the host server. (linux thingys)', inline: true},
-            {name: `${prefix}pin/unpin ★` , value: 'Pin or unpin a message by replying to it. (why discord no make this perm)', inline: true},
-            {name: `${prefix}ping`, value: 'Returns a pong if the bot is working. Useful to test if it crashed.', inline: true},
-            {name: `${prefix}responses ★` , value: 'Manage bot sticker and lyric responses. Birdbox dev only!', inline: true},
-            {name: `${prefix}rps ★` , value: 'Play rock paper scissors with the bot. Simple but fun!', inline: true},
-            {name: `${prefix}rr`, value: 'Error command? Wait a minute. Is it an acronym? You find out.', inline: true},
-            {name: `${prefix}snipe`, value: 'Fetch a recent deleted message! (does not work with images)', inline: true},
-            {name: `${prefix}translate ★` , value: `Use Google Translate right from BirdBox! ${prefix}help translate for details.`, inline: true}
-        ).setFooter({text: 'Made by TheBirdWasHere, with help from friends.'})
+        .setFooter({text: 'Made by TheBirdWasHere, with help from friends.'})
+
+        let commandList = Array.from(client.commands.values());
+        commandList = commandList.map(item => ({
+            name: item.name,
+            value: item.description,
+            hidden: item.hidden,
+            inline: true
+        }));
+
+        commandList.filter(command => !command.hidden)
+        .forEach(command => {
+            console.log(command)
+            basicEmbed.addFields(command)})
 
         //redirect to translatecodes.js
         if (args[0] == 'translate' && args[1]) { require(`./translatecodes`).execute({message, args}, {prefix, db}); return; };
