@@ -19,7 +19,7 @@ const path = require('path');
 const token = process.env.DISCORD_TOKEN;
 const { QuickDB } = require("quick.db");
 const db = new QuickDB();
-const prefix = 'e;';
+const prefix = 'd;';
 const defaults = require('./utils/json/defaults.json');
 const devs = require('./utils/json/devs.json');
 
@@ -129,8 +129,23 @@ client.on(Events.InteractionCreate, async (interaction) => {
 /* ON MESSAGE CREATION */
 
 client.on('messageCreate', async (message) => {
-    if (message.author.id == client.user.id) {return;}
-    if (!message.content) {return;}
+    if (message.author.id == client.user.id) return;
+    if (!message.content) return;
+
+	if (message.content.startsWith(prefix)) {
+		const args = message.content.slice(prefix.length).trim().split(/ +/g);
+        const command = args.shift().toLowerCase();
+
+        if (client.commands.has(command)) {
+			try {
+				client.commands.get(command).executeClassic({message, args}, vars)
+			} catch (err) {
+				message.reply(`The command \`/${command}\` does not support Classic mode yet.`);
+			}
+		} else {
+			message.reply(`The command \`${prefix}${command}\` was not found.`);
+		};
+	}
 });
 
 /* ON MESSAGE DELETION */

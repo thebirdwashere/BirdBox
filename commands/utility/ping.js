@@ -15,5 +15,17 @@ module.exports = {
 
 		await interaction.reply({ embeds: [pingEmbed] });
 		
+	},
+	async executeClassic({message}, {client, embedColors}) {
+
+		const pingEmbed = new EmbedBuilder()
+			.setColor(embedColors.blue)
+			.addFields(
+				{ name: 'Ping Time', value: `${client.ws.ping}ms`}
+			)
+			.setFooter({ text: 'pong you bumbling pillock' });
+
+		await message.reply({ embeds: [pingEmbed] });
+		
 	}
 };
