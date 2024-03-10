@@ -292,40 +292,5 @@ module.exports = {
         selectcollector.on('end', () => {
             //disable the selector
             rowArray.forEach(item => {item.components[0].setDisabled(true)})
-            sent.edit({ components: rowArray })});},
-    help: async ({message, args}, {prefix, db}, {basicEmbed, embed}, sent) => {
-        const select = new StringSelectMenuBuilder()
-            .setCustomId(`help`)
-            .setPlaceholder(`Jump to ★ commands`)
-
-        basicEmbed.data.fields.forEach(command => {
-            if (command.name.endsWith("★")) {
-                select.addOptions(
-                    new StringSelectMenuOptionBuilder()
-                        .setLabel(command.name.replace(" ★", ""))
-                        .setDescription(command.value)
-                        .setValue(command.name.replace(" ★", "")))
-        }})
-        
-        let row = []
-        if (basicEmbed == embed) { row[0] = new ActionRowBuilder().addComponents(select) }
-
-        if (sent) { 
-            await sent.edit({embeds: [embed], components: []})
-        } else { sent = await message.tryreply({embeds: [embed], components: row}) }
-
-        const interactcollector = sent.createMessageComponentCollector({ time: 30000 });
-        interactcollector.on('collect', async i => {
-            let newmessage = message; newmessage.content = i.values[0]
-            let newargs = [].concat(message.content.slice(prefix.length).trim().toLowerCase().split(/ +/g).shift());
-
-            require("./cmds/help").execute({message: newmessage, args: newargs}, {prefix, db}, sent);
-            i.deferUpdate();                  //this physically pains me to do, but it's the only way this runs and i'm tired of debugging.
-        });                                   //i just want to push this update. i've done practically nothing but this all weekend. send help. -matty, 8:29 pm, 1/21/2024 (21/01/2024 for the brits)
-
-        interactcollector.on('end', () => {
-            //disable the selector
-            sent.edit({ components: [] })
-        });
-    }
+            sent.edit({ components: rowArray })});}
 }
