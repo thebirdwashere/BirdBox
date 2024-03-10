@@ -147,4 +147,4 @@ client.on('messageDelete', async (message) => {
 })
 
 /* here we go... */
-client.login();
+client.login(token);
