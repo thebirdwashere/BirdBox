@@ -47,9 +47,9 @@ module.exports = {
                 await sleep(Math.floor(Math.random() * (8000 - 2000) + 2000)); // between two and eight seconds
 
                 if (validOptions[0] === 'heads' && validOptions[1] === 'tails') {
-                    await interaction.followUp(`:coin: Wait, no, that would be "${validOptions[optionNum ^ 1]}." My eyesight isn't the best.`);
+                    await interaction.followUp(`:coin: Wait, no, that would be "${validOptions[optionNum ^ 1]}". My eyesight isn't the best.`);
                 } else {
-                    await interaction.followUp(`:coin: Wait, no, that would be "${validOptions[optionNum ^ 1]}." I forgot which one was which.`);
+                    await interaction.followUp(`:coin: Wait, no, that would be "${validOptions[optionNum ^ 1]}". I forgot which one was which.`);
                 }
             }
         ]
