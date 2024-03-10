@@ -66,7 +66,7 @@ for (const folder of commandFolders) {
 
 let commands = Array.from(client.commands.values());
 commands = commands.map(item => ({
-	name: `/${item.data.name}  ${item.data.options.map(item => `\`${item.name}\``).join(', ')}`,
+	name: `/${item.data.name}  ${item.data.options.map(item => `\`${item.name}\``).join(' ')}`,
 	value: item.data.description,
 	inline: true
 }));
