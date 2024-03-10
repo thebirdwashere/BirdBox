@@ -29,9 +29,6 @@ module.exports = {
 /*/
 
 function classicMode(message, {prefix, db, classic}, {mode, setting, change}) {    
-    //if no mode, they must have done just e;config
-    if (!mode) {return message.channel.trysend({embeds: [userEmbed]})};
-
     //create embed for user settings
     const userEmbed = new EmbedBuilder()
     .setColor('#cbe1ec')
@@ -50,7 +47,10 @@ function classicMode(message, {prefix, db, classic}, {mode, setting, change}) {
     for (let item of Object.keys(settingsText(prefix).server)) {
         serverEmbed.addFields(settingsText(prefix).server[item])}
 
-    //definitely selected a mode at this point (including logic from main execute)
+    //if no mode, they must have done just e;config
+    if (!mode) {return message.channel.trysend({embeds: [userEmbed]})};
+
+    //selected a mode at this point (including logic from main execute)
     if (mode == "user") {
         if (!setting || !change) {return message.channel.trysend({embeds: [userEmbed]})};
         if (!settingsText(prefix).user[setting]) {return message.channel.trysend({content: "invalid setting, try again"})};
