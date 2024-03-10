@@ -15,7 +15,7 @@ module.exports = {
         client.user.setPresence({
             activities: [{ name: status, type: ActivityType.Custom }]
         });
-        console.log(client.user.presence.activities[0].state)
+        
         if (client.user.presence.activities[0].state === status) {
             message.tryreply("Status set successfully!")
         } else {
