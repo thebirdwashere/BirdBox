@@ -14,6 +14,7 @@ module.exports = {
             notes: [
                 `${prefix}translate and ${prefix}ping now use am embed`,
                 `Rewrote help command to import from command info`,
+                `Added help description for diceroll & updated others`,
                 `Fixed issue with both canary and main responding to messages`,
                 `Fixed crashes due to missing message send perms`,
                 `Fixed typo in 8ball response`
