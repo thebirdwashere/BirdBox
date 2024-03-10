@@ -1,6 +1,6 @@
 module.exports = {
     name: 'netstats',
-    description: 'how much garbage has the server sent',
+    description: 'Run netstats on the host server.',
 
 
 execute({message}) {

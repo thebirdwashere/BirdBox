@@ -6,7 +6,7 @@ const { randomIntInRange } = require("../utils");
 
 module.exports = {
 	name: 'rps',
-	description: 'Play a game of Rock Paper Scissors against the computer!',
+	description: 'Play rock paper scissors with the bot. Simple but fun!',
 	execute({message, args}) {
 		const validChoices = ['rock', 'paper', 'scissors', 'r', 'p', 's'];
 		let playerChoice = args[0];

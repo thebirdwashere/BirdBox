@@ -2,7 +2,7 @@ const { EmbedBuilder } = require("discord.js");
 
 module.exports = {
     name: 'ping',
-    description: "ping pong command",
+    description: "Returns a pong if the bot is working. Useful to test if it crashed.",
     execute({message}, {client}){
 		const pingEmbed = new EmbedBuilder()
 			.setColor(0x0282EC)

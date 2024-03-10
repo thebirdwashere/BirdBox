@@ -1,6 +1,6 @@
 module.exports = {
   name: 'pin',
-  description: "command to pin a replied to message",
+  description: "Pin a message by replying to it. (why discord no make this perm)",
   async execute({message}, {devs}){
         let repliedMessage = null;
 

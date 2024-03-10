@@ -1,6 +1,6 @@
 module.exports = {
     name: 'echo',
-    description: "echo command",
+    description: "Make the bot say dumb things. Use e;echo noreply for no message reply!",
     execute({message, args}, {prefix}){
         if (args[0]?.trim() == "noreply") {
             message.channel.trysend(message.content.replace(`${prefix}echo noreply`, '').trim());

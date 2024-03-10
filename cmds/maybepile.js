@@ -6,7 +6,7 @@ const { EmbedBuilder } = require("discord.js");
 
 module.exports = {
     name: 'maybepile',
-    description: 'Take a look at and suggest potential features!',
+    description: 'Take a look at pending features that may or may not happen.',
     async execute({message, args}, {prefix, devs, db}, sent /*part of the jank that is modern mode; should be null ususally*/) {
         const action = args[0]; //can be view, suggest, delete, or edit
         const filter = m => m.author.id == message.author.id //used in message awaits; just doing as stackoverflow guy says

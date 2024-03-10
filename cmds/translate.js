@@ -2,7 +2,7 @@ const { EmbedBuilder } = require("discord.js");
 
 module.exports = {
     name: 'translate',
-    description: "translate command",
+    description: "Use Google Translate right from BirdBox! e;help translate for details.",
     execute({message, args}, {prefix}){
         if (args[0] == "codes") { require(`./translatecodes`).execute({message, args}); return; }
         const translate = require('google-translate-api-x'); // Connect to the Google Translate API

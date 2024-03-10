@@ -1,6 +1,6 @@
 module.exports = {
   name: 'responses',
-  description: "adds and deletes bot message responses",
+  description: "Manage bot sticker and lyric responses. Birdbox dev only!",
   async execute({message, args}, {prefix, devs, db}){
     const filter = m => m.author.id == message.author.id; //used in message awaits; just doing as stackoverflow guy says
     const type = args[0];

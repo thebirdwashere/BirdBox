@@ -1,6 +1,6 @@
 module.exports = {
   name: 'unpin',
-  description: "command to unpin a replied to message",
+  description: "Unpin a message by replying to it. (again, why no seperate perm discord)",
   async execute({message}, {devs}){
         let repliedMessage = null;
 

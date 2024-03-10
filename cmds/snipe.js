@@ -3,7 +3,7 @@ const { randomIntInRange } = require("../utils");
 
 module.exports = {
   name: 'snipe',
-  description: 'fetches last deleted message and displays it',
+  description: 'Fetch a recent deleted message! (does not work with images)',
   async execute({message}, {db}) {
     const snipe = await db.get(`snipe_${message.channel.id}`)
 

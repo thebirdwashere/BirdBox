@@ -2,7 +2,7 @@ const { EmbedBuilder } = require("discord.js");
 
 module.exports = {
     name: 'help',
-    description: 'tells users what the bot is and what it can do',
+    description: 'Returns commands for the bot and info about them. (you just used this)', //if they see this, they just used it anyway
     async execute({message, args}, {prefix, db}, sent /*part of the jank that is modern mode; should be null ususally*/) {
         const classic = Boolean(await db.get(`setting_classic_${message.author.id}`) == "enable")
 

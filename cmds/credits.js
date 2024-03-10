@@ -2,7 +2,7 @@ const { EmbedBuilder } = require("discord.js");
 
 module.exports = {
 	name: 'credits',
-	description: 'Credits to the people who work/worked on this bot.',
+	description: 'View the credits for this bot. It\'s pretty obvious what it does.',
 	execute({message}, {devArray}) {
 		const creditsEmbed = new EmbedBuilder()
 			.setColor(0xAA00FF)

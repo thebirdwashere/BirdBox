@@ -2,7 +2,7 @@ const { EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, StringSelect
 
 module.exports = {
     name: 'config',
-    description: "command to configure server and client settings",
+    description: "Change bot-related settings for the user and server.",
     async execute({message, args}, {prefix, db, devs}){
         if (args[0] && !["user", "server"].includes(args[0])) {
             args[2] = args[1]; args[1] = args[0]; args[0] = "user";} //effectively, insert "user" into the original message
