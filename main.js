@@ -140,7 +140,7 @@ client.on('messageCreate', async (message) => {
             `:test_tube: Your message is on the periodic table! \n\`${periodicness}\``, 
             `:test_tube:`, `is on the periodic table!`, 
             0x21c369, periodicness)
-            if (notifchannel) {await notifchannel.send(notif)} //only send notif if there is a log channel
+            if (notifchannel) {await notifchannel.trysend(notif)} //only send notif if there is a log channel
     }
 
     await db.set(`jinx_${message.channelId}`, { 

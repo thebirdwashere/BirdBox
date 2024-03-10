@@ -14,7 +14,7 @@ module.exports = {
         );
 
         //create the message with the button (variable declared for button disabling)
-        const sent = await message.reply({ content: 'click this', components: [row] }).catch(console.error);
+        const sent = await message.tryreply({ content: 'click this', components: [row] });
         
         //collector for the button responses
         const buttonfilter = i => i.customId === 'modaltest-button';

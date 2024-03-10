@@ -11,6 +11,6 @@ module.exports = {
 			)
 			.setFooter({ text: 'pong you bumbling pillock' });
 
-        message.reply({ embeds: [pingEmbed] });
+        message.tryreply({ embeds: [pingEmbed] });
     }
 }

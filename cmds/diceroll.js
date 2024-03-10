@@ -65,7 +65,7 @@ async function badMathTroll(message, mainResult, secondaryResult) {
 }
 
 async function intenseShakingTroll(message, mainResult) {
-  await message.reply(`:game_die: Hold on, let me shake them first.`)
+  await message.tryreply(`:game_die: Hold on, let me shake them first.`)
   .finally(() => message.channel.sendTyping()); //make birdbox show as typing
 
   //some funny commentary
@@ -90,7 +90,7 @@ async function intenseShakingTroll(message, mainResult) {
 
     //send a random saying
     chosenSaying = randomSayings[randomIntInRange(1, randomSayings.length - 1)];
-    await message.channel.send(chosenSaying)
+    await message.channel.trysend(chosenSaying)
     .finally(() => message.channel.sendTyping());  //make birdbox show as typing
   }
 

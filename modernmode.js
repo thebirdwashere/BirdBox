@@ -46,16 +46,16 @@ module.exports = {
         
                     let failed = false
                     keys.forEach((item) => { 
-                        if (messageArray[keystring]) {interaction.channel.send(`Error: please use a different keyword. \nOne of these keywords is already in use for this response: ${messageArray[keystring]}`); failed = true;}
+                        if (messageArray[keystring]) {interaction.channel.trysend(`Error: please use a different keyword. \nOne of these keywords is already in use for this response: ${messageArray[keystring]}`); failed = true;}
                         messageArray[item.trim()] = response;
                     })
         
                     //confirm/error to user
                     if (failed) {return;} 
                     else if (!(response && keystring)) {
-                        interaction.channel.send("Response has failed to add, please try again. Make sure you provided both a response and some keywords."); 
+                        interaction.channel.trysend("Response has failed to add, please try again. Make sure you provided both a response and some keywords."); 
                         return;
-                    } else { interaction.channel.send(`${response} added successfully!`); }
+                    } else { interaction.channel.trysend(`${response} added successfully!`); }
         
                     db.set('messages', messageArray)
                     console.table(messageArray)
@@ -73,7 +73,7 @@ module.exports = {
         
                     for (let i = 0; i < lyricArray.length; i++) {
                         if (lyric.title == lyricArray[i].title) {
-                            interaction.channel.send("already used that title, try a different one");
+                            interaction.channel.trysend("already used that title, try a different one");
                             return;
                         }
                     }
@@ -85,14 +85,14 @@ module.exports = {
         
                     await db.set('lyrics', lyricArray)
         
-                    interaction.channel.send(`${lyric.title} has successfully been added!`);
+                    interaction.channel.trysend(`${lyric.title} has successfully been added!`);
                     
                 break;} case "maybepile-add": {
                     let maybeArray = await db.get("maybepile");
 
                     maybeArray[maybeArray.length] = {author: interaction.fields.getTextInputValue('maybepile-author'), title: interaction.fields.getTextInputValue('maybepile-title'), desc: interaction.fields.getTextInputValue('maybepile-desc')}
                     await db.set("maybepile", maybeArray);
-                    interaction.channel.send(`${maybeArray[maybeArray.length - 1].title} has successfully been added!`);
+                    interaction.channel.trysend(`${maybeArray[maybeArray.length - 1].title} has successfully been added!`);
                 break;} case "maybepile-edit": {
                     let maybeArray = await db.get("maybepile");
 
@@ -100,14 +100,14 @@ module.exports = {
 
                     if (selectedMessage == 0) {
                         //aborts edit because the user chose table of contents
-                        interaction.channel.send("sorry, you can't edit the table of contents"); return; }
+                        interaction.channel.trysend("sorry, you can't edit the table of contents"); return; }
                     if (!maybeArray[selectedMessage]) {
                         //aborts edit because nothing at the selection
-                        interaction.channel.send(`can't find anything at index ${selectedMessage}`); return; }
+                        interaction.channel.trysend(`can't find anything at index ${selectedMessage}`); return; }
                         
                     maybeArray[selectedMessage] = {author: interaction.fields.getTextInputValue('maybepile-author'), title: interaction.fields.getTextInputValue('maybepile-title'), desc: interaction.fields.getTextInputValue('maybepile-desc')}
                     await db.set("maybepile", maybeArray);
-                    interaction.channel.send(`${maybeArray[selectedMessage].title} has successfully been edited!`);
+                    interaction.channel.trysend(`${maybeArray[selectedMessage].title} has successfully been edited!`);
                 break;}
             }
             interaction.deferUpdate();
@@ -312,7 +312,7 @@ module.exports = {
 
         if (sent) { 
             await sent.edit({embeds: [embed], components: []})
-        } else { sent = await message.reply({embeds: [embed], components: row}).catch(err => {console.error(err)}) }
+        } else { sent = await message.tryreply({embeds: [embed], components: row}) }
 
         const interactcollector = sent.createMessageComponentCollector({ time: 30000 });
         interactcollector.on('collect', async i => {

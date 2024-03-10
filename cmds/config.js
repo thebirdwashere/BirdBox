@@ -282,17 +282,17 @@ async function sendConfigMessage(message, {prefix, db}, {mode, setting}, row) {
     if (!setting) {
         newEmbed = embedTemplate(mode);
         newEmbed.setDescription('Use the menu below to select a setting!')
-        sent = await message.reply({ components: [row], embeds: [newEmbed] }).catch(err => console.error(err));}
+        sent = await message.tryreply({ components: [row], embeds: [newEmbed] });}
     else if (!settingsText[mode][setting]) {
         newEmbed = embedTemplate(mode);
         newEmbed.setDescription(':x: Invalid setting, use the menu below to select a valid one!')
-        sent = await message.reply({ components: [row], embeds: [newEmbed] }).catch(err => console.error(err));}
+        sent = await message.tryreply({ components: [row], embeds: [newEmbed] });}
     else {
         let options
         [newEmbed, options] = await displaySetting(message, {prefix, db}, {mode, setting}); //i am baffled by this syntax working, but it does 
                                                                                             //(edit: used this syntax elsewhere now, this was written when i discovered it)
         options.unshift(row)
-        sent = await message.reply({ components: options, embeds: [newEmbed]}).catch(err => console.error(err))
+        sent = await message.tryreply({ components: options, embeds: [newEmbed]});
     }
 
     return sent

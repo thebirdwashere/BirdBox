@@ -10,6 +10,14 @@ module.exports = {
         //vvvvvvvvvvvvvvvvvv
 
         const patchnotes = [{
+            version: `5.0.1`, date: `TO BE RELEASED`, devs: `AgentNebulator, Bislij`,
+            notes: [
+                `${prefix}translate and ${prefix}ping now use am embed`,
+                `Fixed issue with both canary and main responding to messages`,
+                `Fixed crashes due to missing message send perms`,
+                `Fixed typo in 8ball response`
+            ]
+        }, {
             version: `5.0.0`, date: `3/1/2024`, devs: `AgentNebulator, Bislij`,
             notes: [
                 `Added ${prefix}coinflip and ${prefix}diceroll commands`,
