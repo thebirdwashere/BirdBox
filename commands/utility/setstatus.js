@@ -11,7 +11,7 @@ module.exports = {
                 .setMaxLength(128)
 				.setRequired(true)
         ),
-    async execute(interaction, {embedColors, devs, db}) {
+    async execute(interaction, {devs, db}) {
 
         const authorized = devs.developer.map(item => item.userId); authorized.push(devs.host[0].userId);
         if (!authorized.includes(interaction.user.id)) return interaction.reply({ content: 'Sorry, you must be a dev to use the setstatus command.', ephemeral: true });
