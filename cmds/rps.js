@@ -2,6 +2,7 @@
  * AUTHORS: Matty, Bisly (Modifications)
  * DESCRIPTION: Play RPS against the computer! */
 
+const { EmbedBuilder } = require("discord.js");
 const { randomIntInRange } = require("../utils");
 
 module.exports = {
@@ -11,11 +12,11 @@ module.exports = {
 		const validChoices = ['rock', 'paper', 'scissors', 'r', 'p', 's'];
 		let playerChoice = args[0];
 		
-		if(!validChoices.includes(playerChoice)) { message.channel.trysend('Invalid move. Try again and use "rock", "paper", or "scissors".'); return;}
+		if(!validChoices.includes(playerChoice)) { message.channel.trysend('bruh it\'s literally the title of the game, you gotta use "rock", "paper", or "scissors".'); return;}
 
 		//replace choices with full versions so the logic is cleaner and the later message makes sense
-		const abbreviatedChoices = {r: "rock", p: "paper", s: "scissors"}
-		abbreviatedChoices[playerChoice] && (playerChoice = abbreviatedChoices[playerChoice])
+		const emojifiedChoices = {r: ":rock:", rock: ":rock:", p: ":roll_of_paper:", paper: ":roll_of_paper:", s: ":scissors:", scissors: ":scissors:"};
+		if (emojifiedChoices[playerChoice]) playerChoice = emojifiedChoices[playerChoice]
 
 		const computerNumChoice =  randomIntInRange(0, 2);
 
@@ -25,24 +26,32 @@ module.exports = {
 		*	2 = scissors
 		*/
 
-		const computerChoice = validChoices[computerNumChoice]
-		let playerNumChoice;
+		const computerChoice = emojifiedChoices[validChoices[computerNumChoice]]
 
-		switch(playerChoice) {
-			case 'rock':
-				playerNumChoice = 0; break;
-			case 'paper':
-				playerNumChoice = 1; break;
-			case 'scissors':
-				playerNumChoice = 2; break;
+		const matchResults = {
+			":rock:": {":rock:": 'Tied', ":roll_of_paper:": 'Lost', ":scissors:": 'Won'},
+			":roll_of_paper:": {":rock:": 'Won', ":roll_of_paper:": 'Tied', ":scissors:": 'Lost'},
+			":scissors:": {":rock:": 'Lost', ":roll_of_paper:": 'Won', ":scissors:": 'Tied'}
 		}
 
-		if (playerNumChoice == computerNumChoice) {var result = 'tied';}
-		else if (((playerNumChoice - computerNumChoice) + 3) % 3 == 1) {var result = 'won';} //this works, trust me bro, stackoverlow told me it did
-		else {var result = 'lost';}
+		const result = matchResults[playerChoice][computerChoice]
+        let footer;
 
+		switch (result) {
+			case "Won": footer = 'decent job chump'; break;
+			case "Tied": footer = 'kinda mid game ngl'; break;
+			case "Lost": footer = 'massive L'; break;
+		}
 
+        const rpsEmbed = new EmbedBuilder()
+            .setTitle(`You ${result}!`)
+            .setColor(0x208ddd)
+            .addFields(
+				{ name: 'You', value: `${playerChoice}`, inline: true},
+                { name: 'BirdBox', value: `${computerChoice}`, inline: true}
+			)
+            .setFooter({ text: footer });
 
-		message.tryreply(`Congrats, you ${result}! The computer selected ${computerChoice} and you selected ${playerChoice}.`);
+        message.reply({ embeds: [rpsEmbed] });
 	}
 }
