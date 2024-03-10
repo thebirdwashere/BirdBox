@@ -27,5 +27,28 @@ module.exports = {
 
         await interaction.reply({ embeds: [snipeEmbed] });
 
+    },
+    async executeClassic({message}, {db, embedColors}) {
+
+        const snipe = await db.get(`snipe_${message.channel.id}`);
+
+        if (!snipe) return message.reply('this command is garbage apparently cause i cant find a dang thing here');
+        if (!snipe.timestamp || !snipe.author) return message.reply('this command is garbage apparently cause the snipe i got is busted');
+
+        const sniped = await message.guild.members.fetch(snipe.author.id);
+        const messageDate = new Date(snipe.timestamp);
+
+        const snipeEmbed = new EmbedBuilder()
+            .setTitle(`Deleted from: #${message.channel.name}`)
+            .setAuthor({ name: snipe.author.tag, iconURL: sniped.displayAvatarURL() })
+            .setColor(embedColors.blue)
+            .setFooter({ text: randomFooters('snipe') })
+            .setTimestamp(messageDate);
+
+        if (snipe.content) snipeEmbed.setDescription(snipe.content);
+        if (snipe.attachment) snipeEmbed.setImage(snipe.attachment);
+
+        await message.reply({ embeds: [snipeEmbed] });
+
     }
 }
