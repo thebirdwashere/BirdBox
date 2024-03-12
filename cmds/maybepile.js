@@ -183,6 +183,12 @@ module.exports = {
     }
 }
 
+/*/
+ * --------------------------------
+ * classic mode functions are below
+ * --------------------------------
+/*/
+
 function initializeEmbed(j, embedArray) {
     embedArray[j] = new EmbedBuilder()
     .setColor('#208ddd')
@@ -229,6 +235,12 @@ function createSpecificItemEmbed(maybeArray, pageNum) {
 
     return itemEmbed
 }
+
+/*/
+ * -------------------------------
+ * modern mode functions are below
+ * -------------------------------
+/*/
 
 async function modernModeView(message, embedArray, maybeArray) {
     const rowArray = [];
