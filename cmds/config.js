@@ -279,11 +279,13 @@ async function displaySetting(message, {prefix, db}, {mode, setting}) {
 
 async function sendConfigMessage(message, {prefix, db}, {mode, setting}, row) {
     let sent, newEmbed
+
+    console.log(mode, setting)
     if (!setting) {
         newEmbed = embedTemplate(mode);
         newEmbed.setDescription('Use the menu below to select a setting!')
         sent = await message.tryreply({ components: [row], embeds: [newEmbed] });}
-    else if (!settingsText[mode][setting]) {
+    else if (!settingsText(prefix)[mode][setting]) {
         newEmbed = embedTemplate(mode);
         newEmbed.setDescription(':x: Invalid setting, use the menu below to select a valid one!')
         sent = await message.tryreply({ components: [row], embeds: [newEmbed] });}
