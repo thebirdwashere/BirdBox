@@ -98,7 +98,11 @@ function settingsText(prefix) { //everything here is funky because i wanted prop
             responses: new function() {this.title = `Responses`; 
             this.desc = `Toggles whether message and lyric responses are enabled for this server.`;
             this.name = `${prefix}config server responses enable/disable`; this.options = ["enable", "disable"]; this.default = "enable";
-            this.value = `${this.desc} \nDefaults to **${this.default}** if not set. \n\n**enable:** Allow BirdBox to respond to messages with keywords. \n**disable:** Do not allow keyword-based responses for this.`; }
+            this.value = `${this.desc} \nDefaults to **${this.default}** if not set. \n\n**enable:** Allow BirdBox to respond to messages with keywords. \n**disable:** Do not allow keyword-based responses.`; },
+            pinning: new function() {this.title = `Pin/Unpin`;
+            this.desc = `Modifies the usability of pin and unpin commands.`;
+            this.name = `${prefix}config server pinning enable/restrict/disable`; this.options = ["enable", "restrict", "disable"]; this.default = "restrict";
+            this.value = `${this.desc} \nDefaults to **${this.default}** if not set. \n\n**enable:** Allow any messages to be pinned at any time by any user. \n**restrict:** Restrict users from pinning messages under certain circumstances. Criteria is outlined in the help page for these commands. \n**disable:** Do not allow messages to be pinned by any users except devs.`; }
     }}
 }
 
