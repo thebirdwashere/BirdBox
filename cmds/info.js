@@ -10,11 +10,13 @@ module.exports = {
         //vvvvvvvvvvvvvvvvvv
 
         const patchnotes = [{
-            version: `5.0.1`, date: `TO BE RELEASED`, devs: `AgentNebulator, Bislij`,
+            version: `5.0.1`, date: `TO BE RELEASED`, devs: `AgentNebulator, Bislij, Umadkek`,
             notes: [
-                `${prefix}translate and ${prefix}ping now use am embed`,
-                `Rewrote help command to import from command info`,
+                `${prefix}8ball, ${prefix}ping, ${prefix}rr, and ${prefix}translate now use an embed`,
                 `Added help description for diceroll & updated others`,
+                `Rewrote help command to import from command info`,
+                `Ported remaining modernmode functions to their respective files`,
+                `Renamed modernmode file to be more descriptive about its function`,
                 `Fixed issue with both canary and main responding to messages`,
                 `Fixed crashes due to missing message send perms`,
                 `Fixed typo in 8ball response`
