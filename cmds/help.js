@@ -38,13 +38,13 @@ const moreInfoCommands = {
     pin: (moreInfoEmbed, prefix) => {
         moreInfoEmbed.setTitle('Pin Comamnd')
     .addFields(
-        {name: `${prefix}pin`, value: 'The message replied to will be pinned to its respective channel. Note that (aside from devs) anybody can pin in default channels, but only the thread owner can pin in threads or forum posts.'}
+        {name: `${prefix}pin`, value: 'The message replied to will be pinned to its respective channel. By default, anybody can pin in default channels, but only the thread owner can pin in threads or forum posts. This can be changed in the config, however!'}
     )
     },
     unpin: (moreInfoEmbed, prefix) => {
         moreInfoEmbed.setTitle('Pin Comamnd')
         .addFields(
-            {name: `${prefix}unpin` , value: "The message replied to will be unpinned, if currently pinned. Note that (aside from devs) nobody can unpin in default channels, and only the thread owner can unpin in threads or forum posts."}
+            {name: `${prefix}unpin` , value: "The message replied to will be unpinned, if currently pinned. By default, nobody can unpin in default channels, and only the thread owner can unpin in threads or forum posts. This can be changed in the config, however!"}
         )
     },
     responses: (moreInfoEmbed, prefix) => {
