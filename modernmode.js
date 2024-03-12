@@ -1,4 +1,4 @@
-const { ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder, ButtonBuilder, ButtonStyle, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, ChannelSelectMenuBuilder, ChannelType } = require("discord.js")
+const { ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js")
 
 async function newButtonModal(message, row, modal, {devs}) {
     //create the message with the button (variable declared for button disabling)
@@ -25,6 +25,7 @@ async function newButtonModal(message, row, modal, {devs}) {
 }
 
 module.exports = {
+    newButtonModal: newButtonModal,
     modalHandler: ({client, db}) => {
         client.on('interactionCreate', async (interaction) => {
             if (!interaction.isModalSubmit()) {return;}
@@ -167,130 +168,5 @@ module.exports = {
                         .setLabel('Lyrics')
                         .setStyle(TextInputStyle.Paragraph)
                         .setPlaceholder(`The series of responses Birdbox should use. Separate lyrics with linebreaks, \nlike this.`)
-                        .setRequired(true))]), {devs})},
-    maybepile_add: ({message, args}, {prefix, devs}) => {
-        const suggester = message.author.username
-        const title = message.content.replace(`${prefix}maybepile ${args[0]}`, "").trim()
-
-        newButtonModal(message,
-            new ActionRowBuilder().addComponents(
-                new ButtonBuilder()
-                    .setLabel('Add an item')
-                    .setStyle(ButtonStyle.Primary)
-                    .setCustomId("maybepile-add")
-                    .setDisabled(false)
-            ),
-            new ModalBuilder().setCustomId("maybepile-add").setTitle("Add Maybepile Item")
-            .addComponents([new ActionRowBuilder().addComponents(
-                    new TextInputBuilder()
-                        .setCustomId('maybepile-title')
-                        .setLabel(`Title`)
-                        .setStyle(TextInputStyle.Short)
-                        .setPlaceholder(`Title of the item.`)
-                        .setValue(title)
-                        .setRequired(true)),
-                new ActionRowBuilder().addComponents(
-                    new TextInputBuilder()
-                        .setCustomId('maybepile-desc')
-                        .setLabel('Description')
-                        .setStyle(TextInputStyle.Paragraph)
-                        .setPlaceholder(`The description of the item, displayed on the item's page.`)
-                        .setRequired(true)),
-                new ActionRowBuilder().addComponents(
-                    new TextInputBuilder()
-                        .setCustomId('maybepile-author')
-                        .setLabel(`Suggester`)
-                        .setStyle(TextInputStyle.Short)
-                        .setPlaceholder(`Whoever suggested this item. Credit where it's due!`)
-                        .setValue(suggester)
-                        .setRequired(true))]), {devs})},
-    maybepile_edit: async ({message, args}, {devs, db}) => {
-        const maybeArray = await db.get("maybepile")
-        const item = maybeArray[args[1]]
-
-        newButtonModal(message,
-            new ActionRowBuilder().addComponents(
-                new ButtonBuilder()
-                    .setLabel('Edit an item')
-                    .setStyle(ButtonStyle.Primary)
-                    .setCustomId("maybepile-edit")
-                    .setDisabled(false)
-            ),
-            new ModalBuilder().setCustomId("maybepile-edit").setTitle("Edit Maybepile Item")
-            .addComponents([new ActionRowBuilder().addComponents(
-                    new TextInputBuilder()
-                        .setCustomId('maybepile-title')
-                        .setLabel(`Title`)
-                        .setStyle(TextInputStyle.Short)
-                        .setPlaceholder(`Title of the item.`)
-                        .setValue(item.title)
-                        .setRequired(true)),
-                new ActionRowBuilder().addComponents(
-                    new TextInputBuilder()
-                        .setCustomId('maybepile-desc')
-                        .setLabel('Description')
-                        .setStyle(TextInputStyle.Paragraph)
-                        .setPlaceholder(`The description of the item, displayed on the item's page.`)
-                        .setValue(item.desc)
-                        .setRequired(true)),
-                new ActionRowBuilder().addComponents(
-                    new TextInputBuilder()
-                        .setCustomId('maybepile-author')
-                        .setLabel(`Suggester`)
-                        .setStyle(TextInputStyle.Short)
-                        .setPlaceholder(`Person who suggested this item to be added. Credit where it's due!`)
-                        .setValue(item.author)
-                        .setRequired(true)),
-                new ActionRowBuilder().addComponents(
-                    new TextInputBuilder()
-                        .setCustomId('maybepile-page')
-                        .setLabel(`Page`)
-                        .setStyle(TextInputStyle.Short)
-                        .setPlaceholder(`Which page is being modified.`)
-                        .setValue(args[1])
-                        .setRequired(true))]), {devs})},
-    maybepile_view: async ({message, args}, {prefix, devs, db}, embed, sent) => {
-
-        if (embed[0].data.description !== "Take a look at and suggest potential features!") { //this indicates table of contents
-            if (sent) { sent.edit({ embeds: embed }); }
-            else {sent = await message.tryreply({ embeds: embed });}
-            return;}
-
-        const rowArray = [];
-        let itemNum = 1
-
-        embed.forEach(item => {
-            const options = new StringSelectMenuBuilder()
-            .setCustomId(`maybepile-view-${itemNum}`)
-            .setPlaceholder(`Jump to item (embed ${itemNum})`)
-            for (let i = 0; i < item.data.fields.length; i++) { //iterate through embed fields to grab data
-                options.addOptions(
-                    new StringSelectMenuOptionBuilder()
-                    .setLabel(item.data.fields[i].name)
-                    .setDescription(item.data.fields[i].value)
-                    .setValue(item.data.fields[i].name.split(":")[0].toString())
-                )
-            }
-            rowArray.push(new ActionRowBuilder().addComponents(options)); itemNum++;
-        })
-        
-        //edit if this was sent already, otherwise send
-        if (sent) { sent.edit({ embeds: embed }); }
-        else {sent = await message.tryreply({ components: rowArray, embeds: embed });}
-
-        //collector for the selector responses
-        const selectcollector = sent.createMessageComponentCollector({ time: 15000 });
-
-        selectcollector.on('collect', async i => {
-            message.content = `${prefix}maybepile view ${i.values[0]}`;                 //so over here, because i had no better ideas, we bootstrap paradox ourselves into running maybepile again
-            args = message.content.slice(prefix.length).trim().split(/ +/g).splice(1);  //with new message and args. then it sends it back, where we can edit our inital message with the recived content.            
-            require('./cmds/maybepile').execute({message, args}, {prefix, devs, db}, "", sent);            //this is so janky. if anyone other than me comes in to edit this i owe them a heartfelt apology. 
-            rowArray.forEach(item => {item.components[0].setDisabled(true)})
-            sent.edit({ components: rowArray }); i.deferUpdate().catch(err => {console.error(err)});
-        });
-
-        selectcollector.on('end', () => {
-            //disable the selector
-            rowArray.forEach(item => {item.components[0].setDisabled(true)})
-            sent.edit({ components: rowArray })});}
+                        .setRequired(true))]), {devs})}
 }

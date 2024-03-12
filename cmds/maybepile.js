@@ -2,7 +2,8 @@
  * AUTHORS: Matty
  * DESCRIPTION: Take a look at and suggest potential features! */
 
-const { EmbedBuilder } = require("discord.js");
+const { ModalBuilder, ButtonBuilder, ButtonStyle,  EmbedBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, ActionRowBuilder, TextInputBuilder, TextInputStyle } = require("discord.js");
+const { newButtonModal } = require("../modernmode")
 
 module.exports = {
     name: 'maybepile',
@@ -11,7 +12,7 @@ module.exports = {
         const action = args[0]; //can be view, suggest, delete, or edit
         const filter = m => m.author.id == message.author.id //used in message awaits; just doing as stackoverflow guy says
 
-        let embedArray = []; //used to fix overflow
+        let embedArray = []; //used to fix overflow with embeds
         let maybeArray = await db.get('maybepile') 
 
         const defaultArray = ["table of contents"]
@@ -24,14 +25,9 @@ module.exports = {
             await db.set('maybepile', defaultArray); //default array if nothing is present
             maybeArray = defaultArray
         }
-        
-        function createEmbed(j) {
-            embedArray[j] = new EmbedBuilder()
-            .setColor('#208ddd')
-        }
 
         if (action == "suggest" || action == "add") { //e;maybepile suggest
-            if (!classic) { require("../modernmode").maybepile_add({message, args}, {prefix, devs, db}); return; } //redirect in case of modern mode
+            if (!classic) { modernModeAdd({message, args}, {prefix, devs}); return; } //redirect in case of modern mode
 
             //define array and get author
             const suggestion = {author: message.author.username};
@@ -111,7 +107,7 @@ module.exports = {
                 //aborts edit because user does not have perms to edit
                 message.channel.trysend("sorry, you must be a dev or the original poster to edit something"); return;}
             
-            if (!classic) { require("../modernmode").maybepile_edit({message, args}, {prefix, devs, db}); return; } //redirect in case of modern mode
+            if (!classic) { modernModeEdit({message, args}, {devs}, maybeArray); return; } //redirect in case of modern mode to create button and modal
             
             if (!selectedSection) {
                 message.channel.trysend("Are you editing the title, description, or author?");
@@ -151,56 +147,29 @@ module.exports = {
                 message.channel.trysend("you can edit the title, description, or author. try one of those lol");
             }
         } else if (action == "view" || !action || !isNaN(Number(action))) { //e;maybepile view (page number)
-                let pageNum
-    
-                if (isNaN(Number(action))) {
-                    pageNum = args[1];
-                } else {
-                    pageNum = Number(args[0]);
-                }
-    
-                if (pageNum == 0 || !pageNum) { //table of contents
-                    let i = 1 
-                    let j = 0 //they're special tools that will help us later
-    
-                    createEmbed(j)
-                    embedArray[j]
-                    .setColor('#208ddd')
-                    .setTitle('The Maybe Pile')
-                    .setAuthor({ name: 'BirdBox', iconURL: 'https://cdn.discordapp.com/avatars/803811104953466880/5bce4f0ba438015ec65f5b9cac11c8e3.webp'})
-                    .setDescription('Take a look at and suggest potential features!')
-                    .setFooter({text: 'Page 0 ● Also a bot that doesn\'t run on spaghetti code.'})
-                    .setThumbnail('https://cdn.discordapp.com/attachments/826968641790017576/906737704581079070/iu.png')
-                    
-                    //failsafe that i have no doubt will somehow happen at some point
-                    if (!maybeArray[1] && maybeArray.toString() !== defaultArray.toString() /*i despise javascript equality*/ ) {try {embedArray[0].addFields({name: "maybepile data appears to be corrupted, contact a dev asap", value: " "})} catch {console.error};} 
-                    else if (!maybeArray[1]) {try {embedArray[0].addFields({name: "huh, looks like there's nothing here", value: " "})} catch {console.error};}
-                    //chatgpt did this one
-                    else { maybeArray.slice(1).forEach((item) => {
-                        if (i % 25 == 0) { //in the case of i being any number that is some multiple of 25 (they overflow the embed if 26, i reduced slightly for cleaner inline)
-                            embedArray[j].setFooter({text: ' '})
-                            j++; createEmbed(j)
-                        }
-                        try {embedArray[j].addFields({name: `${i}: ${item.title}`, value: `Suggested by ${item.author}`, inline: true})} catch {console.error};
-                        i++
-                    });}
-                    if (classic) {message.channel.trysend({embeds: embedArray});}
-                    else { require("../modernmode").maybepile_view({message, args}, {prefix, devs, db}, embedArray, sent); } //redirect in case of modern mode}
-                } else {
-                    if (!maybeArray[pageNum]) {message.channel.trysend(`can't find anything at index ${pageNum}`); return; }
-                    //specific maybepile item
-                    const newEmbed = new EmbedBuilder()
-                    .setColor('#208ddd')
-                    .setTitle('The Maybe Pile')
-                    .setAuthor({ name: 'BirdBox', iconURL: 'https://cdn.discordapp.com/avatars/803811104953466880/5bce4f0ba438015ec65f5b9cac11c8e3.webp'})
-                    .setFooter({text: `Page ${pageNum} ● Suggested by ${maybeArray[pageNum].author}, special thanks to them!`})
-                    .setThumbnail('https://cdn.discordapp.com/attachments/826968641790017576/906737704581079070/iu.png');
-                    try {newEmbed.addFields({name: maybeArray[pageNum].title, value: maybeArray[pageNum].desc})} catch {console.error};
+            let pageNum
 
-                    if (classic) {message.channel.trysend({embeds: [newEmbed]});}
-                    else { require("../modernmode").maybepile_view({message, args}, {devs, db}, [newEmbed], sent); } //redirect in case of modern mode
-                    
-                }
+            if (isNaN(Number(action))) {
+                pageNum = args[1];
+            } else {
+                pageNum = Number(args[0]);
+            }
+
+            if (pageNum == 0 || !pageNum) { //table of contents
+                embedArray = createTableOfCOntents(embedArray, maybeArray, defaultArray)
+                if (classic) {message.channel.trysend({embeds: embedArray});}
+                else { modernModeView(message, embedArray, maybeArray) } //redirect in case of modern mode
+            } else {
+                //getting a specific maybepile item
+                if (!maybeArray[pageNum]) {message.channel.trysend(`can't find anything at index ${pageNum}`); return; }
+
+                //get item embed
+                const itemEmbed = createSpecificItemEmbed(maybeArray, pageNum);
+
+                //send item embed (no need to redirect to modernmode here, is ok if the selector only appears on table of contents)
+                message.channel.trysend({embeds: [itemEmbed]});
+                
+            }
         } else if (action) {
             message.channel.trysend(`please use ${prefix}maybepile view/suggest/edit/delete cause idk what "${action}" is`);   
         } else {
@@ -212,4 +181,176 @@ module.exports = {
 
         await db.set('maybepile', maybeArray)
     }
+}
+
+function initializeEmbed(j, embedArray) {
+    embedArray[j] = new EmbedBuilder()
+    .setColor('#208ddd')
+}
+
+function createTableOfCOntents(embedArray, maybeArray, defaultArray) {
+    let i = 1 //incrementor for looping through maybepile items and adding to embeds
+    let j = 0 //incrementor for the embeds themselves
+
+    //create the first embed
+    initializeEmbed(j, embedArray)
+    embedArray[j]
+    .setTitle('The Maybe Pile')
+    .setAuthor({ name: 'BirdBox', iconURL: 'https://cdn.discordapp.com/avatars/803811104953466880/5bce4f0ba438015ec65f5b9cac11c8e3.webp'})
+    .setDescription('Take a look at and suggest potential features!')
+    .setFooter({text: 'Page 0 ● Also a bot that doesn\'t run on spaghetti code.'})
+    .setThumbnail('https://cdn.discordapp.com/attachments/826968641790017576/906737704581079070/iu.png')
+    
+    //failsafe that i have no doubt will somehow happen at some point
+    if (!maybeArray[1] && maybeArray.toString() !== defaultArray.toString() /*i despise javascript equality*/ ) {try {embedArray[0].addFields({name: "maybepile data appears to be corrupted, contact a dev asap", value: " "})} catch {err => console.error(err)};} 
+    else if (!maybeArray[1]) {try {embedArray[0].addFields({name: "huh, looks like there's nothing here", value: " "})} catch {err => console.error(err)};}
+
+    //chatgpt did this one
+    else { maybeArray.slice(1).forEach((item) => {
+        if (i % 25 == 0) { //in the case of i being any number that is some multiple of 25 (they overflow the embed if 26, i reduced slightly for cleaner inline)
+            embedArray[j].setFooter({text: ' '}); //blank out the footer so its not weird looking
+            j++; initializeEmbed(j, embedArray);  //new embed and continue loop
+        }
+        try {embedArray[j].addFields({name: `${i}: ${item.title}`, value: `Suggested by ${item.author}`, inline: true})} catch {err => console.error(err)};
+        i++;
+    });}
+
+    return embedArray
+}
+
+function createSpecificItemEmbed(maybeArray, pageNum) {
+    const itemEmbed = new EmbedBuilder()
+    .setColor('#208ddd')
+    .setTitle('The Maybe Pile')
+    .setAuthor({ name: 'BirdBox', iconURL: 'https://cdn.discordapp.com/avatars/803811104953466880/5bce4f0ba438015ec65f5b9cac11c8e3.webp'})
+    .setFooter({text: `Page ${pageNum} ● Suggested by ${maybeArray[pageNum].author}, special thanks to them!`})
+    .setThumbnail('https://cdn.discordapp.com/attachments/826968641790017576/906737704581079070/iu.png');
+    try {itemEmbed.addFields({name: maybeArray[pageNum].title, value: maybeArray[pageNum].desc})} catch {console.error};
+
+    return itemEmbed
+}
+
+async function modernModeView(message, embedArray, maybeArray) {
+    const rowArray = [];
+    let itemNum = 1
+
+    embedArray.forEach(item => {
+        const options = new StringSelectMenuBuilder()
+        .setCustomId(`maybepile-view-${itemNum}`)
+        .setPlaceholder(`Jump to item (embed ${itemNum})`)
+        for (let i = 0; i < item.data.fields.length; i++) { //iterate through embed fields to grab data
+            options.addOptions(
+                new StringSelectMenuOptionBuilder()
+                .setLabel(item.data.fields[i].name)
+                .setDescription(item.data.fields[i].value)
+                .setValue(item.data.fields[i].name.split(":")[0].toString())
+            )
+        }
+        rowArray.push(new ActionRowBuilder().addComponents(options)); itemNum++;
+    })
+    
+    const sent = await message.tryreply({ components: rowArray, embeds: embedArray });
+
+    //collector for the selector responses
+    const selectcollector = sent.createMessageComponentCollector({ time: 15000 });
+
+    selectcollector.on('collect', async i => {
+        //get a new embed for the selected item
+        const updatedEmbed = createSpecificItemEmbed(maybeArray, i.values[0])
+
+        //disable selectors and edit message with update
+        rowArray.forEach(item => {item.components[0].setDisabled(true)})
+        sent.edit({ embeds: [updatedEmbed], components: rowArray });
+        i.deferUpdate();
+    });
+
+    selectcollector.on('end', () => {
+        //disable the selector
+        rowArray.forEach(item => {item.components[0].setDisabled(true)})
+        sent.edit({ components: rowArray })});
+}
+
+async function modernModeEdit({message, args}, {devs}, maybeArray) {
+    const item = maybeArray[args[1]]
+
+    newButtonModal(message,
+        new ActionRowBuilder().addComponents(
+            new ButtonBuilder()
+                .setLabel('Edit an item')
+                .setStyle(ButtonStyle.Primary)
+                .setCustomId("maybepile-edit")
+                .setDisabled(false)
+        ),
+        new ModalBuilder().setCustomId("maybepile-edit").setTitle("Edit Maybepile Item")
+        .addComponents([new ActionRowBuilder().addComponents(
+                new TextInputBuilder()
+                    .setCustomId('maybepile-title')
+                    .setLabel(`Title`)
+                    .setStyle(TextInputStyle.Short)
+                    .setPlaceholder(`Title of the item.`)
+                    .setValue(item.title)
+                    .setRequired(true)),
+            new ActionRowBuilder().addComponents(
+                new TextInputBuilder()
+                    .setCustomId('maybepile-desc')
+                    .setLabel('Description')
+                    .setStyle(TextInputStyle.Paragraph)
+                    .setPlaceholder(`The description of the item, displayed on the item's page.`)
+                    .setValue(item.desc)
+                    .setRequired(true)),
+            new ActionRowBuilder().addComponents(
+                new TextInputBuilder()
+                    .setCustomId('maybepile-author')
+                    .setLabel(`Suggester`)
+                    .setStyle(TextInputStyle.Short)
+                    .setPlaceholder(`Person who suggested this item to be added. Credit where it's due!`)
+                    .setValue(item.author)
+                    .setRequired(true)),
+            new ActionRowBuilder().addComponents(
+                new TextInputBuilder()
+                    .setCustomId('maybepile-page')
+                    .setLabel(`Page`)
+                    .setStyle(TextInputStyle.Short)
+                    .setPlaceholder(`Which page is being modified.`)
+                    .setValue(args[1])
+                    .setRequired(true))]), {devs})
+}
+
+async function modernModeAdd({message, args}, {prefix, devs}) {
+    const suggester = message.author.username
+    const title = message.content.replace(`${prefix}maybepile ${args[0]}`, "").trim()
+
+    newButtonModal(message,
+        new ActionRowBuilder().addComponents(
+            new ButtonBuilder()
+                .setLabel('Add an item')
+                .setStyle(ButtonStyle.Primary)
+                .setCustomId("maybepile-add")
+                .setDisabled(false)
+        ),
+        new ModalBuilder().setCustomId("maybepile-add").setTitle("Add Maybepile Item")
+        .addComponents([new ActionRowBuilder().addComponents(
+                new TextInputBuilder()
+                    .setCustomId('maybepile-title')
+                    .setLabel(`Title`)
+                    .setStyle(TextInputStyle.Short)
+                    .setPlaceholder(`Title of the item.`)
+                    .setValue(title)
+                    .setRequired(true)),
+            new ActionRowBuilder().addComponents(
+                new TextInputBuilder()
+                    .setCustomId('maybepile-desc')
+                    .setLabel('Description')
+                    .setStyle(TextInputStyle.Paragraph)
+                    .setPlaceholder(`The description of the item, displayed on the item's page.`)
+                    .setRequired(true)),
+            new ActionRowBuilder().addComponents(
+                new TextInputBuilder()
+                    .setCustomId('maybepile-author')
+                    .setLabel(`Suggester`)
+                    .setStyle(TextInputStyle.Short)
+                    .setPlaceholder(`Whoever suggested this item. Credit where it's due!`)
+                    .setValue(suggester)
+                    .setRequired(true))]), {devs}
+    )
 }
