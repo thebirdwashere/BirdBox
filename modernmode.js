@@ -1,4 +1,4 @@
-const { ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js")
+
 
 async function newButtonModal(message, row, modal, {devs}) {
     //create the message with the button (variable declared for button disabling)
@@ -113,60 +113,5 @@ module.exports = {
             }
             interaction.deferUpdate();
         });
-    },
-
-    responses_add_message: ({message, args}, {devs, prefix}) => {
-        let response = message.content.replace(`${prefix}responses ${args[0]} ${args[1]}`, "")
-
-        newButtonModal(message,
-            new ActionRowBuilder().addComponents(
-                new ButtonBuilder()
-                    .setLabel('Add a response')
-                    .setStyle(ButtonStyle.Primary)
-                    .setCustomId("responses-add-message")
-                    .setDisabled(false)
-            ),
-            new ModalBuilder().setCustomId("responses-add-message").setTitle("Add Message Response")
-            .addComponents([new ActionRowBuilder().addComponents(
-                    new TextInputBuilder()
-                        .setCustomId('message-response')
-                        .setLabel(`Message`)
-                        .setStyle(TextInputStyle.Short)
-                        .setPlaceholder(`The response that Birdbox will provide.`)
-                        .setValue(response)
-                        .setRequired(true)),
-                new ActionRowBuilder().addComponents(
-                    new TextInputBuilder()
-                        .setCustomId('message-keywords')
-                        .setLabel('Keywords')
-                        .setStyle(TextInputStyle.Paragraph)
-                        .setPlaceholder(`The words to prompt Birdbox to respond. Separate keywords with commas, not spaces.`)
-                        .setRequired(true))]), {devs})},
-    responses_add_lyric: ({message, args}, {devs, prefix}) => {
-        let response = message.content.replace(`${prefix}responses ${args[0]} ${args[1]}`, "")
-
-        newButtonModal(message,
-            new ActionRowBuilder().addComponents(
-                new ButtonBuilder()
-                    .setLabel('Add a response')
-                    .setStyle(ButtonStyle.Primary)
-                    .setCustomId("responses-add-message")
-                    .setDisabled(false)
-            ),
-            new ModalBuilder().setCustomId("responses-add-lyric").setTitle("Add Lyric Response")
-            .addComponents([new ActionRowBuilder().addComponents(
-                    new TextInputBuilder()
-                        .setCustomId('lyric-title')
-                        .setLabel(`Title`)
-                        .setStyle(TextInputStyle.Short)
-                        .setPlaceholder(`Title of the lyric response, for deletion purposes.`)
-                        .setValue(response)
-                        .setRequired(true)),
-                new ActionRowBuilder().addComponents(
-                    new TextInputBuilder()
-                        .setCustomId('lyric-lyrics')
-                        .setLabel('Lyrics')
-                        .setStyle(TextInputStyle.Paragraph)
-                        .setPlaceholder(`The series of responses Birdbox should use. Separate lyrics with linebreaks, \nlike this.`)
-                        .setRequired(true))]), {devs})}
+    }
 }

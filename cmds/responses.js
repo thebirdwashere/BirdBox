@@ -1,3 +1,6 @@
+const { ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js")
+const { newButtonModal } = require("../modernmode");
+
 module.exports = {
   name: 'responses',
   description: "Manage bot sticker and lyric responses. Birdbox dev only!",
@@ -16,7 +19,7 @@ module.exports = {
                 //aborts addition because user does not have perms to add
                 message.channel.trysend("sorry, you must be a dev to add something"); return; }
 
-            if (!classic) { require("../modernmode").responses_add_message({message, args}, {prefix, devs, db}); return; } //redirect in case of modern mode
+            if (!classic) { responsesAddMessage({message, args}, {devs, prefix}); return; } //redirect in case of modern mode
 
             let messageArray = await db.get('messages')
             console.table(messageArray)
@@ -114,7 +117,7 @@ module.exports = {
                 //aborts addition because user does not have perms to add
                 message.channel.trysend("sorry, you must be a dev to add something"); return; }
 
-            if (!classic) { require("../modernmode").responses_add_lyric({message, args}, {prefix, devs, db}); return; } //redirect in case of modern mode
+            if (!classic) { responsesAddLyric({message, args}, {devs, prefix}); return; } //redirect in case of modern mode
         
             let lyricArray = await db.get('lyrics')
             console.table(lyricArray)
@@ -246,4 +249,64 @@ module.exports = {
         console.table(await db.get(name))
     }
   }
+}
+
+async function responsesAddLyric({message, args}, {devs, prefix}) {
+    let response = message.content.replace(`${prefix}responses ${args[0]} ${args[1]}`, "")
+
+    newButtonModal(message,
+        new ActionRowBuilder().addComponents(
+            new ButtonBuilder()
+                .setLabel('Add a response')
+                .setStyle(ButtonStyle.Primary)
+                .setCustomId("responses-add-message")
+                .setDisabled(false)
+        ),
+        new ModalBuilder().setCustomId("responses-add-lyric").setTitle("Add Lyric Response")
+        .addComponents([new ActionRowBuilder().addComponents(
+                new TextInputBuilder()
+                    .setCustomId('lyric-title')
+                    .setLabel(`Title`)
+                    .setStyle(TextInputStyle.Short)
+                    .setPlaceholder(`Title of the lyric response, for deletion purposes.`)
+                    .setValue(response)
+                    .setRequired(true)),
+            new ActionRowBuilder().addComponents(
+                new TextInputBuilder()
+                    .setCustomId('lyric-lyrics')
+                    .setLabel('Lyrics')
+                    .setStyle(TextInputStyle.Paragraph)
+                    .setPlaceholder(`The series of responses Birdbox should use. Separate lyrics with linebreaks, \nlike this.`)
+                    .setRequired(true))]), {devs}
+    )
+}
+
+async function responsesAddMessage({message, args}, {devs, prefix}) {
+    let response = message.content.replace(`${prefix}responses ${args[0]} ${args[1]}`, "")
+
+    newButtonModal(message,
+        new ActionRowBuilder().addComponents(
+            new ButtonBuilder()
+                .setLabel('Add a response')
+                .setStyle(ButtonStyle.Primary)
+                .setCustomId("responses-add-message")
+                .setDisabled(false)
+        ),
+        new ModalBuilder().setCustomId("responses-add-message").setTitle("Add Message Response")
+        .addComponents([new ActionRowBuilder().addComponents(
+                new TextInputBuilder()
+                    .setCustomId('message-response')
+                    .setLabel(`Message`)
+                    .setStyle(TextInputStyle.Short)
+                    .setPlaceholder(`The response that Birdbox will provide.`)
+                    .setValue(response)
+                    .setRequired(true)),
+            new ActionRowBuilder().addComponents(
+                new TextInputBuilder()
+                    .setCustomId('message-keywords')
+                    .setLabel('Keywords')
+                    .setStyle(TextInputStyle.Paragraph)
+                    .setPlaceholder(`The words to prompt Birdbox to respond. Separate keywords with commas, not spaces.`)
+                    .setRequired(true))]), {devs}
+    )
 }
