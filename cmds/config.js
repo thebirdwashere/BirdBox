@@ -79,7 +79,7 @@ function settingsText(prefix) { //everything here is funky because i wanted prop
             this.name = `${prefix}config user notifs log/reply`; this.options = ["reply", "log"]; this.default = "reply";
             this.value = `${this.desc} \nDefaults to **${this.default}** if not set. \n\n**log:** Only log in the server channel dedicated to bot notifications. \n**reply:** Reply to the original message as well as log it.`},
             snipes: new function () {this.title = `Snipe Logging`;
-            this.desc =  `Change whether deleted messages are logged by ${prefix}snipe.`;
+            this.desc =  `Change whether your deleted messages are logged by ${prefix}snipe.`;
             this.name = `${prefix}config user snipes enable/disable`; this.options = ["enable", "disable"]; this.default = "disable";
             this.value = `${this.desc} \nDefaults to **${this.default}** if not set. \n\n**enable:** Log your deleted messages for snipes, regardless of who deleted it. \n**disable:** Do not log your deleted messages.`},
             classic: new function () {this.title = `BirdBox Classic`;
@@ -102,7 +102,11 @@ function settingsText(prefix) { //everything here is funky because i wanted prop
             pinning: new function() {this.title = `Pin/Unpin`;
             this.desc = `Modifies the usability of pin and unpin commands.`;
             this.name = `${prefix}config server pinning enable/restrict/disable`; this.options = ["enable", "restrict", "disable"]; this.default = "restrict";
-            this.value = `${this.desc} \nDefaults to **${this.default}** if not set. \n\n**enable:** Allow any messages to be pinned at any time by any user. \n**restrict:** Restrict users from pinning messages under certain circumstances. Criteria is outlined in the help page for these commands. \n**disable:** Do not allow messages to be pinned by any users except devs.`; }
+            this.value = `${this.desc} \nDefaults to **${this.default}** if not set. \n\n**enable:** Allow any messages to be pinned at any time by any user. \n**restrict:** Restrict users from pinning messages under certain circumstances. Criteria is outlined in the help page for these commands. \n**disable:** Do not allow messages to be pinned by any users except devs.`; },
+            snipes_server: new function() {this.title = `Snipe Logging`;
+            this.desc = `Change whether this server's deleted messages are logged by ${prefix}snipe.`;
+            this.name = `${prefix}config server snipes_server enable/disable`; this.options = ["enable", "disable"]; this.default = "enable";
+            this.value = `${this.desc} \nDefaults to **${this.default}** if not set. \n\n**enable:** Allows deleted messages to be logged for users that opt in. \n**disable:** Do not allow any messages to be logged for any users.`; }
     }}
 }
 
@@ -127,8 +131,7 @@ function modifyUserSetting(message, {prefix, db, classic}, {setting, change}) {
     })
 }
 
-//futureproofing a default server setting (currently unused)
-async function updateDefaultServerSetting(message, {prefix, db, classic}, {setting, change}) {
+async function updateDefaultServerSetting(message, {prefix, db}, {setting, change}) {
     if (!settingsText(prefix).server[setting].options.includes(change)) {
         return message.channel.trysend(`not sure what ${change} means but it sure isnt "${settingsText(prefix).server[setting].options.join('" or "')}"`)}
     

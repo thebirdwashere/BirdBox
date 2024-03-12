@@ -73,14 +73,17 @@ client.once('ready', async () => {
 });
 
 client.on('messageDelete', async (message) => {
-    if (await db.get(`setting_snipes_${message.author.id}`) !== "enable") {return;}; //don't log people who opted out
-    if (!message.author || !message.createdAt) {return;};               //don't store busted snipess
+    const userAllowsSnipes = (await db.get(`setting_snipes_${message.author.id}`) === "enable");
+    const serverAllowsSnipes = (await db.get(`setting_snipes_server_${message.guildId}`) === "enable");
+
+    if (!userAllowsSnipes || !serverAllowsSnipes) {return;}; //don't log people who opted out
+    if (!message.author || !message.createdAt) {return;};  //don't store busted snipes (edit: not even sure if this does anything lol)
 	await db.set(`snipe_${message.channelId}`, {
 		content: message?.content,
 		author: {tag: message.author.tag, id: message.author.id},
         timestamp: message.createdAt,
         attachment: message.attachments.first()?.url // Grabs the first attachment url out of the message, EXPERIMENTAL FEATURE
-	})
+	});
 })
 
 modals.modalHandler(vars); //handle modals for birdbox modern version
