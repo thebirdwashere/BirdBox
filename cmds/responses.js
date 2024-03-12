@@ -1,5 +1,5 @@
 const { ModalBuilder, TextInputBuilder, TextInputStyle, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js")
-const { newButtonModal } = require("../modernmode");
+const { newButtonModal } = require("../modals");
 
 module.exports = {
   name: 'responses',

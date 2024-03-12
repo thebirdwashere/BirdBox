@@ -3,7 +3,7 @@
  * DESCRIPTION: Take a look at and suggest potential features! */
 
 const { ModalBuilder, ButtonBuilder, ButtonStyle,  EmbedBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, ActionRowBuilder, TextInputBuilder, TextInputStyle } = require("discord.js");
-const { newButtonModal } = require("../modernmode")
+const { newButtonModal } = require("../modals")
 
 module.exports = {
     name: 'maybepile',

@@ -27,7 +27,7 @@ const { QuickDB } = require("quick.db");
 const db = new QuickDB();
 
 const tests = require("./messagetests")
-const modal = require("./modernmode")
+const modals = require("./modals")
 
 let IS_CANARY = true
 let prefix;
@@ -83,7 +83,7 @@ client.on('messageDelete', async (message) => {
 	})
 })
 
-modal.modalHandler(vars); //handle modals for birdbox modern version
+modals.modalHandler(vars); //handle modals for birdbox modern version
 
 client.on('messageCreate', async (message) => {
     if (message.author.id == client.user.id) {return;} //birdbox check
