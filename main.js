@@ -100,8 +100,11 @@ client.on('messageCreate', async (message) => {
         if (client.commands.has(command)) {
             client.commands.get(command).execute({message, args}, vars);}}
 
-    if (await tests.keywords(db, content, message.guildId, messageArray, lyricArray, true)) {//sticker/lyric responses
-        message.tryreply(await tests.keywords(db, content, message.guildId, messageArray, lyricArray, false));} 
+    //sticker/lyric responses
+    const repliesAllowed = (await db.get(`setting_responses_${message.guildId}`) === "enable")
+    const keywordTestResult = await tests.keywords(db, content, message.guildId, messageArray, lyricArray)
+    if (repliesAllowed && keywordTestResult) {
+        message.tryreply(keywordTestResult);}
 
     if (IS_CANARY) {return;} //make sure none of this is duplicated on canary
 

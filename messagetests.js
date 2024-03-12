@@ -16,14 +16,14 @@ module.exports = {
         if(lyrics) {
             let expected = await db.get(`lyric_${guild}`);
             if (expected && string.includes(expected[0]) && lyrics[expected[1]].content[expected[2] + 1]) {
-                if (!isTest) {await db.set(`lyric_${guild}`, [lyrics[expected[1]].content[expected[2] + 2], expected[1], expected[2] + 2]);}; //does not run when used as true/false test, cause it broke stuff
+                await db.set(`lyric_${guild}`, [lyrics[expected[1]].content[expected[2] + 2], expected[1], expected[2] + 2]); //does not run when used as true/false test, cause it broke stuff
                 return lyrics[expected[1]].content[expected[2] + 1];
             }
             for (let i = 0; i < lyrics.length; i++) {
                 for (let j = lyrics[i].content.length - 1; j--;) {
                     if (string.includes(lyrics[i].content[j].toLowerCase()) /*&& (!val || lyrics[i].content[j].length >= val.length)*/) {
                         val = lyrics[i].content[j + 1]
-                        if (!isTest) {await db.set(`lyric_${guild}`, [lyrics[i].content[j + 2], i, j + 2]);}
+                        await db.set(`lyric_${guild}`, [lyrics[i].content[j + 2], i, j + 2]);
                     }
                 }
             }

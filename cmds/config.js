@@ -22,6 +22,11 @@ module.exports = {
     }
 }
 
+// IMPORTANT NOTICE
+// if anyone comes in trying to add new config options, 
+// please just fill out the required info in settingsText
+// and it ought to work
+
 /*/
  * --------------------------------
  * classic mode functions are below
@@ -77,19 +82,23 @@ function settingsText(prefix) { //everything here is funky because i wanted prop
             this.desc =  `Change whether deleted messages are logged by ${prefix}snipe.`;
             this.name = `${prefix}config user snipes enable/disable`; this.options = ["enable", "disable"]; this.default = "disable";
             this.value = `${this.desc} \nDefaults to **${this.default}** if not set. \n\n**enable:** Log your deleted messages for snipes, regardless of who deleted it. \n**disable:** Do not log your deleted messages.`},
-            classic: new function () {this.title = `Birdbox Classic`;
+            classic: new function () {this.title = `BirdBox Classic`;
             this.desc = 'Toggle between modern and classic interfaces.';
             this.name = `${prefix}config user classic enable/disable`; this.options = ["enable", "disable"]; this.default = "disable";
             this.value = `${this.desc} \nDefaults to **${this.default}** if not set. \n\n**enable:** Use old text-based interfaces for content entry. \n**disable:** Use modern modal/button interfaces for content entry.`; }
         }, server: {
             notif_channel: new function() {this.title = `Notifications Channel`;
-            this.desc = `Change the channel notification logs are sent to.`
+            this.desc = `Change the channel notification logs are sent to.`;
             this.name = `${prefix}config server notif_channel (id)`; this.options = "channel"; this.default = "";
             this.value = `${this.desc} \nIf not set, logs will be disabled. \n\n**id:** The ID of the log channel being set.`; },
             announce_channel: new function() {this.title = `Announcement Channel`; 
-            this.desc = `Change the channel ${prefix}announce sends to.`
+            this.desc = `Change the channel ${prefix}announce sends to.`;
             this.name = `${prefix}config server announce_channel (id)`; this.options = "channel"; this.default = "";
-            this.value = `${this.desc} \nIf not set or set to an invalid ID, disables ${prefix}announce. \n\n**id:** The ID of the announcement channel being set.`; }
+            this.value = `${this.desc} \nIf not set or set to an invalid ID, disables ${prefix}announce. \n\n**id:** The ID of the announcement channel being set.`; },
+            responses: new function() {this.title = `Responses`; 
+            this.desc = `Toggles whether message and lyric responses are enabled for this server.`;
+            this.name = `${prefix}config server responses enable/disable`; this.options = ["enable", "disable"]; this.default = "enable";
+            this.value = `${this.desc} \nDefaults to **${this.default}** if not set. \n\n**enable:** Allow BirdBox to respond to messages with keywords. \n**disable:** Do not allow keyword-based responses for this.`; }
     }}
 }
 
@@ -154,7 +163,7 @@ const modifyServerSettingArray = {
 function modifyServerSetting(message, {prefix, db, classic}, {setting, change}) {
     return new Promise((res) => {
         if (modifyServerSettingArray[setting]) modifyServerSettingArray[setting](message, {prefix, db, classic}, change)
-        else updateDefaultServerSetting(message, {prefix, db, classic}, setting, change)
+        else updateDefaultServerSetting(message, {prefix, db, classic}, {setting, change})
 
         res(true)
     })
@@ -280,7 +289,6 @@ async function displaySetting(message, {prefix, db}, {mode, setting}) {
 async function sendConfigMessage(message, {prefix, db}, {mode, setting}, row) {
     let sent, newEmbed
 
-    console.log(mode, setting)
     if (!setting) {
         newEmbed = embedTemplate(mode);
         newEmbed.setDescription('Use the menu below to select a setting!')
