@@ -1,9 +1,10 @@
+const {EmbedBuilder} = require("discord.js")
 const { randomIntInRange } = require("../utils")
 
 module.exports = {
     name: '8ball',
     description: 'Question the Box and never get a straight answer.',
-    execute({message}){
+    execute({message}, {prefix}){
     let responses = [
       'Ask again in Spanish.',
       'bruh im deaf you gotta type it again',
@@ -103,13 +104,35 @@ module.exports = {
       'https://www.youtube.com/watch?v=DRSxqfisPGw'
     ]
 
+    let responseMessage
+
     const randomIndex = randomIntInRange(0, responses.length - 1)
     if (typeof responses[randomIndex] === "string") {
-      message.tryreply(":8ball: " + responses[randomIndex]);
+      responseMessage = responses[randomIndex]
     } else { //if you want rare response variants (like i did)
       const randomRandomIndex = randomIntInRange(0, responses[randomIndex].length - 1)
-      message.tryreply(":8ball: " + responses[randomIndex][randomRandomIndex]);
+      responseMessage = responses[randomIndex][randomRandomIndex]
     }
+
+    const randomFooters = [
+      "i be like that wise tree fr fr",
+      "1 million billion iq move",
+      "big brain",
+      "panzer of ze lake",
+      "erm it's yr'oue* actually"
+    ]
+
+    const youAsked = message.content.replace(`${prefix}8ball`, '').trim() //guys we finally found who asked
+
+    const responseEmbed = new EmbedBuilder()
+    .setTitle(responseMessage)
+    .setAuthor({ name: 'BirdBox', iconURL: 'https://cdn.discordapp.com/avatars/803811104953466880/5bce4f0ba438015ec65f5b9cac11c8e3.png?size=256' })
+    .setColor(0xAA00FF)
+    .setFooter({ text: randomFooters[randomIntInRange(0, randomFooters.length - 1)] });
+
+    if (youAsked) {responseEmbed.addFields({ name: 'You asked:', value: youAsked})}
+
+    message.reply({ embeds: [responseEmbed] });
     
   }
 }
