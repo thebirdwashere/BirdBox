@@ -73,8 +73,8 @@ client.once('ready', async () => {
 });
 
 client.on('messageDelete', async (message) => {
-    const userAllowsSnipes = (await db.get(`setting_snipes_${message.author.id}`) === "enable");
-    const serverAllowsSnipes = (await db.get(`setting_snipes_server_${message.guildId}`) === "enable");
+    const userAllowsSnipes = (await db.get(`setting_snipes_${message.author.id}`) === "enable");         //equals enable since default is off
+    const serverAllowsSnipes = (await db.get(`setting_snipes_server_${message.guildId}`) !== "disable"); //does not equal disable since default is on
 
     if (!userAllowsSnipes || !serverAllowsSnipes) {return;}; //don't log people who opted out
     if (!message.author || !message.createdAt) {return;};  //don't store busted snipes (edit: not even sure if this does anything lol)
@@ -104,7 +104,7 @@ client.on('messageCreate', async (message) => {
             client.commands.get(command).execute({message, args}, vars);}}
 
     //sticker/lyric responses
-    const repliesAllowed = (await db.get(`setting_responses_${message.guildId}`) === "enable")
+    const repliesAllowed = (await db.get(`setting_responses_${message.guildId}`) !== "disable")
     const keywordTestResult = await tests.keywords(db, content, message.guildId, messageArray, lyricArray)
     if (repliesAllowed && keywordTestResult) {
         message.tryreply(keywordTestResult);}
@@ -132,8 +132,12 @@ client.on('messageCreate', async (message) => {
         if (notifchannel) {await notifchannel.trysend(notif)} //only send notif if there is a log channel
     }
 
-    jinx = await db.get(`jinx_${message.channelId}`) //jinx detector
-    if (tests.jinx(message, jinx)) { message.channel.trysend(jinx.content) }
+    const jinxDetectionEnabled = (await db.get(`setting_jinxes_${message.guildId}`) !== "disable")
+
+    if (jinxDetectionEnabled) {
+        jinx = await db.get(`jinx_${message.channelId}`) //jinx detector
+        if (tests.jinx(message, jinx)) { message.channel.trysend(jinx.content) }
+    }
 
     const periodicness = tests.periodictable(content)
     if (periodicness) { //periodic table checker
@@ -149,11 +153,13 @@ client.on('messageCreate', async (message) => {
             if (notifchannel) {await notifchannel.trysend(notif)} //only send notif if there is a log channel
     }
 
-    await db.set(`jinx_${message.channelId}`, { 
-		content: message.content, //for jinx detection
-		author: message.author.displayName,
-        timestamp: message.createdTimestamp
-    })
+    if (jinxDetectionEnabled) {
+        await db.set(`jinx_${message.channelId}`, { 
+            content: message.content, //for jinx detection
+            author: message.author.displayName,
+            timestamp: message.createdTimestamp
+        })
+    };
 });
 
 client.login(process.env.DISCORD_TOKEN);

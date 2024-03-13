@@ -11,7 +11,7 @@ module.exports = {
         const setting = args[1];
         const change = args[2];
 
-        const classic = Boolean(await db.get(`setting_classic_${message.author.id}`) == "enable")
+        const classic = Boolean(await db.get(`setting_classic_${message.author.id}`) === "enable")
         
         //reject server settings if not admin
         if (mode == "server" && !devs.includes(message.author.id)) {return message.channel.trysend("sorry, you must be a birdbox admin to modify server settings")};
@@ -99,6 +99,10 @@ function settingsText(prefix) { //everything here is funky because i wanted prop
             this.desc = `Toggles whether message and lyric responses are enabled for this server.`;
             this.name = `${prefix}config server responses enable/disable`; this.options = ["enable", "disable"]; this.default = "enable";
             this.value = `${this.desc} \nDefaults to **${this.default}** if not set. \n\n**enable:** Allow BirdBox to respond to messages with keywords. \n**disable:** Do not allow keyword-based responses.`; },
+            jinxes: new function() {this.title = `Jinx Detection`; 
+            this.desc = `Toggles whether BirdBox responds to identical messages sent at the same time.`;
+            this.name = `${prefix}config server jinxes enable/disable`; this.options = ["enable", "disable"]; this.default = "enable";
+            this.value = `${this.desc} \nDefaults to **${this.default}** if not set. \n\n**enable:** Allow BirdBox to add to a chain of identical messages. \n**disable:** Do not allow jinx detection or response.`; },
             pinning: new function() {this.title = `Pin/Unpin`;
             this.desc = `Modifies the usability of pin and unpin commands.`;
             this.name = `${prefix}config server pinning enable/restrict/disable`; this.options = ["enable", "restrict", "disable"]; this.default = "restrict";

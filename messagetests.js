@@ -50,7 +50,7 @@ module.exports = {
 
     jinx: (message, jinx) => { //jinx checker
         if (!jinx) {return;}
-        return (Math.abs(jinx.timestamp - message.createdAt) <= 2000 && jinx.content == message.content && jinx.author !== message.author.displayName)
+        return (Math.abs(jinx.timestamp - message.createdAt) <= 2000 && jinx.content == message.content /*&& jinx.author !== message.author.displayName*/)
     },
 
     periodictable: (content) => {
