@@ -10,7 +10,7 @@ module.exports = {
         //vvvvvvvvvvvvvvvvvv
 
         const patchnotes = [{
-            version: `5.0.1`, date: `TO BE RELEASED`, devs: `AgentNebulator, Bislij, Umadkek`,
+            version: `5.0.1`, date: `3/12/2024`, devs: `AgentNebulator, Bislij, Umadkek`,
             notes: [
                 `${prefix}8ball, ${prefix}ping, ${prefix}rr, and ${prefix}translate now use an embed`,
                 `Added help description for diceroll & updated others`,
