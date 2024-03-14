@@ -264,14 +264,14 @@ async function modernModeView(message, embedArray, maybeArray) {
     const sent = await message.tryreply({ components: rowArray, embeds: embedArray });
 
     //collector for the selector responses
-    const selectcollector = sent.createMessageComponentCollector({ time: 15000 });
+    const selectcollector = sent.createMessageComponentCollector({ time: 50000 });
 
     selectcollector.on('collect', async i => {
         //get a new embed for the selected item
         const updatedEmbed = createSpecificItemEmbed(maybeArray, i.values[0])
 
         //disable selectors and edit message with update
-        rowArray.forEach(item => {item.components[0].setDisabled(true)})
+        //rowArray.forEach(item => {item.components[0].setDisabled(true)})
         sent.edit({ embeds: [updatedEmbed], components: rowArray });
         i.deferUpdate();
     });
