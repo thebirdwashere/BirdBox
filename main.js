@@ -86,15 +86,16 @@ client.on('messageDelete', async (message) => {
 	});
 })
 
-modals.modalHandler(vars); //handle modals for birdbox modern version
+client.on('interactionCreate', async (interaction) => {
+    if (!interaction.isModalSubmit()) {return;}
+    modals.modalHandler(interaction, vars); //handle modals for birdbox modern version
+});
 
 client.on('messageCreate', async (message) => {
     if (message.author.id == client.user.id) {return;} //birdbox check
     if (!message.content) {return;}                    //no reason to check an empty message
 
     const content = message.content.toLowerCase() //replaced several uses of message.content with this (however changed so the prefix and command must be lowercase)
-    const messageArray = await db.get("messages") //used for message responses
-    const lyricArray = await db.get("lyrics")     //used for lyric responses
 
     if (message.content.startsWith(prefix)) { //command checker
         const args = message.content.slice(prefix.length).trim().split(/ +/g);
@@ -104,6 +105,9 @@ client.on('messageCreate', async (message) => {
             client.commands.get(command).execute({message, args}, vars);}}
 
     //sticker/lyric responses
+    const messageArray = await db.get("messages") //used for message responses
+    const lyricArray = await db.get("lyrics")     //used for lyric responses
+
     const repliesAllowed = (await db.get(`setting_responses_${message.guildId}`) !== "disable")
     const keywordTestResult = await tests.keywords(db, content, message.guildId, messageArray, lyricArray)
     if (repliesAllowed && keywordTestResult) {
@@ -111,61 +115,8 @@ client.on('messageCreate', async (message) => {
 
     if (IS_CANARY) {return;} //make sure none of this is duplicated on canary
 
-    let notifchannel = false //by default, do not log
-    await message.guild.channels.fetch(await db.get(`setting_notif_channel_${message.guildId}`)).then(channel => {
-        if (!(channel instanceof Discord.Collection)) {notifchannel = channel}}) //for logged responses, overwrites default if found
-
-    const alphabeticalness = tests.alphabetical(content)
-    if (alphabeticalness) { //alphabetical order checker
-        const randomWord = alphabeticalness[randomIntInRange(0, alphabeticalness.length - 1)]
-        const randomfooters = [
-            `now i know my abc's, next time won't you sing with me`,
-            `perfectly sorted, as all things should be`,
-            `remember kids, ${randomWord[0].toUpperCase()} is for "${randomWord}"`]
-        
-        let isItTechnical
-        if (alphabeticalness.every( (val, i, arr) => val === arr[0] )) { //this test if every item is the same
-            isItTechnical = "technical"
-        } else {
-            isItTechnical = "perfect"
-        }
-        const alpha_joined = alphabeticalness.join(" ");
-        
-        const notif = await tests.responsetemplate(message, db, randomfooters, 
-            `:capital_abcd: Your message is in ${isItTechnical} alphabetical order! \n\`${alpha_joined}\``, 
-            `:capital_abcd:`, `is in ${isItTechnical} alphabetical order!`, 
-            0x3b88c3, alpha_joined)
-        if (notifchannel) {await notifchannel.trysend(notif)} //only send notif if there is a log channel
-    }
-
-    const jinxDetectionEnabled = (await db.get(`setting_jinxes_${message.guildId}`) !== "disable")
-
-    if (jinxDetectionEnabled) {
-        jinx = await db.get(`jinx_${message.channelId}`) //jinx detector
-        if (tests.jinx(message, jinx)) { message.channel.trysend(jinx.content) }
-    }
-
-    const periodicness = tests.periodictable(content)
-    if (periodicness) { //periodic table checker
-        const randomfooters = [
-            `${message.author.username} nye the science guy fr`,
-            `i wonder if this is a real compound, probably not but still`,
-            `one could say, this only happens... periodically`]
-        
-            const notif = await tests.responsetemplate(message, db, randomfooters, 
-            `:test_tube: Your message is on the periodic table! \n\`${periodicness}\``, 
-            `:test_tube:`, `is on the periodic table!`, 
-            0x21c369, periodicness)
-            if (notifchannel) {await notifchannel.trysend(notif)} //only send notif if there is a log channel
-    }
-
-    if (jinxDetectionEnabled) {
-        await db.set(`jinx_${message.channelId}`, { 
-            content: message.content, //for jinx detection
-            author: message.author.displayName,
-            timestamp: message.createdTimestamp
-        })
-    };
+    //run tests and stuff
+    tests.detection({message, content}, {db, Discord}, tests);
 });
 
 client.login(process.env.DISCORD_TOKEN);

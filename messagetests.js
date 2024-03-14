@@ -2,7 +2,7 @@ const { EmbedBuilder } = require("discord.js");
 const { randomIntInRange } = require("./utils");
 
 module.exports = {
-    keywords: async (db, string, guild, messages, lyrics, isTest) => { //function for message/lyric responses
+    keywords: async (db, string, guild, messages, lyrics) => { //function for message/lyric responses
         let val = ""
         string = string.replace(/[^\w\s]/gi, "");
         if(messages) {
@@ -128,7 +128,7 @@ module.exports = {
 
         const content_split = content.match(/(.{1,1000})/g); //make sure we don't go over embed char limits
 
-        newEmbed = new EmbedBuilder().setColor(color)
+        const newEmbed = new EmbedBuilder().setColor(color)
             .setTitle(`| ${emoji} | ${message.author.displayName}'s message`)
             .setDescription(`${desc} Take a look:`)
             .addFields({name: " ", value: " "})
@@ -140,5 +140,63 @@ module.exports = {
         newEmbed.addFields({name: " ", value: " "});
 
         return {content: ping, embeds: [newEmbed]}
+    },
+
+    detection: async ({message, content}, {db, Discord}, tests) => {
+        let notifchannel = false //by default, do not log
+        await message.guild.channels.fetch(await db.get(`setting_notif_channel_${message.guildId}`)).then(channel => {
+            if (!(channel instanceof Discord.Collection)) {notifchannel = channel}}) //for logged responses, overwrites default if found
+    
+        const alphabeticalness = tests.alphabetical(content)
+        if (alphabeticalness) { //alphabetical order checker
+            const randomWord = alphabeticalness[randomIntInRange(0, alphabeticalness.length - 1)]
+            const randomfooters = [
+                `now i know my abc's, next time won't you sing with me`,
+                `perfectly sorted, as all things should be`,
+                `remember kids, ${randomWord[0].toUpperCase()} is for "${randomWord}"`]
+            
+            let isItTechnical
+            if (alphabeticalness.every( (val, i, arr) => val === arr[0] )) { //this test if every item is the same
+                isItTechnical = "technical"
+            } else {
+                isItTechnical = "perfect"
+            }
+            const alpha_joined = alphabeticalness.join(" ");
+            
+            const notif = await tests.responsetemplate(message, db, randomfooters, 
+                `:capital_abcd: Your message is in ${isItTechnical} alphabetical order! \n\`${alpha_joined}\``, 
+                `:capital_abcd:`, `is in ${isItTechnical} alphabetical order!`, 
+                0x3b88c3, alpha_joined)
+            if (notifchannel) {await notifchannel.trysend(notif)} //only send notif if there is a log channel
+        }
+    
+        const jinxDetectionEnabled = (await db.get(`setting_jinxes_${message.guildId}`) !== "disable")
+    
+        if (jinxDetectionEnabled) {
+            const jinx = await db.get(`jinx_${message.channelId}`) //jinx detector
+            if (tests.jinx(message, jinx)) { message.channel.trysend(jinx.content) }
+        }
+    
+        const periodicness = tests.periodictable(content)
+        if (periodicness) { //periodic table checker
+            const randomfooters = [
+                `${message.author.username} nye the science guy fr`,
+                `i wonder if this is a real compound, probably not but still`,
+                `one could say, this only happens... periodically`]
+            
+                const notif = await tests.responsetemplate(message, db, randomfooters, 
+                `:test_tube: Your message is on the periodic table! \n\`${periodicness}\``, 
+                `:test_tube:`, `is on the periodic table!`, 
+                0x21c369, periodicness)
+                if (notifchannel) {await notifchannel.trysend(notif)} //only send notif if there is a log channel
+        }
+    
+        if (jinxDetectionEnabled) {
+            await db.set(`jinx_${message.channelId}`, { 
+                content: message.content, //for jinx detection
+                author: message.author.displayName,
+                timestamp: message.createdTimestamp
+            })
+        };
     }
 }
