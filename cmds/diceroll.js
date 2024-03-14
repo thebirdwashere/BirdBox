@@ -76,7 +76,7 @@ async function intenseShakingTroll(message, mainResult) {
     "*still shaking*",
     "*how long will this shaking last*",
     "*vigorous shaking*",
-    "*the shaketh continues*",
+    "*maximum shaketh*",
     "*shake, con los terroristas*"
   ]
 

@@ -170,6 +170,6 @@ module.exports = {
             newEmbed.addFields({name: `${patchnotes[0].version} Patch Notes (${patchnotes[0].date})`, value: patchnotesString})
         }
 
-        message.channel.trysend({embeds: [newEmbed]});
+        message.channel.tryreply({embeds: [newEmbed]});
     }
 }

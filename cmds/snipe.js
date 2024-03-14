@@ -7,8 +7,8 @@ module.exports = {
   async execute({message}, {db}) {
     const snipe = await db.get(`snipe_${message.channel.id}`)
 
-    if (!snipe) return message.channel.trysend('this command is garbage apparently cause i cant find a dang thing here')
-    if (!snipe.timestamp || !snipe.author) return message.channel.trysend('this command is garbage apparently cause the snipe i got is busted')
+    if (!snipe) return message.channel.tryreply('this command is garbage apparently cause i cant find a dang thing here')
+    if (!snipe.timestamp || !snipe.author) return message.channel.tryreply('this command is garbage apparently cause the snipe i got is busted')
     messagedate = new Date(snipe.timestamp)
 
     const sniped = await message.guild.members.fetch(snipe.author.id)
@@ -38,6 +38,6 @@ module.exports = {
       newEmbed.setImage(snipe.attachment);
     }
 
-    message.channel.trysend({embeds: [newEmbed]})
+    message.channel.tryreply({embeds: [newEmbed]})
   }
 }

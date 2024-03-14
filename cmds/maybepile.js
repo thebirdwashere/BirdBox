@@ -167,7 +167,7 @@ module.exports = {
                 const itemEmbed = createSpecificItemEmbed(maybeArray, pageNum);
 
                 //send item embed (no need to redirect to modernmode here, is ok if the selector only appears on table of contents)
-                message.channel.trysend({embeds: [itemEmbed]});
+                message.channel.tryreply({embeds: [itemEmbed]});
                 
             }
         } else if (action) {
