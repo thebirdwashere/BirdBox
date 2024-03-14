@@ -123,11 +123,17 @@ client.on('messageCreate', async (message) => {
             `perfectly sorted, as all things should be`,
             `remember kids, ${randomWord[0].toUpperCase()} is for "${randomWord}"`]
         
+        let isItTechnical
+        if (alphabeticalness.every( (val, i, arr) => val === arr[0] )) { //this test if every item is the same
+            isItTechnical = "technical"
+        } else {
+            isItTechnical = "perfect"
+        }
         const alpha_joined = alphabeticalness.join(" ");
         
         const notif = await tests.responsetemplate(message, db, randomfooters, 
-            `:capital_abcd: Your message is in perfect alphabetical order! \n\`${alpha_joined}\``, 
-            `:capital_abcd:`, `is in alphabetical order!`, 
+            `:capital_abcd: Your message is in ${isItTechnical} alphabetical order! \n\`${alpha_joined}\``, 
+            `:capital_abcd:`, `is in ${isItTechnical} alphabetical order!`, 
             0x3b88c3, alpha_joined)
         if (notifchannel) {await notifchannel.trysend(notif)} //only send notif if there is a log channel
     }
