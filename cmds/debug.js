@@ -5,7 +5,7 @@ module.exports = {
     async execute({message, args}, {devs, db}){
         if (!devs.includes(message.author.id)) {
             //aborts because user does not have dev perms
-            message.channel.tryreply("sorry, you must be a dev to use the debug command"); return; }
+            message.tryreply("sorry, you must be a dev to use the debug command"); return; }
 
         const item = args[0]
         const database_item = await db.get(item)
@@ -14,9 +14,9 @@ module.exports = {
             let itemstring = JSON.stringify(database_item)
             itemstring = itemstring.match(/.{1,2000}/g)
             itemstring.forEach(element => {
-                message.channel.tryreply(element)
+                message.tryreply(element)
             });
         }
-        else (message.channel.tryreply(`failed to locate ${item}`))
+        else (message.tryreply(`failed to locate ${item}`))
     }
 }

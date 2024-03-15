@@ -13,7 +13,7 @@ module.exports = {
 		let playerChoice = args[0];
 		
 		//make sure they added a correct choice
-		if(!validChoices.includes(playerChoice)) { message.channel.tryreply('bruh it\'s literally the title of the game, you gotta use "rock", "paper", or "scissors".'); return;}
+		if(!validChoices.includes(playerChoice)) { message.tryreply('bruh it\'s literally the title of the game, you gotta use "rock", "paper", or "scissors".'); return;}
 
 		//replace choices with full versions so the logic is cleaner and the later message makes sense
 		const emojifiedChoices = {r: ":rock:", rock: ":rock:", p: ":roll_of_paper:", paper: ":roll_of_paper:", s: ":scissors:", scissors: ":scissors:"};

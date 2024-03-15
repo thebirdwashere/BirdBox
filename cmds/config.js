@@ -14,7 +14,7 @@ module.exports = {
         const classic = Boolean(await db.get(`setting_classic_${message.author.id}`) === "enable")
         
         //reject server settings if not admin
-        if (mode == "server" && !devs.includes(message.author.id)) {return message.channel.tryreply("sorry, you must be a birdbox admin to modify server settings")};
+        if (mode == "server" && !devs.includes(message.author.id)) {return message.tryreply("sorry, you must be a birdbox admin to modify server settings")};
 
         //redirect in case of modern mode
         if (!classic) {return modernMode(message, {prefix, db, classic}, {mode, setting, change});} 
@@ -53,18 +53,18 @@ function classicMode(message, {prefix, db, classic}, {mode, setting, change}) {
         serverEmbed.addFields(settingsText(prefix).server[item])}
 
     //if no mode, they must have done just e;config
-    if (!mode) {return message.channel.tryreply({embeds: [userEmbed]})};
+    if (!mode) {return message.tryreply({embeds: [userEmbed]})};
 
     //selected a mode at this point (including logic from main execute)
     if (mode == "user") {
-        if (!setting || !change) {return message.channel.tryreply({embeds: [userEmbed]})};
-        if (!settingsText(prefix).user[setting]) {return message.channel.tryreply({content: "invalid setting, try again"})};
+        if (!setting || !change) {return message.tryreply({embeds: [userEmbed]})};
+        if (!settingsText(prefix).user[setting]) {return message.tryreply({content: "invalid setting, try again"})};
 
         //previous returns mean this is guaranteed to work
         modifyUserSetting(message, {prefix, db, classic}, {setting, change})
     } else if (mode == "server") {
-        if (!setting || !change) {return message.channel.tryreply({embeds: [serverEmbed]})};
-        if (!settingsText(prefix).server[setting]) {return message.channel.tryreply({content: "invalid setting, try again"})};
+        if (!setting || !change) {return message.tryreply({embeds: [serverEmbed]})};
+        if (!settingsText(prefix).server[setting]) {return message.tryreply({content: "invalid setting, try again"})};
 
         //previous returns mean this is guaranteed to work
         modifyServerSetting(message, {prefix, db, classic}, {setting, change})
@@ -116,12 +116,12 @@ function settingsText(prefix) { //everything here is funky because i wanted prop
 
 async function updateDefaultUserSetting(message, {prefix, db, classic}, {setting, change}) {
     if (!settingsText(prefix).user[setting].options.includes(change)) {
-        return message.channel.tryreply(`not sure what ${change} means but it sure isnt "${settingsText(prefix).user[setting].options.join('" or "')}"`)}
+        return message.tryreply(`not sure what ${change} means but it sure isnt "${settingsText(prefix).user[setting].options.join('" or "')}"`)}
     
     await db.set(`setting_${setting}_${message.author.id}`, change)
     if (await db.get(`setting_${setting}_${message.author.id}`) === change) {
-        if (classic) {message.channel.tryreply(`Setting updated successfully!`);}}
-    else {message.channel.tryreply(`setting failed to update, try again`)};
+        if (classic) {message.tryreply(`Setting updated successfully!`);}}
+    else {message.tryreply(`setting failed to update, try again`)};
 }
 
 const modifyUserSettingArray = {}; //futureproofing
@@ -137,12 +137,12 @@ function modifyUserSetting(message, {prefix, db, classic}, {setting, change}) {
 
 async function updateDefaultServerSetting(message, {prefix, db}, {setting, change}) {
     if (!settingsText(prefix).server[setting].options.includes(change)) {
-        return message.channel.tryreply(`not sure what ${change} means but it sure isnt "${settingsText(prefix).server[setting].options.join('" or "')}"`)}
+        return message.tryreply(`not sure what ${change} means but it sure isnt "${settingsText(prefix).server[setting].options.join('" or "')}"`)}
     
     await db.set(`setting_${setting}_${message.guildId}`, change)
     if (await db.get(`setting_${setting}_${message.guildId}`) === change) {
-        message.channel.tryreply(`Setting updated successfully!`);}
-    else {message.channel.tryreply(`setting failed to update, try again`);};
+        message.tryreply(`Setting updated successfully!`);}
+    else {message.tryreply(`setting failed to update, try again`);};
 }
 
 const modifyServerSettingArray = {

@@ -18,7 +18,7 @@ module.exports = {
         )
         .setImage('https://cdn.discordapp.com/avatars/803811104953466880/5bce4f0ba438015ec65f5b9cac11c8e3.webp')
         .setFooter({text: 'lol get rekt this is best command'})
-        message.channel.tryreply({embeds: [newEmbed]});
+        message.tryreply({embeds: [newEmbed]});
     }
 
 

@@ -15,6 +15,6 @@ module.exports = {
 				{ name: 'Bot Testers', value: devArray.botTester.map(item => item.name).join(", ") }
 			)
 			.setFooter({ text: 'Special thanks to users like you!' });
-		message.channel.tryreply({ embeds: [creditsEmbed] });
+		message.tryreply({ embeds: [creditsEmbed] });
 	}
 }

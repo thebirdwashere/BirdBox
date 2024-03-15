@@ -23,7 +23,7 @@ module.exports = {
 			)
 			.setFooter({ text: 'Powered by the Google Translate API!' });
 
-		    message.channel.tryreply({ embeds: [translateEmbed] });
+		    message.tryreply({ embeds: [translateEmbed] });
 
         }).catch(console.error);
     }
