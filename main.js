@@ -6,7 +6,6 @@ const devArray = require("./cmds/json_info/dev_array.json");
 const devs = devArray.host.map(item => item.userId).concat(devArray.developer.map(item => item.userId));
 
 const Discord = require('discord.js');
-const { randomIntInRange } = require("./utils");
 
 require('dotenv').config();
 const { Client, GatewayIntentBits , Message, MessageEmbed, DiscordAPIError, ActivityType, EmbedBuilder } = require('discord.js');

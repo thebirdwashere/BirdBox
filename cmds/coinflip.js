@@ -1,4 +1,4 @@
-const { randomIntInRange, sleepMs } = require("../utils")
+const { randomIntInRange, randomChoice, sleepMs } = require("../utils")
 
 module.exports = {
     name: 'coinflip',
@@ -18,7 +18,7 @@ module.exports = {
     const mainNum = randomIntInRange(0, 1)
     let otherNum = mainNum ^ 1
 
-    const trollSelection = trolls[randomIntInRange(1, trolls.length - 1)];
+    const trollSelection = randomChoice(trolls);
 
     switch (trollSelection) {
       case "normal": message.tryreply(`:coin: Your result is "${responses[mainNum]}"!`); break;

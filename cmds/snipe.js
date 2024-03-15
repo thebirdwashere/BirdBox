@@ -1,5 +1,5 @@
 const { EmbedBuilder } = require("discord.js");
-const { randomIntInRange } = require("../utils");
+const { randomChoice } = require("../utils");
 
 module.exports = {
   name: 'snipe',
@@ -27,7 +27,7 @@ module.exports = {
       .setTitle(`${message.channel.name}’s Snipe`)
       .setAuthor({name: snipe.author.tag, iconURL: sniped.displayAvatarURL()})
       .setColor('Green')
-      .setFooter({text: randomfooters[randomIntInRange(0, randomfooters.length - 1)]})
+      .setFooter({text: randomChoice(randomfooters)})
       .setTimestamp(messagedate);
 
     if (snipe.content) {

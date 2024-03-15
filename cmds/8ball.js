@@ -1,5 +1,5 @@
 const {EmbedBuilder} = require("discord.js")
-const { randomIntInRange } = require("../utils")
+const { randomChoice } = require("../utils")
 
 module.exports = {
     name: '8ball',
@@ -41,8 +41,8 @@ module.exports = {
       'Do you want an honest answer or the one you were expecting?',
       'If I answer, will you leave me alone?',
       'Physically? Mentally? Spiritually? Financially? Socioeconomically? I am not sure what you mean.',
-      ['The answer is love. But only if it\'s eternal love.', //variants on this answer, check at the bottom to see how it works
-      'The answer is love. But only if it\'s eternal love. \nNowadays love is fleeting and never lasts, but true love is eternal and everlasting.'], 
+      'The answer is love. But only if it\'s eternal love.',
+      'The answer is love. But only if it\'s eternal love. \nNowadays love is fleeting and never lasts, but true love is eternal and everlasting.',
       'I had promised myself I would ban the next person who asked me that question...',
       'I was hoping you would be able to tell me that.',
       'Maybe you can Google it.',
@@ -104,15 +104,7 @@ module.exports = {
       'https://www.youtube.com/watch?v=DRSxqfisPGw'
     ]
 
-    let responseMessage
-
-    const randomIndex = randomIntInRange(0, responses.length - 1)
-    if (typeof responses[randomIndex] === "string") {
-      responseMessage = responses[randomIndex]
-    } else { //if you want rare response variants (like i did)
-      const randomRandomIndex = randomIntInRange(0, responses[randomIndex].length - 1)
-      responseMessage = responses[randomIndex][randomRandomIndex]
-    }
+    const randomResponse = randomChoice(responses)
 
     const randomFooters = [
       "i be like that wise tree fr fr",
@@ -125,10 +117,10 @@ module.exports = {
     const youAsked = message.content.replace(`${prefix}8ball`, '').trim() //guys we finally found who asked
 
     const responseEmbed = new EmbedBuilder()
-    .setTitle(responseMessage)
+    .setTitle(randomResponse)
     .setAuthor({ name: 'BirdBox', iconURL: 'https://cdn.discordapp.com/avatars/803811104953466880/5bce4f0ba438015ec65f5b9cac11c8e3.png?size=256' })
     .setColor(0xAA00FF)
-    .setFooter({ text: randomFooters[randomIntInRange(0, randomFooters.length - 1)] });
+    .setFooter({ text: randomChoice(randomFooters) });
 
     if (youAsked) {responseEmbed.addFields({ name: 'You asked:', value: youAsked})}
 

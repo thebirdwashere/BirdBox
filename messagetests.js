@@ -1,5 +1,5 @@
 const { EmbedBuilder } = require("discord.js");
-const { randomIntInRange } = require("./utils");
+const { randomChoice } = require("./utils");
 
 module.exports = {
     keywords: async (db, string, guild, messages, lyrics) => { //function for message/lyric responses
@@ -133,7 +133,7 @@ module.exports = {
             .setDescription(`${desc} Take a look:`)
             .addFields({name: " ", value: " "})
             .setURL(message.url)
-            .setFooter({text: footers[randomIntInRange(0, footers.length - 1)]})
+            .setFooter({text: randomChoice(footers)})
 
         content_split.forEach(str => {
             newEmbed.addFields({name: " ", value: `\`${str}\``});}) //embed char limits once again
@@ -149,7 +149,7 @@ module.exports = {
     
         const alphabeticalness = tests.alphabetical(content)
         if (alphabeticalness) { //alphabetical order checker
-            const randomWord = alphabeticalness[randomIntInRange(0, alphabeticalness.length - 1)]
+            const randomWord = randomChoice(alphabeticalness)
             const randomfooters = [
                 `now i know my abc's, next time won't you sing with me`,
                 `perfectly sorted, as all things should be`,
