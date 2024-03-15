@@ -30,7 +30,7 @@ module.exports = {
             if (!classic) { modernModeAdd({message, args}, {prefix, devs}); return; } //redirect in case of modern mode
 
             //define array and get author
-            const suggestion = {author: message.author.username};
+            const suggestion = {author: message.author.username, claim: "Unclaimed"};
             const title = message.content.replace(`${prefix}maybepile ${action}`, "")
 
             //title
@@ -58,34 +58,11 @@ module.exports = {
             message.channel.trysend(`${maybeArray[maybeArray.length - 1].title} has successfully been added!`);
             
         } else if (action == "delete") { //e;maybepile delete (page number)
-            let selectedMessage = args[1];
-            console.log(maybeArray)
-
-            if (!selectedMessage) 
-                //aborts delete because no selection
-                {message.channel.trysend(`bruh, i need something to delete. please use the format ${prefix}maybepile delete (item number)`); return;}
-            if (!maybeArray[selectedMessage]) {
-                //aborts delete because nothing at the selection
-                message.channel.trysend(`can't find anything at index ${selectedMessage}`); return; }
-            if (selectedMessage == 0) {
-                //aborts delete because the user chose table of contents
-                message.channel.trysend("bruh, you can't delete the table of contents"); return; }
-            if (!devs.includes(message.author.id)) {
-                //aborts delete because user does not have perms to delete
-                message.channel.trysend("sorry, you must be a dev to delete something"); return;}
-
-            message.channel.trysend(`Are you SURE you want to delete suggestion ${maybeArray[selectedMessage].title}?`);    
-            message.channel.trysend('Confirm with "y" in the next ten seconds.');    
-            //await the user confirming with "y" or "Y"
-            await message.channel.awaitMessages({filter, max: 1, time: 10_000,/* ten second timer */ errors: ['time']}).then(collected => {
-                if (collected.first().content.toUpperCase() == "Y") {
-                    maybeArray.splice(selectedMessage, 1);
-                    message.channel.trysend("Delete successful!");
-                } else {
-                    message.channel.trysend("Suggestion delete averted.");
-                }
-            }).catch(() => {message.channel.trysend("Suggestion delete averted.");})
-
+            //moved out so a button can also do it
+            maybeArray = await deleteMaybepileItem({message, args}, maybeArray, {prefix, devs}, filter)
+        } else if (action == "claim") { //e;maybepile claim (page number)
+            //straight up added out so a button can also do it
+            claimMaybepileItem(message, maybeArray, args[1], args[2])
         } else if (action == "edit") { //e;maybepile edit (page number) title/t/desc/description/d/suggester/s/author/a
             let selectedMessage = args[1];
             let selectedSection = args[2];
@@ -158,7 +135,7 @@ module.exports = {
             if (pageNum == 0 || !pageNum) { //table of contents
                 embedArray = createTableOfCOntents(embedArray, maybeArray, defaultArray)
                 if (classic) {message.channel.trysend({embeds: embedArray});}
-                else { modernModeView(message, embedArray, maybeArray) } //redirect in case of modern mode
+                else { modernModeView({message, args}, {maybeArray, embedArray}, {prefix, devs, db}, filter) } //redirect in case of modern mode
             } else {
                 //getting a specific maybepile item
                 if (!maybeArray[pageNum]) {message.channel.trysend(`can't find anything at index ${pageNum}`); return; }
@@ -167,7 +144,7 @@ module.exports = {
                 const itemEmbed = createSpecificItemEmbed(maybeArray, pageNum);
 
                 //send item embed (no need to redirect to modernmode here, is ok if the selector only appears on table of contents)
-                message.channel.tryreply({embeds: [itemEmbed]});
+                message.tryreply({embeds: [itemEmbed]});
                 
             }
         } else if (action) {
@@ -217,7 +194,11 @@ function createTableOfCOntents(embedArray, maybeArray, defaultArray) {
             embedArray[j].setFooter({text: ' '}); //blank out the footer so its not weird looking
             j++; initializeEmbed(j, embedArray);  //new embed and continue loop
         }
-        try {embedArray[j].addFields({name: `${i}: ${item.title}`, value: `Suggested by ${item.author}`, inline: true})} catch {err => console.error(err)};
+
+        let claimStatus = item.claim || `Unclaimed, suggested by ${item.author}`
+        if (claimStatus == "Unclaimed") {claimStatus += `, suggested by ${item.author}`}
+
+        try {embedArray[j].addFields({name: `${i}: ${item.title}`, value: claimStatus, inline: true})} catch {err => console.error(err)};
         i++;
     });}
 
@@ -229,11 +210,66 @@ function createSpecificItemEmbed(maybeArray, pageNum) {
     .setColor('#208ddd')
     .setTitle('The Maybe Pile')
     .setAuthor({ name: 'BirdBox', iconURL: 'https://cdn.discordapp.com/avatars/803811104953466880/5bce4f0ba438015ec65f5b9cac11c8e3.webp'})
-    .setFooter({text: `Page ${pageNum} ● Suggested by ${maybeArray[pageNum].author}, special thanks to them!`})
+    .setFooter({text: `Page ${pageNum} ● Suggested by ${maybeArray[pageNum].author} ● ${maybeArray[pageNum].claim}`})
     .setThumbnail('https://cdn.discordapp.com/attachments/826968641790017576/906737704581079070/iu.png');
     try {itemEmbed.addFields({name: maybeArray[pageNum].title, value: maybeArray[pageNum].desc})} catch {console.error};
 
     return itemEmbed
+}
+
+async function deleteMaybepileItem({message, args}, maybeArray, {prefix, devs}, filter) {
+    let selectedMessage = args[1];
+    console.log(maybeArray)
+
+    if (!selectedMessage) 
+        //aborts delete because no selection
+        {message.channel.trysend(`bruh, i need something to delete. please use the format ${prefix}maybepile delete (item number)`); return;}
+    if (!maybeArray[selectedMessage]) {
+        //aborts delete because nothing at the selection
+        message.channel.trysend(`can't find anything at index ${selectedMessage}`); return; }
+    if (selectedMessage == 0) {
+        //aborts delete because the user chose table of contents
+        message.channel.trysend("bruh, you can't delete the table of contents"); return; }
+    if (!devs.includes(message.author.id)) {
+        //aborts delete because user does not have perms to delete
+        message.channel.trysend("sorry, you must be a dev to delete something"); return;}
+
+    message.channel.trysend(`Are you SURE you want to delete suggestion ${maybeArray[selectedMessage].title}?`);    
+    message.channel.trysend('Confirm with "y" in the next ten seconds.');    
+    //await the user confirming with "y" or "Y"
+    await message.channel.awaitMessages({filter, max: 1, time: 10_000,/* ten second timer */ errors: ['time']}).then(collected => {
+        if (collected.first().content.toUpperCase() == "Y") {
+            maybeArray.splice(selectedMessage, 1);
+            message.channel.trysend("Delete successful!");
+        } else {
+            message.channel.trysend("Suggestion delete averted.");
+        }
+    }).catch(() => {message.channel.trysend("Suggestion delete averted.");})
+
+    return maybeArray
+}
+
+function claimMaybepileItem(message, maybeArray, pageNumber, claimType="claim") {
+    if (maybeArray[pageNumber].claim?.startsWith(`Claimed by `) || maybeArray[pageNumber].claim?.startsWith(`In development by `)) {
+        message.channel.trysend(`sorry, that's already been claimed`)
+        return maybeArray
+    }
+
+    if (claimType == "claim") {
+        maybeArray[pageNumber].claim = `Claimed by ${message.author.username}`
+        message.channel.trysend(`${message.author.username} has claimed ${maybeArray[pageNumber].title}!`)
+    } else if (claimType == "indev") {
+        maybeArray[pageNumber].claim = `In development by ${message.author.username}`
+        message.channel.trysend(`${message.author.username} has started work on ${maybeArray[pageNumber].title}!`)
+    } else if (claimType == "deprioritized") {
+        maybeArray[pageNumber].claim = `Deprioritized`
+        message.channel.trysend(`${message.author.username} has deprioritized ${maybeArray[pageNumber].title}!`)
+    } else if (claimType == "unclaim") {
+        maybeArray[pageNumber].claim = `Unclaimed`
+        message.channel.trysend(`${message.author.username} has unclaimed ${maybeArray[pageNumber].title}!`)
+    }
+
+    return maybeArray
 }
 
 /*/
@@ -242,7 +278,43 @@ function createSpecificItemEmbed(maybeArray, pageNum) {
  * -------------------------------
 /*/
 
-async function modernModeView(message, embedArray, maybeArray) {
+function getEditModal(item, pageNumber) {
+    return new ModalBuilder().setCustomId("maybepile-edit").setTitle("Edit Maybepile Item")
+.addComponents([new ActionRowBuilder().addComponents(
+        new TextInputBuilder()
+            .setCustomId('maybepile-title')
+            .setLabel(`Title`)
+            .setStyle(TextInputStyle.Short)
+            .setPlaceholder(`Title of the item.`)
+            .setValue(item.title)
+            .setRequired(true)),
+    new ActionRowBuilder().addComponents(
+        new TextInputBuilder()
+            .setCustomId('maybepile-desc')
+            .setLabel('Description')
+            .setStyle(TextInputStyle.Paragraph)
+            .setPlaceholder(`The description of the item, displayed on the item's page.`)
+            .setValue(item.desc)
+            .setRequired(true)),
+    new ActionRowBuilder().addComponents(
+        new TextInputBuilder()
+            .setCustomId('maybepile-author')
+            .setLabel(`Suggester`)
+            .setStyle(TextInputStyle.Short)
+            .setPlaceholder(`Person who suggested this item to be added. Credit where it's due!`)
+            .setValue(item.author)
+            .setRequired(true)),
+    new ActionRowBuilder().addComponents(
+        new TextInputBuilder()
+            .setCustomId('maybepile-page')
+            .setLabel(`Page`)
+            .setStyle(TextInputStyle.Short)
+            .setPlaceholder(`Which page is being modified.`)
+            .setValue(pageNumber)
+            .setRequired(true))])
+}
+
+async function modernModeView({message, args}, {maybeArray, embedArray}, {prefix, devs, db}, filter) {
     const rowArray = [];
     let itemNum = 1
 
@@ -267,18 +339,89 @@ async function modernModeView(message, embedArray, maybeArray) {
     const selectcollector = sent.createMessageComponentCollector({ time: 50000 });
 
     selectcollector.on('collect', async i => {
-        //get a new embed for the selected item
-        const updatedEmbed = createSpecificItemEmbed(maybeArray, i.values[0])
+        if (i.member.id !== message.author.id) {
+            return; //if it came from someone other than the original command user
+        }
 
-        //disable selectors and edit message with update
-        //rowArray.forEach(item => {item.components[0].setDisabled(true)})
-        sent.edit({ embeds: [updatedEmbed], components: rowArray });
-        i.deferUpdate();
+        if (i.isButton()) {
+            if (i.customId.startsWith('claimButton')) {
+                const pageNumber = i.customId.replace('claimButton_', "")
+
+                i.deferUpdate();
+
+                maybeArray = claimMaybepileItem(message, maybeArray, pageNumber)
+
+                rowArray[rowArray.length - 1].components[0].setDisabled(true)
+                sent.edit({ components: rowArray });
+
+                await db.set("maybepile", maybeArray)
+            } else if (i.customId.startsWith('editButton')) {
+                const pageNumber = i.customId.replace('editButton_', "")
+                const item = maybeArray[pageNumber]
+
+                if (!devs.includes(message.author.id) && item.author !== message.author.username) {
+                    //aborts edit because user does not have perms to edit
+                    message.channel.trysend("sorry, you must be a dev or the original poster to edit something"); return;}
+
+                await i.showModal(getEditModal(item, pageNumber)).catch(err => console.error(err))
+            } else if (i.customId.startsWith('deleteButton')) {
+                //maybe i should have made this a modal
+                //bailey if you want to do that you can
+                //i know you're reading this lol
+                const pageNumber = i.customId.replace('deleteButton_', "")
+                args[1] = pageNumber
+
+                i.deferUpdate();
+
+                maybeArray = await deleteMaybepileItem({message, args}, maybeArray, {prefix, devs}, filter)
+                await db.set("maybepile", maybeArray)
+            } else {
+                //no idea how this happened
+                console.log("just asking for ham")
+            }
+        } else {
+            //get a new embed for the selected item
+            const updatedEmbed = createSpecificItemEmbed(maybeArray, i.values[0])
+
+            //make buttons
+            const claimButton = new ButtonBuilder()
+                .setCustomId(`claimButton_${i.values[0]}`)
+                .setLabel('Claim')
+                .setStyle(ButtonStyle.Success);
+
+            const editButton = new ButtonBuilder()
+                .setCustomId(`editButton_${i.values[0]}`)
+                .setLabel('Edit')
+                .setStyle(ButtonStyle.Primary);
+        
+            const deleteButton = new ButtonBuilder()
+                .setCustomId(`deleteButton_${i.values[0]}`)
+                .setLabel('Delete')
+                .setStyle(ButtonStyle.Danger);
+
+            if (maybeArray[i.values[0]].claim?.startsWith(`Claimed by `) || maybeArray[i.values[0]].claim?.startsWith(`In development by `)) {
+                claimButton.setDisabled(true)
+            }
+            
+            const buttonRow = new ActionRowBuilder()
+                .addComponents(claimButton, editButton, deleteButton);
+            
+            //add buttons
+            const lastRow = rowArray[rowArray.length - 1]
+            if (lastRow.components[1]) { //if there's more than one item in a row, it has to be the buttons row
+                rowArray.pop()
+            }
+            rowArray.push(buttonRow)
+
+            //edit message with update
+            sent.edit({ embeds: [updatedEmbed], components: rowArray });
+            i.deferUpdate();
+        }
     });
 
     selectcollector.on('end', () => {
         //disable the selector
-        rowArray.forEach(item => {item.components[0].setDisabled(true)})
+        rowArray.forEach(item => {item.components.map(item => item.setDisabled(true))})
         sent.edit({ components: rowArray })});
 }
 
@@ -292,40 +435,7 @@ async function modernModeEdit({message, args}, {devs}, maybeArray) {
                 .setStyle(ButtonStyle.Primary)
                 .setCustomId("maybepile-edit")
                 .setDisabled(false)
-        ),
-        new ModalBuilder().setCustomId("maybepile-edit").setTitle("Edit Maybepile Item")
-        .addComponents([new ActionRowBuilder().addComponents(
-                new TextInputBuilder()
-                    .setCustomId('maybepile-title')
-                    .setLabel(`Title`)
-                    .setStyle(TextInputStyle.Short)
-                    .setPlaceholder(`Title of the item.`)
-                    .setValue(item.title)
-                    .setRequired(true)),
-            new ActionRowBuilder().addComponents(
-                new TextInputBuilder()
-                    .setCustomId('maybepile-desc')
-                    .setLabel('Description')
-                    .setStyle(TextInputStyle.Paragraph)
-                    .setPlaceholder(`The description of the item, displayed on the item's page.`)
-                    .setValue(item.desc)
-                    .setRequired(true)),
-            new ActionRowBuilder().addComponents(
-                new TextInputBuilder()
-                    .setCustomId('maybepile-author')
-                    .setLabel(`Suggester`)
-                    .setStyle(TextInputStyle.Short)
-                    .setPlaceholder(`Person who suggested this item to be added. Credit where it's due!`)
-                    .setValue(item.author)
-                    .setRequired(true)),
-            new ActionRowBuilder().addComponents(
-                new TextInputBuilder()
-                    .setCustomId('maybepile-page')
-                    .setLabel(`Page`)
-                    .setStyle(TextInputStyle.Short)
-                    .setPlaceholder(`Which page is being modified.`)
-                    .setValue(args[1])
-                    .setRequired(true))]), {devs})
+        ), getEditModal(item, args[1]), {devs})
 }
 
 async function modernModeAdd({message, args}, {prefix, devs}) {
