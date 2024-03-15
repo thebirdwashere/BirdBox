@@ -15,6 +15,13 @@ module.exports = {
         randomInteger = Math.floor(Math.random() * (max - min) + min);
         return randomInteger;
     },
+    //Pick a random item from a provided array
+    randomChoice: (array) => {
+        randomInteger = Math.floor(Math.random() * array.length);
+        randomChoice = array[randomInteger]
+
+        return randomChoice
+    },
     //Stop all processes for the designated time
     sleepMs: (milliseconds) => {
         return new Promise(resolve => setTimeout(resolve, milliseconds));
