@@ -200,7 +200,6 @@ module.exports = {
             function testTitles(title, array) {
                 console.table(array)
                 for (let i = 0; i < array.length; i++) {
-                    console.log(array[i].title)
                     if (array[i].title == title) {
                       return i;
                     }
