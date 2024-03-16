@@ -41,8 +41,8 @@ module.exports = {
       'Do you want an honest answer or the one you were expecting?',
       'If I answer, will you leave me alone?',
       'Physically? Mentally? Spiritually? Financially? Socioeconomically? I am not sure what you mean.',
-      ['The answer is love. But only if it\'s eternal love.', //variants on this answer, check at the bottom to see how it works
-      'The answer is love. But only if it\'s eternal love. \nNowadays love is fleeting and never lasts, but true love is eternal and everlasting.'], 
+      'The answer is love. But only if it\'s eternal love.',
+      'The answer is love. But only if it\'s eternal love. \nNowadays love is fleeting and never lasts, but true love is eternal and everlasting.', 
       'I had promised myself I would ban the next person who asked me that question...',
       'I was hoping you would be able to tell me that.',
       'Maybe you can Google it.',
@@ -59,7 +59,7 @@ module.exports = {
       'I\'ll leave that up to your imagination.',
       'I\'m pretty sure I am not obligated to tell you.',
       'Do I really need to answer that?',
-      'Is this some sort of test? Because the answers are way too easy.',
+      'Is this some sort of test?',
       'You could have answered the question yourself in the time it took to ask it.',
       'Are you actually looking for a truthful answer?',
       'Do you always ask people obvious questions?',
@@ -90,29 +90,39 @@ module.exports = {
       'What would you say if someone asked you that?',
       'It\'s too early to answer such a deep question.',
       'Apologies, but my schedule is packed currently. I\'ll be available this Thursday at 3:00, try again then?',
-      'Please email your question to "8ballresponses@birdbox.com," and I’ll reply back as soon as I can.',
+      'Please email your question to "8ballresponses@birdbox.com," and I\'ll reply back as soon as I can.',
       'Sorry, but we\'re full at the moment. We\'ll get back to you eventually.',
       'It could be raining words and I could still not answer your question.',
       'Sorry, have we met before?',
       'I think yes, but the voices in my head say no. You decide which is more trustworthy.',
       'I\'ve dodged every question for years and I\'m not stopping now!',
       'That, I would prefer to leave a mystery.',
-      'That’s a secret only the Dark Lord knows.',
+      'That\'s a secret only the Dark Lord knows.',
       'You go first. Then we can compare answers.',
       'I was looking for a moment of silence, but that is gone now, I guess.',
       'Incorrect question! Try again.',
-      'https://www.youtube.com/watch?v=DRSxqfisPGw'
+      'https://www.youtube.com/watch?v=DRSxqfisPGw',
+      'STOP BOTHERING ME I\'M TRYNA SLEEP',
+      'bruh that\'s 2 ez, give me a hard one next',
+      'You cannot ask now, there are monsters nearby',
+      'Is this a prank? Are there hidden cameras?',
+      'Touch grass, and everything will be revealed.',
+      '[ANSWER REVOKED BY AUTHORITIES]',
+      'Were you expecting me to answer that?',
+      'You\'ve already used up your free questions for today. Go premium for unlimited answers to all of life\'s mysteries!',
+      'I expected better from you.',
+      'Sorry, but I didn\'t quite catch that. Could you repeat it?.',
+      'should\'ve asked for ham instead',
+      'To answer that, I\'m going to need a permission slip from your doctor. Is that alright?',
+      'Inadequate info: please provide your birth certificate, phone number, email, SSN, home address, and favorite ice cream flavor.',
+      'Haven\'t even seen the question yet, but I\'m confident the answer is no.',
+      'You\'*r*e -c*u*~~**t-i**~~-__g__ ~~ou~~- j~~td~~y-**bzo**m-al hl l__p__vd s*l*z-y*eb*o**g**s- xb w*p*w~~xa--x~~tj v**dx**y--k~~o~~g'
     ]
 
     let responseMessage
 
     const randomIndex = randomIntInRange(0, responses.length - 1)
-    if (typeof responses[randomIndex] === "string") {
-      responseMessage = responses[randomIndex]
-    } else { //if you want rare response variants (like i did)
-      const randomRandomIndex = randomIntInRange(0, responses[randomIndex].length - 1)
-      responseMessage = responses[randomIndex][randomRandomIndex]
-    }
+    responseMessage = responses[randomIndex]
 
     const randomFooters = [
       "i be like that wise tree fr fr",
