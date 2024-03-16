@@ -23,7 +23,7 @@ module.exports = {
           emojis: {
               xButton: '❌',
               oButton: '⭕',
-              blankButton: '➖    '
+              blankButton: '➖'
           },
           mentionUser: true,
           timeoutTime: 6000,
