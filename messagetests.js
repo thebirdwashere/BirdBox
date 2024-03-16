@@ -50,7 +50,14 @@ module.exports = {
 
     jinx: (message, jinx) => { //jinx checker
         if (!jinx) {return;}
-        return (Math.abs(jinx.timestamp - message.createdAt) <= 2000 && jinx.content == message.content /*&& jinx.author !== message.author.displayName*/)
+
+        //the required tests
+        const jinxCreatedCloseTogether = Math.abs(jinx.timestamp - message.createdTimestamp) <= 2000
+        const contentIsIdentical = jinx.content == message.content
+        let jinxFromDifferentPeople = jinx.author !== message.author.id
+
+        //only pass if all true
+        return (jinxCreatedCloseTogether && contentIsIdentical && jinxFromDifferentPeople)
     },
 
     periodictable: (content) => {
@@ -173,7 +180,7 @@ module.exports = {
         const jinxDetectionEnabled = (await db.get(`setting_jinxes_${message.guildId}`) !== "disable")
     
         if (jinxDetectionEnabled) {
-            const jinx = await db.get(`jinx_${message.channelId}`) //jinx detector
+            const jinx = await db.get(`jinx.${message.channelId}`) //jinx detector
             if (tests.jinx(message, jinx)) { message.channel.trysend(jinx.content) }
         }
     
@@ -192,9 +199,15 @@ module.exports = {
         }
     
         if (jinxDetectionEnabled) {
-            await db.set(`jinx_${message.channelId}`, { 
+            const oldJinxFormat = await db.get(`jinx_${message.channelId}`)
+            if (oldJinxFormat) {
+                await db.delete(`jinx_${message.channelId}`) //remove jinxes in the old format to clean up the db
+            }
+
+            //new format: changed to use dot notation and make an object of jinxes
+            await db.set(`jinx.${message.channelId}`, { 
                 content: message.content, //for jinx detection
-                author: message.author.displayName,
+                author: message.author.id,
                 timestamp: message.createdTimestamp
             })
         };
