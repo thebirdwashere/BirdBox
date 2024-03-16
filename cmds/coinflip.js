@@ -20,6 +20,7 @@ module.exports = {
 
     const trollNum = Math.floor(Math.random() * trolls.length);
 
+    //credit to umadkek for this one
     const rareCase = Math.floor( Math.random() * 6000 );
 
     if ( rareCase > 2999.5 && rareCase < 3000.5 ) {
