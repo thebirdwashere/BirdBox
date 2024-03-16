@@ -18,13 +18,20 @@ module.exports = {
     const mainNum = randomIntInRange(0, 1)
     let otherNum = mainNum ^ 1
 
-    const trollSelection = randomChoice(trolls);
+    const trollNum = Math.floor(Math.random() * trolls.length);
 
-    switch (trollSelection) {
-      case "normal": message.tryreply(`:coin: Your result is "${responses[mainNum]}"!`); break;
-      case "offtable": message.tryreply(`:coin: Messy flip, and the coin fell on the ground! The result was "${responses[mainNum]}", unless you want to try again.`); break;
-      case "dogatemycoin": message.tryreply(`:coin: A dog just ate the coin before I got a good look at it! I think it was "${responses[mainNum]}", though... or maybe "${responses[otherNum]}"...`); break;
-      case "badmemory": badMemoryTroll(message, responses[mainNum], responses[otherNum]); break;
+    const rareCase = Math.floor( Math.random() * 6000 );
+
+    if ( rareCase > 2999.5 && rareCase < 3000.5 ) {
+        message.reply(`:coin: Your result is...`);
+        message.channel.send(`what???? it landed on the edge??`);
+    } else {
+      switch (trolls[trollNum]) {
+        case "normal": message.tryreply(`:coin: Your result is "${responses[mainNum]}"!`); break;
+        case "offtable": message.tryreply(`:coin: Messy flip, and the coin fell on the ground! The result was "${responses[mainNum]}", unless you want to try again.`); break;
+        case "dogatemycoin": message.tryreply(`:coin: A dog just ate the coin before I got a good look at it! I think it was "${responses[mainNum]}", though... or maybe "${responses[otherNum]}"...`); break;
+        case "badmemory": badMemoryTroll(message, responses[mainNum], responses[otherNum]); break;
+      }
     }
   }
 }
