@@ -55,7 +55,15 @@ module.exports = {
         ]
 
         const trollNum = Math.floor(Math.random() * trollOptions.length);
-        trollOptions[trollNum]();
+        //put the rare case code after the random troll number
+        const rareCase = Math.floor( Math.random() * 6000 );
+
+        if ( 2999.5 < rareCase && rareCase < 3000.5 ) {
+            await interaction.reply(`:coin: Your result is...`);
+            await interaction.followUp(`:coin: what???? it landed on the edge??`);
+        } else {
+            trollOptions[trollNum]();
+        }
         
     },
     async executeClassic({message, args, strings}) {
