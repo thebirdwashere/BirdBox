@@ -26,7 +26,8 @@ const { QuickDB } = require("quick.db");
 const db = new QuickDB();
 
 const tests = require("./messagetests")
-const modals = require("./modals")
+const modals = require("./modals");
+const { randomIntInRange } = require("./utils");
 
 let IS_CANARY = true
 let prefix;
@@ -95,6 +96,11 @@ client.on('messageCreate', async (message) => {
     if (!message.content) {return;}                    //no reason to check an empty message
 
     const content = message.content.toLowerCase() //replaced several uses of message.content with this (however changed so the prefix and command must be lowercase)
+
+    const willWeSendFoof = randomIntInRange(1, 1000)
+    if (willWeSendFoof == 1000) {
+        message.channel.trysend("https://media.discordapp.net/attachments/1138589419796955270/1218588520247988294/saved.gif")
+    }
 
     if (message.content.startsWith(prefix)) { //command checker
         const args = message.content.slice(prefix.length).trim().split(/ +/g);
