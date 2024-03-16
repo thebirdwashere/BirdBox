@@ -116,7 +116,7 @@ module.exports = {
       'To answer that, I\'m going to need a permission slip from your doctor. Is that alright?',
       'Inadequate info: please provide your birth certificate, phone number, email, SSN, home address, and favorite ice cream flavor.',
       'Haven\'t even seen the question yet, but I\'m confident the answer is no.',
-      'You\'*r*e -c*u*~~**t-i**~~-__g__ ~~ou~~- j~~td~~y-**bzo**m-al hl l__p__vd s*l*z-y*eb*o**g**s- xb w*p*w~~xa--x~~tj v**dx**y--k~~o~~g'
+      'yesn\'t'
     ]
 
     let responseMessage
