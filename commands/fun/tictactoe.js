@@ -1,4 +1,4 @@
-const { TicTacToe } = require("discord-gamecord");
+const TicTacToe = require("../../gamecord/TicTacToe");
 const { SlashCommandBuilder } = require("discord.js");
 
 module.exports = {
@@ -17,22 +17,22 @@ module.exports = {
           embed: {
               title: 'tictactoe',
               color: '#575757',
-              statusTitle: 'status',
-              overTitle: 'gameover'
+              statusTitle: 'Game Status:',
+              overTitle: 'Game Finished!'
           },
           emojis: {
               xButton: '❌',
               oButton: '⭕',
-              blankButton: ' '
+              blankButton: '➖'
           },
           mentionUser: true,
           timeoutTime: 6000,
           xButtonStyle: ' ',
           oButtonStyle: ' ',
-          turnMessage: '{emoji} | its turn of player **{player}**',
-          winMessage: '{emoji} | **{player}** won the game',
+          turnMessage: '{emoji} | yo **{player}** its your turn',
+          winMessage: '{emoji} | ggs **{player}**',
           tieMessage: 'tie',
-          timeoutMessage: 'unfinished game',
+          timeoutMessage: 'abandoned it smh',
           playerOnlyMessage: 'only {player} and {opponent} can use these buttons'
       })
       
