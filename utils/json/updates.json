@@ -19,7 +19,7 @@
         {
             "version": "5.0.0",
             "type": "Release",
-            "date": "3/1/2024",
+            "date": "3/9/2024",
             "devs": ["AgentNebulator", "Bislij"],
             "notes": [
                 "Added ${prefix}coinflip and ${prefix}diceroll commands",
