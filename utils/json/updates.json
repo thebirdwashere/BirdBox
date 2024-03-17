@@ -1,9 +1,25 @@
 {
     "patchNotes": [
         {
-            "version": "5.0.0",
+            "version": "5.0.1",
             "type": "Pre-Release",
-            "date": "3/1/2024",
+            "date": "3/12/2024",
+            "devs": ["AgentNebulator", "Bislij", "Umadkek"],
+            "notes": [
+                "${prefix}8ball, ${prefix}ping, ${prefix}rr, and ${prefix}translate now use an embed",
+                "Added help description for diceroll & updated others",
+                "Rewrote help command to import from command info",
+                "Ported remaining modernmode functions to their respective files",
+                "Renamed modernmode file to be more descriptive about its function",
+                "Fixed issue with both canary and main responding to messages",
+                "Fixed crashes due to missing message send perms",
+                "Fixed typo in 8ball response"
+            ]
+        },
+        {
+            "version": "5.0.0",
+            "type": "Release",
+            "date": "3/9/2024",
             "devs": ["AgentNebulator", "Bislij"],
             "notes": [
                 "Added ${prefix}coinflip and ${prefix}diceroll commands",
