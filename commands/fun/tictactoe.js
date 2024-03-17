@@ -32,7 +32,7 @@ module.exports = {
           turnMessage: '{emoji} | yo **{player}** its your turn',
           winMessage: '{emoji} | ggs **{player}**',
           tieMessage: 'tie',
-          timeoutMessage: 'game abandoned smh',
+          timeoutMessage: 'abandoned it smh',
           playerOnlyMessage: 'only {player} and {opponent} can use these buttons'
       })
       
