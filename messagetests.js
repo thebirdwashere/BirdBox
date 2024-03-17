@@ -180,7 +180,7 @@ module.exports = {
         const jinxDetectionEnabled = (await db.get(`setting_jinxes_${message.guildId}`) !== "disable")
     
         if (jinxDetectionEnabled) {
-            const jinx = await db.get(`jinx.${message.channelId}`) //jinx detector
+            const jinx = await db.get(`jinxes.${message.channelId}`) //jinx detector
             if (tests.jinx(message, jinx)) { message.channel.trysend(jinx.content) }
         }
     
@@ -205,7 +205,7 @@ module.exports = {
             }
 
             //new format: changed to use dot notation and make an object of jinxes
-            await db.set(`jinx.${message.channelId}`, { 
+            await db.set(`jinxes.${message.channelId}`, { 
                 content: message.content, //for jinx detection
                 author: message.author.id,
                 timestamp: message.createdTimestamp
