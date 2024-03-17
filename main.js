@@ -77,8 +77,8 @@ client.on('messageDelete', async (message) => {
     const serverAllowsSnipes = (await db.get(`setting_snipes_server_${message.guildId}`) !== "disable"); //does not equal disable since default is on
 
     if (!userAllowsSnipes || !serverAllowsSnipes) {return;}; //don't log people who opted out
-    if (!message.author || !message.createdAt) {return;};  //don't store busted snipes (edit: not even sure if this does anything lol)
-	await db.set(`snipe_${message.channelId}`, {
+    if (!message.author || !message.createdAt) {return;};    //don't store busted snipes (edit: not even sure if this does anything lol)
+	await db.set(`snipes.${message.channelId}`, {
 		content: message?.content,
 		author: {tag: message.author.tag, id: message.author.id},
         timestamp: message.createdAt,
