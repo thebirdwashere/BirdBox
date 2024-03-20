@@ -11,7 +11,7 @@ module.exports = {
         const setting = args[1];
         const change = args[2];
 
-        const classic = Boolean(await db.get(`setting_classic_${message.author.id}`) === "enable")
+        const classic = Boolean(await db.get(`settings.classic.${message.author.id}`) === "enable")
         
         //reject server settings if not admin
         if (mode == "server" && !devs.includes(message.author.id)) {return message.tryreply("sorry, you must be a birdbox admin to modify server settings")};
@@ -118,8 +118,8 @@ async function updateDefaultUserSetting(message, {prefix, db, classic}, {setting
     if (!settingsText(prefix).user[setting].options.includes(change)) {
         return message.tryreply(`not sure what ${change} means but it sure isnt "${settingsText(prefix).user[setting].options.join('" or "')}"`)}
     
-    await db.set(`setting_${setting}_${message.author.id}`, change)
-    if (await db.get(`setting_${setting}_${message.author.id}`) === change) {
+    await db.set(`settings.${setting}.${message.author.id}`, change)
+    if (await db.get(`settings.${setting}.${message.author.id}`) === change) {
         if (classic) {message.tryreply(`Setting updated successfully!`);}}
     else {message.tryreply(`setting failed to update, try again`)};
 }
@@ -139,8 +139,8 @@ async function updateDefaultServerSetting(message, {prefix, db}, {setting, chang
     if (!settingsText(prefix).server[setting].options.includes(change)) {
         return message.tryreply(`not sure what ${change} means but it sure isnt "${settingsText(prefix).server[setting].options.join('" or "')}"`)}
     
-    await db.set(`setting_${setting}_${message.guildId}`, change)
-    if (await db.get(`setting_${setting}_${message.guildId}`) === change) {
+    await db.set(`settings.${setting}.${message.guildId}`, change)
+    if (await db.get(`settings.${setting}.${message.guildId}`) === change) {
         message.tryreply(`Setting updated successfully!`);}
     else {message.tryreply(`setting failed to update, try again`);};
 }
@@ -148,26 +148,26 @@ async function updateDefaultServerSetting(message, {prefix, db}, {setting, chang
 const modifyServerSettingArray = {
     notif_channel: async (message, {db}, change) => {
         if (!Number(change)) {
-            await db.set(`setting_notif_channel_${message.guildId}`, false); 
+            await db.set(`settings.notif_channel.${message.guildId}`, false); 
             return message.channel.trysend(`invalid id, notification logging disabled`)};
         await message.guild.channels.fetch(change).catch(async error => {
-            await db.set(`setting_notif_channel_${message.guildId}`, false); 
+            await db.set(`settings.notif_channel.${message.guildId}`, false); 
             return message.channel.trysend(`id not found, notification logging disabled`);
         })
 
-        await db.set(`setting_notif_channel_${message.guildId}`, change);
+        await db.set(`settings.notif_channel.${message.guildId}`, change);
         await message.channel.trysend(`Notification channel set successfully!`);
 
     }, announce_channel: async (message, {db}, change) => {
         if (!Number(change)) {
-            await db.set(`setting_announce_channel_${message.guildId}`, false); 
+            await db.set(`settings.announce_channel.${message.guildId}`, false); 
             return message.channel.trysend(`invalid id, announcements disabled`)};
         await message.guild.channels.fetch(change).catch(async error => {
-            await db.set(`setting_announce_channel_${message.guildId}`, false); 
+            await db.set(`settings.announce_channel.${message.guildId}`, false); 
             return message.channel.trysend(`id not found, announcements disabled`);
         })
 
-        await db.set(`setting_announce_channel_${message.guildId}`, change);
+        await db.set(`settings.announce_channel.${message.guildId}`, change);
         await message.channel.trysend(`Announcement channel set successfully!`);
 }}
 
@@ -208,7 +208,7 @@ async function modernMode(message, {prefix, db}, {mode, setting, change}) {
             if (mode == "user") {await modifyUserSetting(message, {prefix, db}, {setting, change});}
             else {await modifyServerSetting(message, {prefix, db}, {setting, change})}};
 
-        await db.get(`setting_${setting}_${message.guildlId}`) //this. this right here fixed an issue where buttons
+        await db.get(`settings.${setting}.${message.guildlId}`) //this. this right here fixed an issue where buttons
                                                                //would wait until another setting is changed to properly update.
                                                                //it's messy, it's unnecessary, it's impossible to understand, but it works. and so, i leave it.
         let updatedEmbed, options
@@ -251,8 +251,8 @@ function embedTemplate(mode) {
 
 async function displaySetting(message, {prefix, db}, {mode, setting}) {
     let selectedOption
-    if (mode == "user") {selectedOption = await db.get(`setting_${setting}_${message.author.id}`);}
-    else {selectedOption = await db.get(`setting_${setting}_${message.guildId}`);}
+    if (mode == "user") {selectedOption = await db.get(`settings.${setting}.${message.author.id}`);}
+    else {selectedOption = await db.get(`settings.${setting}.${message.guildId}`);}
     return new Promise((res, rej) => {
         const settingText = settingsText(prefix)[mode][setting]
         settingText.name = settingText.title; //name uses classic interface, title more appropriate here

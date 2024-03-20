@@ -14,16 +14,16 @@ module.exports = {
             }
         }
         if(lyrics) {
-            let expected = await db.get(`lyric_${guild}`);
+            let expected = await db.get(`expected_lyric.${guild}`);
             if (expected && string.includes(expected[0]) && lyrics[expected[1]].content[expected[2] + 1]) {
-                await db.set(`lyric_${guild}`, [lyrics[expected[1]].content[expected[2] + 2], expected[1], expected[2] + 2]); //does not run when used as true/false test, cause it broke stuff
+                await db.set(`expected_lyric.${guild}`, [lyrics[expected[1]].content[expected[2] + 2], expected[1], expected[2] + 2]); //does not run when used as true/false test, cause it broke stuff
                 return lyrics[expected[1]].content[expected[2] + 1];
             }
             for (let i = 0; i < lyrics.length; i++) {
                 for (let j = lyrics[i].content.length - 1; j--;) {
-                    if (string.includes(lyrics[i].content[j].toLowerCase()) /*&& (!val || lyrics[i].content[j].length >= val.length)*/) {
+                    if (string.includes(lyrics[i].content[j].toLowerCase()) /*&& (!val || lyrics[i].content[j].length >= val.length)*/) { //commented out because idk why its here but cant exactly remove it
                         val = lyrics[i].content[j + 1]
-                        await db.set(`lyric_${guild}`, [lyrics[i].content[j + 2], i, j + 2]);
+                        await db.set(`expected_lyric.${guild}`, [lyrics[i].content[j + 2], i, j + 2]);
                     }
                 }
             }
@@ -123,7 +123,7 @@ module.exports = {
     },
 
     responsetemplate: async (message, db, footers, reply, emoji, desc, color, content) => {
-        if (await db.get(`setting_notifs_${message.author.id}`) !== "log") { //other cases require a reply
+        if (await db.get(`settings.notifs.${message.author.id}`) !== "log") { //other cases require a reply
             message.tryreply(reply);}
 
         footers.push(
@@ -131,7 +131,7 @@ module.exports = {
             `it's beautiful, i've stared at it for ten hours now`)
             
         let ping = ""
-        if (await db.get(`setting_notifs_${message.author.id}`) == "log") {ping = `<@${message.author.id}>`} //only ping if no reply
+        if (await db.get(`settings.notifs.${message.author.id}`) == "log") {ping = `<@${message.author.id}>`} //only ping if no reply
 
         const content_split = content.match(/(.{1,1000})/g); //make sure we don't go over embed char limits
 
@@ -151,7 +151,7 @@ module.exports = {
 
     detection: async ({message, content}, {db, Discord}, tests) => {
         let notifchannel = false //by default, do not log
-        await message.guild.channels.fetch(await db.get(`setting_notif_channel_${message.guildId}`)).then(channel => {
+        await message.guild.channels.fetch(await db.get(`settings.notif_channel.${message.guildId}`)).then(channel => {
             if (!(channel instanceof Discord.Collection)) {notifchannel = channel}}) //for logged responses, overwrites default if found
     
         const alphabeticalness = tests.alphabetical(content)
@@ -177,7 +177,7 @@ module.exports = {
             if (notifchannel) {await notifchannel.trysend(notif)} //only send notif if there is a log channel
         }
     
-        const jinxDetectionEnabled = (await db.get(`setting_jinxes_${message.guildId}`) !== "disable")
+        const jinxDetectionEnabled = (await db.get(`settings.jinxes.${message.guildId}`) !== "disable")
     
         if (jinxDetectionEnabled) {
             const jinx = await db.get(`jinxes.${message.channelId}`) //jinx detector
@@ -199,11 +199,6 @@ module.exports = {
         }
     
         if (jinxDetectionEnabled) {
-            const oldJinxFormat = await db.get(`jinx_${message.channelId}`)
-            if (oldJinxFormat) {
-                await db.delete(`jinx_${message.channelId}`) //remove jinxes in the old format to clean up the db
-            }
-
             //new format: changed to use dot notation and make an object of jinxes
             await db.set(`jinxes.${message.channelId}`, { 
                 content: message.content, //for jinx detection

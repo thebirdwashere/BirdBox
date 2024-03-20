@@ -17,7 +17,7 @@ module.exports = {
 
         const defaultArray = ["table of contents"]
 
-        const classic = Boolean(await db.get(`setting_classic_${message.author.id}`) == "enable")
+        const classic = Boolean(await db.get(`settings.classic.${message.author.id}`) == "enable")
 
         //console.table(maybeArray)
 

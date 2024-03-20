@@ -70,11 +70,58 @@ client.once('ready', async () => {
     client.user.setPresence({
         activities: [{ name: status, type: ActivityType.Custom }]
     });
+    
+    //check database version (we might need other versions in the future)
+    let dbVersionNum = await db.get("db_version") || 1
+    switch (dbVersionNum) {
+        case 1:
+            dbVersionNum++
+
+            const oldFormatJinxes = await db.startsWith("jinx_")
+            oldFormatJinxes.forEach(async jinx => await db.delete(jinx.id))
+
+            const oldFormatExpectedLyrics = await db.startsWith("lyric_")
+            oldFormatExpectedLyrics.forEach(async lyric => await db.delete(lyric.id))
+        
+            const oldFormatSnipes = await db.startsWith("snipe_")
+            oldFormatSnipes.forEach(async snipe => {
+                await db.delete(snipe.id)
+                //move old snipes to new format
+                const snipeId = snipe.id.replace("snipe_", "")
+                await db.set(`snipes.${snipeId}`, snipe.value)
+            })
+
+            const oldFormatSettings = await db.startsWith("setting_")
+            const newFormatSettings = {};
+            oldFormatSettings.forEach(async setting => {
+                const settingText = setting.id.replace("setting_", "")
+
+                const settingParts = settingText.split(/(\d+)/)       //splits at first instance of a number
+                const settingName = settingParts.shift().slice(0, -1) //takes first element (the actual setting) out
+                const settingId = settingParts[0]                     //grabs the number
+
+                if (!newFormatSettings[settingName]) newFormatSettings[settingName] = {}
+                newFormatSettings[settingName][settingId] = setting.value
+
+                await db.delete(setting.id)
+            })          
+            
+            await db.set(`settings`, newFormatSettings)
+
+        case NaN: //unlikely to actually register, used as an overflow from previous cases
+            console.log("");
+            console.log(`Database version detected as out of date, moved to version ${dbVersionNum}`);
+            console.log("");
+
+            await db.set("db_version", dbVersionNum)
+
+            break; //break statements not used elsewhere so you go instantly to the latest version
+    }
 });
 
 client.on('messageDelete', async (message) => {
-    const userAllowsSnipes = (await db.get(`setting_snipes_${message.author.id}`) === "enable");         //equals enable since default is off
-    const serverAllowsSnipes = (await db.get(`setting_snipes_server_${message.guildId}`) !== "disable"); //does not equal disable since default is on
+    const userAllowsSnipes = (await db.get(`settings.snipes.${message.author.id}`) === "enable");         //equals enable since default is off
+    const serverAllowsSnipes = (await db.get(`settings.snipes_server.${message.guildId}`) !== "disable"); //does not equal disable since default is on
 
     if (!userAllowsSnipes || !serverAllowsSnipes) {return;}; //don't log people who opted out
     if (!message.author || !message.createdAt) {return;};    //don't store busted snipes (edit: not even sure if this does anything lol)
@@ -113,7 +160,7 @@ client.on('messageCreate', async (message) => {
     const messageArray = await db.get("messages") //used for message responses
     const lyricArray = await db.get("lyrics")     //used for lyric responses
 
-    const repliesAllowed = (await db.get(`setting_responses_${message.guildId}`) !== "disable")
+    const repliesAllowed = (await db.get(`settings.responses.${message.guildId}`) !== "disable")
     const keywordTestResult = await tests.keywords(db, content, message.guildId, messageArray, lyricArray)
     if (repliesAllowed && keywordTestResult) {
         message.tryreply(keywordTestResult);}

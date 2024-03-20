@@ -23,7 +23,7 @@ async function userCanUnpin(message, repliedMessage, {devs, db}) {
   const threadOwner = repliedMessage.channel.ownerId
   const messageAuthor = message.author.id
 
-  const pinSetting = await db.get(`setting_pinning_${message.guildId}`)
+  const pinSetting = await db.get(`settings.pinning.${message.guildId}`)
   const userIsDev = devs.includes(message.author.id)
   const threadOwnerNotPinner = (threadOwner && threadOwner !== messageAuthor)
 
