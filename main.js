@@ -96,7 +96,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
 		vars.prefix = '/'; // Pass the proper prefix to slash commands.
 
-		if (typeof command.filter == 'object') { // Permission filter for commands. Defined in the module.exports on a command-by-command basis.
+		if (Array.isArray(command.filter)) { // Permission filter for commands. Defined in the module.exports on a command-by-command basis.
 			let authorized = [];
 
 			command.filter.forEach(item => {
