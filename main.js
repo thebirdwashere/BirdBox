@@ -78,12 +78,10 @@ client.once('ready', async () => {
 
     let status = await db.get("status") || defaults.status;
 
-    client.user.setPresence({
-        activities: [{ name: status, type: ActivityType.Custom }]
-    });
+    client.user.setPresence({ activities: [{ name: status, type: ActivityType.Custom }] });
 });
 
-/* ON SLASH COMMAND INTERACTION - INTERACTION HANDLER */
+/* INTERACTION HANDLER */
 
 client.on(Events.InteractionCreate, async (interaction) => {
 
@@ -98,16 +96,18 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
 		vars.prefix = '/'; // Pass the proper prefix to slash commands.
 
-		if (command.filter) { // Permission filter for commands. Defined in the module.exports on a command-by-command basis.
+		if (typeof command.filter == 'object') { // Permission filter for commands. Defined in the module.exports on a command-by-command basis.
 			let authorized = [];
 
 			command.filter.forEach(item => {
+				if (!devs[item]) return;
 				let usersWithPermission = devs[item].map(item => item.userId);
 				authorized = authorized.concat(usersWithPermission);
 			});
 
+			if (authorized.length == 0) return interaction.reply({ content: `The permission levels for this command are empty or are not valid. Please contact a developer.`, ephemeral: true });
         	if (!authorized.includes(interaction.user.id)) return interaction.reply({ content: `You do not have the required permission level to use this command. This command requires a permisson level of ${command.filter.map(item => `\`${item}\``).join(', ')}. If you believe this is an error, please contact a developer.`, ephemeral: true });
-		}
+		} else if (command.filter) { return interaction.reply({ content: `The permission levels for this command have been incorrectly configured. Please contact a developer.`, ephemeral: true }); }
 
 		try { // Attempt to execute the command. If failure occurs, handle accordingly.
 			await command.execute(interaction, vars);
