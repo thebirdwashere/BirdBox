@@ -29,6 +29,7 @@ let vars = {
     db: db,
     client: client,
 	devs: devs,
+	admins: devs.developer.concat(devs.host),
 	embedColors: {
 		blue: 0x5282EC,
 		green: 0x03FC30,
@@ -38,6 +39,8 @@ let vars = {
 	}
 	//TODO: Add config option for setting color in database
 };
+
+module.exports = { vars: vars };
 
 /* SLASH COMMAND HANDLER */
 
@@ -93,16 +96,25 @@ client.on(Events.InteractionCreate, async (interaction) => {
 			return;
 		}
 
-		try {
-			vars.prefix = '/';
+		vars.prefix = '/'; // Pass the proper prefix to slash commands.
+
+		if (command.filter) { // Permission filter for commands. Defined in the module.exports on a command-by-command basis.
+			let authorized = [];
+
+			command.filter.forEach(item => {
+				let usersWithPermission = devs[item].map(item => item.userId);
+				authorized = authorized.concat(usersWithPermission);
+			});
+
+        	if (!authorized.includes(interaction.user.id)) return interaction.reply({ content: `You do not have the required permission level to use this command. This command requires a permisson level of ${command.filter.map(item => `\`${item}\``).join(', ')}. If you believe this is an error, please contact a developer.`, ephemeral: true });
+		}
+
+		try { // Attempt to execute the command. If failure occurs, handle accordingly.
 			await command.execute(interaction, vars);
 		} catch (error) {
 			console.error(error);
-			if (interaction.replied || interaction.deferred) {
-				await interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true });
-			} else {
-				await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true });
-			}
+			if (interaction.replied || interaction.deferred) { await interaction.followUp({ content: 'There was an error while executing this command!', ephemeral: true }) }
+			else { await interaction.reply({ content: 'There was an error while executing this command!', ephemeral: true }) }
 		}
 
 	} else if (interaction.isAutocomplete()) {
@@ -137,7 +149,7 @@ client.on('messageCreate', async (message) => {
         if (client.commands.has(command)) {
 			try {
 				vars.prefix = classicPrefix;
-				client.commands.get(command).executeClassic({message, args, strings}, vars)
+				client.commands.get(command).executeClassic({message, args, strings}, vars);
 			} catch (err) {
 				message.reply(`The command \`/${command}\` does not support Classic mode yet.`);
 			}
