@@ -43,7 +43,7 @@ To download BirdBox, download the latest release from the Releases section, this
 
 **Configuration**
 
-To change BirdBox's status, edit line 61 of main.js (under client.user.setPresence) with your chosen status message. (Note: command may be coming soon to make this process easier, stay tuned!)
+To change BirdBox's status, edit line 61 of main.js (under client.user.setPresence) with your chosen status message, or use the built-in e;setstatus command to edit the status on the fly while the bot is running.
 You can also change ActivityType to Competing, Custom (the default), Listening, Playing, Streaming and Watching.
 
 If you want to be considered a dev (for modifying the maybepile and responses), add your User ID to the array at the top of main.js. Details for how to acquire a User ID can be found online.
