@@ -74,7 +74,7 @@ module.exports = { // this is messy but i literally dont care at the moment
                 .setCustomId('versionSelect')
                 .setPlaceholder('Select version...');
             
-            for (let f of patchNotes) {
+            for (let f of patchNotes) { // change to patchnotes.foreach()
                 versionSelect.addOptions([
                     new StringSelectMenuOptionBuilder()
                         .setLabel(f.version)
