@@ -148,9 +148,63 @@ module.exports = {
                     return;
 
                 });
-
             } break;
         }
+    },
+    async executeClassic({message, args}, {embedColors, prefix}){
+        if (args[0] == "codes") { 
+            const lettersList = 'abcdefghijklmnopqrstuvwxyz'.split('');
+            const charList = 'abdefghijklmnprstuvwxyz'.split('');
+            const requestedPage = args[1].toLowerCase()
 
+            if (!requestedPage) {
+                message.reply(`use ${prefix}translate codes A-Z to go to a page`).catch(e => console.error(e));
+                return; 
+            } else if (!lettersList.includes(requestedPage)) {
+                message.reply(`${requestedPage} isn't a letter bruh, use ${prefix}translate codes A-Z`).catch(e => console.error(e));
+                return; 
+            } else if (!charList.includes(requestedPage)) {
+                message.reply(`no codes on page ${requestedPage}, somehow`).catch(e => console.error(e));
+                return; 
+            }
+
+            const codesEmbed = new EmbedBuilder()
+			.setColor(embedColors.blue)
+			.setTitle(`${requestedPage} Codes`)
+			.setAuthor({ name: 'Google Translate', iconURL: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Google_Translate_logo.svg/1024px-Google_Translate_logo.svg.png' })
+			.setFooter({ text: 'Powered by the Google Translate API!' });
+
+            langs.forEach(item => {
+                if (item.name.toLowerCase().startsWith(requestedPage)) {
+                    codesEmbed.addFields(item)
+                }
+            })
+
+		    message.reply({ embeds: [codesEmbed] }).catch(e => console.error(e));
+
+            return; 
+        }
+
+        const translate = require('google-translate-api-x'); // Connect to the Google Translate API
+
+        const langTypeFrom = args[0];
+        const langTypeTo = args[1];
+        const rawMessage = message.content.replace(`${prefix}translate ${langTypeFrom} ${langTypeTo}`, '');
+
+        translate(rawMessage, {from: langTypeFrom, to: langTypeTo}).then(res => {
+
+            const translateEmbed = new EmbedBuilder()
+			.setColor(embedColors.blue)
+			.setTitle('Translation Output')
+			.setAuthor({ name: 'Google Translate', iconURL: 'https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Google_Translate_logo.svg/1024px-Google_Translate_logo.svg.png' })
+            .addFields(
+				{ name: 'Raw', value: rawMessage, inline: true },
+				{ name: 'Output', value: res.text, inline: true }
+			)
+			.setFooter({ text: 'Powered by the Google Translate API!' });
+
+		    message.reply({ embeds: [translateEmbed] }).catch(e => console.error(e));
+
+        }).catch(console.error);
     }
 }
