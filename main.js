@@ -8,7 +8,7 @@ const devs = devArray.host.map(item => item.userId).concat(devArray.developer.ma
 const Discord = require('discord.js');
 
 require('dotenv').config();
-const { Client, GatewayIntentBits , Message, MessageEmbed, DiscordAPIError, ActivityType, EmbedBuilder } = require('discord.js');
+const { Client, GatewayIntentBits, ActivityType } = require('discord.js');
 const client = new Client({intents : [GatewayIntentBits.GuildMessages , GatewayIntentBits.DirectMessages, GatewayIntentBits.Guilds, GatewayIntentBits.MessageContent]});
 
 const fs = require('fs');
