@@ -206,11 +206,12 @@ function createTableOfCOntents(embedArray, maybeArray, defaultArray) {
 }
 
 function createSpecificItemEmbed(maybeArray, pageNum) {
+    const itemClaim = maybeArray[pageNum].claim || `Unclaimed`
     const itemEmbed = new EmbedBuilder()
     .setColor('#208ddd')
     .setTitle('The Maybe Pile')
     .setAuthor({ name: 'BirdBox', iconURL: 'https://cdn.discordapp.com/avatars/803811104953466880/5bce4f0ba438015ec65f5b9cac11c8e3.webp'})
-    .setFooter({text: `Page ${pageNum} ● Suggested by ${maybeArray[pageNum].author} ● ${maybeArray[pageNum].claim}`})
+    .setFooter({text: `Page ${pageNum} ● Suggested by ${maybeArray[pageNum].author} ● ${itemClaim}`})
     .setThumbnail('https://cdn.discordapp.com/attachments/826968641790017576/906737704581079070/iu.png');
     try {itemEmbed.addFields({name: maybeArray[pageNum].title, value: maybeArray[pageNum].desc})} catch {console.error};
 
