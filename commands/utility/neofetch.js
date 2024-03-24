@@ -6,7 +6,6 @@ module.exports = {
 		.setName('neofetch')
 		.setDescription('Runs neofetch on the server that the bot is hosted on.'),
     async execute(interaction) {
-
         exec("neofetch --stdout", (error, stdout, stderr) => {
 
             if (error) {
@@ -22,8 +21,24 @@ module.exports = {
             }
 
             interaction.reply(`\`\`\`\n${stdout}\n\`\`\``);
-
         })
+    },
+    async executeClassic({message}) {
+        exec("neofetch --stdout", (error, stdout, stderr) => {
 
+            if (error) {
+                //console.log(`error: ${error.message}`);
+                message.reply({ content: 'Could not run neofetch', ephemeral: true });
+                return;
+            }
+
+            if (stderr) {
+                message.reply({ content: `There was an error: ${stderr}`, ephemeral: true });
+                console.log(`stderr: ${stderr}`);
+                return;
+            }
+
+            message.reply(`\`\`\`\n${stdout}\n\`\`\``);
+        })
     }
 }
