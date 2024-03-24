@@ -151,11 +151,12 @@ client.on('messageCreate', async (message) => {
 		for (let i of strings) commandFormatted = commandFormatted.replaceAll(`"${i}"`, '');
 		const args = commandFormatted.slice(classicPrefix.length).trim().split(/ +/g);
         const command = args.shift().toLowerCase();
+		const content = message.content.replace(`${classicPrefix}${command}`, "").trim()
 
         if (client.commands.has(command)) {
 			try {
 				vars.prefix = classicPrefix;
-				client.commands.get(command).executeClassic({message, args, strings}, vars);
+				client.commands.get(command).executeClassic({message, args, strings, content}, vars);
 			} catch (err) {
 				message.reply(`The command \`/${command}\` does not support Classic mode yet.`);
 			}
