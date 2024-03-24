@@ -19,7 +19,8 @@ module.exports = {
                 `${prefix}maybepile item selector no longer disables after one use`,
                 `Alphabetical order response now changes if all words are the same`,
                 `Added randomChoice utils function for choosing a random array element`,
-                `Most commands now reply to command use`
+                `Most commands now reply to command use`,
+                `Added 15 new 8ball responses`
             ]
         }, {
             version: `5.0.1`, date: `3/12/2024`, devs: `AgentNebulator, Bislij, Umadkek`,
