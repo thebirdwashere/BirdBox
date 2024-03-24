@@ -43,10 +43,10 @@ To download BirdBox, download the latest release from the Releases section, this
 
 **Configuration**
 
-To change BirdBox's status, edit line 61 of main.js (under client.user.setPresence) with your chosen status message. (Note: command may be coming soon to make this process easier, stay tuned!)
+To change BirdBox's status, edit line 61 of main.js (under client.user.setPresence) with your chosen status message, or use the built-in e;setstatus command to edit the status on the fly while the bot is running.
 You can also change ActivityType to Competing, Custom (the default), Listening, Playing, Streaming and Watching.
 
-If you want to be considered a dev (for modifying the maybepile and responses), add your User ID to the array at the top of main.js. Details for how to acquire a User ID can be found online.
+If you want to be considered a dev (for modifying the maybepile and responses), add your User ID and name to the json under cmds/json_info/dev_array. Details for how to acquire a User ID can be found online.
 
 Note: If you are creating a version of BirdBox for development/contribution purposes, you are legally obligated to change its profile picture to an image of Foof (the depicted rabbit) if at all possible. Other rabbits may be substituted, particularly if they are also owned by Bird, or another in-joke from the development team's members can suffice.
 
