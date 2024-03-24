@@ -2,7 +2,7 @@ const { randomIntInRange, randomChoice, sleepMs } = require("../utils")
 
 module.exports = {
     name: 'coinflip',
-    description: 'It is a coin flip. Use "" to add options to heads or tails!',
+    description: 'It is a coin flip. Use quotes to add options to heads or tails!',
     execute({message}, {prefix}){
 
     const providedOptions = getOptions(message, prefix)
@@ -18,7 +18,7 @@ module.exports = {
     const mainNum = randomIntInRange(0, 1)
     let otherNum = mainNum ^ 1
 
-    const trollNum = Math.floor(Math.random() * trolls.length);
+    const chosenTroll = randomChoice(trolls);
 
     //credit to umadkek for this one
     const rareCase = Math.floor( Math.random() * 6000 );
@@ -27,7 +27,7 @@ module.exports = {
         message.reply(`:coin: Your result is...`);
         message.channel.send(`what???? it landed on the edge??`);
     } else {
-      switch (trolls[trollNum]) {
+      switch (chosenTroll) {
         case "normal": message.tryreply(`:coin: Your result is "${responses[mainNum]}"!`); break;
         case "offtable": message.tryreply(`:coin: Messy flip, and the coin fell on the ground! The result was "${responses[mainNum]}", unless you want to try again.`); break;
         case "dogatemycoin": message.tryreply(`:coin: A dog just ate the coin before I got a good look at it! I think it was "${responses[mainNum]}", though... or maybe "${responses[otherNum]}"...`); break;
