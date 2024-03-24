@@ -10,7 +10,7 @@ module.exports = {
         //vvvvvvvvvvvvvvvvvv
 
         const patchnotes = [{
-            version: `5.1.0`, date: `TO BE RELEASED`, devs: `AgentNebulator, Umadkek`,
+            version: `5.1.0`, date: `3/24/2024`, devs: `AgentNebulator, Umadkek`,
             notes: [
                 `Added new serverside config options for response types and pin command`,
                 `Added claim, edit, and delete buttons to ${prefix}maybepile view`,
