@@ -48,7 +48,6 @@ Discord.Message.prototype.tryreply = async function(content) {
     try { return await this.reply(content); } catch {
         console.warn(`Error sending message in ${this.guild.name}'s ${this.channel.name}; check if permissions are needed for that channel`);}}
 
-try {
 client.once('ready', async () => {
     console.log('BirdBox Unified is now online! (developed by TheBirdWasHere and friends)');
     console.log('Logs will be shown in this terminal, better hope this stuff works and doesnt break');
@@ -87,17 +86,9 @@ client.once('ready', async () => {
             const oldFormatSnipes = await db.startsWith("snipe_")
             oldFormatSnipes.forEach(async snipe => {
                 await db.delete(snipe.id)
-
-                const snipeValue = {
-                    content: snipe.value?.content,
-                    author: {tag: snipe.value.author.tag, id: snipe.value.author.id},
-                    timestamp: snipe.value.createdAt,
-                    attachment: snipe.value.attachments?.first()?.url // Grabs the first attachment url out of the message, EXPERIMENTAL FEATURE
-                }
-
                 //move old snipes to new format
                 const snipeId = snipe.id.replace("snipe_", "")
-                await db.set(`snipes.${snipeId}`, snipeValue)
+                await db.set(`snipes.${snipeId}`, snipe.value)
             })
 
             const oldFormatSettings = await db.startsWith("setting_")
@@ -127,7 +118,6 @@ client.once('ready', async () => {
             break; //break statements not used elsewhere so you go instantly to the latest version
     }
 });
-} catch (err) {console.error(err)}
 
 client.on('messageDelete', async (message) => {
     const userAllowsSnipes = (await db.get(`settings.snipes.${message.author.id}`) === "enable");         //equals enable since default is off
