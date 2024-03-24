@@ -9,7 +9,7 @@ module.exports = {
     const type = args[0];
     const action = args[1];
 
-    const classic = Boolean(await db.get(`settings.classic.${message.author.id}`) == "enable")
+    const classic = Boolean(await db.get(`setting_classic_${message.author.id}`) == "enable")
 
     let response = message.content.replace(`${prefix}responses ${type} ${action}`, "")
       

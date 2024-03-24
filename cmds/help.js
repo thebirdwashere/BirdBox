@@ -5,7 +5,7 @@ module.exports = {
     description: 'Returns commands for the bot and info about them. (you just used this)', //at least if they see this, they did
     async execute({message, args}, {client, prefix, db}) {
         //get classic variable (determines one thing just below)
-        const classic = Boolean(await db.get(`settings.classic.${message.author.id}`) == "enable")
+        const classic = Boolean(await db.get(`setting_classic_${message.author.id}`) == "enable")
 
         //create the embed to be either sent or passed
         const helpEmbed = createEmbed({message, args}, {client, prefix})
