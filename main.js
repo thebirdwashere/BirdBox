@@ -132,7 +132,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 			return;
 		}
 
-		try { await command.autocomplete(interaction); } catch (error) { console.error(error); }
+		try { await command.autocomplete(interaction, vars); } catch (error) { console.error(error); }
 
 	}
 

@@ -14,9 +14,22 @@ module.exports = {
             subcommand
                 .setName('permissions')
                 .setDescription('Checks the permissions of a command.')
-                .addStringOption(option => option.setName('command').setDescription('The command to check the permissions of.').setRequired(true))
+                .addStringOption(option => option.setName('command').setDescription('The command to check the permissions of.').setRequired(true).setAutocomplete(true))
         ),
     filter: ['host', 'developer'],
+    async autocomplete(interaction, {commands}) {
+
+        const choices = commands.map(item => item.data.name);
+
+        const focusedOption = interaction.options.getFocused(true);
+        const value = focusedOption.value.charAt(0).toUpperCase() + focusedOption.value.slice(1)
+        let filtered = choices.filter(choice => choice.startsWith(value));
+        filtered = filtered.map(choice => ({ name: choice, value: choice }));
+        filtered = filtered.slice(0, 25);
+
+        await interaction.respond(filtered);
+
+    },
     async execute(interaction, {db, commands}) {
 
         switch (interaction.options.getSubcommand()) { // Switch to handle different subcommands.
