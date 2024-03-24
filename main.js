@@ -6,10 +6,9 @@ const devArray = require("./cmds/json_info/dev_array.json");
 const devs = devArray.host.map(item => item.userId).concat(devArray.developer.map(item => item.userId));
 
 const Discord = require('discord.js');
-const { randomIntInRange } = require("./utils");
 
 require('dotenv').config();
-const { Client, GatewayIntentBits , Message, MessageEmbed, DiscordAPIError, ActivityType, EmbedBuilder } = require('discord.js');
+const { Client, GatewayIntentBits, ActivityType } = require('discord.js');
 const client = new Client({intents : [GatewayIntentBits.GuildMessages , GatewayIntentBits.DirectMessages, GatewayIntentBits.Guilds, GatewayIntentBits.MessageContent]});
 
 const fs = require('fs');
@@ -27,7 +26,8 @@ const { QuickDB } = require("quick.db");
 const db = new QuickDB();
 
 const tests = require("./messagetests")
-const modals = require("./modals")
+const modals = require("./modals");
+const { randomIntInRange } = require("./utils");
 
 let IS_CANARY = true
 let prefix;
@@ -73,25 +73,34 @@ client.once('ready', async () => {
 });
 
 client.on('messageDelete', async (message) => {
-    if (await db.get(`setting_snipes_${message.author.id}`) !== "enable") {return;}; //don't log people who opted out
-    if (!message.author || !message.createdAt) {return;};               //don't store busted snipess
-	await db.set(`snipe_${message.channelId}`, {
+    const userAllowsSnipes = (await db.get(`setting_snipes_${message.author.id}`) === "enable");         //equals enable since default is off
+    const serverAllowsSnipes = (await db.get(`setting_snipes_server_${message.guildId}`) !== "disable"); //does not equal disable since default is on
+
+    if (!userAllowsSnipes || !serverAllowsSnipes) {return;}; //don't log people who opted out
+    if (!message.author || !message.createdAt) {return;};    //don't store busted snipes (edit: not even sure if this does anything lol)
+	await db.set(`snipes.${message.channelId}`, {
 		content: message?.content,
 		author: {tag: message.author.tag, id: message.author.id},
         timestamp: message.createdAt,
         attachment: message.attachments.first()?.url // Grabs the first attachment url out of the message, EXPERIMENTAL FEATURE
-	})
+	});
 })
 
-modals.modalHandler(vars); //handle modals for birdbox modern version
+client.on('interactionCreate', async (interaction) => {
+    if (!interaction.isModalSubmit()) {return;}
+    modals.modalHandler(interaction, vars); //handle modals for birdbox modern version
+});
 
 client.on('messageCreate', async (message) => {
     if (message.author.id == client.user.id) {return;} //birdbox check
     if (!message.content) {return;}                    //no reason to check an empty message
 
     const content = message.content.toLowerCase() //replaced several uses of message.content with this (however changed so the prefix and command must be lowercase)
-    const messageArray = await db.get("messages") //used for message responses
-    const lyricArray = await db.get("lyrics")     //used for lyric responses
+
+    const willWeSendFoof = randomIntInRange(1, 1000)
+    if (willWeSendFoof == 1000) {
+        message.channel.trysend("https://media.discordapp.net/attachments/1138589419796955270/1218588520247988294/saved.gif")
+    }
 
     if (message.content.startsWith(prefix)) { //command checker
         const args = message.content.slice(prefix.length).trim().split(/ +/g);
@@ -100,54 +109,19 @@ client.on('messageCreate', async (message) => {
         if (client.commands.has(command)) {
             client.commands.get(command).execute({message, args}, vars);}}
 
-    if (await tests.keywords(db, content, message.guildId, messageArray, lyricArray, true)) {//sticker/lyric responses
-        message.tryreply(await tests.keywords(db, content, message.guildId, messageArray, lyricArray, false));} 
+    //sticker/lyric responses
+    const messageArray = await db.get("messages") //used for message responses
+    const lyricArray = await db.get("lyrics")     //used for lyric responses
+
+    const repliesAllowed = (await db.get(`setting_responses_${message.guildId}`) !== "disable")
+    const keywordTestResult = await tests.keywords(db, content, message.guildId, messageArray, lyricArray)
+    if (repliesAllowed && keywordTestResult) {
+        message.tryreply(keywordTestResult);}
 
     if (IS_CANARY) {return;} //make sure none of this is duplicated on canary
 
-    let notifchannel = false //by default, do not log
-    await message.guild.channels.fetch(await db.get(`setting_notif_channel_${message.guildId}`)).then(channel => {
-        if (!(channel instanceof Discord.Collection)) {notifchannel = channel}}) //for logged responses, overwrites default if found
-
-    const alphabeticalness = tests.alphabetical(content)
-    if (alphabeticalness) { //alphabetical order checker
-        const randomWord = alphabeticalness[randomIntInRange(0, alphabeticalness.length - 1)]
-        const randomfooters = [
-            `now i know my abc's, next time won't you sing with me`,
-            `perfectly sorted, as all things should be`,
-            `remember kids, ${randomWord[0].toUpperCase()} is for "${randomWord}"`]
-        
-        const alpha_joined = alphabeticalness.join(" ");
-        
-        const notif = await tests.responsetemplate(message, db, randomfooters, 
-            `:capital_abcd: Your message is in perfect alphabetical order! \n\`${alpha_joined}\``, 
-            `:capital_abcd:`, `is in alphabetical order!`, 
-            0x3b88c3, alpha_joined)
-        if (notifchannel) {await notifchannel.trysend(notif)} //only send notif if there is a log channel
-    }
-
-    jinx = await db.get(`jinx_${message.channelId}`) //jinx detector
-    if (tests.jinx(message, jinx)) { message.channel.trysend(jinx.content) }
-
-    const periodicness = tests.periodictable(content)
-    if (periodicness) { //periodic table checker
-        const randomfooters = [
-            `${message.author.username} nye the science guy fr`,
-            `i wonder if this is a real compound, probably not but still`,
-            `one could say, this only happens... periodically`]
-        
-            const notif = await tests.responsetemplate(message, db, randomfooters, 
-            `:test_tube: Your message is on the periodic table! \n\`${periodicness}\``, 
-            `:test_tube:`, `is on the periodic table!`, 
-            0x21c369, periodicness)
-            if (notifchannel) {await notifchannel.trysend(notif)} //only send notif if there is a log channel
-    }
-
-    await db.set(`jinx_${message.channelId}`, { 
-		content: message.content, //for jinx detection
-		author: message.author.displayName,
-        timestamp: message.createdTimestamp
-    })
+    //run tests and stuff
+    tests.detection({message, content}, {db, Discord}, tests);
 });
 
 client.login(process.env.DISCORD_TOKEN);

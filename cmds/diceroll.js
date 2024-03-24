@@ -1,4 +1,4 @@
-const { randomIntInRange, sleepMs } = require("../utils")
+const { randomIntInRange, randomChoice, sleepMs } = require("../utils")
 
 module.exports = {
   name: 'diceroll',
@@ -18,7 +18,8 @@ module.exports = {
       "intenseshaking"
     ]
 
-    const trollSelection = trolls[randomIntInRange(1, trolls.length - 1)];
+    const trollSelection = randomChoice(trolls);
+    
     switch (trollSelection) {
       case "normal": message.tryreply(`:game_die: You rolled ${mainNum}!`); break;
       case "offtable": message.tryreply(`:game_die: The die fell off the table! It landed on ${mainNum} though, if you think it counts.`); break;
@@ -76,7 +77,7 @@ async function intenseShakingTroll(message, mainResult) {
     "*still shaking*",
     "*how long will this shaking last*",
     "*vigorous shaking*",
-    "*the shaketh continues*",
+    "*maximum shaketh*",
     "*shake, con los terroristas*"
   ]
 
@@ -89,7 +90,7 @@ async function intenseShakingTroll(message, mainResult) {
     await sleepMs(randomIntInRange(2000, 8000)); //between two and eight seconds
 
     //send a random saying
-    chosenSaying = randomSayings[randomIntInRange(1, randomSayings.length - 1)];
+    chosenSaying = randomChoice(randomSayings);
     await message.channel.trysend(chosenSaying)
     .finally(() => message.channel.sendTyping());  //make birdbox show as typing
   }

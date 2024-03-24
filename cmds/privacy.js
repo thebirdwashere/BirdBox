@@ -11,6 +11,6 @@ module.exports = {
 			.setDescription('Click the link for more information about the data BirdBox stores, how it is stored, and the license BirdBox uses.')
 			.setURL('https://thebirdwashere.thejasperhouse.net/birdbox/privacy.html');
         
-		message.channel.trysend({ embeds: [creditsEmbed] });
+		message.tryreply({ embeds: [creditsEmbed] });
 	}
 }

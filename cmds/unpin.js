@@ -1,13 +1,13 @@
 module.exports = {
   name: 'unpin',
   description: "Unpin a message by replying to it. (again, why no seperate perm discord)",
-  async execute({message}, {devs}){
+  async execute({message}, {devs, db}){
         let repliedMessage = null;
 
         try {
           repliedMessage = await message.fetchReference();
 
-          if (!userCanPin(message, repliedMessage, devs)) {return;}
+          if (!userCanUnpin(message, repliedMessage, devs)) {return;}
 
           try { 
             await repliedMessage.unpin()
@@ -19,20 +19,28 @@ module.exports = {
   }
 }
 
-function userCanPin(message, repliedMessage, devs) {
-  const channelOwner = repliedMessage.channel.ownerId
+async function userCanUnpin(message, repliedMessage, {devs, db}) {
+  const threadOwner = repliedMessage.channel.ownerId
   const messageAuthor = message.author.id
+
+  const pinSetting = await db.get(`setting_pinning_${message.guildId}`)
+  const userIsDev = devs.includes(message.author.id)
+  const threadOwnerNotPinner = (threadOwner && threadOwner !== messageAuthor)
 
   //check if it's even pinned lol
   if (!repliedMessage.pinned) { message.tryreply("bruh that message isn't even pinned"); return false;}
 
-  //override if birdbox developer
-  if (devs.includes(message.author.id)) {return true;}
-
-  //if it's a thread
-  if (channelOwner && channelOwner !== messageAuthor) { message.tryreply("sorry, you can only unpin messages in a thread you own"); return false; }
-  //if it's not a thread
-  if (!channelOwner) { message.tryreply("sorry, you can't unpin messages here"); return false; }
-
-  return true;
+  if (pinSetting == "enable") { //just enabled for absolutely everyone
+    return true;
+  } else if (userIsDev) { //override if birdbox developer
+    return true;
+  } else if (pinSetting == "disable") { //does not work for anyone except devs
+    message.tryreply("sorry, unpinning is disabled for everyone in this server"); return false;
+  } else if (!threadOwner) { //can't unpin messages in non-threads anyway
+    message.tryreply("sorry, you can't unpin messages here"); return false; 
+  } else if (threadOwnerNotPinner) {  //can only unpin messages in a thread if you own it
+    message.tryreply("sorry, you can only unpin messages in a thread you own"); return false; 
+  } else { //any other circmustance is fine for unpinning
+    return true;
+  }
 }

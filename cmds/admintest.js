@@ -5,9 +5,9 @@ module.exports = {
     execute({message}){
              
     if (message.member.permissions.has('KICK_MEMBERS' || 'BAN_MEMBERS')) {
-        message.channel.trysend('User has moderator permissions.');
+        message.tryreply('User has moderator permissions.');
     } else {
-        message.channel.trysend('User does not have moderator permissions.');
+        message.tryreply('User does not have moderator permissions.');
     }
   }
 }

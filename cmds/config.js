@@ -11,16 +11,21 @@ module.exports = {
         const setting = args[1];
         const change = args[2];
 
-        const classic = Boolean(await db.get(`setting_classic_${message.author.id}`) == "enable")
+        const classic = Boolean(await db.get(`setting_classic_${message.author.id}`) === "enable")
         
         //reject server settings if not admin
-        if (mode == "server" && !devs.includes(message.author.id)) {return message.channel.trysend("sorry, you must be a birdbox admin to modify server settings")};
+        if (mode == "server" && !devs.includes(message.author.id)) {return message.tryreply("sorry, you must be a birdbox admin to modify server settings")};
 
         //redirect in case of modern mode
         if (!classic) {return modernMode(message, {prefix, db, classic}, {mode, setting, change});} 
         else {return classicMode(message, {prefix, db, classic}, {mode, setting, change})}
     }
 }
+
+// IMPORTANT NOTICE
+// if anyone comes in trying to add new config options, 
+// please just fill out the required info in settingsText
+// and it ought to work
 
 /*/
  * --------------------------------
@@ -48,18 +53,18 @@ function classicMode(message, {prefix, db, classic}, {mode, setting, change}) {
         serverEmbed.addFields(settingsText(prefix).server[item])}
 
     //if no mode, they must have done just e;config
-    if (!mode) {return message.channel.trysend({embeds: [userEmbed]})};
+    if (!mode) {return message.tryreply({embeds: [userEmbed]})};
 
     //selected a mode at this point (including logic from main execute)
     if (mode == "user") {
-        if (!setting || !change) {return message.channel.trysend({embeds: [userEmbed]})};
-        if (!settingsText(prefix).user[setting]) {return message.channel.trysend({content: "invalid setting, try again"})};
+        if (!setting || !change) {return message.tryreply({embeds: [userEmbed]})};
+        if (!settingsText(prefix).user[setting]) {return message.tryreply({content: "invalid setting, try again"})};
 
         //previous returns mean this is guaranteed to work
         modifyUserSetting(message, {prefix, db, classic}, {setting, change})
     } else if (mode == "server") {
-        if (!setting || !change) {return message.channel.trysend({embeds: [serverEmbed]})};
-        if (!settingsText(prefix).server[setting]) {return message.channel.trysend({content: "invalid setting, try again"})};
+        if (!setting || !change) {return message.tryreply({embeds: [serverEmbed]})};
+        if (!settingsText(prefix).server[setting]) {return message.tryreply({content: "invalid setting, try again"})};
 
         //previous returns mean this is guaranteed to work
         modifyServerSetting(message, {prefix, db, classic}, {setting, change})
@@ -74,33 +79,49 @@ function settingsText(prefix) { //everything here is funky because i wanted prop
             this.name = `${prefix}config user notifs log/reply`; this.options = ["reply", "log"]; this.default = "reply";
             this.value = `${this.desc} \nDefaults to **${this.default}** if not set. \n\n**log:** Only log in the server channel dedicated to bot notifications. \n**reply:** Reply to the original message as well as log it.`},
             snipes: new function () {this.title = `Snipe Logging`;
-            this.desc =  `Change whether deleted messages are logged by ${prefix}snipe.`;
+            this.desc =  `Change whether your deleted messages are logged by ${prefix}snipe.`;
             this.name = `${prefix}config user snipes enable/disable`; this.options = ["enable", "disable"]; this.default = "disable";
             this.value = `${this.desc} \nDefaults to **${this.default}** if not set. \n\n**enable:** Log your deleted messages for snipes, regardless of who deleted it. \n**disable:** Do not log your deleted messages.`},
-            classic: new function () {this.title = `Birdbox Classic`;
+            classic: new function () {this.title = `BirdBox Classic`;
             this.desc = 'Toggle between modern and classic interfaces.';
             this.name = `${prefix}config user classic enable/disable`; this.options = ["enable", "disable"]; this.default = "disable";
             this.value = `${this.desc} \nDefaults to **${this.default}** if not set. \n\n**enable:** Use old text-based interfaces for content entry. \n**disable:** Use modern modal/button interfaces for content entry.`; }
         }, server: {
             notif_channel: new function() {this.title = `Notifications Channel`;
-            this.desc = `Change the channel notification logs are sent to.`
+            this.desc = `Change the channel notification logs are sent to.`;
             this.name = `${prefix}config server notif_channel (id)`; this.options = "channel"; this.default = "";
             this.value = `${this.desc} \nIf not set, logs will be disabled. \n\n**id:** The ID of the log channel being set.`; },
             announce_channel: new function() {this.title = `Announcement Channel`; 
-            this.desc = `Change the channel ${prefix}announce sends to.`
+            this.desc = `Change the channel ${prefix}announce sends to.`;
             this.name = `${prefix}config server announce_channel (id)`; this.options = "channel"; this.default = "";
-            this.value = `${this.desc} \nIf not set or set to an invalid ID, disables ${prefix}announce. \n\n**id:** The ID of the announcement channel being set.`; }
+            this.value = `${this.desc} \nIf not set or set to an invalid ID, disables ${prefix}announce. \n\n**id:** The ID of the announcement channel being set.`; },
+            responses: new function() {this.title = `Responses`; 
+            this.desc = `Toggles whether message and lyric responses are enabled for this server.`;
+            this.name = `${prefix}config server responses enable/disable`; this.options = ["enable", "disable"]; this.default = "enable";
+            this.value = `${this.desc} \nDefaults to **${this.default}** if not set. \n\n**enable:** Allow BirdBox to respond to messages with keywords. \n**disable:** Do not allow keyword-based responses.`; },
+            jinxes: new function() {this.title = `Jinx Detection`; 
+            this.desc = `Toggles whether BirdBox responds to identical messages sent at the same time.`;
+            this.name = `${prefix}config server jinxes enable/disable`; this.options = ["enable", "disable"]; this.default = "enable";
+            this.value = `${this.desc} \nDefaults to **${this.default}** if not set. \n\n**enable:** Allow BirdBox to add to a chain of identical messages. \n**disable:** Do not allow jinx detection or response.`; },
+            pinning: new function() {this.title = `Pin/Unpin`;
+            this.desc = `Modifies the usability of pin and unpin commands.`;
+            this.name = `${prefix}config server pinning enable/restrict/disable`; this.options = ["enable", "restrict", "disable"]; this.default = "restrict";
+            this.value = `${this.desc} \nDefaults to **${this.default}** if not set. \n\n**enable:** Allow any messages to be pinned at any time by any user. \n**restrict:** Restrict users from pinning messages under certain circumstances. Criteria is outlined in the help page for these commands. \n**disable:** Do not allow messages to be pinned by any users except devs.`; },
+            snipes_server: new function() {this.title = `Snipe Logging`;
+            this.desc = `Change whether this server's deleted messages are logged by ${prefix}snipe.`;
+            this.name = `${prefix}config server snipes_server enable/disable`; this.options = ["enable", "disable"]; this.default = "enable";
+            this.value = `${this.desc} \nDefaults to **${this.default}** if not set. \n\n**enable:** Allows deleted messages to be logged for users that opt in. \n**disable:** Do not allow any messages to be logged for any users.`; }
     }}
 }
 
 async function updateDefaultUserSetting(message, {prefix, db, classic}, {setting, change}) {
     if (!settingsText(prefix).user[setting].options.includes(change)) {
-        return message.channel.trysend(`not sure what ${change} means but it sure isnt "${settingsText(prefix).user[setting].options.join('" or "')}"`)}
+        return message.tryreply(`not sure what ${change} means but it sure isnt "${settingsText(prefix).user[setting].options.join('" or "')}"`)}
     
     await db.set(`setting_${setting}_${message.author.id}`, change)
     if (await db.get(`setting_${setting}_${message.author.id}`) === change) {
-        if (classic) {message.channel.trysend(`Setting updated successfully!`);}}
-    else {message.channel.trysend(`setting failed to update, try again`)};
+        if (classic) {message.tryreply(`Setting updated successfully!`);}}
+    else {message.tryreply(`setting failed to update, try again`)};
 }
 
 const modifyUserSettingArray = {}; //futureproofing
@@ -114,15 +135,14 @@ function modifyUserSetting(message, {prefix, db, classic}, {setting, change}) {
     })
 }
 
-//futureproofing a default server setting (currently unused)
-async function updateDefaultServerSetting(message, {prefix, db, classic}, {setting, change}) {
+async function updateDefaultServerSetting(message, {prefix, db}, {setting, change}) {
     if (!settingsText(prefix).server[setting].options.includes(change)) {
-        return message.channel.trysend(`not sure what ${change} means but it sure isnt "${settingsText(prefix).server[setting].options.join('" or "')}"`)}
+        return message.tryreply(`not sure what ${change} means but it sure isnt "${settingsText(prefix).server[setting].options.join('" or "')}"`)}
     
     await db.set(`setting_${setting}_${message.guildId}`, change)
     if (await db.get(`setting_${setting}_${message.guildId}`) === change) {
-        message.channel.trysend(`Setting updated successfully!`);}
-    else {message.channel.trysend(`setting failed to update, try again`);};
+        message.tryreply(`Setting updated successfully!`);}
+    else {message.tryreply(`setting failed to update, try again`);};
 }
 
 const modifyServerSettingArray = {
@@ -154,7 +174,7 @@ const modifyServerSettingArray = {
 function modifyServerSetting(message, {prefix, db, classic}, {setting, change}) {
     return new Promise((res) => {
         if (modifyServerSettingArray[setting]) modifyServerSettingArray[setting](message, {prefix, db, classic}, change)
-        else updateDefaultServerSetting(message, {prefix, db, classic}, setting, change)
+        else updateDefaultServerSetting(message, {prefix, db, classic}, {setting, change})
 
         res(true)
     })
@@ -280,7 +300,6 @@ async function displaySetting(message, {prefix, db}, {mode, setting}) {
 async function sendConfigMessage(message, {prefix, db}, {mode, setting}, row) {
     let sent, newEmbed
 
-    console.log(mode, setting)
     if (!setting) {
         newEmbed = embedTemplate(mode);
         newEmbed.setDescription('Use the menu below to select a setting!')
