@@ -27,5 +27,17 @@ module.exports = {
 
         await interaction.reply({ embeds: [responseEmbed] });
 
-    }
+    }, 
+    async executeClassic({message, content}, {embedColors}) {
+        const responseEmbed = new EmbedBuilder()
+            .setTitle(randomMsg('ball'))
+            .setAuthor({ name: 'BirdBox', iconURL: 'https://cdn.discordapp.com/avatars/803811104953466880/5bce4f0ba438015ec65f5b9cac11c8e3.png?size=256' })
+            .setColor(embedColors.blue)
+            .setFooter({ text: randomFooters('ball') });
+        
+        if (content) {responseEmbed.addFields({ name: 'You asked:', value: content})}
+
+        await message.reply({ embeds: [responseEmbed] });
+
+    }, 
 }
