@@ -2,7 +2,7 @@ const { EmbedBuilder } = require("discord.js");
 
 module.exports = {
     name: 'info',
-    description: `Learn about the bot's latest updates. Use e;info all to see even more!`,
+    description: `Learn about the bot's latest updates. Info all to see even more!`,
     execute({message, args}, {prefix}) {
         //I M P O R T A N T
         //If you are modifying this in the future,
@@ -10,7 +10,19 @@ module.exports = {
         //vvvvvvvvvvvvvvvvvv
 
         const patchnotes = [{
-            version: `5.0.1`, date: `TO BE RELEASED`, devs: `AgentNebulator, Bislij, Umadkek`,
+            version: `5.1.0`, date: `TO BE RELEASED`, devs: `AgentNebulator, Umadkek`,
+            notes: [
+                `Added new serverside config options for response types and pin command`,
+                `Added claim, edit, and delete buttons to ${prefix}maybepile view`,
+                `Added claim system to maybepile to establish development status`,
+                `${prefix}coinflip now has a small change to land on the edge`,
+                `${prefix}maybepile item selector no longer disables after one use`,
+                `Alphabetical order response now changes if all words are the same`,
+                `Added randomChoice utils function for choosing a random array element`,
+                `Most commands now reply to command use`
+            ]
+        }, {
+            version: `5.0.1`, date: `3/12/2024`, devs: `AgentNebulator, Bislij, Umadkek`,
             notes: [
                 `${prefix}8ball, ${prefix}ping, ${prefix}rr, and ${prefix}translate now use an embed`,
                 `Added help description for diceroll & updated others`,
@@ -60,12 +72,12 @@ module.exports = {
                 `Fixed a crash when attempting to send something in a restricted channel`,
                 `Fixed some instances where periodic table detection would fail`,
                 `Fixed issue where non-dev users can delete responses`,
-                `Fixed a typo in ${pre}help regarding ${pre}info`,
-                `Fixed a typo in ${pre}config`,
-                `Actually removed ${pre}db-test this time`*/
+                `Fixed a typo in ${prefix}help regarding ${prefix}info`,
+                `Fixed a typo in ${prefix}config`,
+                `Actually removed ${prefix}db-test this time`*/
             ]
         }, {
-            version: `4.3.2`, date: `1/08/2024`, devs: `AgentNebulator`, contribs: `Crisby, Anpun`,
+            version: `4.3.2`, date: `1/8/2024`, devs: `AgentNebulator`, contribs: `Crisby, Anpun`,
             notes: [
                 `Added jinx detector for two people saying the same thing at a similar time`,
                 `Added element detector for messages made of periodic table abbreviations`,
@@ -108,35 +120,29 @@ module.exports = {
                 `Removed hardcoded sticker responses`,
                 `Updated ${prefix}help to reflect these changes`
             ]
-        }]
-
-        /* PAST PATCH NOTES
-
-        {
+        }, {
             version: `4.2.2`, date: `11/30/2023`, devs: `AgentNebulator`,
             notes: [
-                `Reworked ${pre}info internally to allow for multiple patches`,
-                `Fixed ${pre}maybepile bug where page numbers would not work if "view" is assumed`,
+                `Reworked ${prefix}info internally to allow for multiple patches`,
+                `Fixed ${prefix}maybepile bug where page numbers would not work if "view" is assumed`,
                 'Leading spaces are no longer included in maybepile titles if created using the inital command',
-                `${pre}help maybepile now accurately reflects these changes`
+                `${prefix}help maybepile now accurately reflects these changes`
             ]
         }, {
             version: `4.2.1`, date: `11/24/2023`, devs: `AgentNebulator`,
             notes: [
-                `Added ${pre}info to display bot info, version, and patch notes`,
-                `${pre}help is now reformatted to be shorter and easier to read`,
-                `${pre}help can now take arguments for certain command-specific pages`,
-                `Rewrote ${pre}maybepile to be modifiable with Discord commands`,
+                `Added ${prefix}info to display bot info, version, and patch notes`,
+                `${prefix}help is now reformatted to be shorter and easier to read`,
+                `${prefix}help can now take arguments for certain command-specific pages`,
+                `Rewrote ${prefix}maybepile to be modifiable with Discord commands`,
                 `Reworked translation codes directory so pages are alphabetized`,
-                `Translation codes are now found under ${pre}help translate (page) and ${pre}translate codes (page)`,
-                `Added array of dev user ids, to be passed to commands like ${pre}maybepile for perm checks`,
-                `${pre}command name are once again case-sensitive (this fixes bugs with echo-based commands)`,
+                `Translation codes are now found under ${prefix}help translate (page) and ${prefix}translate codes (page)`,
+                `Added array of dev user ids, to be passed to commands like ${prefix}maybepile for perm checks`,
+                `${prefix}command name are once again case-sensitive (this fixes bugs with echo-based commands)`,
                 `Fixed bug where pinning a pinned message would return sucessful (and likewise with unpinning)`,
                 `Updated bot credits to be more accurate`
             ]
-        }
-
-        */
+        }]
 
         let devs = patchnotes[0].devs
         let versioncontribs
