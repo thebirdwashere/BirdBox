@@ -108,7 +108,11 @@ client.on(Events.InteractionCreate, async (interaction) => {
 			});
 
 			if (authorized.length == 0) return interaction.reply({ content: `The permission levels for this command are empty or are not valid. Please contact a developer.`, ephemeral: true });
-        	if (!authorized.includes(interaction.user.id)) return interaction.reply({ content: `You do not have the required permission level to use this command. This command requires a permisson level of ${command.filter.map(item => `\`${item}\``).join(', ')}. If you believe this is an error, please contact a developer.`, ephemeral: true });
+        	if (!authorized.includes(interaction.user.id)) {
+				const permissionLevelFormatter = new Intl.ListFormat("en", { type: "disjunction" })
+				const permissionLevels = permissionLevelFormatter.format(command.filter.map(item => `\`${item}\``))
+				return interaction.reply({ content: `You do not have the required permission level to use this command. This command requires a permisson level of ${permissionLevels}. If you believe this is an error, please contact a developer.`, ephemeral: true });
+			}
 		} else if (command.filter) { return interaction.reply({ content: `The permission levels for this command have been incorrectly configured. Please contact a developer.`, ephemeral: true }); }
 
 		try { // Attempt to execute the command. If failure occurs, handle accordingly.
