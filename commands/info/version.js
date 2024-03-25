@@ -138,7 +138,7 @@ module.exports = { // this is messy but i literally dont care at the moment
                 .setAuthor({ name: 'BirdBox', iconURL: 'https://cdn.discordapp.com/avatars/803811104953466880/5bce4f0ba438015ec65f5b9cac11c8e3.webp' })
                 .setColor(embedColors.white)
                 .addFields({ name: `Update by ${patchNotes[page].devs.join(', ')}`, value: patchNotes[page]?.contribs?.join(', ') ?? ' ' })
-                .addFields({ name: `v${patchNotes[page].version} Patch Notes`, value: `● ${patchNotes[page].notes.join('\n● ').replaceAll('${prefix}', prefix)}` })
+                .addFields({ name: `v${patchNotes[page].version} Patch Notes`, value: `● ${patchNotes[page].notes.join('\n● ').replaceAll('e;', prefix)}` })
                 .setFooter({ text: `Release Date: ${patchNotes[page].date}` });
 
             
