@@ -28,7 +28,7 @@ module.exports = { // this is messy but i literally dont care at the moment
 
         let version = interaction.options?.getString('version') ?? patchNotes[0].version;
 
-        if (!patchNotes.map(item => item.version).includes(version)) return interaction.reply({ content: 'Not a valid version number.', ephemeral: true });
+        if (!patchNotes.map(item => item.version).includes(version)) return interaction.reply({ content: 'that was not a version we released lol', ephemeral: true });
         let page = patchNotes.map(item => item.version).indexOf(version);
 
         if(page + 1 > patchNotes.length) return interaction.reply({ content: 'bruh the pages dont even go that far back it up buddy', ephemeral: true }); // how did you even trigger this
@@ -39,12 +39,12 @@ module.exports = { // this is messy but i literally dont care at the moment
             try {
             
                 infoEmbed = new EmbedBuilder()
-                    .setTitle(`${patchNotes[i].type} ${patchNotes[i].version}`)
+                    .setTitle(`${patchNotes[page].type} ${patchNotes[page].version}`)
                     .setAuthor({ name: 'BirdBox', iconURL: 'https://cdn.discordapp.com/avatars/803811104953466880/5bce4f0ba438015ec65f5b9cac11c8e3.webp' })
                     .setColor(embedColors.white)
-                    .addFields({ name: `Update by ${patchNotes[i].devs.join(', ')}`, value: patchNotes[i]?.contribs?.join(', ') ?? ' ' })
-                    .addFields({ name: `v${patchNotes[i].version} Patch Notes`, value: `● ${patchNotes[i].notes.join('\n● ').replaceAll('${prefix}', prefix)}` })
-                    .setFooter({ text: `Release Date: ${patchNotes[i].date}` });
+                    .addFields({ name: `Update by ${patchNotes[page].devs.join(', ')}`, value: patchNotes[page]?.contribs?.join(', ') ?? ' ' })
+                    .addFields({ name: `v${patchNotes[page].version} Patch Notes`, value: `● ${patchNotes[page].notes.join('\n● ').replaceAll('${prefix}', prefix)}` })
+                    .setFooter({ text: `Release Date: ${patchNotes[page].date}` });
 
                 
             } catch(err) { // Failsafe, something triggered this so putting a catch in to be safe
@@ -119,7 +119,38 @@ module.exports = { // this is messy but i literally dont care at the moment
             await interaction.message.edit({ embeds: updateEmbed(page), components: updateRow(page) });
             await interaction.deferUpdate();
         });
+    },
+    async executeClassic({message, args}, {prefix, embedColors}) {
 
+        let version = args[0] ?? patchNotes[0].version;
 
+        if (!patchNotes.map(item => item.version).includes(version)) return interaction.reply({ content: 'that was not a version we released lol', ephemeral: true });
+        let page = patchNotes.map(item => item.version).indexOf(version);
+
+        if(page + 1 > patchNotes.length) return interaction.reply({ content: 'bruh the pages dont even go that far back it up buddy', ephemeral: true }); // how did you even trigger this
+
+        let infoEmbed;
+
+        try {
+        
+            infoEmbed = new EmbedBuilder()
+                .setTitle(`${patchNotes[page].type} ${patchNotes[page].version}`)
+                .setAuthor({ name: 'BirdBox', iconURL: 'https://cdn.discordapp.com/avatars/803811104953466880/5bce4f0ba438015ec65f5b9cac11c8e3.webp' })
+                .setColor(embedColors.white)
+                .addFields({ name: `Update by ${patchNotes[page].devs.join(', ')}`, value: patchNotes[page]?.contribs?.join(', ') ?? ' ' })
+                .addFields({ name: `v${patchNotes[page].version} Patch Notes`, value: `● ${patchNotes[page].notes.join('\n● ').replaceAll('${prefix}', prefix)}` })
+                .setFooter({ text: `Release Date: ${patchNotes[page].date}` });
+
+            
+        } catch(err) { // Failsafe, something triggered this so putting a catch in to be safe
+
+            infoEmbed = new EmbedBuilder()
+                .setTitle('ERROR')
+                .setColor(embedColors.white)
+                .setDescription('There was an error while trying to read data.' );
+
+        }
+
+        message.reply({ embeds: [infoEmbed] });
     }
 }
