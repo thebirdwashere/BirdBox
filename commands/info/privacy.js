@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
+const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -10,10 +10,31 @@ module.exports = {
 			.setColor(embedColors.blue)
 			.setTitle('Privacy Policy')
 			.setAuthor({ name: 'BirdBox', iconURL: 'https://cdn.discordapp.com/avatars/803811104953466880/5bce4f0ba438015ec65f5b9cac11c8e3.png?size=256' })
-			.setDescription('Click the link for more information about the data BirdBox stores, how it is stored, and the license BirdBox uses.')
+			.setFooter({text: 'User data and license information.'})
+			.setURL('https://thebirdwashere.thejasperhouse.net/birdbox/privacy.html');
+		
+		const linkButton = new ButtonBuilder()
+			.setLabel('Link')
+			.setStyle(ButtonStyle.Link)
+			.setDisabled(false)
+			.setURL('https://thebirdwashere.thejasperhouse.net/birdbox/privacy.html');
+		
+		const linkButtonRow = new ActionRowBuilder()
+			.addComponents(linkButton);
+
+        await interaction.reply({ embeds: [privacyEmbed], components: [linkButtonRow] });
+        
+    },
+	async executeClassic({message}, {embedColors}) {
+
+        const privacyEmbed = new EmbedBuilder()
+			.setColor(embedColors.blue)
+			.setTitle('Privacy Policy')
+			.setAuthor({ name: 'BirdBox', iconURL: 'https://cdn.discordapp.com/avatars/803811104953466880/5bce4f0ba438015ec65f5b9cac11c8e3.png?size=256' })
+			.setFooter({text: 'User data and license information.'})
 			.setURL('https://thebirdwashere.thejasperhouse.net/birdbox/privacy.html');
 
-        await interaction.reply({ embeds: [privacyEmbed] });
+        await message.reply({ embeds: [privacyEmbed] }).catch(e => console.error(e));
         
     }
 }
