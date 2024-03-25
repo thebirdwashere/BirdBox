@@ -24,6 +24,7 @@ module.exports = { // this is messy but i literally dont care at the moment
         await interaction.respond(filtered);
 
     },
+    // Modern Mode
     async execute(interaction, {embedColors, prefix}) {
 
         let version = interaction.options?.getString('version') ?? patchNotes[0].version;
@@ -33,7 +34,7 @@ module.exports = { // this is messy but i literally dont care at the moment
 
         if(page + 1 > patchNotes.length) return interaction.reply({ content: 'bruh the pages dont even go that far back it up buddy', ephemeral: true }); // how did you even trigger this
 
-        function updateEmbed(i) {
+        function updateEmbed(page) { // Returns the updated embed
             let infoEmbed;
 
             try {
@@ -59,7 +60,7 @@ module.exports = { // this is messy but i literally dont care at the moment
             return [infoEmbed];
         }
 
-        function updateRow(i) {
+        function updateRow(page) { // Returns the updated row
             const backButton = new ButtonBuilder()
                 .setCustomId('backButton')
                 .setLabel('🠈')
@@ -73,17 +74,17 @@ module.exports = { // this is messy but i literally dont care at the moment
             const versionSelect = new StringSelectMenuBuilder()
                 .setCustomId('versionSelect')
                 .setPlaceholder('Select version...');
-            
-            for (let f of patchNotes) { // change to patchnotes.foreach()
+
+            patchNotes.forEach((item) => {
                 versionSelect.addOptions([
                     new StringSelectMenuOptionBuilder()
-                        .setLabel(f.version)
-                        .setValue(patchNotes.indexOf(f).toString())
+                        .setLabel(item.version)
+                        .setValue(patchNotes.indexOf(item).toString())
                 ]);
-            }
+            })
 
-            if(i <= 0) { backButton.setDisabled(true) } else { backButton.setDisabled(false) };
-            if(i >= patchNotes.length - 1) { forwardButton.setDisabled(true) } else { forwardButton.setDisabled(false) };
+            if(page <= 0) { backButton.setDisabled(true) } else { backButton.setDisabled(false) };
+            if(page >= patchNotes.length - 1) { forwardButton.setDisabled(true) } else { forwardButton.setDisabled(false) };
 
             const infoButtonRow = new ActionRowBuilder()
                 .addComponents(backButton, forwardButton);
@@ -120,6 +121,7 @@ module.exports = { // this is messy but i literally dont care at the moment
             await interaction.deferUpdate();
         });
     },
+    // Classic Mode
     async executeClassic({message, args}, {prefix, embedColors}) {
 
         let version = args[0] ?? patchNotes[0].version;
