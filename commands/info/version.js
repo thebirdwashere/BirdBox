@@ -33,7 +33,7 @@ module.exports = { // this is messy but i literally dont care at the moment
 
         if(page + 1 > patchNotes.length) return interaction.reply({ content: 'bruh the pages dont even go that far back it up buddy', ephemeral: true }); // how did you even trigger this
 
-        function updateEmbed(i) {
+        function updateEmbed(page) {
             let infoEmbed;
 
             try {
