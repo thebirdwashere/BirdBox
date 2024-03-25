@@ -17,6 +17,12 @@ module.exports = {
                     { name: 'gif', value: 'gif' }
                 )
               )
+          .addStringOption(option =>
+            option
+              .setName('breed')
+              .setDescription('What breed of cat you want images of.')
+              .setAutocomplete(true)
+              )
     )
     .addSubcommand(subcommand =>
       subcommand
@@ -31,16 +37,58 @@ module.exports = {
                     { name: 'gif', value: 'gif' }
                 )
               )
+          .addStringOption(option =>
+            option
+              .setName('breed')
+              .setDescription('What breed of dog you want images of.')
+              .setAutocomplete(true)
+              )
     ),
+    async autocomplete(interaction) {
+
+      let petBreeds
+
+      switch (interaction.options.getSubcommand()) { // Switch to handle different subcommands.
+        case 'cat': {
+          await fetch(`https://api.thecatapi.com/v1/breeds`)
+          .then(response => response.json())
+          .then(json => {petBreeds = json})
+          break;
+        }
+        
+        case 'dog': {
+          await fetch(`https://api.thedogapi.com/v1/breeds`)
+          .then(response => response.json())
+          .then(json => {petBreeds = json})
+          break;
+        }
+      }
+
+      const focusedOption = interaction.options.getFocused(true);
+      const value = focusedOption.value.charAt(0).toLowerCase() + focusedOption.value.slice(1)
+      let filtered = petBreeds.filter(breed => breed.name.toLowerCase().startsWith(value));
+      filtered = filtered.map(breed => ({ name: breed.name, value: breed.id.toString() }));
+      filtered = filtered.slice(0, 25);
+
+      await interaction.respond(filtered);
+
+  },
     async execute(interaction, {embedColors}) {
 
       switch (interaction.options.getSubcommand()) { // Switch to handle different subcommands.
         case 'cat': {
 
           const imageType = interaction.options?.getString('type') ?? 'jpg';
+          const selectedBreed = interaction.options?.getString('breed') ?? '';
+
+          let fetchString = `https://api.thecatapi.com/v1/images/search?mime_types=${imageType}`
+
+          if (selectedBreed) {
+            fetchString += `&breed_ids=${selectedBreed}`
+          }
 
           try {
-            let catData; await fetch(`https://api.thecatapi.com/v1/images/search?mime_types=${imageType}`)
+            let catData; await fetch(fetchString)
             .then(response => response.json())
             .then(json => {catData = json})
 
@@ -58,9 +106,16 @@ module.exports = {
         case 'dog': {
 
           const imageType = interaction.options?.getString('type') ?? 'jpg';
+          const selectedBreed = interaction.options?.getString('breed') ?? '';
+
+          let fetchString = `https://api.thedogapi.com/v1/images/search?mime_types=${imageType}`
+
+          if (selectedBreed) {
+            fetchString += `&breed_ids=${selectedBreed}`
+          }
 
           try {
-            let dogData; await fetch(`https://api.thedogapi.com/v1/images/search?mime_types=${imageType}`)
+            let dogData; await fetch(fetchString)
             .then(response => response.json())
             .then(json => {dogData = json})
 
@@ -71,7 +126,7 @@ module.exports = {
               .setImage(dogData[0].url);
 
             await interaction.reply({ embeds: [dogEmbed] });
-          } catch (error) { await interaction.reply({ content: `There was an error: \`${error}\`. This was most likely caused by a cooldown or timeout. Consider slowing down your request rate.`, ephemeral: true }); console.log(error); }
+          } catch (error) { await interaction.reply({ content: `There was an error: \`${error}\`. This was most likely caused by a cooldown or timeout. Consider slowing down your request rate.`, ephemeral: true }); }
           break;
         }
       }
