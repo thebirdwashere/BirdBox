@@ -24,8 +24,8 @@ module.exports = {
 
             try {
                 await targetMessage.unpin()
-                if (targetMessage) {
-                    await interaction.reply(`"${targetMessage}" unpinned successfully!`);
+                if (targetMessage.content) {
+                    await interaction.reply(`"${targetMessage.content}" unpinned successfully!`);
                 } else {
                     await interaction.reply(`Unpinned successfully!`);
                 }
