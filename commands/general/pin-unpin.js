@@ -39,12 +39,12 @@ module.exports = {
     }
 }
 
-function userCanPin(interaction, messageBeingPinned, admins) {
-    const channelOwner = messageBeingPinned.channel.ownerId
+function userCanPin(interaction, targetMessage, admins) {
+    const channelOwner = targetMessage.channel.ownerId
     const interactionUser = interaction.member.id
   
     //if it's already pinned
-    if (messageBeingPinned.pinned) { interaction.reply({ content: "bruh that message is already pinned", ephemeral: true }); return false;}
+    if (targetMessage.pinned) { interaction.reply({ content: "bruh that message is already pinned", ephemeral: true }); return false;}
   
     //override if birdbox developer
     if (admins.map(user => user.userId).includes(interactionUser)) {return true;}
@@ -55,8 +55,8 @@ function userCanPin(interaction, messageBeingPinned, admins) {
     return true;
 }
 
-function userCanUnpin(interaction, messageBeingPinned, admins) {
-    const channelOwner = messageBeingPinned.channel.ownerId
+function userCanUnpin(interaction, targetMessage, admins) {
+    const channelOwner = targetMessage.channel.ownerId
     const interactionUser = interaction.member.id
 
     //override if birdbox developer
