@@ -10,7 +10,7 @@ module.exports = {
 
         //decide to use pin or unpin
         if (!targetMessage.pinned) {
-            if (!userCanPin(interaction, targetMessage, admins)) {return;}
+            if (!userCanPin(interaction, targetMessage, admins)) return;
 
             try { 
                 await targetMessage.pin()
@@ -20,7 +20,7 @@ module.exports = {
             await interaction.deleteReply(); //had to use bailey's code and yep it's janky
 
         } else {
-            if (!userCanUnpin(interaction, targetMessage, admins)) {return;}
+            if (!userCanUnpin(interaction, targetMessage, admins)) return;
 
             try {
                 await targetMessage.unpin()
