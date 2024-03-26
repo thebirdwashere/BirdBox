@@ -87,7 +87,7 @@ client.once('ready', async () => {
 
 client.on(Events.InteractionCreate, async (interaction) => {
 
-	if (interaction.isChatInputCommand()) {
+	if (interaction.isChatInputCommand() || interaction.isContextMenuCommand()) {
 
 		const command = interaction.client.commands.get(interaction.commandName);
 
