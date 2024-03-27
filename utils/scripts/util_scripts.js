@@ -1,5 +1,6 @@
 const responses = require('../../utils/json/responses.json');
 const footers = require('../../utils/json/footers.json');
+const defaults = require('../../utils/json/defaults.json');
 
 module.exports = {
     randomFooters: (type) => {
@@ -27,5 +28,9 @@ module.exports = {
     },
     sleep: (ms) => {
         return new Promise(resolve => setTimeout(resolve, ms));
+    },
+    getSettingValue: async (setting, db) => {
+        const dbSetting = await db.get(setting)
+        return dbSetting ?? defaults[setting]
     }
 }
