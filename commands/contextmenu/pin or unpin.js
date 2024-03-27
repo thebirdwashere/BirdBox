@@ -2,7 +2,7 @@ const { ContextMenuCommandBuilder, ApplicationCommandType } = require('discord.j
 
 module.exports = {
     data: new ContextMenuCommandBuilder()
-		.setName('pin-unpin')
+		.setName('pin or unpin')
         .setType(ApplicationCommandType.Message),
     async execute(interaction, {admins}) {
 
@@ -34,8 +34,8 @@ module.exports = {
         }
     },
     async executeClassic({message}, {prefix}) {
-        //they'll never know
-        message.reply(`The command \`${prefix}pin-unpin\` was not found.`)
+        //they'll never know (not that they should see this anyway)
+        message.reply(`The command \`${prefix}pin or unpin\` was not found.`)
     }
 }
 
