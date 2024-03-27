@@ -60,7 +60,7 @@ module.exports = {
     },
     async executeClassic({message, args}, {admins}) {
 
-        const targetMessageId = args[0].replace(`https://discord.com/channels/${message.guildId}/${message.channel.id}/`, "")
+        const targetMessageId = args[0]?.replace(`https://discord.com/channels/${message.guildId}/${message.channel.id}/`, "")
         let targetMessage
 
         try {
@@ -69,7 +69,7 @@ module.exports = {
             try {
                 targetMessage = await message.channel.messages.fetch(targetMessageId)
             } catch (err) {
-                message.reply("try again, either reply to the message you want pinned or give me its id/link");
+                return message.reply("try again, either reply to the message you want pinned or give me its id/link");
             }
         }
         
