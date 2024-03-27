@@ -31,6 +31,10 @@ module.exports = {
     },
     getSettingValue: async (setting, db) => {
         const dbSetting = await db.get(setting)
-        return dbSetting ?? defaults[setting]
+        const settingValue = dbSetting ?? defaults[setting]
+
+        const specialReturns = {enable: true, disable: false}
+
+        return specialReturns[settingValue] ?? settingValue
     }
 }
