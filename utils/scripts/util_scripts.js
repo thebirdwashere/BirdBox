@@ -36,5 +36,14 @@ module.exports = {
         const specialReturns = {enable: true, disable: false}
 
         return specialReturns[settingValue] ?? settingValue
+    },
+    shuffleArray: (array) => {
+        let shuffledArray = []
+        while (array.length) {
+            const randomInt = Math.floor(Math.random() * array.length)
+            shuffledArray = shuffledArray.concat(array.splice(randomInt, 1))
+        }
+
+        return shuffledArray
     }
 }
