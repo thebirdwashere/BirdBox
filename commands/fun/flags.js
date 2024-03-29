@@ -100,34 +100,38 @@ module.exports = {
             const correctUserString = usersFormatter.format(correctUsers)
             const wrongUserString = usersFormatter.format(wrongUsers)
 
+            let responseText = ""
+
             switch (correctUsers.length) {
                 case 0:
-                    await interaction.followUp(`Nobody got it right!`)
+                    responseText += `Nobody got it right! \n`
                     break;
                 case 1:
-                    await interaction.followUp(`${correctUserString} got it right! gg`)
+                    responseText += `${correctUserString} got it right! gg \n`
                     break;
                 case 2:
-                    await interaction.followUp(`${correctUserString} both got it right! gg`)
+                    responseText += `${correctUserString} both got it right! gg \n`
                     break;
                 default:
-                    await interaction.followUp(`${correctUserString} all got it right! gg`)
+                    responseText += `${correctUserString} all got it right! gg \n`
                     break;
             }
             switch (wrongUsers.length) {
                 case 0:
-                    await interaction.channel.send(`That means nobody got it wrong... pretty good ig`)
+                    responseText += `That means nobody got it wrong... pretty good ig`
                     break;
                 case 1:
-                    await interaction.channel.send(`That means ${wrongUserString} got it wrong, massive L`)
+                    responseText += `That means ${wrongUserString} got it wrong, massive L`
                     break;
                 case 2:
-                    await interaction.channel.send(`That means ${wrongUserString} both got it wrong, massive L`)
+                    responseText += `That means ${wrongUserString} both got it wrong, massive L`
                     break;
                 default:
-                    await interaction.channel.send(`That means ${wrongUserString} all got it wrong, massive L`)
+                    responseText += `That means ${wrongUserString} all got it wrong, massive L`
                     break;
             }
+            
+            await interaction.followUp(responseText)
         });
 
         while (remainingTime) {
