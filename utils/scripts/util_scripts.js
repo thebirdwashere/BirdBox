@@ -38,12 +38,25 @@ module.exports = {
         return specialReturns[settingValue] ?? settingValue
     },
     shuffleArray: (array) => {
+        let originalArray = [...array]
         let shuffledArray = []
-        while (array.length) {
-            const randomInt = Math.floor(Math.random() * array.length)
-            shuffledArray = shuffledArray.concat(array.splice(randomInt, 1))
+
+        while (originalArray.length) {
+            const randomInt = Math.floor(Math.random() * originalArray.length)
+            shuffledArray = shuffledArray.concat(originalArray.splice(randomInt, 1))
         }
 
         return shuffledArray
+    },
+    sampleArray: (array, sampleSize) => {
+        let originalArray = [...array]
+        let sampledArray = []
+
+        while (sampledArray.length < sampleSize) {
+            const randomInt = Math.floor(Math.random() * originalArray.length)
+            sampledArray = sampledArray.concat(originalArray.splice(randomInt, 1))
+        }
+
+        return sampledArray
     }
 }
