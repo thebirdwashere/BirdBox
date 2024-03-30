@@ -58,5 +58,14 @@ module.exports = {
         }
 
         return sampledArray
+    },
+    chunk: (arr, size) => {
+        function* chunkSplit(arr, size) {
+            for (let i = 0; i < arr.length; i += size) {
+                yield arr.slice(i, i + size);
+            }
+        }
+
+        return [...chunkSplit(arr, size)];
     }
 }
