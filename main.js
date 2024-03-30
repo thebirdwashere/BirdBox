@@ -22,6 +22,7 @@ const db = new QuickDB();
 const classicPrefix = 'd;';
 const defaults = require('./utils/json/defaults.json');
 const devs = require('./utils/json/devs.json');
+const tests = require("./messagetests")
 
 /* VARS PASSED TO COMMANDS */
 
@@ -68,7 +69,15 @@ for (const folder of commandFolders) {
 
 /* FOR HELP COMMAND */
 
-const commands = Array.from(client.commands.values());
+let commands = Array.from(client.commands.values());
+commands = commands.filter((item) => { if (item.data.options) return item; });
+
+commands.sort((a, b) => { // Put commands in alphabetical order.
+	if (a.data.name < b.data.name) { return -1 }
+	else if (a.data.name > b.data.name) { return 1 }
+	else { return 0 }
+});
+
 vars.commands = commands;
 
 /* ON READY */
@@ -147,8 +156,10 @@ client.on('messageCreate', async (message) => {
 	if (message.content.startsWith(classicPrefix)) {
 		
 		let commandFormatted = message.content;
+
 		const strings = message.content.match(/(?<=")(.*?)(?=")/g)?.filter(item => item.trim() != '') ?? [];
-		for (let i of strings) commandFormatted = commandFormatted.replaceAll(`"${i}"`, '');
+		strings.forEach((item) => {commandFormatted = commandFormatted.replaceAll(`"${item}"`, '');});
+
 		const args = commandFormatted.slice(classicPrefix.length).trim().split(/ +/g);
         const command = args.shift().toLowerCase();
 		const content = message.content.replace(`${classicPrefix}${command}`, "").trim()
