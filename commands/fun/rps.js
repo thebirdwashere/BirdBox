@@ -44,8 +44,8 @@ module.exports = {
         let playerMoveNum = moveNames.indexOf(playerMove);
         let computerMoveNum = moveNames.indexOf(computerMove);
 
-        if (playerMoveNum == computerMoveNum) {result = 'You Tied!'; footer = 'kinda mid game ngl'; color = embedColors.yellow;}
-		else if (((playerMoveNum - computerMoveNum) + 3) % 3 == 1) {result = 'You Won!'; footer = 'decent job chump'; color = embedColors.green;}
+        if (playerMoveNum === computerMoveNum) {result = 'You Tied!'; footer = 'kinda mid game ngl'; color = embedColors.yellow;}
+		else if (((playerMoveNum - computerMoveNum) + 3) % 3 === 1) {result = 'You Won!'; footer = 'decent job chump'; color = embedColors.green;}
 		else {result = 'You Lost!'; footer = 'massive L';  color = embedColors.red;}
 
         const rpsEmbed = new EmbedBuilder()
