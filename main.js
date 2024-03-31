@@ -36,7 +36,8 @@ let vars = {
 		green: 0x03FC30,
 		red: 0xFF0000,
 		yellow: 0xFFE600,
-		white: 0xFFFFFF
+		white: 0xFFFFFF,
+		purple: 0x900099
 	}
 	//TODO: Add config option for setting color in database
 };
