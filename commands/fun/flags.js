@@ -23,10 +23,11 @@ module.exports = {
         const shuffledFlags = shuffleArray(guessFlags)
 
         let remainingTime = 15
+        let peopleGuessed = 0
 
         const flagEmbed = new EmbedBuilder()
         .setTitle(`What is the flag of ${rightCountry}?`)
-        .setFooter({text: `${remainingTime} seconds left to answer get going ppl`})
+        flagEmbed.setFooter({text: `${peopleGuessed} guessed ● ${remainingTime} seconds left`})
         .setColor(embedColors.blue)
 
         const flagButton1 = new ButtonBuilder()
@@ -76,8 +77,8 @@ module.exports = {
                 wrongUsers.push(userPing)
             }
 
-            const peopleGuessed = correctUsers.length + wrongUsers.length
-            flagEmbed.setDescription(`${peopleGuessed} guessed`)
+            peopleGuessed = correctUsers.length + wrongUsers.length
+            flagEmbed.setFooter({text: `${peopleGuessed} guessed ● ${remainingTime} seconds left`})
             
             await response.edit({embeds: [flagEmbed]})
             i.deferUpdate()
@@ -138,7 +139,7 @@ module.exports = {
             await sleep(5000)
 
             remainingTime -= 5
-            flagEmbed.setFooter({text: `${remainingTime} seconds left to answer get going ppl`})
+            flagEmbed.setFooter({text: `${peopleGuessed} guessed ● ${remainingTime} seconds left`})
 
             await response.edit({embeds: [flagEmbed]})
         }
