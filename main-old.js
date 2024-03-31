@@ -27,7 +27,7 @@ const { QuickDB } = require("quick.db");
 const db = new QuickDB();
 
 const tests = require("./messagetests")
-const modal = require("./modernmode")
+const modals = require("./modals")
 
 let IS_CANARY = true
 let prefix;
@@ -49,9 +49,8 @@ Discord.Message.prototype.tryreply = async function(content) {
         console.warn(`Error sending message in ${this.guild.name}'s ${this.channel.name}; check if permissions are needed for that channel`);}}
 
 client.once('ready', async () => {
-    console.log('BirdBox Unified is now online!');
-    console.log('(developed by TheBirdWasHere) Logs will be shown in this terminal.');
-    console.log('(better hope this stuff works and doesnt break)');
+    console.log('BirdBox Unified is now online! (developed by TheBirdWasHere and friends)');
+    console.log('Logs will be shown in this terminal, better hope this stuff works and doesnt break');
     console.log(`Logged in as ${client.user.tag}!`);
 
     if (client.user.id == 803811104953466880) { //main
@@ -74,17 +73,20 @@ client.once('ready', async () => {
 });
 
 client.on('messageDelete', async (message) => {
-    if (await db.get(`setting_snipes_${message.author.id}`) !== "enable") {return;}; //don't log people who opted out
-    if (!message.author || !message.createdAt) {return;};               //don't store busted snipes
+    const userAllowsSnipes = (await db.get(`setting_snipes_${message.author.id}`) === "enable");         //equals enable since default is off
+    const serverAllowsSnipes = (await db.get(`setting_snipes_server_${message.guildId}`) !== "disable"); //does not equal disable since default is on
+
+    if (!userAllowsSnipes || !serverAllowsSnipes) {return;}; //don't log people who opted out
+    if (!message.author || !message.createdAt) {return;};  //don't store busted snipes (edit: not even sure if this does anything lol)
 	await db.set(`snipe_${message.channelId}`, {
 		content: message?.content,
 		author: {tag: message.author.tag, id: message.author.id},
         timestamp: message.createdAt,
         attachment: message.attachments.first()?.url // Grabs the first attachment url out of the message, EXPERIMENTAL FEATURE
-	})
+	});
 })
 
-modal.modalHandler(vars); //handle modals for birdbox modern version
+modals.modalHandler(vars); //handle modals for birdbox modern version
 
 client.on('messageCreate', async (message) => {
     if (message.author.id == client.user.id) {return;} //birdbox check
@@ -101,8 +103,11 @@ client.on('messageCreate', async (message) => {
         if (client.commands.has(command)) {
             client.commands.get(command).execute({message, args}, vars);}}
 
-    if (await tests.keywords(db, content, message.guildId, messageArray, lyricArray, true)) {//sticker/lyric responses
-        message.tryreply(await tests.keywords(db, content, message.guildId, messageArray, lyricArray, false));} 
+    //sticker/lyric responses
+    const repliesAllowed = (await db.get(`setting_responses_${message.guildId}`) !== "disable")
+    const keywordTestResult = await tests.keywords(db, content, message.guildId, messageArray, lyricArray)
+    if (repliesAllowed && keywordTestResult) {
+        message.tryreply(keywordTestResult);}
 
     if (IS_CANARY) {return;} //make sure none of this is duplicated on canary
 
@@ -118,17 +123,27 @@ client.on('messageCreate', async (message) => {
             `perfectly sorted, as all things should be`,
             `remember kids, ${randomWord[0].toUpperCase()} is for "${randomWord}"`]
         
+        let isItTechnical
+        if (alphabeticalness.every( (val, i, arr) => val === arr[0] )) { //this test if every item is the same
+            isItTechnical = "technical"
+        } else {
+            isItTechnical = "perfect"
+        }
         const alpha_joined = alphabeticalness.join(" ");
         
         const notif = await tests.responsetemplate(message, db, randomfooters, 
-            `:capital_abcd: Your message is in perfect alphabetical order! \n\`${alpha_joined}\``, 
-            `:capital_abcd:`, `is in alphabetical order!`, 
+            `:capital_abcd: Your message is in ${isItTechnical} alphabetical order! \n\`${alpha_joined}\``, 
+            `:capital_abcd:`, `is in ${isItTechnical} alphabetical order!`, 
             0x3b88c3, alpha_joined)
-        if (notifchannel) {await notifchannel.send(notif)} //only send notif if there is a log channel
+        if (notifchannel) {await notifchannel.trysend(notif)} //only send notif if there is a log channel
     }
 
-    jinx = await db.get(`jinx_${message.channelId}`) //jinx detector
-    if (tests.jinx(message, jinx)) { message.channel.trysend(jinx.content) }
+    const jinxDetectionEnabled = (await db.get(`setting_jinxes_${message.guildId}`) !== "disable")
+
+    if (jinxDetectionEnabled) {
+        jinx = await db.get(`jinx_${message.channelId}`) //jinx detector
+        if (tests.jinx(message, jinx)) { message.channel.trysend(jinx.content) }
+    }
 
     const periodicness = tests.periodictable(content)
     if (periodicness) { //periodic table checker
@@ -141,14 +156,16 @@ client.on('messageCreate', async (message) => {
             `:test_tube: Your message is on the periodic table! \n\`${periodicness}\``, 
             `:test_tube:`, `is on the periodic table!`, 
             0x21c369, periodicness)
-            if (notifchannel) {await notifchannel.send(notif)} //only send notif if there is a log channel
+            if (notifchannel) {await notifchannel.trysend(notif)} //only send notif if there is a log channel
     }
 
-    await db.set(`jinx_${message.channelId}`, { 
-		content: message.content, //for jinx detection
-		author: message.author.displayName,
-        timestamp: message.createdTimestamp
-    })
+    if (jinxDetectionEnabled) {
+        await db.set(`jinx_${message.channelId}`, { 
+            content: message.content, //for jinx detection
+            author: message.author.displayName,
+            timestamp: message.createdTimestamp
+        })
+    };
 });
 
 client.login(process.env.DISCORD_TOKEN);
