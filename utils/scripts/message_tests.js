@@ -1,5 +1,4 @@
 const { EmbedBuilder } = require("discord.js");
-const { randomChoice } = require("./utils");
 
 module.exports = {
     keywords: async (db, string, guild, messages, lyrics) => { //function for message/lyric responses
