@@ -74,7 +74,7 @@ module.exports = {
                         .setFooter({ text: 'Special thanks to users like you!' });
 
                     filteredLangs.forEach((item) => { translateEmbed.addFields({ name: item.name, value: item.value }) });
-                    if(filteredLangs.length == 0) translateEmbed.addFields({ name: ' ', value: 'No results found.' });
+                    if(filteredLangs.length === 0) translateEmbed.addFields({ name: ' ', value: 'No results found.' });
 
                     return [translateEmbed];
                 }
@@ -145,14 +145,13 @@ module.exports = {
 
                     console.log(error);
                     interaction.reply({ content: 'You have either entered an invalid language code/name or broke the command in some other way. Consult the help command for more information on how to use this command.', ephemeral: true });
-                    return;
 
                 });
             } break;
         }
     },
     async executeClassic({message, args}, {embedColors, prefix}){
-        if (args[0] == "codes") { 
+        if (args[0] === 'codes') {
             const lettersList = 'abcdefghijklmnopqrstuvwxyz'.split('');
             const charList = 'abdefghijklmnprstuvwxyz'.split('');
             const requestedPage = args[1].toLowerCase()

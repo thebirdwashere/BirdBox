@@ -26,13 +26,13 @@ module.exports = {
         } else {
             await interaction.channel.send(message);
             await interaction.reply({ content: 'echoing...', ephemeral: true });
-            await interaction.deleteReply(); // Janky but it's the best I can do, discord.js dosen't have an inbuilt interaction ender.
+            await interaction.deleteReply(); // Janky but it's the best I can do, discord.js doesn't have an inbuilt interaction ender.
         }
 
     },
     async executeClassic({message, args, strings}) {
 
-        if (args[0] != 'noreply') {
+        if (args[0] !== 'noreply') {
             await message.reply(strings[0] || 'You need to enter a message surrounded by quotes.');
         } else {
             await message.channel.send(strings[0] || 'You need to enter a message surrounded by quotes.');

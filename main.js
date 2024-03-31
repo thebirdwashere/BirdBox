@@ -22,7 +22,7 @@ const db = new QuickDB();
 const classicPrefix = 'd;';
 const defaults = require('./utils/json/defaults.json');
 const devs = require('./utils/json/devs.json');
-const tests = require("./messagetests")
+const tests = require("./utils/scripts/message_tests.js");
 
 /* VARS PASSED TO COMMANDS */
 

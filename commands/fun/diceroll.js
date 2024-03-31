@@ -17,7 +17,7 @@ module.exports = {
         if (sides < 1) {
             interaction.reply({content: `bro i kinda need a positive number of faces`, ephemeral: true});
             return;
-        } else if (sides != Math.floor(sides)) {
+        } else if (sides !== Math.floor(sides)) {
             interaction.reply({content: `bro i kinda need an integer number of faces`, ephemeral: true});
             return;
         }
@@ -27,7 +27,7 @@ module.exports = {
         
         //secondary result is needed for some trolls
         let secondaryResult = Math.floor(Math.random() * sides) + 1;
-        while (secondaryResult == mainResult) { //ensure this is different from main
+        while (secondaryResult === mainResult) { //ensure this is different from main
             secondaryResult = Math.floor(Math.random() * sides) + 1;}
 
         const trollOptions = [
@@ -95,7 +95,7 @@ module.exports = {
         if (sides < 1) {
             message.reply(`bro i kinda need a positive number of faces`);
             return;
-        } else if (sides != Math.floor(sides)) {
+        } else if (sides !== Math.floor(sides)) {
             message.reply(`bro i kinda need an integer number of faces`);
             return;
         }
@@ -105,7 +105,7 @@ module.exports = {
         
         //secondary result is needed for some trolls
         let secondaryResult = Math.floor(Math.random() * sides) + 1;
-        while (secondaryResult == mainResult) { //ensure this is different from main
+        while (secondaryResult === mainResult) { //ensure this is different from main
             secondaryResult = Math.floor(Math.random() * sides) + 1;}
 
         const trollOptions = [

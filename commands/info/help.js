@@ -22,7 +22,7 @@ module.exports = {
             const pageEmbed = new EmbedBuilder()
                 .setTitle('Commands and Info')
                 .setAuthor({ name: 'BirdBox', iconURL: 'https://cdn.discordapp.com/avatars/803811104953466880/5bce4f0ba438015ec65f5b9cac11c8e3.webp'})
-                .setDescription(`Learn about this bot's capabilities.`)
+                .setDescription(`Learn about this bots capabilities.`)
                 .setFooter({ text: `Page ${commandsArray.indexOf(item) + 1}` })
                 .setColor(embedColors.white);
 
@@ -31,7 +31,7 @@ module.exports = {
             embeds.push(pageEmbed);
         });
 
-        function updateEmbed(page) { return [embeds[page]] };
+        function updateEmbed(page) { return [embeds[page]] }
 
         function updateRow(page) { // Returns the updated row
             const backButton = new ButtonBuilder()
@@ -44,8 +44,8 @@ module.exports = {
                 .setLabel('🠊')
                 .setStyle(ButtonStyle.Primary);
 
-            if(page <= 0) { backButton.setDisabled(true) } else { backButton.setDisabled(false) };
-            if(page >= embeds.length - 1) { forwardButton.setDisabled(true) } else { forwardButton.setDisabled(false) };
+            if(page <= 0) { backButton.setDisabled(true) } else { backButton.setDisabled(false) }
+            if(page >= embeds.length - 1) { forwardButton.setDisabled(true) } else { forwardButton.setDisabled(false) }
 
             const infoButtonRow = new ActionRowBuilder()
                 .addComponents(backButton, forwardButton);
@@ -103,7 +103,7 @@ module.exports = {
         embeds[0]
             .setTitle('Commands and Info')
             .setAuthor({ name: 'BirdBox', iconURL: 'https://cdn.discordapp.com/avatars/803811104953466880/5bce4f0ba438015ec65f5b9cac11c8e3.webp'})
-            .setDescription(`Learn about this bot's capabilities.`);
+            .setDescription(`Learn about this bots capabilities.`);
 
         await message.reply({ embeds: embeds });
         

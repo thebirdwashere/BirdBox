@@ -7,10 +7,8 @@ module.exports = {
         switch (type) {
             case 'snipe':
                 return footers.snipe[Math.floor(Math.random() * footers.snipe.length)];
-                break;
             case 'ball':
                 return footers.ball[Math.floor(Math.random() * footers.ball.length)];
-                break;
             default:
                 // Put code here for default footers to use across functions
                 break;
@@ -20,10 +18,8 @@ module.exports = {
         switch (type) {
             case 'rps':
                 return responses.rps[Math.floor(Math.random() * responses.rps.length)];
-                break;
             case 'ball':
                 return responses.ball[Math.floor(Math.random() * responses.ball.length)];
-                break;
         }
     },
     sleep: (ms) => {

@@ -1,8 +1,7 @@
 const { EmbedBuilder } = require("discord.js");
-const { randomIntInRange } = require("./utils");
 
 module.exports = {
-    keywords: async (db, string, guild, messages, lyrics, isTest) => { //function for message/lyric responses
+    keywords: async (db, string, guild, messages, lyrics) => { //function for message/lyric responses
         let val = ""
         string = string.replace(/[^\w\s]/gi, "");
         if(messages) {
@@ -16,14 +15,14 @@ module.exports = {
         if(lyrics) {
             let expected = await db.get(`lyric_${guild}`);
             if (expected && string.includes(expected[0]) && lyrics[expected[1]].content[expected[2] + 1]) {
-                if (!isTest) {await db.set(`lyric_${guild}`, [lyrics[expected[1]].content[expected[2] + 2], expected[1], expected[2] + 2]);}; //does not run when used as true/false test, cause it broke stuff
+                await db.set(`lyric_${guild}`, [lyrics[expected[1]].content[expected[2] + 2], expected[1], expected[2] + 2]); //does not run when used as true/false test, cause it broke stuff
                 return lyrics[expected[1]].content[expected[2] + 1];
             }
             for (let i = 0; i < lyrics.length; i++) {
                 for (let j = lyrics[i].content.length - 1; j--;) {
                     if (string.includes(lyrics[i].content[j].toLowerCase()) /*&& (!val || lyrics[i].content[j].length >= val.length)*/) {
                         val = lyrics[i].content[j + 1]
-                        if (!isTest) {await db.set(`lyric_${guild}`, [lyrics[i].content[j + 2], i, j + 2]);}
+                        await db.set(`lyric_${guild}`, [lyrics[i].content[j + 2], i, j + 2]);
                     }
                 }
             }
@@ -50,7 +49,14 @@ module.exports = {
 
     jinx: (message, jinx) => { //jinx checker
         if (!jinx) {return;}
-        return (Math.abs(jinx.timestamp - message.createdAt) <= 2000 && jinx.content == message.content && jinx.author !== message.author.displayName)
+
+        //the required tests
+        const jinxCreatedCloseTogether = Math.abs(jinx.timestamp - message.createdTimestamp) <= 2000
+        const contentIsIdentical = jinx.content == message.content
+        let jinxFromDifferentPeople = jinx.author !== message.author.id
+
+        //only pass if all true
+        return (jinxCreatedCloseTogether && contentIsIdentical && jinxFromDifferentPeople)
     },
 
     periodictable: (content) => {
@@ -128,17 +134,81 @@ module.exports = {
 
         const content_split = content.match(/(.{1,1000})/g); //make sure we don't go over embed char limits
 
-        newEmbed = new EmbedBuilder().setColor(color)
+        const newEmbed = new EmbedBuilder().setColor(color)
             .setTitle(`| ${emoji} | ${message.author.displayName}'s message`)
             .setDescription(`${desc} Take a look:`)
             .addFields({name: " ", value: " "})
             .setURL(message.url)
-            .setFooter({text: footers[randomIntInRange(0, footers.length - 1)]})
+            .setFooter({text: randomChoice(footers)})
 
         content_split.forEach(str => {
             newEmbed.addFields({name: " ", value: `\`${str}\``});}) //embed char limits once again
         newEmbed.addFields({name: " ", value: " "});
 
         return {content: ping, embeds: [newEmbed]}
+    },
+
+    detection: async ({message, content}, {db, Discord}, tests) => {
+        let notifchannel = false //by default, do not log
+        await message.guild.channels.fetch(await db.get(`setting_notif_channel_${message.guildId}`)).then(channel => {
+            if (!(channel instanceof Discord.Collection)) {notifchannel = channel}}) //for logged responses, overwrites default if found
+    
+        const alphabeticalness = tests.alphabetical(content)
+        if (alphabeticalness) { //alphabetical order checker
+            const randomWord = randomChoice(alphabeticalness)
+            const randomfooters = [
+                `now i know my abc's, next time won't you sing with me`,
+                `perfectly sorted, as all things should be`,
+                `remember kids, ${randomWord[0].toUpperCase()} is for "${randomWord}"`]
+            
+            let isItTechnical
+            if (alphabeticalness.every( (val, i, arr) => val === arr[0] )) { //this test if every item is the same
+                isItTechnical = "technical"
+            } else {
+                isItTechnical = "perfect"
+            }
+            const alpha_joined = alphabeticalness.join(" ");
+            
+            const notif = await tests.responsetemplate(message, db, randomfooters, 
+                `:capital_abcd: Your message is in ${isItTechnical} alphabetical order! \n\`${alpha_joined}\``, 
+                `:capital_abcd:`, `is in ${isItTechnical} alphabetical order!`, 
+                0x3b88c3, alpha_joined)
+            if (notifchannel) {await notifchannel.trysend(notif)} //only send notif if there is a log channel
+        }
+    
+        const jinxDetectionEnabled = (await db.get(`setting_jinxes_${message.guildId}`) !== "disable")
+    
+        if (jinxDetectionEnabled) {
+            const jinx = await db.get(`jinxes.${message.channelId}`) //jinx detector
+            if (tests.jinx(message, jinx)) { message.channel.trysend(jinx.content) }
+        }
+    
+        const periodicness = tests.periodictable(content)
+        if (periodicness) { //periodic table checker
+            const randomfooters = [
+                `${message.author.username} nye the science guy fr`,
+                `i wonder if this is a real compound, probably not but still`,
+                `one could say, this only happens... periodically`]
+            
+                const notif = await tests.responsetemplate(message, db, randomfooters, 
+                `:test_tube: Your message is on the periodic table! \n\`${periodicness}\``, 
+                `:test_tube:`, `is on the periodic table!`, 
+                0x21c369, periodicness)
+                if (notifchannel) {await notifchannel.trysend(notif)} //only send notif if there is a log channel
+        }
+    
+        if (jinxDetectionEnabled) {
+            const oldJinxFormat = await db.get(`jinx_${message.channelId}`)
+            if (oldJinxFormat) {
+                await db.delete(`jinx_${message.channelId}`) //remove jinxes in the old format to clean up the db
+            }
+
+            //new format: changed to use dot notation and make an object of jinxes
+            await db.set(`jinxes.${message.channelId}`, { 
+                content: message.content, //for jinx detection
+                author: message.author.id,
+                timestamp: message.createdTimestamp
+            })
+        };
     }
 }
