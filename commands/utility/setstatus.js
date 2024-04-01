@@ -15,7 +15,7 @@ module.exports = {
     async execute(interaction, {devs, db}) {
 
         const status = interaction.options.getString('status');
-        db.set("status", status);
+        db.set('status', status);
 
         interaction.client.user.setPresence({ activities: [{ name: status, type: ActivityType.Custom }] });
         await interaction.reply({ content: `Set status successfully: "${status}"`, ephemeral: true });
