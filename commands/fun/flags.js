@@ -15,11 +15,11 @@ module.exports = {
                         .setName('difficulty')
                         .setDescription('Change how many flags are available to guess.')
                         .addChoices(
-                            { name: `${difficulties[0].name} (${difficulties[0].points} points)`, value: "0" },
-                            { name: `${difficulties[1].name} (${difficulties[1].points} points)`, value: "1" },
-                            { name: `${difficulties[2].name} (${difficulties[2].points} points)`, value: "2" },
-                            { name: `${difficulties[3].name} (${difficulties[3].points} points)`, value: "3" },
-                            { name: `${difficulties[4].name} (${difficulties[4].points} points)`, value: "4" }
+                            { name: `${difficulties[0].name} (${difficulties[0].earned} points)`, value: "0" },
+                            { name: `${difficulties[1].name} (${difficulties[1].earned} points)`, value: "1" },
+                            { name: `${difficulties[2].name} (${difficulties[2].earned} points)`, value: "2" },
+                            { name: `${difficulties[3].name} (${difficulties[3].earned} points)`, value: "3" },
+                            { name: `${difficulties[4].name} (${difficulties[4].earned} points)`, value: "4" }
                         )
                 )
         )
