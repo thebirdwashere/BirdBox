@@ -27,6 +27,17 @@ module.exports = {
             subcommand
                 .setName('leaderboard')
                 .setDescription('View high scores across all BirdBox users.')
+                .addStringOption(option =>
+                    option
+                        .setName('stat')
+                        .setDescription('Change what statistic you want to view.')
+                        .setRequired(true)
+                        .addChoices(
+                            { name: `points`, value: "points" },
+                            { name: `win percentage`, value: "win percentage" },
+                            { name: `best streak`, value: "best streak" }
+                        )
+                )
         ),
     async execute(interaction, {client, embedColors, db}) {
 
@@ -209,43 +220,124 @@ module.exports = {
                 break;
             }
             case "leaderboard": {
+                const statisticChoice = interaction.options?.getString('stat')
+
                 const leaderboardEmbed = new EmbedBuilder()
                 .setColor(embedColors.purple)
-                .setTitle("Flag Quiz - Most Points")
 
                 const gameStats = await db.get(`flags_stats.flag_quiz`)
 
                 if (!gameStats) {
+                    leaderboardEmbed.setTitle("Flag Quiz")
                     leaderboardEmbed.setDescription("huh, looks like there's nothing here");
                     await interaction.reply({ embeds: [leaderboardEmbed] });
                     return;
                 }
 
-                let pointsLeaderboardArray = [];
-                let pointsLeaderboardText = "";
+                switch (statisticChoice) { // Switch to handle different subcommands.
+                    case 'points': {
+                        leaderboardEmbed.setTitle("Flag Quiz - Most Points")
+        
+                        let pointsLeaderboardArray = [];
+                        let pointsLeaderboardText = "";
+        
+                        for (const userId of Object.keys(gameStats)) {
+                            const userInfo = await client.users.fetch(userId)
+                            const userName = userInfo.username
+        
+                            gameStats[userId].name = userName
+                            pointsLeaderboardArray.push(gameStats[userId])
+                        }
+        
+                        //sort by most points (kinda confusing)
+                        pointsLeaderboardArray.sort((a, b) => {
+                            if (a.points > b.points) return -1
+                            else if (a.points < a.points) return 1
+                            else return 0 
+                        });
+        
+                        for (user of pointsLeaderboardArray) {
+                            pointsLeaderboardText += `${user.name}: **${user.points} points**\n`
+                        }
+        
+                        leaderboardEmbed.setDescription(pointsLeaderboardText);
+            
+                        await interaction.reply({ embeds: [leaderboardEmbed] });
 
-                for (const userId of Object.keys(gameStats)) {
-                    const userInfo = await client.users.fetch(userId)
-                    const userName = userInfo.username
+                        break;
+                    }
+                    case 'win percentage': {
+                        leaderboardEmbed.setTitle("Flag Quiz - Highest Win Percentage")
 
-                    gameStats[userId].name = userName
-                    pointsLeaderboardArray.push(gameStats[userId])
+                        let percentLeaderboardArray = [];
+                        let percentLeaderboardText = "";
+
+                        for (const userId of Object.keys(gameStats)) {
+                            const userInfo = await client.users.fetch(userId)
+                            const userName = userInfo.username
+
+                            const totalGames = gameStats[userId].wins + gameStats[userId].losses
+                            const winPercentage = Number(gameStats[userId].wins / totalGames).toLocaleString(undefined,{style: 'percent', minimumFractionDigits:2});
+        
+                            gameStats[userId].name = userName
+                            gameStats[userId].win_percent = winPercentage
+                            percentLeaderboardArray.push(gameStats[userId])
+                        }
+
+                        //sort by most points (kinda confusing)
+                        percentLeaderboardArray.sort((a, b) => {
+                            if (a.win_percent > b.win_percent) return -1
+                            else if (a.win_percent < a.win_percent) return 1
+                            else return 0 
+                        });
+
+                        for (user of percentLeaderboardArray) {
+                            percentLeaderboardText += `${user.name}: **${user.win_percent} of games**\n`
+                        }
+
+                        leaderboardEmbed.setDescription(percentLeaderboardText);
+            
+                        await interaction.reply({ embeds: [leaderboardEmbed] });
+
+                        break;
+                    }
+                    case 'best streak': {
+                        leaderboardEmbed.setTitle("Flag Quiz - Longest Win Streak")
+
+                        let streakLeaderboardArray = [];
+                        let streakLeaderboardText = "";
+
+                        for (const userId of Object.keys(gameStats)) {
+                            const userInfo = await client.users.fetch(userId)
+                            const userName = userInfo.username
+        
+                            gameStats[userId].name = userName
+                            streakLeaderboardArray.push(gameStats[userId])
+                        }
+
+                        //sort by most points (kinda confusing)
+                        streakLeaderboardArray.sort((a, b) => {
+                            if (a.best_streak > b.best_streak) return -1
+                            else if (a.best_streak < a.best_streak) return 1
+                            else return 0 
+                        });
+
+                        for (user of streakLeaderboardArray) {
+                            if (user.best_streak == 1) {
+                                streakLeaderboardText += `${user.name}: **${user.best_streak} game**\n`
+                            } else {
+                                streakLeaderboardText += `${user.name}: **${user.best_streak} games**\n`
+                            }
+                            
+                        }
+
+                        leaderboardEmbed.setDescription(streakLeaderboardText);
+            
+                        await interaction.reply({ embeds: [leaderboardEmbed] });
+
+                        break;
+                    }
                 }
-
-                //sort by most points (kinda confusing)
-                pointsLeaderboardArray.sort((a, b) => {
-                    if (a.points > b.points) return -1
-                    else if (a.points < a.points) return 1
-                    else return 0 
-                });
-
-                for (user of pointsLeaderboardArray) {
-                    pointsLeaderboardText += `${user.name}: **${user.points} points**\n`
-                }
-
-                leaderboardEmbed.setDescription(pointsLeaderboardText);
-    
-                await interaction.reply({ embeds: [leaderboardEmbed] });
             }
         }
     }
