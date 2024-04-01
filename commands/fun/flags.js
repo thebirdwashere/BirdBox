@@ -1,6 +1,6 @@
 const { sampleArray, shuffleArray, sleep } = require("../../utils/scripts/util_scripts.js");
 const { flags, difficulties } = require("../../utils/json/flags.json");
-const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require("discord.js");
+const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, StringSelectMenuBuilder, StringSelectMenuOptionBuilder} = require("discord.js");
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -224,6 +224,7 @@ module.exports = {
 
                 const leaderboardEmbed = new EmbedBuilder()
                 .setColor(embedColors.purple)
+                .setFooter({ text: "look at all these amateurs"})
 
                 const gameStats = await db.get(`flags_stats.flag_quiz`)
 
@@ -234,8 +235,8 @@ module.exports = {
                     return;
                 }
 
-                switch (statisticChoice) { // Switch to handle different subcommands.
-                    case 'points': {
+                const statisticDisplays = {
+                    'points': async () => {
                         leaderboardEmbed.setTitle("Flag Quiz - Most Points")
         
                         let pointsLeaderboardArray = [];
@@ -261,12 +262,8 @@ module.exports = {
                         }
         
                         leaderboardEmbed.setDescription(pointsLeaderboardText);
-            
-                        await interaction.reply({ embeds: [leaderboardEmbed] });
-
-                        break;
-                    }
-                    case 'win percentage': {
+                    },
+                    'win percentage': async () => {
                         leaderboardEmbed.setTitle("Flag Quiz - Highest Win Percentage")
 
                         let percentLeaderboardArray = [];
@@ -296,12 +293,8 @@ module.exports = {
                         }
 
                         leaderboardEmbed.setDescription(percentLeaderboardText);
-            
-                        await interaction.reply({ embeds: [leaderboardEmbed] });
-
-                        break;
-                    }
-                    case 'best streak': {
+                    },
+                    'best streak': async () => {
                         leaderboardEmbed.setTitle("Flag Quiz - Longest Win Streak")
 
                         let streakLeaderboardArray = [];
@@ -332,12 +325,46 @@ module.exports = {
                         }
 
                         leaderboardEmbed.setDescription(streakLeaderboardText);
-            
-                        await interaction.reply({ embeds: [leaderboardEmbed] });
-
-                        break;
                     }
                 }
+
+                await statisticDisplays[statisticChoice]()
+
+                const statSelector = new StringSelectMenuBuilder()
+                    .setCustomId('statSelector')
+                    .setPlaceholder('Select statistic...')
+                    .addOptions([
+                        new StringSelectMenuOptionBuilder()
+                            .setLabel("points")
+                            .setValue("points"),
+                        new StringSelectMenuOptionBuilder()
+                            .setLabel("win percentage")
+                            .setValue("win percentage"),
+                        new StringSelectMenuOptionBuilder()
+                            .setLabel("best streak")
+                            .setValue("best streak")
+                    ])
+
+                const selectorRow = new ActionRowBuilder()
+                    .addComponents(statSelector)
+
+                const response = await interaction.reply({ embeds: [leaderboardEmbed], components: [selectorRow] });
+
+                const menuCollector = response.createMessageComponentCollector({ componentType: ComponentType.StringSelect, time: 60000 });
+
+                menuCollector.on('collect', async i => {
+                    const newStatisticChoice = i.values[0]
+
+                    await statisticDisplays[newStatisticChoice]()
+
+                    await response.edit({ embeds: [leaderboardEmbed] });
+
+                    await i.deferUpdate();
+                })
+
+                menuCollector.on('end', async i => {
+                    
+                })
             }
         }
     }
