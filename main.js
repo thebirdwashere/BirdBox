@@ -166,10 +166,7 @@ client.on('messageCreate', async (message) => {
 
         if (client.commands.has(command)) {
 
-			console.log(client.commands.get(command).filter);
-
 			if (Array.isArray(client.commands.get(command).filter)) { // Permission filter for commands. Defined in the module.exports on a command-by-command basis.
-				console.log('HAS FILTER');
 
 				let authorized = [];
 	
