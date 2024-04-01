@@ -26,12 +26,12 @@ module.exports = {
         return new Promise(resolve => setTimeout(resolve, ms));
     },
     getSettingValue: async (setting, db) => {
-        const dbSetting = await db.get(setting)
-        const settingValue = dbSetting ?? defaults[setting]
+        const dbSetting = await db.get(setting);
+        const settingValue = dbSetting ?? defaults[setting];
 
-        const specialReturns = {enable: true, disable: false}
+        const specialReturns = {enable: true, disable: false};
 
-        return specialReturns[settingValue] ?? settingValue
+        return specialReturns[settingValue] ?? settingValue;
     },
     shuffleArray: (array) => {
         let originalArray = [...array]

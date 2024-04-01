@@ -166,12 +166,34 @@ client.on('messageCreate', async (message) => {
 		const content = message.content.replace(`${classicPrefix}${command}`, "").trim()
 
         if (client.commands.has(command)) {
+
+			if (Array.isArray(client.commands.get(command).filter)) { // Permission filter for commands. Defined in the module.exports on a command-by-command basis.
+
+				let authorized = [];
+	
+				client.commands.get(command).filter.forEach(item => {
+					if (!devs[item]) return;
+					let usersWithPermission = devs[item].map(item => item.userId);
+					authorized = authorized.concat(usersWithPermission);
+				});
+	
+				if (authorized.length == 0) return message.reply({ content: `The permission levels for this command are empty or are not valid. Please contact a developer.`, ephemeral: true });
+				if (!authorized.includes(message.author.id)) {
+					const permissionLevelFormatter = new Intl.ListFormat("en", { type: "disjunction" })
+					const permissionLevels = permissionLevelFormatter.format(client.commands.get(command).filter.map(item => `\`${item}\``))
+					return message.reply(`You do not have the required permission level to use this command. This command requires a permisson level of ${permissionLevels}. If you believe this is an error, please contact a developer.`);
+				}
+			} else if (client.commands.get(command).filter) { return message.reply(`The permission levels for this command have been incorrectly configured. Please contact a developer.`); }
+
 			try {
 				vars.prefix = classicPrefix;
+
 				client.commands.get(command).executeClassic({message, args, strings, content}, vars);
 			} catch (err) {
 				message.reply(`The command \`/${command}\` does not support Classic mode yet.`);
 			}
+
+			return;
 		} else {
 			message.reply(`The command \`${classicPrefix}${command}\` was not found.`);
 		};

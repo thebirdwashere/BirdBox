@@ -59,5 +59,41 @@ module.exports = {
             } break;
         }
     
+    },
+    async executeClassic({ message, args }, {db, commands}) {
+
+        switch (args[0]) { // Switch to handle different subcommands.
+            case 'database': {
+
+                const item = args[1];
+                const database_item = await db.get(item);
+                
+                if (database_item) {
+                    let itemstring = JSON.stringify(database_item);
+                    itemstring = itemstring.match(/.{1,2000}/g);
+                    itemstring.forEach(element => { message.reply(`Value: ${element}`) });
+                } else { message.reply(`Failed to locate item: \`${item}\` in the database. Please try again.`) };
+
+            } break;
+
+            case 'permissions': {
+
+                const command = args[1];
+                if (!commands.map(item => item.data.name).includes(command)) return message.reply('The specified command does not exist. Please try again.');
+
+                const commandPerms = Object.fromEntries( commands.map(item => item.data.name).map((key, index) => [key, commands.map(item => item.filter)[index]]) );
+
+                if (!commandPerms[command]) return message.reply(`Valid permission levels of \`/${command}\`: \`(any)\``);
+                message.reply(`Valid permission levels of \`/${command}\`: ${commandPerms[command].map(item => `\`${item}\``).join(', ')}`);
+
+            } break;
+
+            default: {
+
+                message.reply('Invalid subcommand. Please try again.');
+
+            } break;
+        }
+    
     }
 }
