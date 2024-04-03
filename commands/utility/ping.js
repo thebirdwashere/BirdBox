@@ -1,6 +1,12 @@
 const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
 
 module.exports = {
+	jsonData: {
+		"name": "ping",
+		"description": "Ping the bot, get a response.",
+		"integration_types": [0, 1],
+		"contexts": [0, 1, 2]
+	},
 	data: new SlashCommandBuilder()
 		.setName('ping')
 		.setDescription('Ping the bot, get a response.'),
