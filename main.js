@@ -92,8 +92,8 @@ client.on('interactionCreate', async (interaction) => {
 });
 
 client.on('messageCreate', async (message) => {
-    if (message.author.id == client.user.id) {return;} //birdbox check
-    if (!message.content) {return;}                    //no reason to check an empty message
+    if (message.author.bot) {return;} //birdbox or other bot check
+    if (!message.content) {return;}   //no reason to check an empty message
 
     const content = message.content.toLowerCase() //replaced several uses of message.content with this (however changed so the prefix and command must be lowercase)
 
