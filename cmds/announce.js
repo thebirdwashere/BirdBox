@@ -1,3 +1,5 @@
+const { EmbedBuilder } = require("discord.js")
+
 module.exports = {
     name: 'announce',
     description: "Announce to another channel. May be disabled depending on server.",
@@ -10,6 +12,13 @@ module.exports = {
         
         if (!announce_channel.id) {message.channel.trysend(`announcements disabled currently, use ${prefix}config to enable it`); return;}
         
-        announce_channel.trysend(message.content.replace(`${prefix}announce`, '').trim());
+        const announcedEmbed = new EmbedBuilder()
+        .setTitle(`${message.channel.name}’s Announcement`)
+        .setDescription(message.content.replace(`${prefix}announce`, '').trim())
+        .setAuthor({name: message.author.tag, iconURL: message.author.displayAvatarURL()})
+        .setColor(0xAA00FF)
+        .setTimestamp(message.createdTimestamp);
+
+        announce_channel.trysend({embeds: [announcedEmbed]});
     }
 }

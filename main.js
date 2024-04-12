@@ -8,7 +8,7 @@ const devs = devArray.host.map(item => item.userId).concat(devArray.developer.ma
 const Discord = require('discord.js');
 
 require('dotenv').config();
-const { Client, GatewayIntentBits, ActivityType } = require('discord.js');
+const { Client, GatewayIntentBits, ActivityType, AuditLogEvent, Events } = require('discord.js');
 const client = new Client({intents : [GatewayIntentBits.GuildMessages , GatewayIntentBits.DirectMessages, GatewayIntentBits.Guilds, GatewayIntentBits.MessageContent]});
 
 const fs = require('fs');
@@ -76,8 +76,8 @@ client.on('messageDelete', async (message) => {
     const userAllowsSnipes = (await db.get(`setting_snipes_${message.author.id}`) === "enable");         //equals enable since default is off
     const serverAllowsSnipes = (await db.get(`setting_snipes_server_${message.guildId}`) !== "disable"); //does not equal disable since default is on
 
-    if (!userAllowsSnipes || !serverAllowsSnipes) {return;}; //don't log people who opted out
-    if (!message.author || !message.createdAt) {return;};    //don't store busted snipes (edit: not even sure if this does anything lol)
+    if (!userAllowsSnipes || !serverAllowsSnipes) return; //don't log people who opted out
+    if (!message.author || !message.createdAt) return;    //don't store busted snipes (edit: not even sure if this does anything lol)
 	await db.set(`snipes.${message.channelId}`, {
 		content: message?.content,
 		author: {tag: message.author.tag, id: message.author.id},
