@@ -29,8 +29,6 @@ async function userCanPin(message, repliedMessage, {devs, db}) {
   //if it's already pinned
   if (repliedMessage.pinned) { message.tryreply("bruh that message is already pinned"); return false;}
 
-  console.log("what is " + pinSetting)
-
   if (pinSetting == "enable") { //just enabled for absolutely everyone
     return true;
   } else if (userIsDev) { //works for devs regardless of setting
