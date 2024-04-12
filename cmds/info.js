@@ -10,6 +10,13 @@ module.exports = {
         //vvvvvvvvvvvvvvvvvv
 
         const patchnotes = [{
+            version: `5.1.1`, date: `4/12/2024`, devs: `AgentNebulator`,
+            notes: [
+                `BirdBox no longer responds to messages sent by any bot`,
+                `Fixed pin permissions not working in threads`,
+                `Added embed to ${prefix}announce`
+            ]
+        }, {
             version: `5.1.0`, date: `3/24/2024`, devs: `AgentNebulator, Umadkek`,
             notes: [
                 `Added new serverside config options for response types and pin command`,
