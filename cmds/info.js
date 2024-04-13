@@ -10,7 +10,7 @@ module.exports = {
         //vvvvvvvvvvvvvvvvvv
 
         const patchnotes = [{
-            version: `5.1.1`, date: `4/12/2024`, devs: `AgentNebulator`,
+            version: `5.1.1`, date: `4/12/2024`, devs: `AgentNebulator`, contribs: `TheBirdWasHere`,
             notes: [
                 `BirdBox no longer responds to messages sent by any bot`,
                 `Fixed pin permissions not working in threads`,
