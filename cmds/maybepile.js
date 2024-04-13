@@ -197,6 +197,7 @@ function createTableOfCOntents(embedArray, maybeArray, defaultArray) {
 
         let claimStatus = item.claim || `Unclaimed, suggested by ${item.author}`
         if (claimStatus == "Unclaimed") {claimStatus += `, suggested by ${item.author}`}
+        if (claimStatus == "Deprioritized") {claimStatus += `, suggested by ${item.author}`}
 
         try {embedArray[j].addFields({name: `${i}: ${item.title}`, value: claimStatus, inline: true})} catch {err => console.error(err)};
         i++;
