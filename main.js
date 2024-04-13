@@ -27,7 +27,7 @@ const db = new QuickDB();
 
 const tests = require("./messagetests")
 const modals = require("./modals");
-const { randomIntInRange } = require("./utils");
+const { randomIntInRange, randomChoice } = require("./utils");
 
 let IS_CANARY = true
 let prefix;
@@ -113,6 +113,22 @@ client.on('messageCreate', async (message) => {
     const keywordTestResult = await tests.keywords(db, content, message.guildId, messageArray, lyricArray)
     if (repliesAllowed && keywordTestResult) {
         message.tryreply(keywordTestResult);}
+
+    //ping responses
+    if (message.content.contains(`<@${client.user.id}>`)) {
+        const pingReplies = [
+            "bruh can't a bot get some shuteye around here",
+            "make it quick alright",
+            "you rang?",
+            "you hath summoned the ancient one",
+            "what's up",
+            "hello there",
+            "that's my name, don't wear it out"
+        ]
+
+        message.reply(randomChoice(pingReplies))
+    }
+
 });
 
 //MAIN BIRDBOX ONLY MESSAGE TESTS (NO CANARY)
@@ -146,6 +162,7 @@ client.on('messageCreate', async (message) => {
         message.channel.trysend(randomChoice(interruptions))
     }
 
+    //create notif channel for message tests
     let notifchannel = false //by default, do not log
     await message.guild.channels.fetch(await db.get(`setting_notif_channel_${message.guildId}`)).then(channel => {
         if (!(channel instanceof Discord.Collection)) {notifchannel = channel}}) //for logged responses, overwrites default if found
