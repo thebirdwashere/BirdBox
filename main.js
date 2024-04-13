@@ -91,16 +91,12 @@ client.on('interactionCreate', async (interaction) => {
     modals.modalHandler(interaction, vars); //handle modals for birdbox modern version
 });
 
+//ANY BIRDBOX MESSAGE TESTS (CANARY OR MAIN)
 client.on('messageCreate', async (message) => {
     if (message.author.bot) {return;} //birdbox or other bot check
     if (!message.content) {return;}   //no reason to check an empty message
 
     const content = message.content.toLowerCase() //replaced several uses of message.content with this (however changed so the prefix and command must be lowercase)
-
-    const willWeSendFoof = randomIntInRange(1, 1000)
-    if (willWeSendFoof == 1000) {
-        message.channel.trysend("https://media.discordapp.net/attachments/1138589419796955270/1218588520247988294/saved.gif")
-    }
 
     if (message.content.startsWith(prefix)) { //command checker
         const args = message.content.slice(prefix.length).trim().split(/ +/g);
@@ -117,11 +113,98 @@ client.on('messageCreate', async (message) => {
     const keywordTestResult = await tests.keywords(db, content, message.guildId, messageArray, lyricArray)
     if (repliesAllowed && keywordTestResult) {
         message.tryreply(keywordTestResult);}
+});
 
-    if (IS_CANARY) {return;} //make sure none of this is duplicated on canary
+//MAIN BIRDBOX ONLY MESSAGE TESTS (NO CANARY)
+client.on('messageCreate', async (message) => {
+    if (IS_CANARY) {return;}
 
-    //run tests and stuff
-    tests.detection({message, content}, {db, Discord}, tests);
+    //randomly interrupt conversation for fun
+    const randomInterruptionInt = randomIntInRange(1, 5000)
+    if (randomInterruptionInt == 5000) {
+        const interruptions = [
+            "https://media.discordapp.net/attachments/1138589419796955270/1218588520247988294/saved.gif",
+
+            //https://www.tumblr.com/arcaneloquence/140358623151/things-you-can-say-in-response-to-literally
+            "As the prophecy foretold.",
+            "But at what cost?",
+            "So let it be written; so let it be done.",
+            "So...it has come to this.",
+            "That's just what he/she/they would've said.",
+            "Is this why fate brought us together?",
+            "And thus, I die.",
+            "...just like in my dream...",
+            "Be that as it may, still may it be as it may be",
+            "There is no escape from destiny.",
+            "Wise words by wise men write wise deeds in wise pen.",
+            "In this economy?",
+            "....and then the wolves came."
+        ]
+
+        message.channel.trysend(randomChoice(interruptions))
+    }
+
+    let notifchannel = false //by default, do not log
+    await message.guild.channels.fetch(await db.get(`setting_notif_channel_${message.guildId}`)).then(channel => {
+        if (!(channel instanceof Discord.Collection)) {notifchannel = channel}}) //for logged responses, overwrites default if found
+
+    const alphabeticalness = tests.alphabetical(content)
+    if (alphabeticalness) { //alphabetical order checker
+        const randomWord = randomChoice(alphabeticalness)
+        const randomfooters = [
+            `now i know my abc's, next time won't you sing with me`,
+            `perfectly sorted, as all things should be`,
+            `remember kids, ${randomWord[0].toUpperCase()} is for "${randomWord}"`]
+        
+        let isItTechnical
+        if (alphabeticalness.every( (val, i, arr) => val === arr[0] )) { //this test if every item is the same
+            isItTechnical = "technical"
+        } else {
+            isItTechnical = "perfect"
+        }
+        const alpha_joined = alphabeticalness.join(" ");
+        
+        const notif = await tests.responsetemplate(message, db, randomfooters, 
+            `:capital_abcd: Your message is in ${isItTechnical} alphabetical order! \n\`${alpha_joined}\``, 
+            `:capital_abcd:`, `is in ${isItTechnical} alphabetical order!`, 
+            0x3b88c3, alpha_joined)
+        if (notifchannel) {await notifchannel.trysend(notif)} //only send notif if there is a log channel
+    }
+
+    const jinxDetectionEnabled = (await db.get(`setting_jinxes_${message.guildId}`) !== "disable")
+
+    if (jinxDetectionEnabled) {
+        const jinx = await db.get(`jinxes.${message.channelId}`) //jinx detector
+        if (tests.jinx(message, jinx)) { message.channel.trysend(jinx.content) }
+    }
+
+    const periodicness = tests.periodictable(content)
+    if (periodicness) { //periodic table checker
+        const randomfooters = [
+            `${message.author.username} nye the science guy fr`,
+            `i wonder if this is a real compound, probably not but still`,
+            `one could say, this only happens... periodically`]
+        
+            const notif = await tests.responsetemplate(message, db, randomfooters, 
+            `:test_tube: Your message is on the periodic table! \n\`${periodicness}\``, 
+            `:test_tube:`, `is on the periodic table!`, 
+            0x21c369, periodicness)
+            if (notifchannel) {await notifchannel.trysend(notif)} //only send notif if there is a log channel
+    }
+
+    if (jinxDetectionEnabled) {
+        const oldJinxFormat = await db.get(`jinx_${message.channelId}`)
+        if (oldJinxFormat) {
+            await db.delete(`jinx_${message.channelId}`) //remove jinxes in the old format to clean up the db
+        }
+
+        //new format: changed to use dot notation and make an object of jinxes
+        await db.set(`jinxes.${message.channelId}`, { 
+            content: message.content, //for jinx detection
+            author: message.author.id,
+            timestamp: message.createdTimestamp
+        })
+    };
 });
 
 client.login(process.env.DISCORD_TOKEN);
