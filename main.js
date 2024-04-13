@@ -126,7 +126,7 @@ client.on('messageCreate', async (message) => {
             "that's my name, don't wear it out"
         ]
 
-        message.reply(randomChoice(pingReplies))
+        message.tryreply(randomChoice(pingReplies))
     }
 
 });
