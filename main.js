@@ -93,8 +93,8 @@ client.on('interactionCreate', async (interaction) => {
 
 //ANY BIRDBOX MESSAGE TESTS (CANARY OR MAIN)
 client.on('messageCreate', async (message) => {
-    if (message.author.bot) {return;} //birdbox or other bot check
-    if (!message.content) {return;}   //no reason to check an empty message
+    if (message.author.bot) return; //birdbox or other bot check
+    if (!message.content) return;   //no reason to check an empty message
 
     const content = message.content.toLowerCase() //replaced several uses of message.content with this (however changed so the prefix and command must be lowercase)
 
@@ -117,7 +117,9 @@ client.on('messageCreate', async (message) => {
 
 //MAIN BIRDBOX ONLY MESSAGE TESTS (NO CANARY)
 client.on('messageCreate', async (message) => {
-    if (IS_CANARY) {return;}
+    if (message.author.bot) return; //birdbox or other bot check
+    if (!message.content) return;   //no reason to check an empty message
+    if (IS_CANARY) return;          //canary not allowed here
 
     //randomly interrupt conversation for fun
     const randomInterruptionInt = randomIntInRange(1, 5000)
