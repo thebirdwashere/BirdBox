@@ -115,7 +115,7 @@ client.on('messageCreate', async (message) => {
         message.tryreply(keywordTestResult);}
 
     //ping responses
-    if (message.content.contains(`<@${client.user.id}>`)) {
+    if (message.content.includes(`<@${client.user.id}>`)) {
         const pingReplies = [
             "bruh can't a bot get some shuteye around here",
             "make it quick alright",
