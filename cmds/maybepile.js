@@ -252,7 +252,10 @@ async function deleteMaybepileItem({message, args}, maybeArray, {prefix, devs}, 
 }
 
 function claimMaybepileItem(message, maybeArray, pageNumber, claimType="claim") {
-    if (maybeArray[pageNumber].claim?.startsWith(`Claimed by `) || maybeArray[pageNumber].claim?.startsWith(`In development by `)) {
+    const alreadyClaimed = maybeArray[pageNumber].claim?.startsWith(`Claimed by `) || maybeArray[pageNumber].claim?.startsWith(`In development by `)
+    const claimerNotCommandUser = message.author.username != maybeArray[pageNumber].claim?.split(" ").at(-1)
+
+    if (alreadyClaimed && claimerNotCommandUser) {
         message.channel.trysend(`sorry, that's already been claimed`)
         return maybeArray
     }
