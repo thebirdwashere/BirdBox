@@ -120,7 +120,8 @@ client.on('messageCreate', async (message) => {
             "bruh can't a bot get some shuteye around here",
             "make it quick alright",
             "you rang?",
-            "you hath summoned the ancient one",
+            "i've been summoned",
+            "whomst has awakened the ancient one",
             "what's up",
             "hello there",
             "that's my name, don't wear it out"
