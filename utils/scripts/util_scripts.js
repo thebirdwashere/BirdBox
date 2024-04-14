@@ -1,6 +1,7 @@
 const responses = require('../../utils/json/responses.json');
 const footers = require('../../utils/json/footers.json');
 const defaults = require('../../utils/json/defaults.json');
+const wordle = require('../../utils/json/wordle.json');
 
 module.exports = {
     randomFooters: (type) => {
@@ -20,6 +21,8 @@ module.exports = {
                 return responses.rps[Math.floor(Math.random() * responses.rps.length)];
             case 'ball':
                 return responses.ball[Math.floor(Math.random() * responses.ball.length)];
+            case 'wordle':
+                return wordle.solutions[Math.floor(Math.random() * wordle.solutions.length)];
         }
     },
     sleep: (ms) => {
