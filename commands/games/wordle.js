@@ -161,7 +161,7 @@ module.exports = {
                         const resultsString = `\`\`\`\nBirdBox Wordle \nID ${encryptedSolution}\n${gameFields.map(field => field?.boxes.join("")).join("\n")}\n\`\`\``
 
                         const resultsEmbed = new EmbedBuilder()
-                            .setTitle("Copiable Results")
+                            .setTitle("Results")
                             .setDescription(`Copy in the top right corner! \n${resultsString}`)
 
                         i.reply({embeds: [resultsEmbed], ephemeral: true})
