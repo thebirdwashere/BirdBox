@@ -55,12 +55,11 @@ module.exports = {
                     return interaction.reply({content: `what kinda code is that, use the code subcommand to get a valid one lol`, ephemeral: true})
                 }
 
-                if (!guesses.includes(guess) && !extras.includes(guess)) {
+                if (guess && !guesses.includes(guess) && !extras.includes(guess)) {
                     return interaction.reply({content: `bruh ${guess} is definitely not a word, try again`, ephemeral: true})
                 }
 
                 const solutionWord = code ? decryptWordCode(code) : randomMsg('wordle')
-
                 const encryptedSolution = encryptWordCode(solutionWord)
 
                 let numberOfGuesses = 0
@@ -80,12 +79,32 @@ module.exports = {
                 }
 
                 const wordleEmbed = createWordleEmbed(embedColors, numberOfGuesses, encryptedSolution, gameFields)
+
+                const usedLettersButton = new ButtonBuilder()
+                    .setCustomId("wordle-used-letters")
+                    .setLabel("See Used Letters")
+                    .setStyle(ButtonStyle.Secondary)
+        
+                const wordleActionRow = new ActionRowBuilder()
+                    .addComponents(usedLettersButton)
                 
-                const response = await interaction.reply({embeds: [wordleEmbed]})
+                const response = await interaction.reply({embeds: [wordleEmbed], components: [wordleActionRow]})
+
+                const buttonCollector = response.createMessageComponentCollector({ componentType: ComponentType.Button, time: 60000 });
+
+                buttonCollector.on('collect', async i => {
+                    const keyboardString = handleUsedLettersDisplay(response, gameFields)
+            
+                    i.reply({content: keyboardString, ephemeral: true})
+                })
+            
+                buttonCollector.on('end', async () => {
+                    //disable the button
+                    wordleActionRow.components[0].setDisabled(true)
+                    response.edit({ components: [wordleActionRow] })
+                })
 
                 wordleSessions[interaction.member.id] = {
-                    channel: interaction.channel.id, 
-                    message: response.id, 
                     solution: solutionWord, 
                     guesses: numberOfGuesses,
                     fields: gameFields
@@ -95,6 +114,10 @@ module.exports = {
             }
             case 'guess': {
                 const currentSession = wordleSessions[interaction.member.id]
+
+                if (!currentSession) {
+                    return interaction.reply({content: `how bout you start a game before trying to guess lol`, ephemeral: true})
+                }
 
                 const guess = interaction.options?.getString('guess').toLowerCase()
 
@@ -122,22 +145,63 @@ module.exports = {
                         }
                     }
 
-                    const resultsString = `\`\`\`\nBirdBox Wordle \n${encryptedSolution}\n${gameFields.map(field => field?.boxes.join("")).join("\n")}\n\`\`\``
+                    const copyResultsButton = new ButtonBuilder()
+                        .setCustomId("wordle-copy-results")
+                        .setLabel("Copy Results")
+                        .setStyle(ButtonStyle.Success)
+                    
+                    const wordleActionRow = new ActionRowBuilder()
+                        .addComponents(copyResultsButton)
 
-                    const resultsEmbed = new EmbedBuilder()
-                        .setTitle("Copiable Results")
-                        .setDescription(resultsString)
+                    const response = await interaction.reply({embeds: [wordleEmbed], components: [wordleActionRow]})
 
-                    await interaction.reply({embeds: [wordleEmbed, resultsEmbed]})
+                    const buttonCollector = response.createMessageComponentCollector({ componentType: ComponentType.Button, time: 60000 });
+
+                    buttonCollector.on('collect', async i => {
+                        const resultsString = `\`\`\`\nBirdBox Wordle \nID ${encryptedSolution}\n${gameFields.map(field => field?.boxes.join("")).join("\n")}\n\`\`\``
+
+                        const resultsEmbed = new EmbedBuilder()
+                            .setTitle("Copiable Results")
+                            .setDescription(`Copy in the top right corner! \n${resultsString}`)
+
+                        i.reply({embeds: [resultsEmbed], ephemeral: true})
+                    })
+
+                    buttonCollector.on('end', async () => {
+                        //disable the button
+                        wordleActionRow.components[0].setDisabled(true)
+                        response.edit({ components: [wordleActionRow] })
+                    })
+
+                    wordleSessions[interaction.member.id] = undefined
 
                 } else { //no win for you :(
-                    
 
-                    const response = await interaction.reply({embeds: [wordleEmbed]})
-    
+                    const usedLettersButton = new ButtonBuilder()
+                        .setCustomId("wordle-used-letters")
+                        .setLabel("See Used Letters")
+                        .setStyle(ButtonStyle.Secondary)
+            
+                    const wordleActionRow = new ActionRowBuilder()
+                        .addComponents(usedLettersButton)
+                    
+                    const response = await interaction.reply({embeds: [wordleEmbed], components: [wordleActionRow]})
+
+                    const buttonCollector = response.createMessageComponentCollector({ componentType: ComponentType.Button, time: 60000 });
+
+                    buttonCollector.on('collect', async i => {
+                        const keyboardString = handleUsedLettersDisplay(response, gameFields)
+                
+                        i.reply({content: keyboardString, ephemeral: true})
+                    })
+                
+                    buttonCollector.on('end', async () => {
+                        //disable the button
+                        wordleActionRow.components[0].setDisabled(true)
+                        response.edit({ components: [wordleActionRow] })
+                    })
+
                     wordleSessions[interaction.member.id] = {
-                        channel: interaction.channel.id, 
-                        message: response.id, 
                         solution: solutionWord, 
                         guesses: numberOfGuesses,
                         fields: gameFields
@@ -228,4 +292,70 @@ function createWordleEmbed(embedColors, numberOfGuesses, encryptedSolution, game
     wordleEmbed.setDescription(boxString)
 
     return wordleEmbed
+}
+
+function handleUsedLettersDisplay(response, gameFields) {
+    //proper spacing estimated by hand
+    let keyboardTop = ""
+    let keyboardMiddle = "     "
+    let keyboardBottom = "                  "
+
+    const keyboardTopEntries = ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"]
+    const keyboardMiddleEntries = ["A", "S", "D", "F", "G", "H", "J", "K", "L"]
+    const keyboardBottomEntries = ["Z", "X", "C", "V", "B", "N", "M"]
+
+    const letterStatus = new Map([
+        ["Q", "🔲"],
+        ["W", "🔲"],
+        ["E", "🔲"],
+        ["R", "🔲"],
+        ["T", "🔲"],
+        ["Y", "🔲"],
+        ["U", "🔲"],
+        ["I", "🔲"],
+        ["O", "🔲"],
+        ["P", "🔲"],
+        ["A", "🔲"],
+        ["S", "🔲"],
+        ["D", "🔲"],
+        ["F", "🔲"],
+        ["G", "🔲"],
+        ["H", "🔲"],
+        ["J", "🔲"],
+        ["K", "🔲"],
+        ["L", "🔲"],
+        ["Z", "🔲"],
+        ["X", "🔲"],
+        ["C", "🔲"],
+        ["V", "🔲"],
+        ["B", "🔲"],
+        ["N", "🔲"],
+        ["M", "🔲"]
+    ])
+
+    for (const field of gameFields) {
+        for (let num = 0; num < 5; num++) {
+            const letter = field.word[num]?.toUpperCase()
+            const newBox = field.boxes[num]
+            const currentBox = letterStatus.get(letter)
+
+            if (letter && currentBox != "🟩") {
+                letterStatus.set(letter, newBox)
+            }
+        }
+    }
+
+    for (const [key, val] of letterStatus.entries()) {
+        if (keyboardTopEntries.includes(key)) {
+            keyboardTop += `${val}${key} `
+        } else if (keyboardMiddleEntries.includes(key)) {
+            keyboardMiddle += `${val}${key} `
+        } else if (keyboardBottomEntries.includes(key)) {
+            keyboardBottom += `${val}${key} `
+        }
+    }
+
+    const keyboardString = `${keyboardTop}\n${keyboardMiddle}\n${keyboardBottom}`
+
+    return keyboardString
 }
