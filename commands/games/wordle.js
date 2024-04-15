@@ -21,6 +21,7 @@ module.exports = {
                     option
                         .setName('guess')
                         .setDescription('Make your first guess without wasting time running two commands.')
+                        .setAutocomplete(true)
                 )
         )
         .addSubcommand(subcommand =>
@@ -32,6 +33,7 @@ module.exports = {
                         .setName('guess')
                         .setDescription('The word you want to guess.')
                         .setRequired(true)
+                        .setAutocomplete(true)
                 )
         )
         .addSubcommand(subcommand =>
@@ -45,7 +47,27 @@ module.exports = {
                         .setRequired(true)
                 )
         ),
-    async execute(interaction, {embedColors}) {
+    async autocomplete(interaction) {
+        //broken rn, still testing
+
+        const focusedOption = interaction.options.getFocused(true)
+        const guessedWord = focusedOption.value.toLowerCase()
+        
+        const wordIsInvalid = !guesses.includes(guessedWord) && !extras.includes(guessedWord)
+
+        let responseText
+        if (guessedWord && wordIsInvalid) {
+            responseText = `${guessedWord} is definitely not a word bruh, try something else`
+        } else if (guessedWord) {
+            responseText = guessedWord
+        } else {
+            responseText = `well hurry up and guess, i aint got all day`
+        }
+
+        await interaction.respond([{name: responseText, value: responseText}])
+
+    },
+    async execute(interaction, {embedColors, db}) {
         switch (interaction.options.getSubcommand()) { // Switch to handle different subcommands.
             case 'start': {
                 const code = interaction.options?.getString('code')
@@ -55,6 +77,7 @@ module.exports = {
                     return interaction.reply({content: `what kinda code is that, use the code subcommand to get a valid one lol`, ephemeral: true})
                 }
 
+                //note: autocomplete does NOT make this redundant if you're quick about it
                 if (guess && !guesses.includes(guess) && !extras.includes(guess)) {
                     return interaction.reply({content: `bruh ${guess} is definitely not a word, try again`, ephemeral: true})
                 }
@@ -93,7 +116,7 @@ module.exports = {
                 const buttonCollector = response.createMessageComponentCollector({ componentType: ComponentType.Button, time: 60000 });
 
                 buttonCollector.on('collect', async i => {
-                    const keyboardString = handleUsedLettersDisplay(response, gameFields)
+                    const keyboardString = handleUsedLettersDisplay(gameFields)
             
                     i.reply({content: keyboardString, ephemeral: true})
                 })
@@ -107,7 +130,8 @@ module.exports = {
                 wordleSessions[interaction.member.id] = {
                     solution: solutionWord, 
                     guesses: numberOfGuesses,
-                    fields: gameFields
+                    fields: gameFields,
+                    usedCode: !!code //this is somehow the recommended way to convert to a bool
                 }
 
                 break;
@@ -121,6 +145,7 @@ module.exports = {
 
                 const guess = interaction.options?.getString('guess').toLowerCase()
 
+                //note: autocomplete does NOT make this redundant if you're quick about it
                 if (!guesses.includes(guess) && !extras.includes(guess)) {
                     return interaction.reply({content: `bruh ${guess} is definitely not a word, try again`, ephemeral: true})
                 }
@@ -138,10 +163,14 @@ module.exports = {
                 const wordleEmbed = createWordleEmbed(embedColors, numberOfGuesses, encryptedSolution, gameFields)
 
                 //win detection
-                if (letterColors.every(char => char === "🟩")) { //win!
+                const userHasWon = letterColors.every(char => char === "🟩")
+                const userHasLost = numberOfGuesses == 6
+
+                if (userHasWon || userHasLost) { //win! or lose :(
+                    let updatedGameFields = []
                     for (let i = 0; i < gameFields.length; i++) {
-                        if (gameFields[i].boxes.every(char => char === "⬛")) {
-                            gameFields[i] = undefined
+                        if (!gameFields[i].boxes.every(char => char === "⬛")) {
+                            updatedGameFields[i] = gameFields[i]
                         }
                     }
 
@@ -158,7 +187,7 @@ module.exports = {
                     const buttonCollector = response.createMessageComponentCollector({ componentType: ComponentType.Button, time: 60000 });
 
                     buttonCollector.on('collect', async i => {
-                        const resultsString = `\`\`\`\nBirdBox Wordle \nID ${encryptedSolution}\n${gameFields.map(field => field?.boxes.join("")).join("\n")}\n\`\`\``
+                        const resultsString = `\`\`\`\nBirdBox Wordle \nID ${encryptedSolution}\n${updatedGameFields.map(field => field?.boxes.join("")).join("\n")}\n\`\`\``
 
                         const resultsEmbed = new EmbedBuilder()
                             .setTitle("Results")
@@ -174,8 +203,42 @@ module.exports = {
                     })
 
                     wordleSessions[interaction.member.id] = undefined
+                    
+                    //updating statistics now, but only if there was no word code (to avoid cheating)
+                    if (!currentSession.usedCode) {
+                        let userStats = await db.get(`wordle_stats.random_6letter.${interaction.member.id}`);
 
-                } else { //no win for you :(
+                        if (!userStats) userStats = {
+                            guess_stats: {
+                                "1": 0,
+                                "2": 0,
+                                "3": 0,
+                                "4": 0,
+                                "5": 0,
+                                "6": 0,
+                                "loss": 0
+                            },
+                            
+                            current_streak: 0,
+                            best_streak: 0
+                        };
+
+                        if (userHasWon) {
+                            userStats.guess_stats[numberOfGuesses]++;
+                            userStats.current_streak++;
+
+                            if (userStats.current_streak > userStats.best_streak) {
+                                userStats.best_streak = userStats.current_streak;
+                            }
+                        } else if (userHasLost) {
+                            userStats.guess_stats["loss"]++;
+                            userStats.current_streak = 0;
+                        }
+    
+                        await db.set(`wordle_stats.random_6letter.${interaction.member.id}`, userStats);
+                    }
+
+                } else { //game continues as normal
 
                     const usedLettersButton = new ButtonBuilder()
                         .setCustomId("wordle-used-letters")
@@ -190,7 +253,7 @@ module.exports = {
                     const buttonCollector = response.createMessageComponentCollector({ componentType: ComponentType.Button, time: 60000 });
 
                     buttonCollector.on('collect', async i => {
-                        const keyboardString = handleUsedLettersDisplay(response, gameFields)
+                        const keyboardString = handleUsedLettersDisplay(gameFields)
                 
                         i.reply({content: keyboardString, ephemeral: true})
                     })
@@ -204,7 +267,8 @@ module.exports = {
                     wordleSessions[interaction.member.id] = {
                         solution: solutionWord, 
                         guesses: numberOfGuesses,
-                        fields: gameFields
+                        fields: gameFields,
+                        usedCode: currentSession.usedCode
                     }
                 }
 
@@ -294,11 +358,11 @@ function createWordleEmbed(embedColors, numberOfGuesses, encryptedSolution, game
     return wordleEmbed
 }
 
-function handleUsedLettersDisplay(response, gameFields) {
+function handleUsedLettersDisplay(gameFields) {
     //proper spacing estimated by hand
     let keyboardTop = ""
     let keyboardMiddle = "     "
-    let keyboardBottom = "                  "
+    let keyboardBottom = "                    "
 
     const keyboardTopEntries = ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"]
     const keyboardMiddleEntries = ["A", "S", "D", "F", "G", "H", "J", "K", "L"]
