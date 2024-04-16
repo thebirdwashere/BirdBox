@@ -4,7 +4,7 @@ const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, Butt
 
 let wordleSessions = {};
 
-module.exports = {
+module.exports = { //MARK: command data
     data: new SlashCommandBuilder()
 		.setName('wordle')
 		.setDescription('Play the iconic daily game anytime on BirdBox!')
@@ -47,7 +47,7 @@ module.exports = {
                         .setRequired(true)
                 )
         ),
-    async autocomplete(interaction) {
+    async autocomplete(interaction) { //MARK: autocomplete
         //broken rn, still testing
 
         const focusedOption = interaction.options.getFocused(true)
@@ -69,7 +69,7 @@ module.exports = {
     },
     async execute(interaction, {embedColors, db}) {
         switch (interaction.options.getSubcommand()) { // Switch to handle different subcommands.
-            case 'start': {
+            case 'start': { //MARK: start subcommand
                 const code = interaction.options?.getString('code')
                 const guess = interaction.options?.getString('guess')?.toLowerCase()
 
@@ -136,7 +136,7 @@ module.exports = {
 
                 break;
             }
-            case 'guess': {
+            case 'guess': {//MARK: guess subcommand
                 const currentSession = wordleSessions[interaction.member.id]
 
                 if (!currentSession) {
@@ -162,11 +162,11 @@ module.exports = {
 
                 const wordleEmbed = createWordleEmbed(embedColors, numberOfGuesses, encryptedSolution, gameFields)
 
-                //win detection
+                //win/loss detection
                 const userHasWon = letterColors.every(char => char === "🟩")
                 const userHasLost = numberOfGuesses == 6
 
-                if (userHasWon || userHasLost) { //win! or lose :(
+                if (userHasWon || userHasLost) { //MARK: game ended
                     let updatedGameFields = []
                     for (let i = 0; i < gameFields.length; i++) {
                         if (!gameFields[i].boxes.every(char => char === "⬛")) {
@@ -210,15 +210,10 @@ module.exports = {
 
                         if (!userStats) userStats = {
                             guess_stats: {
-                                "1": 0,
-                                "2": 0,
-                                "3": 0,
-                                "4": 0,
-                                "5": 0,
-                                "6": 0,
+                                "1": 0, "2": 0, "3": 0,
+                                "4": 0, "5": 0, "6": 0,
                                 "loss": 0
                             },
-                            
                             current_streak: 0,
                             best_streak: 0
                         };
@@ -238,7 +233,7 @@ module.exports = {
                         await db.set(`wordle_stats.random_6letter.${interaction.member.id}`, userStats);
                     }
 
-                } else { //game continues as normal
+                } else { //MARK: game continuing
 
                     const usedLettersButton = new ButtonBuilder()
                         .setCustomId("wordle-used-letters")
@@ -274,7 +269,7 @@ module.exports = {
 
                 break;
             }
-            case 'code': {
+            case 'code': { //MARK: code subcommand
 
                 break;
             }
@@ -284,6 +279,7 @@ module.exports = {
 
 const shuffledAlphabet = "rlzwvefuognicapqmytbjksxdh".split("")
 
+//MARK: code encryption functions
 function encryptWordCode(word) {
     const splitWord = word.split("")
 
@@ -309,6 +305,7 @@ function decryptWordCode(code) {
     return decryptedString
 }
 
+//MARK: gameplay functions
 function getLetterColors(solutionWord, guessedWord) {
     //behavior sourced from https://www.reddit.com/r/wordle/comments/ry49ne/illustration_of_what_happens_when_your_guess_has/
     //more or less modified the source code from https://github.com/Hugo0/wordle/blob/main/webapp/static/game.js
@@ -368,34 +365,18 @@ function handleUsedLettersDisplay(gameFields) {
     const keyboardMiddleEntries = ["A", "S", "D", "F", "G", "H", "J", "K", "L"]
     const keyboardBottomEntries = ["Z", "X", "C", "V", "B", "N", "M"]
 
-    const letterStatus = new Map([
-        ["Q", "🔲"],
-        ["W", "🔲"],
-        ["E", "🔲"],
-        ["R", "🔲"],
-        ["T", "🔲"],
-        ["Y", "🔲"],
-        ["U", "🔲"],
-        ["I", "🔲"],
-        ["O", "🔲"],
-        ["P", "🔲"],
-        ["A", "🔲"],
-        ["S", "🔲"],
-        ["D", "🔲"],
-        ["F", "🔲"],
-        ["G", "🔲"],
-        ["H", "🔲"],
-        ["J", "🔲"],
-        ["K", "🔲"],
-        ["L", "🔲"],
-        ["Z", "🔲"],
-        ["X", "🔲"],
-        ["C", "🔲"],
-        ["V", "🔲"],
-        ["B", "🔲"],
-        ["N", "🔲"],
-        ["M", "🔲"]
-    ])
+    const keyboardLetters = keyboardTopEntries.concat(keyboardMiddleEntries, keyboardBottomEntries)
+
+    let keyboardMapArray = []
+    for (let letter of keyboardLetters) {
+        //format:
+        //[
+        //  ["LETTER", "EMOJI"]
+        //]
+        keyboardMapArray.push([letter, "🔲"])
+    }
+
+    const letterStatus = new Map(keyboardMapArray)
 
     for (const field of gameFields) {
         for (let num = 0; num < 5; num++) {
