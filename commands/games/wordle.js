@@ -48,15 +48,19 @@ module.exports = { //MARK: command data
                 )
         ),
     async autocomplete(interaction) { //MARK: autocomplete
-        //broken rn, still testing
-
         const focusedOption = interaction.options.getFocused(true)
         const guessedWord = focusedOption.value.toLowerCase()
         
-        const wordIsInvalid = !guesses.includes(guessedWord) && !extras.includes(guessedWord)
+        //have to access the solution in a different place based on subcommand
+        const solutionWordIfGuess = wordleSessions?.[interaction.member.id]?.solution
+        const solutionCodeIfStart = interaction?.options?._hoistedOptions?.filter(opt => opt?.name == 'code')?.[0]?.value //this is weird but it works
+        const solutionWordIfStart = decryptWordCode(solutionCodeIfStart)
+        
+        const wordInvalid = !guesses.includes(guessedWord) && !extras.includes(guessedWord)
+        const wordCorrect = (guessedWord == solutionWordIfGuess || guessedWord == solutionWordIfStart)
 
         let responseText
-        if (guessedWord && wordIsInvalid) {
+        if (guessedWord && wordInvalid && !wordCorrect) {
             responseText = `${guessedWord} is definitely not a word bruh, try something else`
         } else if (guessedWord) {
             responseText = guessedWord
@@ -77,13 +81,16 @@ module.exports = { //MARK: command data
                     return interaction.reply({content: `what kinda code is that, use the code subcommand to get a valid one lol`, ephemeral: true})
                 }
 
-                //note: autocomplete does NOT make this redundant if you're quick about it
-                if (guess && !guesses.includes(guess) && !extras.includes(guess)) {
-                    return interaction.reply({content: `bruh ${guess} is definitely not a word, try again`, ephemeral: true})
-                }
-
                 const solutionWord = code ? decryptWordCode(code) : randomMsg('wordle')
                 const encryptedSolution = encryptWordCode(solutionWord)
+
+                //note: autocomplete does NOT make this redundant if you're quick about it
+                const guessInvalid = !guesses.includes(guess) && !extras.includes(guess)
+                const guessCorrect = (guess == solutionWord)
+
+                if (guess && guessInvalid && !guessCorrect) {
+                    return interaction.reply({content: `bruh ${guess} is definitely not a word, try again`, ephemeral: true})
+                }
 
                 let numberOfGuesses = 0
 
@@ -145,14 +152,17 @@ module.exports = { //MARK: command data
 
                 const guess = interaction.options?.getString('guess').toLowerCase()
 
-                //note: autocomplete does NOT make this redundant if you're quick about it
-                if (!guesses.includes(guess) && !extras.includes(guess)) {
-                    return interaction.reply({content: `bruh ${guess} is definitely not a word, try again`, ephemeral: true})
-                }
-
                 const solutionWord = currentSession.solution
                 const gameFields = currentSession.fields
                 const numberOfGuesses = currentSession.guesses + 1
+
+                //note: autocomplete does NOT make this redundant if you're quick about it
+                const guessInvalid = !guesses.includes(guess) && !extras.includes(guess)
+                const guessCorrect = (guess == solutionWord)
+
+                if (guessInvalid && !guessCorrect) {
+                    return interaction.reply({content: `bruh ${guess} is definitely not a word, try again`, ephemeral: true})
+                }
 
                 const letterColors = getLetterColors(solutionWord, guess)
 
@@ -270,7 +280,14 @@ module.exports = { //MARK: command data
                 break;
             }
             case 'code': { //MARK: code subcommand
+                    const word = interaction.options?.getString('word')
 
+                    if (word.length != 5) return await interaction.reply({content: `bruh we need a 5 letter word for wordle`, ephemeral: true})
+
+                    const encryptedCode = encryptWordCode(word.toLowerCase())
+
+                    const responseText = `The Wordle code for ${word} is \`${encryptedCode}\`. \nUse \`/wordle code\` to play your custom game!`
+                    await interaction.reply({content: responseText, ephemeral: true})
                 break;
             }
         }
@@ -295,6 +312,8 @@ function encryptWordCode(word) {
 }
 
 function decryptWordCode(code) {
+    if (!code) return;
+
     const hexCode = code.match(/(.{2})/g)
 
     let decryptedString = ""
