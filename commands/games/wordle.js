@@ -120,7 +120,7 @@ module.exports = { //MARK: command data
                 
                 const response = await interaction.reply({embeds: [wordleEmbed], components: [wordleActionRow]})
 
-                const buttonCollector = response.createMessageComponentCollector({ componentType: ComponentType.Button, time: 60000 });
+                const buttonCollector = response.createMessageComponentCollector({ componentType: ComponentType.Button, time: 600000 });
 
                 buttonCollector.on('collect', async i => {
                     const keyboardString = handleUsedLettersDisplay(gameFields)
@@ -194,7 +194,7 @@ module.exports = { //MARK: command data
 
                     const response = await interaction.reply({embeds: [wordleEmbed], components: [wordleActionRow]})
 
-                    const buttonCollector = response.createMessageComponentCollector({ componentType: ComponentType.Button, time: 60000 });
+                    const buttonCollector = response.createMessageComponentCollector({ componentType: ComponentType.Button, time: 600000 });
 
                     buttonCollector.on('collect', async i => {
                         const resultsString = `\`\`\`\nBirdBox Wordle \nID ${encryptedSolution}\n${updatedGameFields.map(field => field?.boxes.join("")).join("\n")}\n\`\`\``
