@@ -215,7 +215,7 @@ module.exports = { //MARK: command data
                     wordleSessions[interaction.member.id] = undefined
                     
                     //updating statistics now, but only if there was no word code (to avoid cheating)
-                    if (!currentSession.usedCode) {
+                    if (!currentSession.usedCode) { //MARK: update statistics
                         let userStats = await db.get(`wordle_stats.random_6letter.${interaction.member.id}`);
 
                         if (!userStats) userStats = {
@@ -324,7 +324,7 @@ function decryptWordCode(code) {
     return decryptedString
 }
 
-//MARK: gameplay functions
+//MARK: get letter colors
 function getLetterColors(solutionWord, guessedWord) {
     //behavior sourced from https://www.reddit.com/r/wordle/comments/ry49ne/illustration_of_what_happens_when_your_guess_has/
     //more or less modified the source code from https://github.com/Hugo0/wordle/blob/main/webapp/static/game.js
@@ -357,6 +357,7 @@ function getLetterColors(solutionWord, guessedWord) {
     return colorsArray;
 }
 
+//MARK: create wordle embed
 function createWordleEmbed(embedColors, numberOfGuesses, encryptedSolution, gameFields) {
 
     const wordleEmbed = new EmbedBuilder()
@@ -374,6 +375,7 @@ function createWordleEmbed(embedColors, numberOfGuesses, encryptedSolution, game
     return wordleEmbed
 }
 
+//MARK: used letters display
 function handleUsedLettersDisplay(gameFields) {
     //proper spacing estimated by hand
     let keyboardTop = ""
