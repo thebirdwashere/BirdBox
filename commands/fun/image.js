@@ -132,8 +132,6 @@ module.exports = {
 
       const imageType = args[1] || 'jpg';
       const selectedBreed = content.replace(`${args[0]}`, "").replace(`${args[1]}`, "").trim()
-      
-      console.log(imageType)
 
       switch (args[0]) { // Switch to handle different subcommands.
         case 'cat': {

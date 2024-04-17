@@ -327,8 +327,7 @@ module.exports = {
                         leaderboardEmbed.setDescription(streakLeaderboardText);
                     }
                 }
-
-                console.log(statisticChoice)
+                
                 await statisticDisplays[statisticChoice]()
 
                 const statSelector = new StringSelectMenuBuilder()
