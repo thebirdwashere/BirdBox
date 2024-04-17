@@ -206,7 +206,7 @@ module.exports = { //MARK: command data
                 if (userHasWon || userHasLost) { //MARK: game ended
                     let updatedGameFields = []
                     for (let i = 0; i < gameFields.length; i++) {
-                        if (!gameFields[i].boxes.every(char => char === "⬛")) {
+                        if (!gameFields[i].boxes.every(char => char === "🔲")) {
                             updatedGameFields[i] = gameFields[i]
                         }
                     }
@@ -224,7 +224,7 @@ module.exports = { //MARK: command data
                     const buttonCollector = response.createMessageComponentCollector({ componentType: ComponentType.Button, time: 600000 });
 
                     buttonCollector.on('collect', async i => {
-                        const resultsString = `\`\`\`\nBirdBox Wordle \nID ${encryptedSolution}\n${updatedGameFields.map(field => field?.boxes.join("")).join("\n")}\n\`\`\``
+                        const resultsString = `\`\`\`\nBirdBox Wordle \nCode: ${encryptedSolution}\n${updatedGameFields.map(field => field?.boxes.join("")).join("\n")}\n\`\`\``
 
                         const resultsEmbed = new EmbedBuilder()
                             .setTitle("Results")
@@ -391,8 +391,8 @@ module.exports = { //MARK: command data
 
                         //sort by most points (kinda confusing)
                         percentLeaderboardArray.sort((a, b) => {
-                            if (a.win_percent > b.win_percent) return -1
-                            else if (a.win_percent < a.win_percent) return 1
+                            if (a.win_percent < b.win_percent) return -1
+                            else if (a.win_percent > a.win_percent) return 1
                             else return 0 
                         });
 
