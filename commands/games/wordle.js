@@ -120,13 +120,14 @@ module.exports = { //MARK: command data
 
                 let numberOfGuesses = 0
 
+                const emptyBoxRow = ["🔲", "🔲", "🔲", "🔲", "🔲"]
                 const gameFields = [
-                    {boxes: ["⬛", "⬛", "⬛", "⬛", "⬛"], word: ""},
-                    {boxes: ["⬛", "⬛", "⬛", "⬛", "⬛"], word: ""},
-                    {boxes: ["⬛", "⬛", "⬛", "⬛", "⬛"], word: ""},
-                    {boxes: ["⬛", "⬛", "⬛", "⬛", "⬛"], word: ""},
-                    {boxes: ["⬛", "⬛", "⬛", "⬛", "⬛"], word: ""},
-                    {boxes: ["⬛", "⬛", "⬛", "⬛", "⬛"], word: ""}
+                    {boxes: emptyBoxRow, word: ""},
+                    {boxes: emptyBoxRow, word: ""},
+                    {boxes: emptyBoxRow, word: ""},
+                    {boxes: emptyBoxRow, word: ""},
+                    {boxes: emptyBoxRow, word: ""},
+                    {boxes: emptyBoxRow, word: ""}
                 ]
 
                 if (guess) {
