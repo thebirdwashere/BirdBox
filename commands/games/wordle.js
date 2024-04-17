@@ -25,11 +25,11 @@ module.exports = { //MARK: command data
                 )
                 .addStringOption(option =>
                     option
-                        .setName('more_solutions')
-                        .setDescription('Allow for every valid guess to be a possible answer, rather than just the curated list of solutions')
+                        .setName('solutions')
+                        .setDescription('Allow for every valid guess to be a possible answer, rather than just the curated list of solutions.')
                         .addChoices(
-                            { name: `true`, value: "wordle all" },
-                            { name: `false`, value: "wordle" }
+                            { name: `curated`, value: "wordle" },
+                            { name: `all`, value: "wordle all" }
                         )
                 )
         )
@@ -101,7 +101,7 @@ module.exports = { //MARK: command data
             case 'start': { //MARK: start subcommand
                 const code = interaction.options?.getString('code')
                 const guess = interaction.options?.getString('guess')?.toLowerCase()
-                const moreSolutions = interaction.options?.getString('more_solutions') ?? 'wordle'
+                const moreSolutions = interaction.options?.getString('solutions') ?? 'wordle'
 
                 if (code?.length > 10) {
                     return interaction.reply({content: `what kinda code is that, use the code subcommand to get a valid one lol`, ephemeral: true})
