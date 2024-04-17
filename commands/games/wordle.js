@@ -103,7 +103,7 @@ module.exports = { //MARK: command data
                 const guess = interaction.options?.getString('guess')?.toLowerCase()
                 const moreSolutions = interaction.options?.getString('solutions') ?? 'wordle'
 
-                if (code?.length > 10) {
+                if (code?.length != 10) {
                     return interaction.reply({content: `what kinda code is that, use the code subcommand to get a valid one lol`, ephemeral: true})
                 }
 
