@@ -29,7 +29,7 @@ module.exports = {
                 .setDescription('View high scores across all BirdBox users.')
                 .addStringOption(option =>
                     option
-                        .setName('stat')
+                        .setName('statistic')
                         .setDescription('Change what statistic you want to view.')
                         .setRequired(true)
                         .addChoices(
@@ -220,7 +220,7 @@ module.exports = {
                 break;
             }
             case "leaderboard": {
-                const statisticChoice = interaction.options?.getString('stat')
+                const statisticChoice = interaction.options?.getString('statistic')
 
                 const leaderboardEmbed = new EmbedBuilder()
                 .setColor(embedColors.purple)
@@ -328,6 +328,7 @@ module.exports = {
                     }
                 }
 
+                console.log(statisticChoice)
                 await statisticDisplays[statisticChoice]()
 
                 const statSelector = new StringSelectMenuBuilder()
@@ -363,8 +364,12 @@ module.exports = {
                 })
 
                 menuCollector.on('end', async i => {
-                    
+                    //disable the selector
+                    selectorRow.components[0].setDisabled(true)
+                    response.edit({ components: [selectorRow] })
                 })
+
+                break;
             }
         }
     }

@@ -38,6 +38,22 @@ module.exports = { //MARK: command data
         )
         .addSubcommand(subcommand =>
             subcommand
+                .setName('leaderboard')
+                .setDescription('View high scores across all BirdBox users.')
+                .addStringOption(option =>
+                    option
+                        .setName('statistic')
+                        .setDescription('Change what statistic you want to view.')
+                        .setRequired(true)
+                        .addChoices(
+                            { name: `average guesses`, value: "average guesses" },
+                            { name: `win percentage`, value: "win percentage" },
+                            { name: `best streak`, value: "best streak" }
+                        )
+                )
+        )
+        .addSubcommand(subcommand =>
+            subcommand
                 .setName('code')
                 .setDescription('Get the code for a word to share it with others.')
                 .addStringOption(option =>
@@ -71,7 +87,7 @@ module.exports = { //MARK: command data
         await interaction.respond([{name: responseText, value: responseText}])
 
     },
-    async execute(interaction, {embedColors, db}) {
+    async execute(interaction, {embedColors, client, db}) {
         switch (interaction.options.getSubcommand()) { // Switch to handle different subcommands.
             case 'start': { //MARK: start subcommand
                 const code = interaction.options?.getString('code')
@@ -89,7 +105,7 @@ module.exports = { //MARK: command data
                 const guessCorrect = (guess == solutionWord)
 
                 if (guess && guessInvalid && !guessCorrect) {
-                    return interaction.reply({content: `bruh ${guess} is definitely not a word, try again`, ephemeral: true})
+                    return interaction.reply({content: `bruh "${guess}" is definitely not a word, try again`, ephemeral: true})
                 }
 
                 let numberOfGuesses = 0
@@ -276,6 +292,182 @@ module.exports = { //MARK: command data
                         usedCode: currentSession.usedCode
                     }
                 }
+
+                break;
+            }
+            case 'leaderboard': { //MARK: leaderboard subcommand
+                const statisticChoice = interaction.options?.getString('statistic')
+
+                const leaderboardEmbed = new EmbedBuilder()
+                .setColor(embedColors.purple)
+                .setFooter({ text: "look at all these amateurs"})
+
+                const gameStats = await db.get(`wordle_stats.random_6letter`)
+
+                if (!gameStats) {
+                    leaderboardEmbed.setTitle("Wordle Game")
+                    leaderboardEmbed.setDescription("huh, looks like there's nothing here");
+                    await interaction.reply({ embeds: [leaderboardEmbed] });
+                    return;
+                }
+
+                const statisticDisplays = {
+                    'average guesses': async () => {
+                        leaderboardEmbed.setTitle("Wordle Game - Average Guesses per Game")
+        
+                        let averageLeaderboardArray = [];
+                        let averageLeaderboardText = "";
+        
+                        for (const userId of Object.keys(gameStats)) {
+                            const userInfo = await client.users.fetch(userId)
+                            const userName = userInfo.username
+        
+                            gameStats[userId].name = userName
+
+                            const guessStats = gameStats[userId].guess_stats
+                            const numberOfGames = guessStats[1] + guessStats[2] + guessStats[3] + guessStats[4] + guessStats[5] + guessStats[6]
+
+                            let numberOfGuesses = 0
+                            for (const [key, val] of Object.entries(guessStats)) {
+
+                                if (key != "loss") {
+                                    //multiply the number of instances where it took x many guesses
+                                    //by x to get the number of guesses, then add it to running total
+                                    numberOfGuesses += (val * key)
+                                }
+                            }
+
+                            const averageGuessesPerGame = (numberOfGuesses / numberOfGames).toFixed(2)
+
+                            gameStats[userId].avg = averageGuessesPerGame
+
+                            console.log(numberOfGames)
+                            console.log(numberOfGuesses)
+                            console.log(averageGuessesPerGame)
+
+                            averageLeaderboardArray.push(gameStats[userId])
+                        }
+        
+                        //sort by lowest average (kinda confusing)
+                        averageLeaderboardArray.sort((a, b) => {
+                            if (a.avg < b.avg) return -1
+                            else if (a.avg > a.avg) return 1
+                            else return 0 
+                        });
+        
+                        for (user of averageLeaderboardArray) {
+                            averageLeaderboardText += `${user.name}: **${user.avg} guesses**\n`
+                        }
+        
+                        leaderboardEmbed.setDescription(averageLeaderboardText);
+                    },
+                    'win percentage': async () => {
+                        leaderboardEmbed.setTitle("Wordle Game - Highest Win Percentage")
+
+                        let percentLeaderboardArray = [];
+                        let percentLeaderboardText = "";
+
+                        for (const userId of Object.keys(gameStats)) {
+                            const userInfo = await client.users.fetch(userId)
+                            const userName = userInfo.username
+
+                            const guessStats = gameStats[userId].guess_stats
+
+                            const numberOfWonGames = guessStats[1] + guessStats[2] + guessStats[3] + guessStats[4] + guessStats[5] + guessStats[6]
+                            const numberOfGames = numberOfWonGames + guessStats["loss"]
+                            const winPercentage = Number(numberOfWonGames / numberOfGames).toLocaleString(undefined,{style: 'percent', minimumFractionDigits:2});
+        
+                            gameStats[userId].name = userName
+                            gameStats[userId].win_percent = winPercentage
+                            percentLeaderboardArray.push(gameStats[userId])
+                        }
+
+                        //sort by most points (kinda confusing)
+                        percentLeaderboardArray.sort((a, b) => {
+                            if (a.win_percent > b.win_percent) return -1
+                            else if (a.win_percent < a.win_percent) return 1
+                            else return 0 
+                        });
+
+                        for (user of percentLeaderboardArray) {
+                            percentLeaderboardText += `${user.name}: **${user.win_percent} of games**\n`
+                        }
+
+                        leaderboardEmbed.setDescription(percentLeaderboardText);
+                    },
+                    'best streak': async () => {
+                        leaderboardEmbed.setTitle("Wordle Game - Longest Win Streak")
+
+                        let streakLeaderboardArray = [];
+                        let streakLeaderboardText = "";
+
+                        for (const userId of Object.keys(gameStats)) {
+                            const userInfo = await client.users.fetch(userId)
+                            const userName = userInfo.username
+        
+                            gameStats[userId].name = userName
+                            streakLeaderboardArray.push(gameStats[userId])
+                        }
+
+                        //sort by most points (kinda confusing)
+                        streakLeaderboardArray.sort((a, b) => {
+                            if (a.best_streak > b.best_streak) return -1
+                            else if (a.best_streak < a.best_streak) return 1
+                            else return 0 
+                        });
+
+                        for (user of streakLeaderboardArray) {
+                            if (user.best_streak == 1) {
+                                streakLeaderboardText += `${user.name}: **${user.best_streak} game**\n`
+                            } else {
+                                streakLeaderboardText += `${user.name}: **${user.best_streak} games**\n`
+                            }
+                            
+                        }
+
+                        leaderboardEmbed.setDescription(streakLeaderboardText);
+                    }
+                }
+
+                await statisticDisplays[statisticChoice]()
+
+                const statSelector = new StringSelectMenuBuilder()
+                    .setCustomId('statSelector')
+                    .setPlaceholder('Select statistic...')
+                    .addOptions([
+                        new StringSelectMenuOptionBuilder()
+                            .setLabel("points")
+                            .setValue("points"),
+                        new StringSelectMenuOptionBuilder()
+                            .setLabel("win percentage")
+                            .setValue("win percentage"),
+                        new StringSelectMenuOptionBuilder()
+                            .setLabel("best streak")
+                            .setValue("best streak")
+                    ])
+
+                const selectorRow = new ActionRowBuilder()
+                    .addComponents(statSelector)
+
+                const response = await interaction.reply({ embeds: [leaderboardEmbed], components: [selectorRow] });
+
+                const menuCollector = response.createMessageComponentCollector({ componentType: ComponentType.StringSelect, time: 60000 });
+
+                menuCollector.on('collect', async i => {
+                    const newStatisticChoice = i.values[0]
+
+                    await statisticDisplays[newStatisticChoice]()
+
+                    await response.edit({ embeds: [leaderboardEmbed] });
+
+                    await i.deferUpdate();
+                })
+
+                menuCollector.on('end', async i => {
+                    //disable the selector
+                    selectorRow.components[0].setDisabled(true)
+                    response.edit({ components: [selectorRow] })
+                })
 
                 break;
             }
