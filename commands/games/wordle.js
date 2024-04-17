@@ -312,7 +312,7 @@ module.exports = { //MARK: command data
                 }
 
                 const statisticDisplays = {
-                    'average guesses': async () => {
+                    'average guesses': async () => { //MARK: average guesses statistic
                         leaderboardEmbed.setTitle("Wordle Game - Average Guesses per Game")
         
                         let averageLeaderboardArray = [];
@@ -361,7 +361,7 @@ module.exports = { //MARK: command data
         
                         leaderboardEmbed.setDescription(averageLeaderboardText);
                     },
-                    'win percentage': async () => {
+                    'win percentage': async () => { //MARK: win percentage statistic
                         leaderboardEmbed.setTitle("Wordle Game - Highest Win Percentage")
 
                         let percentLeaderboardArray = [];
@@ -395,7 +395,7 @@ module.exports = { //MARK: command data
 
                         leaderboardEmbed.setDescription(percentLeaderboardText);
                     },
-                    'best streak': async () => {
+                    'best streak': async () => { //MARK: best streak statistic
                         leaderboardEmbed.setTitle("Wordle Game - Longest Win Streak")
 
                         let streakLeaderboardArray = [];
@@ -429,6 +429,7 @@ module.exports = { //MARK: command data
                     }
                 }
 
+                //MARK: handling statistic selector
                 await statisticDisplays[statisticChoice]()
 
                 const statSelector = new StringSelectMenuBuilder()
