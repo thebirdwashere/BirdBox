@@ -23,6 +23,8 @@ module.exports = {
                 return responses.ball[Math.floor(Math.random() * responses.ball.length)];
             case 'wordle':
                 return wordle.solutions[Math.floor(Math.random() * wordle.solutions.length)];
+            case 'wordle all':
+                return wordle.guesses[Math.floor(Math.random() * wordle.guesses.length)];
         }
     },
     sleep: (ms) => {

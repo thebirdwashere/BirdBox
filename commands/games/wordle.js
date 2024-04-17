@@ -23,6 +23,15 @@ module.exports = { //MARK: command data
                         .setDescription('Make your first guess without wasting time running two commands.')
                         .setAutocomplete(true)
                 )
+                .addStringOption(option =>
+                    option
+                        .setName('more_solutions')
+                        .setDescription('Allow for every valid guess to be a possible answer, rather than just the curated list of solutions')
+                        .addChoices(
+                            { name: `true`, value: "wordle all" },
+                            { name: `false`, value: "wordle" }
+                        )
+                )
         )
         .addSubcommand(subcommand =>
             subcommand
@@ -92,12 +101,13 @@ module.exports = { //MARK: command data
             case 'start': { //MARK: start subcommand
                 const code = interaction.options?.getString('code')
                 const guess = interaction.options?.getString('guess')?.toLowerCase()
+                const moreSolutions = interaction.options?.getString('more_solutions')
 
                 if (code?.length > 10) {
                     return interaction.reply({content: `what kinda code is that, use the code subcommand to get a valid one lol`, ephemeral: true})
                 }
 
-                const solutionWord = code ? decryptWordCode(code) : randomMsg('wordle')
+                const solutionWord = code ? decryptWordCode(code) : randomMsg(moreSolutions)
                 const encryptedSolution = encryptWordCode(solutionWord)
 
                 //note: autocomplete does NOT make this redundant if you're quick about it
@@ -340,10 +350,6 @@ module.exports = { //MARK: command data
                             const averageGuessesPerGame = (numberOfGuesses / numberOfGames).toFixed(2)
 
                             gameStats[userId].avg = averageGuessesPerGame
-
-                            console.log(numberOfGames)
-                            console.log(numberOfGuesses)
-                            console.log(averageGuessesPerGame)
 
                             averageLeaderboardArray.push(gameStats[userId])
                         }
