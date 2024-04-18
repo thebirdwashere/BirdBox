@@ -1,6 +1,6 @@
 const { sampleArray, shuffleArray, sleep } = require("../../utils/scripts/util_scripts.js");
 const { flags, difficulties } = require("../../utils/json/flags.json");
-const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, StringSelectMenuBuilder, StringSelectMenuOptionBuilder} = require("discord.js");
+const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, SKUFlags} = require("discord.js");
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -47,11 +47,26 @@ module.exports = {
                 const flagsNum = difficulty.flags;
 
                 const countryNames = Object.keys(flags);
-                const countryFlags = Object.values(flags);
+                const countryFlags = Object.values(flags).filter(flag => flag.decoys.length > 0).map(flag => flag.emoji);
         
                 const guessFlags = sampleArray(countryFlags, flagsNum);
-                const rightFlag = guessFlags[0];
-                const rightCountry = countryNames[countryFlags.indexOf(rightFlag)];
+                const rightFlagEmoji = guessFlags[0];
+                const rightFlagCountry = countryNames[countryFlags.indexOf(rightFlagEmoji)];
+                const rightFlag = flags[rightFlagCountry]
+
+                //add decoy flags if on hard mode
+                if (difficulty.usesDecoys) {
+                    let decoyFlags = rightFlag.decoys;
+
+                    for (let i = 0; i < decoyFlags.length; i++) {
+                        const chosenDecoy = decoyFlags[Math.floor(Math.random() * decoyFlags.length)]
+                        const chosenPosition = Math.floor(Math.random() * (guessFlags.length - 1)) + 1
+
+                        guessFlags[chosenPosition] = chosenDecoy
+
+                        decoyFlags = decoyFlags.filter(item => item !== chosenDecoy)
+                    }
+                }
                 
                 const shuffledFlags = shuffleArray(guessFlags);
         
@@ -59,9 +74,9 @@ module.exports = {
                 let peopleGuessed = 0;
         
                 const flagEmbed = new EmbedBuilder()
-                .setTitle(`What is the flag of ${rightCountry}?`)
-                flagEmbed.setFooter({text: `${peopleGuessed} guessed ● ${remainingTime} seconds left`})
-                .setColor(embedColors.blue);
+                    .setTitle(`What is the flag of ${rightFlagCountry}?`)
+                    .setFooter({text: `${peopleGuessed} guessed ● ${remainingTime} seconds left`})
+                    .setColor(embedColors.blue);
         
                 let buttonRowArray = []
 
@@ -89,7 +104,7 @@ module.exports = {
         
                 buttonCollector.on('collect', async i => {
                     const userId = i.member.id
-                    if (i.customId == rightFlag && !correctUsers.includes(userId)) {
+                    if (i.customId == rightFlagEmoji && !correctUsers.includes(userId)) {
                         if (wrongUsers.includes(userId)) {
                             wrongUsers.splice(wrongUsers.indexOf(userId), 1)
                         }
@@ -97,7 +112,7 @@ module.exports = {
                         correctUsers.push(userId)
                     }
         
-                    if (i.customId != rightFlag && !wrongUsers.includes(userId)) {
+                    if (i.customId != rightFlagEmoji && !wrongUsers.includes(userId)) {
                         if (correctUsers.includes(userId)) {
                             correctUsers.splice(correctUsers.indexOf(userId), 1)
                         }
@@ -120,8 +135,9 @@ module.exports = {
                                 .setDisabled(true)
                         })
                     })
-        
-                    const rightFlagIndex = shuffledFlags.indexOf(rightFlag)
+                    
+                    const rightFlagIndex = shuffledFlags.indexOf(rightFlagEmoji)
+
                     await buttonRowArray[Math.floor(rightFlagIndex / 4)].components[rightFlagIndex % 4].setStyle(ButtonStyle.Success)
         
                     await response.edit({embeds: [flagEmbed], components: buttonRowArray})
