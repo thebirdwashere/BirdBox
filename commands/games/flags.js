@@ -471,34 +471,45 @@ module.exports = {
       case "stats": {
         const userChoice = interaction.options?.getUser("user");
 
-        const userStats = await db.get(`flags_stats.flag_quiz${userChoice.id}`);
+        let userStats = await db.get(`flags_stats.flag_quiz.${userChoice?.id}`);
 
         const statsEmbed = new EmbedBuilder()
-            .setColor(embedColors.purple)
-            .setFooter({ text: "look at this sweaty nerd"});
-    
-       
+          .setColor(embedColors.purple)
+          .setFooter({ text: "look at this sweaty nerd" });
 
-        if(!userStats) { 
-            statsEmbed.setTitle("Flag Quiz")
-            statsEmbed.setDescription(
-                "huh, looks like there's nothing here"
-            );
-            await interaction.reply({ embeds: [statsEmbed] });
-            return;
+        if (!userStats) {
+          statsEmbed.setTitle("Flag Quiz");
+          statsEmbed.setDescription("huh, looks like there's nothing here");
+          await interaction.reply({ embeds: [statsEmbed] });
+          return;
         }
 
         statsEmbed.setTitle(`Stats for ${userChoice.username}`);
 
         statsEmbed.addFields(
-
-            { name: "Points", value: `**${userStats.points} points**`, inline: true },
-          
-            { name: "Win Percentage", value: `**${Number(userStats.wins / (userStats.wins + userStats.losses)).toLocaleString(undefined, { style: "percent", minimumFractionDigits: 2 })} of games**`, inline: true },
-          
-            { name: "Best Streak", value: `**${userStats.best_streak} ${userStats.best_streak === 1? "game" : "games"}**`, inline: true }
-          
-          );
+          {
+            name: "Points",
+            value: `**${userStats.points} points**\n`,
+            inline: false,
+          },
+          {
+            name: "Win Percentage",
+            value: `**${Number(
+              userStats.wins / (userStats.wins + userStats.losses)
+            ).toLocaleString(undefined, {
+              style: "percent",
+              minimumFractionDigits: 2,
+            })} of games**\n`,
+            inline: false,
+          },
+          {
+            name: "Best Streak",
+            value: `**${userStats.best_streak} ${
+              userStats.best_streak === 1 ? "game" : "games"
+            }**\n`,
+            inline: false,
+          }
+        );
         await interaction.reply({ embeds: [statsEmbed] });
         break;
       }
