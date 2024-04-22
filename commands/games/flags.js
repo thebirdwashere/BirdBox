@@ -1,6 +1,20 @@
-const { sampleArray, shuffleArray, sleep } = require("../../utils/scripts/util_scripts.js");
+const {
+  sampleArray,
+  shuffleArray,
+  sleep,
+} = require("../../utils/scripts/util_scripts.js");
 const { flags, difficulties } = require("../../utils/json/flags.json");
-const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, SKUFlags} = require("discord.js");
+const {
+  SlashCommandBuilder,
+  EmbedBuilder,
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  ComponentType,
+  StringSelectMenuBuilder,
+  StringSelectMenuOptionBuilder,
+  SKUFlags,
+} = require("discord.js");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -62,24 +76,26 @@ module.exports = {
           option
             .setName("user")
             .setDescription("The person to view stats of")
-            .setRequired(true)
+            .setRequired(false)
         )
     ),
   async execute(interaction, { client, embedColors, db }) {
-    
-        switch (interaction.options.getSubcommand()) { // Switch to handle different subcommands.
-    case 'quiz': {
-        const difficulty = difficulties[interaction.options?.getString('difficulty')] ?? difficulties[0]
+    switch (
+      interaction.options.getSubcommand() // Switch to handle different subcommands.
+    ) {
+      case "quiz": {
+        const difficulty =
+          difficulties[interaction.options?.getString("difficulty")] ??
+          difficulties[0];
         const flagsNum = difficulty.flags;
 
         const countryNames = Object.keys(flags);
-        const countryFlags = Object.values(flags)
-          .filter((flag) => flag.decoys.length > 0)
-          .map((flag) => flag.emoji);
+        const countryFlags = Object.values(flags).map((flag) => flag.emoji);
 
         const guessFlags = sampleArray(countryFlags, flagsNum);
         const rightFlagEmoji = guessFlags[0];
-        const rightFlagCountry = countryNames[countryFlags.indexOf(rightFlagEmoji)];
+        const rightFlagCountry =
+          countryNames[countryFlags.indexOf(rightFlagEmoji)];
         const rightFlag = flags[rightFlagCountry];
 
         //add decoy flags if on hard mode
@@ -87,8 +103,10 @@ module.exports = {
           let decoyFlags = rightFlag.decoys;
 
           for (let i = 0; i < decoyFlags.length; i++) {
-            const chosenDecoy = decoyFlags[Math.floor(Math.random() * decoyFlags.length)]
-            const chosenPosition = Math.floor(Math.random() * (guessFlags.length - 1)) + 1
+            const chosenDecoy =
+              decoyFlags[Math.floor(Math.random() * decoyFlags.length)];
+            const chosenPosition =
+              Math.floor(Math.random() * (guessFlags.length - 1)) + 1;
 
             guessFlags[chosenPosition] = chosenDecoy;
 
@@ -103,7 +121,9 @@ module.exports = {
 
         const flagEmbed = new EmbedBuilder()
           .setTitle(`What is the flag of ${rightFlagCountry}?`)
-          .setFooter({text: `${peopleGuessed} guessed ● ${remainingTime} seconds left`})
+          .setFooter({
+            text: `${peopleGuessed} guessed ● ${remainingTime} seconds left`,
+          })
           .setColor(embedColors.blue);
 
         let buttonRowArray = [];
@@ -123,7 +143,10 @@ module.exports = {
           );
         }
 
-        const response = await interaction.reply({embeds: [flagEmbed], components: buttonRowArray})
+        const response = await interaction.reply({
+          embeds: [flagEmbed],
+          components: buttonRowArray,
+        });
 
         const buttonCollector = response.createMessageComponentCollector({
           componentType: ComponentType.Button,
@@ -151,7 +174,9 @@ module.exports = {
           }
 
           peopleGuessed = correctUsers.length + wrongUsers.length;
-          flagEmbed.setFooter({text: `${peopleGuessed} guessed ● ${remainingTime} seconds left`})
+          flagEmbed.setFooter({
+            text: `${peopleGuessed} guessed ● ${remainingTime} seconds left`,
+          });
 
           await response.edit({ embeds: [flagEmbed] });
           i.deferUpdate();
@@ -166,9 +191,14 @@ module.exports = {
 
           const rightFlagIndex = shuffledFlags.indexOf(rightFlagEmoji);
 
-          await buttonRowArray[Math.floor(rightFlagIndex / 4)].components[rightFlagIndex % 4].setStyle(ButtonStyle.Success)
+          await buttonRowArray[Math.floor(rightFlagIndex / 4)].components[
+            rightFlagIndex % 4
+          ].setStyle(ButtonStyle.Success);
 
-          await response.edit({embeds: [flagEmbed], components: buttonRowArray})
+          await response.edit({
+            embeds: [flagEmbed],
+            components: buttonRowArray,
+          });
 
           const pointsEarned = difficulty.earned;
           const pointsLost = difficulty.lost;
@@ -263,7 +293,9 @@ module.exports = {
           await sleep(5000);
 
           remainingTime -= 5;
-          flagEmbed.setFooter({text: `${peopleGuessed} guessed ● ${remainingTime} seconds left`})
+          flagEmbed.setFooter({
+            text: `${peopleGuessed} guessed ● ${remainingTime} seconds left`,
+          });
 
           await response.edit({ embeds: [flagEmbed] });
         }
@@ -281,8 +313,11 @@ module.exports = {
 
         if (!gameStats) {
           leaderboardEmbed.setTitle("Flag Quiz");
-          leaderboardEmbed.setDescription("huh, looks like there's nothing here");
-          return await interaction.reply({ embeds: [leaderboardEmbed] });
+          leaderboardEmbed.setDescription(
+            "huh, looks like there's nothing here"
+          );
+          await interaction.reply({ embeds: [leaderboardEmbed] });
+          return;
         }
 
         const statisticDisplays = {
@@ -323,8 +358,14 @@ module.exports = {
               const userInfo = await client.users.fetch(userId);
               const userName = userInfo.username;
 
-              const totalGames = gameStats[userId].wins + gameStats[userId].losses
-              const winPercentage = Number(gameStats[userId].wins / totalGames).toLocaleString(undefined,{style: 'percent', minimumFractionDigits:2});
+              const totalGames =
+                gameStats[userId].wins + gameStats[userId].losses;
+              const winPercentage = Number(
+                gameStats[userId].wins / totalGames
+              ).toLocaleString(undefined, {
+                style: "percent",
+                minimumFractionDigits: 2,
+              });
 
               gameStats[userId].name = userName;
               gameStats[userId].win_percent = winPercentage;
@@ -396,7 +437,10 @@ module.exports = {
 
         const selectorRow = new ActionRowBuilder().addComponents(statSelector);
 
-        const response = await interaction.reply({ embeds: [leaderboardEmbed], components: [selectorRow] });
+        const response = await interaction.reply({
+          embeds: [leaderboardEmbed],
+          components: [selectorRow],
+        });
 
         const menuCollector = response.createMessageComponentCollector({
           componentType: ComponentType.StringSelect,
@@ -423,55 +467,48 @@ module.exports = {
       }
 
       case "stats": {
-        const userChoice = interaction.options?.getUser("user");
+        const userChoice =
+          interaction.options?.getUser("user") || interaction.member.user;
 
-        let userStats = await db.get(`flags_stats.flag_quiz.${userChoice?.id}`);
+        const userStats = await db.get(
+          `flags_stats.flag_quiz.${userChoice?.id}`
+        );
 
         const statsEmbed = new EmbedBuilder()
           .setColor(embedColors.purple)
-          .setThumbnail(userChoice.avatarURL())
           .setFooter({ text: "look at this sweaty nerd" });
 
         if (!userStats) {
           statsEmbed.setTitle("Flag Quiz");
           statsEmbed.setDescription("huh, looks like there's nothing here");
-          return await interaction.reply({ embeds: [statsEmbed] });
+          await interaction.reply({ embeds: [statsEmbed] });
+          return;
         }
 
         statsEmbed.setTitle(`Stats for ${userChoice.username}`);
 
         statsEmbed.addFields(
           {
-            name: "Wins",
-            value: `${userStats.wins} ${userStats.current_streak === 1 ? "win" : "wins"}\n`,
-            inline: true,
-          },
-          {
-            name: "Losses",
-            value: `${userStats.losses} ${userStats.current_streak === 1 ? "loss" : "losses"}\n`,
-            inline: true,
+            name: "Points",
+            value: `**${userStats.points} points**\n`,
+            inline: false,
           },
           {
             name: "Win Percentage",
-            value: `${Number(userStats.wins / (userStats.wins + userStats.losses))
-              .toLocaleString(undefined, {style: "percent", minimumFractionDigits: 2,
-            })} of games\n`,
-            inline: true,
-          },
-          {
-            name: "Points",
-            value: `${userStats.points} points\n`,
-            inline: true,
-          },
-          {
-            name: "Current Streak",
-            value: `${userStats.current_streak} ${userStats.current_streak === 1 ? "game" : "games"}\n`,
-            inline: true,
+            value: `**${Number(
+              userStats.wins / (userStats.wins + userStats.losses)
+            ).toLocaleString(undefined, {
+              style: "percent",
+              minimumFractionDigits: 2,
+            })} of games**\n`,
+            inline: false,
           },
           {
             name: "Best Streak",
-            value: `${userStats.best_streak} ${userStats.best_streak === 1 ? "game" : "games"}\n`,
-            inline: true,
+            value: `**${userStats.best_streak} ${
+              userStats.best_streak === 1 ? "game" : "games"
+            }**\n`,
+            inline: false,
           }
         );
         await interaction.reply({ embeds: [statsEmbed] });
