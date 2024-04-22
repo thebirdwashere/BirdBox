@@ -282,8 +282,7 @@ module.exports = {
         if (!gameStats) {
           leaderboardEmbed.setTitle("Flag Quiz");
           leaderboardEmbed.setDescription("huh, looks like there's nothing here");
-          await interaction.reply({ embeds: [leaderboardEmbed] });
-          return;
+          return await interaction.reply({ embeds: [leaderboardEmbed] });
         }
 
         const statisticDisplays = {
@@ -430,39 +429,49 @@ module.exports = {
 
         const statsEmbed = new EmbedBuilder()
           .setColor(embedColors.purple)
+          .setThumbnail(userChoice.avatarURL())
           .setFooter({ text: "look at this sweaty nerd" });
 
         if (!userStats) {
           statsEmbed.setTitle("Flag Quiz");
           statsEmbed.setDescription("huh, looks like there's nothing here");
-          await interaction.reply({ embeds: [statsEmbed] });
-          return;
+          return await interaction.reply({ embeds: [statsEmbed] });
         }
 
         statsEmbed.setTitle(`Stats for ${userChoice.username}`);
 
         statsEmbed.addFields(
           {
-            name: "Points",
-            value: `**${userStats.points} points**\n`,
-            inline: false,
+            name: "Wins",
+            value: `${userStats.wins} ${userStats.current_streak === 1 ? "win" : "wins"}\n`,
+            inline: true,
+          },
+          {
+            name: "Losses",
+            value: `${userStats.losses} ${userStats.current_streak === 1 ? "loss" : "losses"}\n`,
+            inline: true,
           },
           {
             name: "Win Percentage",
-            value: `**${Number(
-              userStats.wins / (userStats.wins + userStats.losses)
-            ).toLocaleString(undefined, {
-              style: "percent",
-              minimumFractionDigits: 2,
-            })} of games**\n`,
-            inline: false,
+            value: `${Number(userStats.wins / (userStats.wins + userStats.losses))
+              .toLocaleString(undefined, {style: "percent", minimumFractionDigits: 2,
+            })} of games\n`,
+            inline: true,
+          },
+          {
+            name: "Points",
+            value: `${userStats.points} points\n`,
+            inline: true,
+          },
+          {
+            name: "Current Streak",
+            value: `${userStats.current_streak} ${userStats.current_streak === 1 ? "game" : "games"}\n`,
+            inline: true,
           },
           {
             name: "Best Streak",
-            value: `**${userStats.best_streak} ${
-              userStats.best_streak === 1 ? "game" : "games"
-            }**\n`,
-            inline: false,
+            value: `${userStats.best_streak} ${userStats.best_streak === 1 ? "game" : "games"}\n`,
+            inline: true,
           }
         );
         await interaction.reply({ embeds: [statsEmbed] });
