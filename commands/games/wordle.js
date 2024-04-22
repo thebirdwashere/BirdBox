@@ -250,6 +250,9 @@ module.exports = { //MARK: command data
 
                     //reply to message
                     const response = await interaction.reply({embeds: [wordleEmbed], components: [wordleActionRow]});
+                    if (userHasLost) {
+                        await interaction.followUp({content: `bruh it was ${solutionWord.toLowerCase()} how did you not get that`})
+                    }
 
                     const buttonCollector = response.createMessageComponentCollector({ componentType: ComponentType.Button, time: 600000 });
 
