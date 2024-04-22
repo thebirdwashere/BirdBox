@@ -74,7 +74,7 @@ module.exports = {
 
         const countryNames = Object.keys(flags);
         const countryFlags = Object.values(flags)
-          .filter((flag) => flag.decoys.length > 0)
+          //.filter((flag) => flag.decoys.length > 0)
           .map((flag) => flag.emoji);
 
         const guessFlags = sampleArray(countryFlags, flagsNum);
