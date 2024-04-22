@@ -9,8 +9,8 @@
             "decoys": ["🇧🇴", "🇨🇲", "🇨🇴", "🇪🇨", "🇲🇩", "🇷🇴"]
         },
         "United Arab Emirates": {
-            "emoji": "\ud83c\udde6\ud83c\uddea",
-            "decoys": ["🇯🇴", "🇲🇬", "🇵🇸", "🇰🇼", "🇸🇩"]
+            "emoji": "🇦🇪",
+            "decoys": ["🇯🇴", "🇲🇬", "🇵🇸", "🇰🇼", "🇸🇩", "🇿🇦"]
         },
         "Afghanistan": {
             "emoji": "\ud83c\udde6\ud83c\uddeb",
@@ -1028,14 +1028,14 @@
 			"flags": 16,
 			"earned": 500,
 			"lost": 100,
-			"usesDecoys": true
+			"usesDecoys": false
 		},
 		{
 			"name": "💀",
 			"flags": 20,
 			"earned": 750,
 			"lost": 150,
-			"usesDecoys": true
+			"usesDecoys": false
 		}
 	]
 }
