@@ -47,7 +47,8 @@ module.exports = {
                 const flagsNum = difficulty.flags;
 
                 const countryNames = Object.keys(flags);
-                const countryFlags = Object.values(flags).filter(flag => flag.decoys.length > 0).map(flag => flag.emoji);
+                let countryFlags = Object.values(flags).map(flag => flag.emoji);
+                if (difficulty.usesDecoys) {countryFlags = countryFlags.filter(flag => flag.decoys.length > 0)}
         
                 const guessFlags = sampleArray(countryFlags, flagsNum);
                 const rightFlagEmoji = guessFlags[0];
