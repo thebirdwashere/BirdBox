@@ -76,7 +76,6 @@ module.exports = {
           option
             .setName("user")
             .setDescription("The person to view stats of")
-            .setRequired(false)
         )
     ),
   async execute(interaction, { client, embedColors, db }) {
@@ -90,7 +89,9 @@ module.exports = {
         const flagsNum = difficulty.flags;
 
         const countryNames = Object.keys(flags);
-        const countryFlags = Object.values(flags).map((flag) => flag.emoji);
+        const countryFlags = Object.values(flags)
+          //.filter((flag) => flag.decoys.length > 0)
+          .map((flag) => flag.emoji);
 
         const guessFlags = sampleArray(countryFlags, flagsNum);
         const rightFlagEmoji = guessFlags[0];
@@ -316,8 +317,7 @@ module.exports = {
           leaderboardEmbed.setDescription(
             "huh, looks like there's nothing here"
           );
-          await interaction.reply({ embeds: [leaderboardEmbed] });
-          return;
+          return await interaction.reply({ embeds: [leaderboardEmbed] });
         }
 
         const statisticDisplays = {
@@ -467,48 +467,66 @@ module.exports = {
       }
 
       case "stats": {
-        const userChoice =
-          interaction.options?.getUser("user") || interaction.member.user;
+        const userChoice = interaction.options?.getUser("user") || interaction.member.user;
 
-        const userStats = await db.get(
-          `flags_stats.flag_quiz.${userChoice?.id}`
-        );
+        let userStats = await db.get(`flags_stats.flag_quiz.${userChoice?.id}`);
 
         const statsEmbed = new EmbedBuilder()
           .setColor(embedColors.purple)
+          .setThumbnail(userChoice.avatarURL())
           .setFooter({ text: "look at this sweaty nerd" });
 
         if (!userStats) {
           statsEmbed.setTitle("Flag Quiz");
           statsEmbed.setDescription("huh, looks like there's nothing here");
-          await interaction.reply({ embeds: [statsEmbed] });
-          return;
+          return await interaction.reply({ embeds: [statsEmbed] });
         }
 
         statsEmbed.setTitle(`Stats for ${userChoice.username}`);
 
         statsEmbed.addFields(
           {
-            name: "Points",
-            value: `**${userStats.points} points**\n`,
-            inline: false,
+            name: "Wins",
+            value: `${userStats.wins} ${
+              userStats.current_streak === 1 ? "win" : "wins"
+            }\n`,
+            inline: true,
+          },
+          {
+            name: "Losses",
+            value: `${userStats.losses} ${
+              userStats.current_streak === 1 ? "loss" : "losses"
+            }\n`,
+            inline: true,
           },
           {
             name: "Win Percentage",
-            value: `**${Number(
+            value: `${Number(
               userStats.wins / (userStats.wins + userStats.losses)
             ).toLocaleString(undefined, {
               style: "percent",
               minimumFractionDigits: 2,
-            })} of games**\n`,
-            inline: false,
+            })} of games\n`,
+            inline: true,
+          },
+          {
+            name: "Points",
+            value: `${userStats.points} points\n`,
+            inline: true,
+          },
+          {
+            name: "Current Streak",
+            value: `${userStats.current_streak} ${
+              userStats.current_streak === 1 ? "game" : "games"
+            }\n`,
+            inline: true,
           },
           {
             name: "Best Streak",
-            value: `**${userStats.best_streak} ${
+            value: `${userStats.best_streak} ${
               userStats.best_streak === 1 ? "game" : "games"
-            }**\n`,
-            inline: false,
+            }\n`,
+            inline: true,
           }
         );
         await interaction.reply({ embeds: [statsEmbed] });
