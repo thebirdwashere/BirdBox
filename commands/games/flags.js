@@ -1,20 +1,6 @@
-const {
-  sampleArray,
-  shuffleArray,
-  sleep,
-} = require("../../utils/scripts/util_scripts.js");
+const { sampleArray, shuffleArray, sleep } = require("../../utils/scripts/util_scripts.js");
 const { flags, difficulties } = require("../../utils/json/flags.json");
-const {
-  SlashCommandBuilder,
-  EmbedBuilder,
-  ActionRowBuilder,
-  ButtonBuilder,
-  ButtonStyle,
-  ComponentType,
-  StringSelectMenuBuilder,
-  StringSelectMenuOptionBuilder,
-  SKUFlags,
-} = require("discord.js");
+const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, SKUFlags} = require("discord.js");
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -80,13 +66,10 @@ module.exports = {
         )
     ),
   async execute(interaction, { client, embedColors, db }) {
-    switch (
-      interaction.options.getSubcommand() // Switch to handle different subcommands.
-    ) {
-      case "quiz": {
-        const difficulty =
-          difficulties[interaction.options?.getString("difficulty")] ??
-          difficulties[0];
+    
+        switch (interaction.options.getSubcommand()) { // Switch to handle different subcommands.
+    case 'quiz': {
+        const difficulty = difficulties[interaction.options?.getString('difficulty')] ?? difficulties[0]
         const flagsNum = difficulty.flags;
 
         const countryNames = Object.keys(flags);
@@ -96,8 +79,7 @@ module.exports = {
 
         const guessFlags = sampleArray(countryFlags, flagsNum);
         const rightFlagEmoji = guessFlags[0];
-        const rightFlagCountry =
-          countryNames[countryFlags.indexOf(rightFlagEmoji)];
+        const rightFlagCountry = countryNames[countryFlags.indexOf(rightFlagEmoji)];
         const rightFlag = flags[rightFlagCountry];
 
         //add decoy flags if on hard mode
@@ -105,10 +87,8 @@ module.exports = {
           let decoyFlags = rightFlag.decoys;
 
           for (let i = 0; i < decoyFlags.length; i++) {
-            const chosenDecoy =
-              decoyFlags[Math.floor(Math.random() * decoyFlags.length)];
-            const chosenPosition =
-              Math.floor(Math.random() * (guessFlags.length - 1)) + 1;
+            const chosenDecoy = decoyFlags[Math.floor(Math.random() * decoyFlags.length)]
+            const chosenPosition = Math.floor(Math.random() * (guessFlags.length - 1)) + 1
 
             guessFlags[chosenPosition] = chosenDecoy;
 
@@ -123,9 +103,7 @@ module.exports = {
 
         const flagEmbed = new EmbedBuilder()
           .setTitle(`What is the flag of ${rightFlagCountry}?`)
-          .setFooter({
-            text: `${peopleGuessed} guessed ● ${remainingTime} seconds left`,
-          })
+          .setFooter({text: `${peopleGuessed} guessed ● ${remainingTime} seconds left`})
           .setColor(embedColors.blue);
 
         let buttonRowArray = [];
@@ -145,10 +123,7 @@ module.exports = {
           );
         }
 
-        const response = await interaction.reply({
-          embeds: [flagEmbed],
-          components: buttonRowArray,
-        });
+        const response = await interaction.reply({embeds: [flagEmbed], components: buttonRowArray})
 
         const buttonCollector = response.createMessageComponentCollector({
           componentType: ComponentType.Button,
@@ -176,9 +151,7 @@ module.exports = {
           }
 
           peopleGuessed = correctUsers.length + wrongUsers.length;
-          flagEmbed.setFooter({
-            text: `${peopleGuessed} guessed ● ${remainingTime} seconds left`,
-          });
+          flagEmbed.setFooter({text: `${peopleGuessed} guessed ● ${remainingTime} seconds left`})
 
           await response.edit({ embeds: [flagEmbed] });
           i.deferUpdate();
@@ -193,14 +166,9 @@ module.exports = {
 
           const rightFlagIndex = shuffledFlags.indexOf(rightFlagEmoji);
 
-          await buttonRowArray[Math.floor(rightFlagIndex / 4)].components[
-            rightFlagIndex % 4
-          ].setStyle(ButtonStyle.Success);
+          await buttonRowArray[Math.floor(rightFlagIndex / 4)].components[rightFlagIndex % 4].setStyle(ButtonStyle.Success)
 
-          await response.edit({
-            embeds: [flagEmbed],
-            components: buttonRowArray,
-          });
+          await response.edit({embeds: [flagEmbed], components: buttonRowArray})
 
           const pointsEarned = difficulty.earned;
           const pointsLost = difficulty.lost;
@@ -295,9 +263,7 @@ module.exports = {
           await sleep(5000);
 
           remainingTime -= 5;
-          flagEmbed.setFooter({
-            text: `${peopleGuessed} guessed ● ${remainingTime} seconds left`,
-          });
+          flagEmbed.setFooter({text: `${peopleGuessed} guessed ● ${remainingTime} seconds left`})
 
           await response.edit({ embeds: [flagEmbed] });
         }
@@ -315,9 +281,7 @@ module.exports = {
 
         if (!gameStats) {
           leaderboardEmbed.setTitle("Flag Quiz");
-          leaderboardEmbed.setDescription(
-            "huh, looks like there's nothing here"
-          );
+          leaderboardEmbed.setDescription("huh, looks like there's nothing here");
           await interaction.reply({ embeds: [leaderboardEmbed] });
           return;
         }
@@ -360,14 +324,8 @@ module.exports = {
               const userInfo = await client.users.fetch(userId);
               const userName = userInfo.username;
 
-              const totalGames =
-                gameStats[userId].wins + gameStats[userId].losses;
-              const winPercentage = Number(
-                gameStats[userId].wins / totalGames
-              ).toLocaleString(undefined, {
-                style: "percent",
-                minimumFractionDigits: 2,
-              });
+              const totalGames = gameStats[userId].wins + gameStats[userId].losses
+              const winPercentage = Number(gameStats[userId].wins / totalGames).toLocaleString(undefined,{style: 'percent', minimumFractionDigits:2});
 
               gameStats[userId].name = userName;
               gameStats[userId].win_percent = winPercentage;
@@ -439,10 +397,7 @@ module.exports = {
 
         const selectorRow = new ActionRowBuilder().addComponents(statSelector);
 
-        const response = await interaction.reply({
-          embeds: [leaderboardEmbed],
-          components: [selectorRow],
-        });
+        const response = await interaction.reply({ embeds: [leaderboardEmbed], components: [selectorRow] });
 
         const menuCollector = response.createMessageComponentCollector({
           componentType: ComponentType.StringSelect,
