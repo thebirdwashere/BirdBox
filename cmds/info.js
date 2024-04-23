@@ -10,6 +10,11 @@ module.exports = {
         //vvvvvvvvvvvvvvvvvv
 
         const patchnotes = [{
+            version: `5.1.3`, date: `4/23/2024`, devs: `AgentNebulator`,
+            notes: [
+                `Fixed crash when testing for alphabetical messages`
+            ]
+        }, {
             version: `5.1.2`, date: `4/22/2024`, devs: `AgentNebulator`,
             notes: [
                 `${prefix}maybepile view now always lists either the author or the claimer`,
