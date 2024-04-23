@@ -7,7 +7,7 @@ module.exports = {
         try {
           repliedMessage = await message.fetchReference();
 
-          if (!userCanUnpin(message, repliedMessage, devs)) {return;}
+          if (!userCanUnpin(message, repliedMessage, {devs, db})) {return;}
 
           try { 
             await repliedMessage.unpin()
