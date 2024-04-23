@@ -10,7 +10,7 @@ module.exports = {
         //vvvvvvvvvvvvvvvvvv
 
         const patchnotes = [{
-            version: `5.1.2`, date: `TBR`, devs: `AgentNebulator`,
+            version: `5.1.2`, date: `4/22/2024`, devs: `AgentNebulator`,
             notes: [
                 `${prefix}maybepile view now always lists either the author or the claimer`,
                 `Claimers can now unclaim or deprioritize things on maybepile`,
