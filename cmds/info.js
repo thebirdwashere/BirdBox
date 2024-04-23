@@ -191,11 +191,15 @@ module.exports = {
                 newEmbed.addFields({name: `${patch.version} Patch Notes (${patch.date})`, value: patchnotesString})
             });
         } else { //only the most recent notes
-            let patchnotesString = ``
-            patchnotes[0].notes.forEach((item) => {
-                patchnotesString = `${patchnotesString}\n ● ${item}`
-            })
-            newEmbed.addFields({name: `${patchnotes[0].version} Patch Notes (${patchnotes[0].date})`, value: patchnotesString})
+            patchnotes.filter(item => {
+                    return item.version.substring(0, 3) == patchnotes[0].version.substring(0, 3)
+                }).reverse().forEach((patch) => {
+                    let patchnotesString = ``
+                    patch.notes.forEach((item) => {
+                        patchnotesString = `${patchnotesString}\n ● ${item}`
+                    })
+                    newEmbed.addFields({name: `${patch.version} Patch Notes (${patch.date})`, value: patchnotesString})
+            });
         }
 
         message.tryreply({embeds: [newEmbed]});
