@@ -117,14 +117,24 @@ client.on('messageCreate', async (message) => {
     //ping responses
     if (message.content.includes(`<@${client.user.id}>`)) {
         const pingReplies = [
-            "bruh can't a bot get some shuteye around here",
-            "make it quick alright",
+            "can't a bot get some shuteye around here",
+            "let's make it quick, whatcha need ",
             "you rang?",
             "i've been summoned",
             "whomst has awakened the ancient one",
             "what's up",
             "hello there",
-            "that's my name, don't wear it out"
+            "that's my name, don't wear it out",
+			"wait i got mentioned what's going on",
+			"am i needed?",
+			"who goes there",
+			"did you really ping me for THAT?",
+			"bruh",
+
+			//i swear i will make this a copypasta at all costs
+			//(nobody knows what this is referencing still and i think that's glorious)
+			'The answer is love. But only if it\'s eternal love.',
+			"The answer is love. But only if it's eternal love. \nNowadays love is fleeting and never lasts, but true love is eternal and everlasting."
         ]
 
         message.tryreply(randomChoice(pingReplies))
@@ -143,13 +153,14 @@ client.on('messageCreate', async (message) => {
     if (randomInterruptionInt == 5000) {
         const interruptions = [
             "https://media.discordapp.net/attachments/1138589419796955270/1218588520247988294/saved.gif",
+			"what is going on in here",
 
             //https://www.tumblr.com/arcaneloquence/140358623151/things-you-can-say-in-response-to-literally
             "As the prophecy foretold.",
             "But at what cost?",
             "So let it be written; so let it be done.",
             "So...it has come to this.",
-            "That's just what he/she/they would've said.",
+            "That's just what they would've said.",
             "Is this why fate brought us together?",
             "And thus, I die.",
             "...just like in my dream...",
