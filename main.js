@@ -133,8 +133,8 @@ client.on('messageCreate', async (message) => {
 
 			//i swear i will make this a copypasta at all costs
 			//(nobody knows what this is referencing still and i think that's glorious)
-			'The answer is love. But only if it\'s eternal love.',
-			"The answer is love. But only if it's eternal love. \nNowadays love is fleeting and never lasts, but true love is eternal and everlasting."
+			'It\'s love. But only if it\'s eternal love.',
+			"It\'s love. But only if it's eternal love. \nNowadays love is fleeting and never lasts, but true love is eternal and everlasting."
         ]
 
         message.tryreply(randomChoice(pingReplies))

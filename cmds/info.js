@@ -192,7 +192,7 @@ module.exports = {
             });
         } else { //only the most recent notes
             patchnotes.filter(item => {
-                    return item.version.substring(0, 3) == patchnotes[0].version.substring(0, 3)
+                    return item.version.substring(0, 3) == patchnotes[0].version.substring(0, 3) //check if the major and minor release are the same
                 }).reverse().forEach((patch) => {
                     let patchnotesString = ``
                     patch.notes.forEach((item) => {
