@@ -62,7 +62,6 @@ module.exports = {
           option
             .setName("user")
             .setDescription("The person to view stats of")
-            .setRequired(true)
         )
     ),
   async execute(interaction, { client, embedColors, db }) {
@@ -423,7 +422,7 @@ module.exports = {
       }
 
       case "stats": {
-        const userChoice = interaction.options?.getUser("user");
+        const userChoice = interaction.options?.getUser("user") ?? interaction.member.user;
 
         let userStats = await db.get(`flags_stats.flag_quiz.${userChoice?.id}`);
 
