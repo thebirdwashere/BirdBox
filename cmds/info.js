@@ -10,6 +10,12 @@ module.exports = {
         //vvvvvvvvvvvvvvvvvv
 
         const patchnotes = [{
+            version: `5.1.4`, date: `4/23/2024`, devs: `AgentNebulator`,
+            notes: [
+                `Fixed crash when using unpin`,
+                `Minor changes to ping responses`
+            ]
+        }, {
             version: `5.1.3`, date: `4/23/2024`, devs: `AgentNebulator`,
             notes: [
                 `Fixed crash when testing for alphabetical messages`
