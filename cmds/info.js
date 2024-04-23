@@ -2,7 +2,7 @@ const { EmbedBuilder } = require("discord.js");
 
 module.exports = {
     name: 'info',
-    description: `Learn about the bot's latest updates. Info all to see even more!`,
+    description: `Learn about the bot's latest updates. "info all" to see even more!`,
     execute({message, args}, {prefix}) {
         //I M P O R T A N T
         //If you are modifying this in the future,
@@ -204,19 +204,13 @@ module.exports = {
         const newEmbed = new EmbedBuilder()
         .setColor('#cbe1ec')
         .setTitle(`Current Version: ${version}`)
-        .addFields({name: `Update by ${devs}`, value: `${versioncontribs}`})
         .setAuthor({ name: 'BirdBox', iconURL: 'https://cdn.discordapp.com/avatars/803811104953466880/5bce4f0ba438015ec65f5b9cac11c8e3.webp'})
         .setFooter({text: 'pretty regularly under development, maybe check back soon'})
-        
-        if (args[0] == "all") { //all notes in the command
-            patchnotes.forEach((patch) => {
-                let patchnotesString = ``
-                patch.notes.forEach((item) => {
-                    patchnotesString = `${patchnotesString}\n ● ${item}`
-                })
-                newEmbed.addFields({name: `${patch.version} Patch Notes (${patch.date})`, value: patchnotesString})
-            });
-        } else { //only the most recent notes
+    
+
+        if (args[0] == "all") { //recent minor release plus its hotfixes
+            newEmbed.addFields({name: `Update by ${devs}`, value: `${versioncontribs}`})
+
             patchnotes.filter(item => {
                     return item.version.substring(0, 3) == patchnotes[0].version.substring(0, 3) //check if the major and minor release are the same
                 }).reverse().forEach((patch) => {
@@ -226,6 +220,16 @@ module.exports = {
                     })
                     newEmbed.addFields({name: `${patch.version} Patch Notes (${patch.date})`, value: patchnotesString})
             });
+        } else { //only the most recent notes
+            newEmbed.addFields({name: `Patch by ${patchnotes[0].devs}`, value: 
+                `${patchnotes[0].contribs ? `with help from ${patchnotes[0].contribs}` : " "}`
+            })
+
+            let patchnotesString = ``
+            patchnotes[0].notes.forEach((item) => {
+                patchnotesString = `${patchnotesString}\n ● ${item}`
+            })
+            newEmbed.addFields({name: `${patchnotes[0].version} Patch Notes (${patchnotes[0].date})`, value: patchnotesString})
         }
 
         message.tryreply({embeds: [newEmbed]});
