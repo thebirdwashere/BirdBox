@@ -10,6 +10,15 @@ module.exports = {
         //vvvvvvvvvvvvvvvvvv
 
         const patchnotes = [{
+            version: `5.1.2`, date: `TBR`, devs: `AgentNebulator`,
+            notes: [
+                `${prefix}maybepile view now always lists either the author or the claimer`,
+                `Claimers can now unclaim or deprioritize things on maybepile`,
+                `Added 15 new random conversation interruptions`,
+                `Decreased the chances of BirdBox interrupting to 1/5000`,
+                `BirdBox now responds to being pinged (currently 15 responses)`
+            ]
+        }, {
             version: `5.1.1`, date: `4/12/2024`, devs: `AgentNebulator`, contribs: `TheBirdWasHere`,
             notes: [
                 `BirdBox no longer responds to messages sent by any bot`,

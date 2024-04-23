@@ -153,6 +153,7 @@ client.on('messageCreate', async (message) => {
     if (randomInterruptionInt == 5000) {
         const interruptions = [
             "https://media.discordapp.net/attachments/1138589419796955270/1218588520247988294/saved.gif",
+			"https://tenor.com/view/cat-sochi-sochi-the-cat-post-this-cat-when-they-least-expect-it-gif-10012483772678340442",
 			"what is going on in here",
 
             //https://www.tumblr.com/arcaneloquence/140358623151/things-you-can-say-in-response-to-literally
