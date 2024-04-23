@@ -12,7 +12,8 @@ module.exports = {
         const patchnotes = [{
             version: `5.1.4`, date: `4/23/2024`, devs: `AgentNebulator`,
             notes: [
-                `Fixed crash when using unpin`,
+                `Updated ${prefix}info to show initial version and hotfixes`,
+                `Fixed crash when using ${prefix}unpin`,
                 `Minor changes to ping responses`
             ]
         }, {
@@ -105,7 +106,7 @@ module.exports = {
                 `Actually removed ${prefix}db-test this time`*/
             ]
         }, {
-            version: `4.3.2`, date: `1/8/2024`, devs: `AgentNebulator`, contribs: `Crisby, Anpun`,
+            version: `4.3.2`, date: `1/8/2024`, devs: `AgentNebulator`, contribs: `Anpun, Crisby`,
             notes: [
                 `Added jinx detector for two people saying the same thing at a similar time`,
                 `Added element detector for messages made of periodic table abbreviations`,
@@ -172,9 +173,28 @@ module.exports = {
             ]
         }]
 
-        let devs = patchnotes[0].devs
-        let versioncontribs
-        if (patchnotes[0].contribs) {versioncontribs = `with help from ${patchnotes[0].contribs}`} else {versioncontribs = " "}
+        let devs = patchnotes
+            .filter(item => {
+                return item.version.substring(0, 3) == patchnotes[0].version.substring(0, 3) //check if the major and minor release are the same
+            })
+            .map(item => item.devs)
+            .reduce((acc, val) => acc.concat(val.split(", ")), []) //get all devs and put them in an array
+            .filter((val, i, arr) => arr.indexOf(val) === i)
+            .join(", ")
+
+        const contributors = patchnotes
+            .filter(item => {
+                return item.version.substring(0, 3) == patchnotes[0].version.substring(0, 3) //check if the major and minor release are the same
+            })
+            .filter(item => {
+                return !!item.contribs //check if the item has contributors at all
+            })
+            .map(item => item.contribs)
+            .reduce((acc, val) => acc.concat(val.split(", ")), []) //get all contribs and put them in an array
+            .filter((val, i, arr) => arr.indexOf(val) === i)
+            .join(", ")
+        
+        const versioncontribs = contributors ? `with help from ${contributors}` : " "
         let version = patchnotes[0].version
 
         let canary = true;
@@ -183,7 +203,7 @@ module.exports = {
 
         const newEmbed = new EmbedBuilder()
         .setColor('#cbe1ec')
-        .setTitle(`Version: ${version}`)
+        .setTitle(`Current Version: ${version}`)
         .addFields({name: `Update by ${devs}`, value: `${versioncontribs}`})
         .setAuthor({ name: 'BirdBox', iconURL: 'https://cdn.discordapp.com/avatars/803811104953466880/5bce4f0ba438015ec65f5b9cac11c8e3.webp'})
         .setFooter({text: 'pretty regularly under development, maybe check back soon'})
