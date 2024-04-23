@@ -148,6 +148,38 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
 });
 
+/* TEMP ON MESSAGE CREATION */
+
+// client.on('messageCreate', async (message) => {
+//     if (message.content === "go go gadget flag matcher") {
+//         const flagsList = require("./utils/json/flags.json").flags
+
+// 		const filter = m => m.author.id == message.author.id //used in message awaits; just doing as stackoverflow guy says
+
+// 		for (const [key1, val1] of Object.entries(flagsList)) {
+// 			flagsList[key1].decoys = []
+// 			for (const [key2, val2] of Object.entries(flagsList)) {
+// 				if (key1 == key2) continue;
+						
+// 				await message.channel.send(`Are ${val1.emoji} and ${val2.emoji} similar? y/n `)
+
+// 				await message.channel.awaitMessages({filter, max: 1, time: 600_000,/* ten minute timer */ errors: ['time']}).then(collected => {
+//                 	const returnedMessage = collected.first().content
+
+// 					if (returnedMessage == "y") {
+// 						flagsList[key1].decoys.push(val2.emoji)
+// 					}
+// 				})
+
+// 				console.log(flagsList)
+// 			}
+// 		}
+
+//         console.log("FINAL LIST")
+//         console.log(flagsList)
+//     }
+// })
+
 /* ON MESSAGE CREATION */
 
 client.on('messageCreate', async (message) => {
