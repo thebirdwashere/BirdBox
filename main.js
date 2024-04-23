@@ -148,6 +148,8 @@ client.on('messageCreate', async (message) => {
     if (!message.content) return;   //no reason to check an empty message
     if (IS_CANARY) return;          //canary not allowed here
 
+    const content = message.content.toLowerCase()
+
     //randomly interrupt conversation for fun
     const randomInterruptionInt = randomIntInRange(1, 5000)
     if (randomInterruptionInt == 5000) {
