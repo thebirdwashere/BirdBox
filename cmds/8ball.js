@@ -101,7 +101,7 @@ module.exports = {
       'You go first. Then we can compare answers.',
       'I was looking for a moment of silence, but that is gone now, I guess.',
       'Incorrect question! Try again.',
-      'https://www.youtube.com/watch?v=DRSxqfisPGw',
+      'https://youtu.be/82upuKqYkBk?si=rmVmxRKxdBP89CEx',
       'STOP BOTHERING ME I\'M TRYNA SLEEP',
       'bruh that\'s 2 ez, give me a hard one next',
       'You cannot ask now, there are monsters nearby',
