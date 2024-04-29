@@ -1,11 +1,30 @@
-const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
+const { SlashCommandBuilder, EmbedBuilder, ChannelType } = require("discord.js");
 
 module.exports = {
   data: new SlashCommandBuilder()
-   .setName("announce")
-   .setDescription("Announce to another channel. May be disabled depending on server.")
-   .addStringOption(option => option.setName("message").setDescription("The message to announce").setRequired(true))
-   .addChannelOption(option => option.setName("channel").setDescription("The channel to announce in").setRequired(true)),
+    .setName("announce")
+    .setDescription("Announce to another channel. May be disabled depending on server.")
+    .addStringOption(option => 
+      option
+        .setName("message")
+        .setDescription("The message to announce")
+        .setRequired(true)
+    )
+    .addChannelOption(option => 
+      option
+        .setName("channel")
+        .setDescription("The channel to announce in")
+        .setRequired(true)
+        .addChannelTypes(
+          ChannelType.GuildText, 
+          ChannelType.GuildVoice, 
+          ChannelType.GuildAnnouncement, 
+          ChannelType.AnnouncementThread,
+          ChannelType.PublicThread,
+          ChannelType.PrivateThread,
+          ChannelType.GuildStageVoice
+      )
+  ),
   async execute(interaction, { db }) {
     await interaction.deferReply();
 
