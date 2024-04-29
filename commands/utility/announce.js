@@ -28,7 +28,7 @@ module.exports = {
     await interaction.deferReply();
 
     let announce_channel = interaction.options?.getChannel("channel")?.id  //command option
-    ?? await db.get(`settings_announce_channel_${interaction.guildId}`); //OR database default
+    ?? await db.get(`setting_announce_channel_${interaction.guildId}`); //OR database default
 
     if (!announce_channel) {
       interaction.editReply({ content: `announce disable 1`, ephemeral: true});
