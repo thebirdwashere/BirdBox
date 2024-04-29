@@ -14,7 +14,6 @@ module.exports = {
       option
         .setName("channel")
         .setDescription("The channel to announce in")
-        .setRequired(true)
         .addChannelTypes(
           ChannelType.GuildText, 
           ChannelType.GuildVoice, 
@@ -28,10 +27,8 @@ module.exports = {
   async execute(interaction, { db }) {
     await interaction.deferReply();
 
-    const channelId = interaction.options.getChannel("channel").id;
-    await db.set(`settings_announce_channel_${interaction.guildId}`, channelId);
-
-    let announce_channel = await db.get(`settings_announce_channel_${interaction.guildId}`);
+    let announce_channel = interaction.options?.getChannel("channel")?.id  //command option
+    ?? await db.get(`settings_announce_channel_${interaction.guildId}`); //OR database default
 
     if (!announce_channel) {
       interaction.editReply({ content: `announce disable 1`, ephemeral: true});
