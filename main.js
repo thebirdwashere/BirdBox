@@ -162,21 +162,24 @@ client.on(Events.InteractionCreate, async (interaction) => {
 // 				if (key1 == key2) continue;
 						
 // 				await message.channel.send(`Are ${val1.emoji} and ${val2.emoji} similar? y/n `)
-
+				
+// 				let returnedMessage
 // 				await message.channel.awaitMessages({filter, max: 1, time: 600_000,/* ten minute timer */ errors: ['time']}).then(collected => {
-//                 	const returnedMessage = collected.first().content
-
-// 					if (returnedMessage == "y") {
-// 						flagsList[key1].decoys.push(val2.emoji)
-// 					}
+//                 	returnedMessage = collected.first().content
 // 				})
 
-// 				console.log(flagsList)
+// 				if (returnedMessage == "y") {
+// 					flagsList[key1].decoys.push(val2.emoji)
+// 				} else if (returnedMessage == "exit") {
+// 					break;
+// 				}
+
+// 				console.log(JSON.stringify(flagsList, null, 2))
 // 			}
 // 		}
 
 //         console.log("FINAL LIST")
-//         console.log(flagsList)
+// 		console.log(JSON.stringify(flagsList, null, 4))
 //     }
 // })
 
