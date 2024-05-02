@@ -27,29 +27,24 @@ module.exports = {
   async execute(interaction, { db }) {
     await interaction.deferReply();
 
-    let announce_channel = interaction.options?.getChannel("channel")?.id  //command option
-    ?? await db.get(`setting_announce_channel_${interaction.guildId}`); //OR database default
+    let announce_channel = interaction.options?.getChannel("channel")?.id ?? (await db.get(`setting_announce_channel_${interaction.guildId}`) ?? interaction.channelId);
 
     if (!announce_channel) {
-      interaction.editReply({ content: `announce disable 1`, ephemeral: true});
-      return;
+      return interaction.editReply({ content: `announce disable 1`, ephemeral: true});
     }
 
     try {
       const channel = interaction.guild.channels.cache.get(announce_channel);
       if (!channel) {
-        interaction.editReply({ content: `announce disable 2`, ephemeral: true});
-        return;
+        return interaction.editReply({ content: `announce disable 2`, ephemeral: true});
       }
       announce_channel = channel;
     } catch {
-      interaction.editReply({ content: `announce disable 2`, ephemeral: true});
-      return;
+      return interaction.editReply({ content: `announce disable 2`, ephemeral: true});
     }
 
     if (!announce_channel.id) {
-      interaction.editReply({ content: `announce disable 3`, ephemeral: true});
-      return;
+      return interaction.editReply({ content: `announce disable 3`, ephemeral: true});
     }
 
     const announceEmbed = new EmbedBuilder()
