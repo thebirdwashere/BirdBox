@@ -110,7 +110,8 @@
         "To answer that, I'm going to need a permission slip from your doctor. Is that alright?",
         "Inadequate info: please provide your birth certificate, phone number, email, SSN, home address, and favorite ice cream flavor.",
         "Haven't even seen the question yet, but I'm confident the answer is no.",
-        "yesn't"
+        "yesn't",
+        "Don't tell me you're too blind to see."
     ],
     "rps": [
         {
