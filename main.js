@@ -152,16 +152,20 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
 // client.on('messageCreate', async (message) => {
 //     if (message.content === "go go gadget flag matcher") {
-//         const flagsList = require("./utils/json/flags.json").flags
+//         const flagsList = require("./flags_upd.json")
 
 // 		const filter = m => m.author.id == message.author.id //used in message awaits; just doing as stackoverflow guy says
 
+// 		console.log(Object.values(flagsList).length)
+
 // 		for (const [key1, val1] of Object.entries(flagsList)) {
-// 			flagsList[key1].decoys = []
 // 			for (const [key2, val2] of Object.entries(flagsList)) {
+// 				const flagKeys = Object.keys(flagsList)
 // 				if (key1 == key2) continue;
+// 				if (flagsList[key1].decoys.includes(val2.emoji)) continue;
+// 				if (flagKeys.indexOf(key1) > flagKeys.indexOf(key2)) continue;
 						
-// 				await message.channel.send(`Are ${val1.emoji} and ${val2.emoji} similar? y/n `)
+// 				await message.channel.send(`Are ${val1.emoji} (${key1}) and ${val2.emoji} (${key2}) similar? y/n `)
 				
 // 				let returnedMessage
 // 				await message.channel.awaitMessages({filter, max: 1, time: 600_000,/* ten minute timer */ errors: ['time']}).then(collected => {
@@ -170,16 +174,18 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
 // 				if (returnedMessage == "y") {
 // 					flagsList[key1].decoys.push(val2.emoji)
+// 					flagsList[key2].decoys.push(val1.emoji)
 // 				} else if (returnedMessage == "exit") {
 // 					break;
 // 				}
 
-// 				console.log(JSON.stringify(flagsList, null, 2))
+				
+// 				fs.writeFile("./flags_upd.json", JSON.stringify(flagsList, null, 4), (result) => console.log(result))
 // 			}
 // 		}
 
 //         console.log("FINAL LIST")
-// 		console.log(JSON.stringify(flagsList, null, 4))
+// 		fs.writeFile("./flags_upd.json", JSON.stringify(flagsList, null, 4), (result) => console.log(result))
 //     }
 // })
 

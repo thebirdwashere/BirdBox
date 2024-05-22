@@ -66,8 +66,8 @@ module.exports = {
     ),
   async execute(interaction, { client, embedColors, db }) {
     
-        switch (interaction.options.getSubcommand()) { // Switch to handle different subcommands.
-    case 'quiz': {
+    switch (interaction.options.getSubcommand()) { // Switch to handle different subcommands.
+      case 'quiz': {
         const difficulty = difficulties[interaction.options?.getString('difficulty')] ?? difficulties[0]
         const flagsNum = difficulty.flags;
 
