@@ -72,23 +72,26 @@ module.exports = {
         const flagsNum = difficulty.flags;
 
         const countryNames = Object.keys(flags);
-        const countryFlags = Object.values(flags)
-          //.filter((flag) => flag.decoys.length > 0)
-          .map((flag) => flag.emoji);
+        const countryFlags = Object.values(flags).map((flag) => flag.emoji);
 
         const guessFlags = sampleArray(countryFlags, flagsNum);
         const rightFlagEmoji = guessFlags[0];
         const rightFlagCountry = countryNames[countryFlags.indexOf(rightFlagEmoji)];
         const rightFlag = flags[rightFlagCountry];
 
-        //add decoy flags if on hard mode
-        if (difficulty.usesDecoys) {
-          let decoyFlags = rightFlag.decoys;
+        //add decoy flags if decoys in use
+        if (difficulty.decoysAmount) {
+          let decoyFlags = rightFlag.decoys.filter(flag => flag !== rightFlagEmoji);
+          const decoyFlagsAmount = difficulty.decoysAmount;
 
-          for (let i = 0; i < decoyFlags.length; i++) {
-            const chosenDecoy = decoyFlags[Math.floor(Math.random() * decoyFlags.length)]
+          for (let i = 0; i < decoyFlagsAmount; i++) {
+            const chosenDecoy = decoyFlags[Math.floor(Math.random() * decoyFlags.length)];
+
+            if (guessFlags.includes(chosenDecoy)) {
+              i--; console.log(guessFlags, chosenDecoy); continue;
+            };
+
             const chosenPosition = Math.floor(Math.random() * (guessFlags.length - 1)) + 1
-
             guessFlags[chosenPosition] = chosenDecoy;
 
             decoyFlags = decoyFlags.filter((item) => item !== chosenDecoy);

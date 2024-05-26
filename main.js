@@ -83,7 +83,7 @@ vars.commands = commands;
 
 /* ON READY */
 
-client.once('ready', async () => {
+client.once(Events.ClientReady, async () => {
     console.log('BirdBox Unified is now online!');
     console.log(`Logged in as ${client.user.tag}!`);
     console.log('Logs will be shown in this terminal.');
@@ -148,50 +148,9 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
 });
 
-/* TEMP ON MESSAGE CREATION */
-
-// client.on('messageCreate', async (message) => {
-//     if (message.content === "go go gadget flag matcher") {
-//         const flagsList = require("./flags_upd.json")
-
-// 		const filter = m => m.author.id == message.author.id //used in message awaits; just doing as stackoverflow guy says
-
-// 		console.log(Object.values(flagsList).length)
-
-// 		for (const [key1, val1] of Object.entries(flagsList)) {
-// 			for (const [key2, val2] of Object.entries(flagsList)) {
-// 				const flagKeys = Object.keys(flagsList)
-// 				if (key1 == key2) continue;
-// 				if (flagsList[key1].decoys.includes(val2.emoji)) continue;
-// 				if (flagKeys.indexOf(key1) > flagKeys.indexOf(key2)) continue;
-						
-// 				await message.channel.send(`Are ${val1.emoji} (${key1}) and ${val2.emoji} (${key2}) similar? y/n `)
-				
-// 				let returnedMessage
-// 				await message.channel.awaitMessages({filter, max: 1, time: 600_000,/* ten minute timer */ errors: ['time']}).then(collected => {
-//                 	returnedMessage = collected.first().content
-// 				})
-
-// 				if (returnedMessage == "y") {
-// 					flagsList[key1].decoys.push(val2.emoji)
-// 					flagsList[key2].decoys.push(val1.emoji)
-// 				} else if (returnedMessage == "exit") {
-// 					break;
-// 				}
-
-				
-// 				fs.writeFile("./flags_upd.json", JSON.stringify(flagsList, null, 4), (result) => console.log(result))
-// 			}
-// 		}
-
-//         console.log("FINAL LIST")
-// 		fs.writeFile("./flags_upd.json", JSON.stringify(flagsList, null, 4), (result) => console.log(result))
-//     }
-// })
-
 /* ON MESSAGE CREATION */
 
-client.on('messageCreate', async (message) => {
+client.on(Events.MessageCreate, async (message) => {
     if (message.author.id == client.user.id) return;
     if (!message.content) return;
 
@@ -243,7 +202,7 @@ client.on('messageCreate', async (message) => {
 
 /* ON MESSAGE DELETION */
 
-client.on('messageDelete', async (message) => {
+client.on(Events.MessageDelete, async (message) => {
     if (!message.author || !message.createdAt) return; // Don't log broken messages.
 
 	await db.set(`snipe_${message.channelId}`, {
