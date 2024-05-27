@@ -68,6 +68,14 @@ for (const folder of commandFolders) {
 	}
 }
 
+/* COOLDOWN HANDLER */
+
+client.cooldowns = new Collection();
+
+for (const command of client.commands) {
+	client.cooldowns.set(command[0], {})
+}
+
 /* FOR HELP COMMAND */
 
 let commands = Array.from(client.commands.values());
@@ -125,6 +133,23 @@ client.on(Events.InteractionCreate, async (interaction) => {
 			}
 		} else if (command.filter) { return interaction.reply({ content: `The permission levels for this command have been incorrectly configured. Please contact a developer.`, ephemeral: true }); }
 
+		if (typeof(command.cooldown) === "number") {
+			
+			const cooldowns = client.cooldowns.get(command.data.name)
+			const lastUsedTime = cooldowns[interaction.user.id] ?? 0
+			const currentTime = Date.now()
+			const cooldownTime = command.cooldown  ?? 0
+
+			if ((currentTime - lastUsedTime) < cooldownTime) {
+				const timeWhenAvailable = Math.floor((lastUsedTime + cooldownTime) / 1000)
+				return interaction.reply({ content: `You're going too fast! This command will be available <t:${timeWhenAvailable}:R>`, ephemeral: true });
+			} else {
+				cooldowns[interaction.user.id] = currentTime
+				client.cooldowns.set(command, cooldowns)
+			}
+
+		} else if (command.cooldown) { return interaction.reply({ content: `The cooldown for this command has been incorrectly configured. Please contact a developer.`, ephemeral: true }); }
+
 		try { // Attempt to execute the command. If failure occurs, handle accordingly.
 			await command.execute(interaction, vars);
 		} catch (error) {
@@ -177,13 +202,30 @@ client.on(Events.MessageCreate, async (message) => {
 					authorized = authorized.concat(usersWithPermission);
 				});
 	
-				if (authorized.length == 0) return message.reply({ content: `The permission levels for this command are empty or are not valid. Please contact a developer.`, ephemeral: true });
+				if (authorized.length == 0) return message.reply(`The permission levels for this command are empty or are not valid. Please contact a developer.`);
 				if (!authorized.includes(message.author.id)) {
 					const permissionLevelFormatter = new Intl.ListFormat("en", { type: "disjunction" })
 					const permissionLevels = permissionLevelFormatter.format(client.commands.get(command).filter.map(item => `\`${item}\``))
 					return message.reply(`You do not have the required permission level to use this command. This command requires a permisson level of ${permissionLevels}. If you believe this is an error, please contact a developer.`);
 				}
 			} else if (client.commands.get(command).filter) { return message.reply(`The permission levels for this command have been incorrectly configured. Please contact a developer.`); }
+
+			if (typeof(client.commands.get(command).cooldown) === "number") {
+			
+				const cooldowns = client.cooldowns.get(command)
+				const lastUsedTime = cooldowns[message.author.id] ?? 0
+				const currentTime = Date.now()
+				const cooldownTime = client.commands.get(command).cooldown ?? 0
+	
+				if ((currentTime - lastUsedTime) < cooldownTime) {
+					const timeWhenAvailable = Math.floor((lastUsedTime + cooldownTime) / 1000)
+					return message.reply(`You're going too fast! This command will be available <t:${timeWhenAvailable}:R>`);
+				} else {
+					cooldowns[message.author.id] = currentTime
+					client.cooldowns.set(command, cooldowns)
+				}
+	
+			} else if (client.commands.get(command).cooldown) { return message.reply(`The cooldown for this command has been incorrectly configured. Please contact a developer.`); }
 
 			try {
 				vars.prefix = classicPrefix;
@@ -192,6 +234,8 @@ client.on(Events.MessageCreate, async (message) => {
 			} catch (err) {
 				message.reply(`The command \`/${command}\` does not support Classic mode yet.`);
 			}
+
+			console.log(client.cooldowns)
 
 			return;
 		} else {
