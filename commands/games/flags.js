@@ -2,7 +2,7 @@ const { sampleArray, shuffleArray, sleep } = require("../../utils/scripts/util_s
 const { flags, difficulties } = require("../../utils/json/flags.json");
 const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, SKUFlags} = require("discord.js");
 
-module.exports = {
+module.exports = { //MARK: command data
   data: new SlashCommandBuilder()
     .setName("flags")
     .setDescription("Guess some stuff about flags.")
@@ -67,13 +67,16 @@ module.exports = {
   async execute(interaction, { client, embedColors, db }) {
     
     switch (interaction.options.getSubcommand()) { // Switch to handle different subcommands.
-      case 'quiz': {
+      case 'quiz': { //MARK: quiz subcommand
         const difficulty = difficulties[interaction.options?.getString('difficulty')] ?? difficulties[0]
         const flagsNum = difficulty.flags;
-
+        
+        //get all flag names and emojis
         const countryNames = Object.keys(flags);
         const countryFlags = Object.values(flags).map((flag) => flag.emoji);
-
+        
+        //selects random flags and the correct flag
+        //correct flag always first in the list, shuffle later to rectify this
         const guessFlags = sampleArray(countryFlags, flagsNum);
         const rightFlagEmoji = guessFlags[0];
         const rightFlagCountry = countryNames[countryFlags.indexOf(rightFlagEmoji)];
@@ -84,39 +87,48 @@ module.exports = {
           let decoyFlags = rightFlag.decoys.filter(flag => flag !== rightFlagEmoji);
           const decoyFlagsAmount = difficulty.decoysAmount;
 
-          for (let i = 0; i < decoyFlagsAmount; i++) {
+          //starts at 1 so it never overwrites the correct answer
+          for (let i = 1; i <= decoyFlagsAmount; i++) {
             const chosenDecoy = decoyFlags[Math.floor(Math.random() * decoyFlags.length)];
 
+            //ensure this decoy isn't already an option
+            //if it is, redo this step of the loop
             if (guessFlags.includes(chosenDecoy)) {
               i--; console.log(guessFlags, chosenDecoy); continue;
             };
 
-            const chosenPosition = Math.floor(Math.random() * (guessFlags.length - 1)) + 1
-            guessFlags[chosenPosition] = chosenDecoy;
-
+            //set decoy and remove it from the decoy options
+            guessFlags[i] = chosenDecoy;
             decoyFlags = decoyFlags.filter((item) => item !== chosenDecoy);
           }
         }
 
+        //shuffle flags
         const shuffledFlags = shuffleArray(guessFlags);
 
+        //set numbers that display in the embed footer
         let remainingTime = 15;
         let peopleGuessed = 0;
-
+        
+        //create embed
         const flagEmbed = new EmbedBuilder()
           .setTitle(`What is the flag of ${rightFlagCountry}?`)
           .setFooter({text: `${peopleGuessed} guessed ● ${remainingTime} seconds left`})
           .setColor(embedColors.blue);
 
+        //initialize array of rows of buttons
         let buttonRowArray = [];
 
+        //for every flag
         for (let i = 0; i < flagsNum; i++) {
           const buttonRowNum = Math.floor(i / 4);
 
+          //if row not currently created, create it
           if (!buttonRowArray[buttonRowNum]) {
             buttonRowArray[buttonRowNum] = new ActionRowBuilder();
           }
 
+          //add button to row
           buttonRowArray[buttonRowNum].addComponents(
             new ButtonBuilder()
               .setCustomId(shuffledFlags[i])
@@ -125,56 +137,71 @@ module.exports = {
           );
         }
 
+        //send embed
         const response = await interaction.reply({embeds: [flagEmbed], components: buttonRowArray})
 
+        //collect button responses
         const buttonCollector = response.createMessageComponentCollector({
           componentType: ComponentType.Button,
           time: 15000,
         });
 
+        //initialize arrays of correct and wrong users; used for point changes later
         let correctUsers = [];
         let wrongUsers = [interaction.member.id]; //automatically a loser, just in case you don't answer
-
-        buttonCollector.on("collect", async (i) => {
+        
+        buttonCollector.on("collect", async (i) => { //MARK: handle guess
           const userId = i.member.id;
+
+          //if user is correct
           if (i.customId == rightFlagEmoji && !correctUsers.includes(userId)) {
+            //if user previously wrong, take them out of wrong array
             if (wrongUsers.includes(userId)) {
               wrongUsers.splice(wrongUsers.indexOf(userId), 1);
             }
 
+            //add user to correct array
             correctUsers.push(userId);
           }
 
+          //if user is wrong
           if (i.customId != rightFlagEmoji && !wrongUsers.includes(userId)) {
+            //if user previously correct, take them out of correct array
             if (correctUsers.includes(userId)) {
               correctUsers.splice(correctUsers.indexOf(userId), 1);
             }
+
+            //add user to wrong array
             wrongUsers.push(userId);
           }
 
+          //calculate total answerers and display on embed
           peopleGuessed = correctUsers.length + wrongUsers.length;
           flagEmbed.setFooter({text: `${peopleGuessed} guessed ● ${remainingTime} seconds left`})
-
+          
           await response.edit({ embeds: [flagEmbed] });
           i.deferUpdate();
         });
 
-        buttonCollector.on("end", async () => {
+        buttonCollector.on("end", async () => { //MARK: game ended
+          //for every button, disable it and make it red
           buttonRowArray.forEach((row) => {
             row.components.forEach(async (button) => {
               await button.setStyle(ButtonStyle.Danger).setDisabled(true);
             });
           });
 
+          //get index of correct flag and set to green
           const rightFlagIndex = shuffledFlags.indexOf(rightFlagEmoji);
-
           await buttonRowArray[Math.floor(rightFlagIndex / 4)].components[rightFlagIndex % 4].setStyle(ButtonStyle.Success)
 
           await response.edit({embeds: [flagEmbed], components: buttonRowArray})
 
+          //get values of points
           const pointsEarned = difficulty.earned;
           const pointsLost = difficulty.lost;
 
+          //get correct and wrong users as a formatted list (with commas or "and" when necessary)
           const usersFormatter = new Intl.ListFormat("en", {
             type: "conjunction",
           });
@@ -185,42 +212,20 @@ module.exports = {
             wrongUsers.map((userId) => `<@${userId}>`)
           );
 
+          //create reply based on correct and wrong users
           let responseText = "";
-
-          switch (correctUsers.length) {
-            case 0:
-              responseText += `Nobody got it right! \n`;
-              break;
-            case 1:
-              responseText += `${correctUserString} got it right! gg *(+${pointsEarned} points)*\n`;
-              break;
-            case 2:
-              responseText += `${correctUserString} both got it right! gg *(+${pointsEarned} points)*\n`;
-              break;
-            default:
-              responseText += `${correctUserString} all got it right! gg *(+${pointsEarned} points)*\n`;
-              break;
-          }
-          switch (wrongUsers.length) {
-            case 0:
-              responseText += `That means nobody got it wrong... pretty good ig`;
-              break;
-            case 1:
-              responseText += `That means ${wrongUserString} got it wrong, massive L *(-${pointsLost} points)*`;
-              break;
-            case 2:
-              responseText += `That means ${wrongUserString} both got it wrong, massive L *(-${pointsLost} points)*`;
-              break;
-            default:
-              responseText += `That means ${wrongUserString} all got it wrong, massive L *(-${pointsLost} points)*`;
-              break;
-          }
+          responseText += !correctUsers.length ? `Nobody got it right! \n` : `${correctUserString} got it right! gg *(+${pointsEarned} points)*\n`;
+          responseText += !wrongUsers.length ? `That means nobody got it wrong... pretty good ig` : `That means ${wrongUserString} got it wrong, massive L *(-${pointsLost} points)*`;
 
           await interaction.followUp(responseText);
 
+          //MARK: update stats
+
+          //runs on every correct user
           for (const userId of correctUsers) {
             let userStats = await db.get(`flags_stats.flag_quiz.${userId}`);
 
+            //default stats
             if (!userStats)
               userStats = {
                 wins: 0,
@@ -230,20 +235,25 @@ module.exports = {
                 points: 0,
               };
 
+            //simple stat manipulation
             userStats.wins++;
             userStats.current_streak++;
             userStats.points += pointsEarned;
 
+            //set new best streak if needed
             if (userStats.current_streak > userStats.best_streak) {
               userStats.best_streak = userStats.current_streak;
             }
 
+            //enter into db
             await db.set(`flags_stats.flag_quiz.${userId}`, userStats);
           }
 
+          //runs on every wrong user
           for (const userId of wrongUsers) {
             let userStats = await db.get(`flags_stats.flag_quiz.${userId}`);
 
+            //default stats
             if (!userStats)
               userStats = {
                 wins: 0,
@@ -253,6 +263,7 @@ module.exports = {
                 points: 0,
               };
 
+            //simple stat manipulation
             userStats.losses++;
             userStats.current_streak = 0;
             userStats.points -= pointsLost;
@@ -261,10 +272,14 @@ module.exports = {
           }
         });
 
-        while (remainingTime) {
-          await sleep(5000);
+        while (remainingTime) { //MARK: handle timer
+          //sleep for less than a second because of slight timer delay
+          //and it's better to stall on 0 than for the quiz to end early
+          //exact value chosen by vibes based on trial and error
+          await sleep(800); 
 
-          remainingTime -= 5;
+          //subtract time and update on embed
+          remainingTime -= 1;
           flagEmbed.setFooter({text: `${peopleGuessed} guessed ● ${remainingTime} seconds left`})
 
           await response.edit({ embeds: [flagEmbed] });
@@ -272,33 +287,43 @@ module.exports = {
 
         break;
       }
-      case "leaderboard": {
+      case "leaderboard": { //MARK: leaderboard subcommand
         const statisticChoice = interaction.options?.getString("statistic");
 
+        //initialize leaderboard embed
         const leaderboardEmbed = new EmbedBuilder()
           .setColor(embedColors.purple)
           .setFooter({ text: "look at all these amateurs" });
 
+        //get game stats for every player
         const gameStats = await db.get(`flags_stats.flag_quiz`);
 
+        //end execution if no stats found
         if (!gameStats) {
           leaderboardEmbed.setTitle("Flag Quiz");
           leaderboardEmbed.setDescription("huh, looks like there's nothing here");
           return await interaction.reply({ embeds: [leaderboardEmbed] });
         }
-
+        
+        //different stat display functions
+        //note: this is an object and not a switch statement for later access
+        //when selecting via message selector menu
         const statisticDisplays = {
-          points: async () => {
+          points: async () => { //MARK: points board
             leaderboardEmbed.setTitle("Flag Quiz - Most Points");
 
+            //initialize variables
             let pointsLeaderboardArray = [];
             let pointsLeaderboardText = "";
 
+            //add username to each user's stats
             for (const userId of Object.keys(gameStats)) {
               const userInfo = await client.users.fetch(userId);
               const userName = userInfo.username;
 
               gameStats[userId].name = userName;
+              
+              //push to centralized array
               pointsLeaderboardArray.push(gameStats[userId]);
             }
 
@@ -309,27 +334,34 @@ module.exports = {
               else return 0;
             });
 
+            //concat onto a single string
             for (user of pointsLeaderboardArray) {
               pointsLeaderboardText += `${user.name}: **${user.points} points**\n`;
             }
 
+            //add to embed
             leaderboardEmbed.setDescription(pointsLeaderboardText);
           },
-          "win percentage": async () => {
+          "win percentage": async () => { //MARK: win % board
             leaderboardEmbed.setTitle("Flag Quiz - Highest Win Percentage");
 
+            //initialize variables
             let percentLeaderboardArray = [];
             let percentLeaderboardText = "";
 
+            //add username to each user's stats
             for (const userId of Object.keys(gameStats)) {
               const userInfo = await client.users.fetch(userId);
               const userName = userInfo.username;
 
+              //some calculated stats too
               const totalGames = gameStats[userId].wins + gameStats[userId].losses
               const winPercentage = Number(gameStats[userId].wins / totalGames).toLocaleString(undefined,{style: 'percent', minimumFractionDigits:2});
 
               gameStats[userId].name = userName;
               gameStats[userId].win_percent = winPercentage;
+
+              //push to centralized array
               percentLeaderboardArray.push(gameStats[userId]);
             }
 
@@ -340,23 +372,29 @@ module.exports = {
               else return 0;
             });
 
+            //concatenate onto string
             for (user of percentLeaderboardArray) {
               percentLeaderboardText += `${user.name}: **${user.win_percent} of games**\n`;
             }
 
+            //add to embed
             leaderboardEmbed.setDescription(percentLeaderboardText);
           },
-          "best streak": async () => {
+          "best streak": async () => { //MARK: streak board
             leaderboardEmbed.setTitle("Flag Quiz - Longest Win Streak");
 
+            //initialize variables
             let streakLeaderboardArray = [];
             let streakLeaderboardText = "";
 
+            //add username to each user's stats
             for (const userId of Object.keys(gameStats)) {
               const userInfo = await client.users.fetch(userId);
               const userName = userInfo.username;
 
               gameStats[userId].name = userName;
+
+              //push to centralized array
               streakLeaderboardArray.push(gameStats[userId]);
             }
 
@@ -367,6 +405,7 @@ module.exports = {
               else return 0;
             });
 
+            //concatenate to string, with appropriate plurals
             for (user of streakLeaderboardArray) {
               if (user.best_streak == 1) {
                 streakLeaderboardText += `${user.name}: **${user.best_streak} game**\n`;
@@ -375,15 +414,18 @@ module.exports = {
               }
             }
 
+            //add to embed
             leaderboardEmbed.setDescription(streakLeaderboardText);
-          },
+          }
         };
 
+        //execute correct statistic display
         await statisticDisplays[statisticChoice]();
-
-        const statSelector = new StringSelectMenuBuilder()
-          .setCustomId("statSelector")
-          .setPlaceholder("Select statistic...")
+        
+        //MARK: create board selector
+        const boardSelector = new StringSelectMenuBuilder()
+          .setCustomId("boardSelector")
+          .setPlaceholder("Select leaderboard statistic...")
           .addOptions([
             new StringSelectMenuOptionBuilder()
               .setLabel("points")
@@ -396,7 +438,8 @@ module.exports = {
               .setValue("best streak"),
           ]);
 
-        const selectorRow = new ActionRowBuilder().addComponents(statSelector);
+        //boilerplate for sending the message
+        const selectorRow = new ActionRowBuilder().addComponents(boardSelector);
 
         const response = await interaction.reply({ embeds: [leaderboardEmbed], components: [selectorRow] });
 
@@ -406,16 +449,16 @@ module.exports = {
         });
 
         menuCollector.on("collect", async (i) => {
+          //update for new statistic
           const newStatisticChoice = i.values[0];
-
           await statisticDisplays[newStatisticChoice]();
 
+          //update message
           await response.edit({ embeds: [leaderboardEmbed] });
-
           await i.deferUpdate();
         });
 
-        menuCollector.on("end", async (i) => {
+        menuCollector.on("end", async () => {
           //disable the selector
           selectorRow.components[0].setDisabled(true);
           response.edit({ components: [selectorRow] });
@@ -423,25 +466,29 @@ module.exports = {
 
         break;
       }
-
-      case "stats": {
+      case "stats": { //MARK: stats subcommand
         const userChoice = interaction.options?.getUser("user") ?? interaction.member.user;
 
+        //get stats of a specific user
         let userStats = await db.get(`flags_stats.flag_quiz.${userChoice?.id}`);
 
+        //initialize embed
         const statsEmbed = new EmbedBuilder()
           .setColor(embedColors.purple)
           .setThumbnail(userChoice.avatarURL())
           .setFooter({ text: "look at this sweaty nerd" });
 
+        //end execution if no stats found
         if (!userStats) {
           statsEmbed.setTitle("Flag Quiz");
           statsEmbed.setDescription("huh, looks like there's nothing here");
           return await interaction.reply({ embeds: [statsEmbed] });
         }
 
+        //title with user name
         statsEmbed.setTitle(`Stats for ${userChoice.username}`);
 
+        //add stats
         statsEmbed.addFields(
           {
             name: "Wins",
