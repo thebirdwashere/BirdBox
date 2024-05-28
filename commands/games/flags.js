@@ -1,6 +1,6 @@
 const { sampleArray, shuffleArray, sleep } = require("../../utils/scripts/util_scripts.js");
 const { flags, difficulties } = require("../../utils/json/flags.json");
-const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, SKUFlags} = require("discord.js");
+const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, StringSelectMenuBuilder, StringSelectMenuOptionBuilder} = require("discord.js");
 
 module.exports = { //MARK: command data
   data: new SlashCommandBuilder()
