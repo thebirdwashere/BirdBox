@@ -228,7 +228,7 @@ module.exports = { //MARK: command data
 
                 //win/loss detection
                 const userHasWon = letterColors.every(char => char === "🟩");
-                const userHasLost = (numberOfGuesses == 6);
+                const userHasLost = (!userHasWon && numberOfGuesses == 6);
 
                 if (userHasWon || userHasLost) { //MARK: game ended
                     //remove empty fields
