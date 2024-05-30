@@ -138,9 +138,11 @@ client.on(Events.InteractionCreate, async (interaction) => {
 			const cooldowns = client.cooldowns.get(command.data.name)
 			const lastUsedTime = cooldowns[interaction.user.id] ?? 0
 			const currentTime = Date.now()
-			const cooldownTime = command.cooldown  ?? 0
+			const cooldownTime = command.cooldown ?? 0
 
-			if ((currentTime - lastUsedTime) < cooldownTime) {
+			const userIsAdmin = vars.admins.map(user => user.userId).includes(interaction.user.id)
+
+			if (((currentTime - lastUsedTime) < cooldownTime) && !userIsAdmin) {
 				const timeWhenAvailable = Math.floor((lastUsedTime + cooldownTime) / 1000)
 				return interaction.reply({ content: `You're going too fast! This command will be available <t:${timeWhenAvailable}:R>`, ephemeral: true });
 			} else {
