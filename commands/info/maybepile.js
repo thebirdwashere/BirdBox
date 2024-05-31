@@ -115,7 +115,7 @@ module.exports = { //MARK: command data
 
         switch (interaction.options.getSubcommand()) { // Switch to handle different subcommands.
             case 'view': { //MARK: view subcommand
-                const pageNum = interaction.options?.getString('page')[0] ?? 0
+                let pageNum = interaction.options?.getString('page')[0] ?? 0
                 console.log(pageNum)
 
                 if (pageNum == 0) { //table of contents
@@ -139,31 +139,91 @@ module.exports = { //MARK: command data
 
                 } else { //specific item
 
-                    const chosenItem = maybeArray[pageNum]
+                    let chosenItem = maybeArray[pageNum]
 
-                    const suggestedStatus = `Suggested by ${chosenItem.suggester}`
-                    let claimStatus = "Claimed by WILL ADD LATER"
-
-                    if (chosenItem.claim?.text == "claimed") {
-                        claimStatus = `Claimed by ${chosenItem.claim?.claimer}`
-                    } else if (chosenItem.claim?.text == "in development") {
-                        claimStatus = `In development by ${chosenItem.claim?.claimer}`
-                    } else if (chosenItem.claim?.text == "deprioritized") {
-                        claimStatus = `Deprioritized`
-                    } else {
-                        claimStatus = `Unclaimed`
+                    function generateItemEmbed(item) {
+                        const suggestedStatus = `Suggested by ${item.suggester}`
+                        let claimStatus = "Claimed by WILL ADD LATER"
+    
+                        if (item.claim?.text == "claimed") {
+                            claimStatus = `Claimed by ${item.claim?.claimer}`
+                        } else if (item.claim?.text == "in development") {
+                            claimStatus = `In development by ${item.claim?.claimer}`
+                        } else if (item.claim?.text == "deprioritized") {
+                            claimStatus = `Deprioritized`
+                        } else {
+                            claimStatus = `Unclaimed`
+                        }
+    
+                        const itemEmbed = new EmbedBuilder()
+                            .setColor(embedColors.purple)
+                            .setTitle("The Maybe Pile")
+                            .setDescription('Take a look at and suggest potential features!')
+                            .addFields({name: item.title, value: item.description})
+                            .setAuthor({ name: 'BirdBox', iconURL: 'https://cdn.discordapp.com/avatars/803811104953466880/5bce4f0ba438015ec65f5b9cac11c8e3.webp'})
+                            .setFooter({text: `Page ${pageNum} ● ${suggestedStatus} ● ${claimStatus}`})
+                        
+                        return itemEmbed
                     }
 
-                    const itemEmbed = new EmbedBuilder()
-                        .setColor(embedColors.purple)
-                        .setTitle("The Maybe Pile")
-                        .setDescription('Take a look at and suggest potential features!')
-                        .addFields({name: chosenItem.title, value: chosenItem.description})
-                        .setAuthor({ name: 'BirdBox', iconURL: 'https://cdn.discordapp.com/avatars/803811104953466880/5bce4f0ba438015ec65f5b9cac11c8e3.webp'})
-                        .setFooter({text: `Page ${pageNum} ● ${suggestedStatus} ● ${claimStatus}`})
+                    const leftButton = new ButtonBuilder()
+                        .setStyle(ButtonStyle.Primary)
+                        .setCustomId("maybepile-left")
+                        .setLabel("🡨")
+                    const rightButton = new ButtonBuilder()
+                        .setStyle(ButtonStyle.Primary)
+                        .setCustomId("maybepile-right")
+                        .setLabel("🡪")
+                    const buttonRow = new ActionRowBuilder()
+                        .addComponents(leftButton, rightButton)
                     
-                    await interaction.reply({embeds: [itemEmbed]});
+                    if (pageNum == 1) {
+                        buttonRow.components[0].setDisabled(true)
+                    }
 
+                    console.log("yep its running")
+                    
+                    const response = await interaction.reply({embeds: [generateItemEmbed(chosenItem)], components: [buttonRow]});
+
+                    const buttonCollector = response.createMessageComponentCollector({
+                        componentType: ComponentType.Button,
+                        time: 15000,
+                    });
+                    
+                    buttonCollector.on("collect", async (i) => {
+                        const customId = i.customId
+                        if (customId == "maybepile-left") {
+                            pageNum--
+                        } else if (customId == "maybepile-right") {
+                            pageNum++
+                        } else { //huh what
+                            await response.edit({content: "what did you just press. how did this happen."})
+                        }
+
+                        chosenItem = maybeArray[pageNum]
+
+                            if (pageNum == 1) {
+                                buttonRow.components[0].setDisabled(true)
+                            } else {
+                                buttonRow.components[0].setDisabled(false)
+                            }
+
+                            if (pageNum == maybeArray.length - 1) {
+                                buttonRow.components[1].setDisabled(true)
+                            } else {
+                                buttonRow.components[1].setDisabled(false)
+                            }
+
+                            await response.edit({embeds: [generateItemEmbed(chosenItem)], components: [buttonRow]})
+
+                        await i.deferUpdate()
+                    })
+
+                    buttonCollector.on("end", async () => {
+                        //disable the buttons
+                        buttonRow.components.forEach(item => item.setDisabled(true))
+                        await response.edit({ components: [buttonRow] })
+                    });
                 }
 
                 break;
