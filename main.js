@@ -3,8 +3,8 @@
  *      thebirdwashere       *
  *      agentnebulator       *
  *          bislij           *
- *                           *
- * Last Modified: 03/02/2024 */
+ *         umadkek?          *
+ * Last Modified: 08/01/2024 */
 
 /* Requires the file with the Discord Bot Token. If you have cloned this repo, it will not have the file, so add a file named ".env" and put DISCORD_TOKEN=yourbottokennumberhere inside of it. */
 require('dotenv').config();
@@ -22,7 +22,7 @@ const db = new QuickDB();
 const classicPrefix = 'd;';
 const defaults = require('./utils/json/defaults.json');
 const devs = require('./utils/json/devs.json');
-const tests = require("./utils/scripts/message_tests.js");
+const messageTests = require("./utils/scripts/message_tests.js");
 
 /* VARS PASSED TO COMMANDS */
 
@@ -180,6 +180,12 @@ client.on(Events.InteractionCreate, async (interaction) => {
 client.on(Events.MessageCreate, async (message) => {
     if (message.author.id == client.user.id) return;
     if (!message.content) return;
+	
+	for (const [_, test] of Object.entries(messageTests)) {
+		const testResult = await test.check({message, db})
+
+		console.log(testResult)
+	}
 
 	if (message.content.startsWith(classicPrefix)) {
 		
