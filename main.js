@@ -38,8 +38,9 @@ let vars = {
 		yellow: 0xFFE600,
 		white: 0xFFFFFF,
 		purple: 0x900099
-	}
+	},
 	//TODO: Add config option for setting color in database
+	Discord: Discord
 };
 
 module.exports = { vars: vars };
@@ -183,8 +184,9 @@ client.on(Events.MessageCreate, async (message) => {
 	
 	for (const [_, test] of Object.entries(messageTests)) {
 		const testResult = await test.check({message, db})
-
-		console.log(testResult)
+		if (testResult) {
+			await test.respond({message, vars, testResult})
+		}
 	}
 
 	if (message.content.startsWith(classicPrefix)) {
@@ -250,6 +252,16 @@ client.on(Events.MessageCreate, async (message) => {
 			message.reply(`The command \`${classicPrefix}${command}\` was not found.`);
 		};
 	}
+
+	const jinxDetectionEnabled = true
+
+	if (jinxDetectionEnabled) {
+        await db.set(`jinx_${message.channelId}`, { 
+            content: message.content, //for jinx detection
+            author: message.author.id,
+            timestamp: message.createdTimestamp
+        })
+    };
 });
 
 /* ON MESSAGE DELETION */
