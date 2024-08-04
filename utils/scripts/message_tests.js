@@ -1,46 +1,48 @@
 const { EmbedBuilder } = require("discord.js")
 const footers = require("../json/footers.json")
+const { messages, lyrics } = require("../json/messages.json")
 
 module.exports = {
     keywords: {
-        check: async ({message, db}) => { //function for message/lyric responses
-            const messageArray = await db.get("messages")
-            const lyricArray = await db.get("lyrics")
-            const guild = message.guildId
+        check: async ({message}) => { //function for message/lyric responses
+            const filterRegex = /[^A-Za-z\s!?]/g
+            const content = message.content.toLowerCase().replace(filterRegex,'').trim();
 
-            let val = undefined
-            content = message.content.toLowerCase().replace(/[^\w\s]/gi, "");
+            const messagesMap = new Map([...new Map(Object.entries(messages))].sort((a, b) => a[1].length - b[1].length));
 
-            if(messageArray) {
-                for (const key in messageArray) {
-                    const regex = new RegExp(`(?:^|\\s)${key.toLowerCase()}(?:\\s|$)`); //chatgpt promised this would work, and it did, somehow
-                    if (regex.test(content) && (!val || key.length > val.length)) {
-                        val = messageArray[key]
-                    }
+            for (let [key, val] of messagesMap) {
+                if (content.includes(key)) {
+                    return val;
                 }
             }
-            if(lyricArray) {
-                let expected = await db.get(`lyric_${guild}`);
-                if (expected && content.includes(expected[0]) && lyricArray[expected[1]].content[expected[2] + 1]) {
-                    await db.set(`lyric_${guild}`, [lyricArray[expected[1]].content[expected[2] + 2], expected[1], expected[2] + 2]); //does not run when used as true/false test, cause it broke stuff
-                    return lyricArray[expected[1]].content[expected[2] + 1];
-                }
-                for (let i = 0; i < lyricArray.length; i++) {
-                    for (let j = lyricArray[i].content.length - 1; j--;) {
-                        if (content.includes(lyricArray[i].content[j].toLowerCase()) /*&& (!val || lyricArray[i].content[j].length >= val.length)*/) {
-                            val = lyricArray[i].content[j + 1]
-                            await db.set(`lyric_${guild}`, [lyricArray[i].content[j + 2], i, j + 2]);
-                        }
-                    }
+
+            const flattenedLyrics = lyrics.reduce((a, b) => a.concat(b));
+            const previousMessages = await message.channel.messages.fetch({limit:2});
+            const lastMessage = previousMessages.last();
+
+            if (flattenedLyrics.includes(lastMessage.content)) {
+                const previousLyricIndex = flattenedLyrics.indexOf(lastMessage.content);
+                if (message.content == flattenedLyrics[previousLyricIndex + 1].replace(filterRegex,'').trim()) {
+                    return flattenedLyrics[previousLyricIndex + 2];
                 }
             }
-            return val;
+
+            let decidedLyric = "";
+            for (const song of lyrics) { for (const lyric of song) {
+                if (content.endsWith(lyric.replace(filterRegex,'').trim())) {
+                    if (lyric.length >= decidedLyric?.length) {
+                        const lyricIndex = song.indexOf(lyric);
+                        decidedLyric = song[lyricIndex + 1];
+                    }
+                }
+            }}
+
+            return decidedLyric
         },
         respond: async ({message, testResult}) => {
             await message.reply(testResult)
         }
     },
-   
     alphabetical: {
         check: ({message}) => { //alphabetical order checker
             const content = message.content.toLowerCase()
@@ -50,6 +52,7 @@ module.exports = {
 
             const splitContent = content.split(" ").filter(word => word !== "")
 
+            if (splitContent.length < 5) return;
             if (splitContent.some(word => word.startsWith(":"))) return;
             if (splitContent.every( (val, i, arr) => val === arr[0] )) return;
             if ((new Set(splitContent)).size !== splitContent.length) return;
