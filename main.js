@@ -183,7 +183,7 @@ client.on(Events.MessageCreate, async (message) => {
     if (!message.content) return;
 	
 	for (const [_, test] of Object.entries(messageTests)) {
-		const testResult = await test.check({message, db})
+		const testResult = await test.check({message, vars})
 		if (testResult) {
 			await test.respond({message, vars, testResult})
 		}
@@ -252,16 +252,6 @@ client.on(Events.MessageCreate, async (message) => {
 			message.reply(`The command \`${classicPrefix}${command}\` was not found.`);
 		};
 	}
-
-	const jinxDetectionEnabled = true
-
-	if (jinxDetectionEnabled) {
-        await db.set(`jinx_${message.channelId}`, { 
-            content: message.content, //for jinx detection
-            author: message.author.id,
-            timestamp: message.createdTimestamp
-        })
-    };
 });
 
 /* ON MESSAGE DELETION */

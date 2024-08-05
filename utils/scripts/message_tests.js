@@ -1,6 +1,6 @@
 const { EmbedBuilder } = require("discord.js")
 const footers = require("../json/footers.json")
-const { messages, lyrics } = require("../json/messages.json")
+const { messages, lyrics, interruptions, pings, mentions } = require("../json/messages.json")
 
 module.exports = {
     keywords: {
@@ -40,7 +40,7 @@ module.exports = {
             return decidedLyric
         },
         respond: async ({message, testResult}) => {
-            await message.reply(testResult)
+            await message.reply(testResult).catch(e => console.error(e));
         }
     },
     alphabetical: {
@@ -98,28 +98,6 @@ module.exports = {
         
                 await notifchannel.send({content: ping, embeds: [newEmbed]}).catch(e => console.error(e)); //only send notif if there is a log channel
             }
-        }
-    },
-    jinx: {
-        check: async ({message, db}) => { //jinx checker
-            const jinx = await db.get(`jinx_${message.channelId}`)
-            if (!jinx) return;
-
-            const jinxMsWindow = 2000
-
-            //the required tests
-            const jinxCreatedCloseTogether = Math.abs(jinx.timestamp - message.createdTimestamp) <= jinxMsWindow
-            const contentIsIdentical = jinx.content == message.content
-            const jinxFromDifferentPeople = jinx.author.id !== message.author.id
-
-            //only pass if all true
-            if (jinxCreatedCloseTogether && contentIsIdentical && jinxFromDifferentPeople) {
-                return jinx
-            } else return;
-            
-        },
-        respond: async ({message, testResult}) => {
-            await message.channel.send(testResult).catch(e => console.error(e));
         }
     },
     periodictable: {
@@ -207,6 +185,70 @@ module.exports = {
         
                 await notifchannel.send({content: ping, embeds: [newEmbed]}).catch(e => console.error(e)); //only send notif if there is a log channel
             }
+        }
+    },
+    jinx: {
+        check: async ({message}) => { //jinx checker
+            const previousMessages = await message.channel.messages.fetch({limit:2});
+            const lastMessage = previousMessages.last();
+
+            const jinxMsWindow = 2000
+
+            //the required tests
+            const jinxCreatedCloseTogether = Math.abs(lastMessage.createdTimestamp - message.createdTimestamp) <= jinxMsWindow
+            const contentIsIdentical = lastMessage.content == message.content
+            const jinxFromDifferentPeople = lastMessage.author.id !== message.author.id
+
+            //only pass if all true
+            if (jinxCreatedCloseTogether && contentIsIdentical && jinxFromDifferentPeople) {
+                return lastMessage.content
+            } else return;
+            
+        },
+        respond: async ({message, testResult}) => {
+            await message.channel.send(testResult).catch(e => console.error(e));
+        }
+    },
+    interrupting: {
+        check: async ({message}) => { //entirely random responses
+            const chanceOfInterrupting = 1000
+            const randomInt = Math.floor(Math.random() * chanceOfInterrupting) + 1
+
+            if (randomInt == chanceOfInterrupting) {
+                const randomInterruption = interruptions[Math.floor(Math.random() * interruptions.length)]
+                return randomInterruption
+            }
+        },
+        respond: async ({message, testResult}) => {
+            await message.channel.send(testResult).catch(e => console.error(e));
+        },
+    },
+    ping: {
+        check: async ({message, vars}) => { //birdbox responding to pings
+            const clientId = vars.client.user.id
+            if (message.content.includes(`<@${clientId}>`)) {
+                const randomReply = ping[Math.floor(Math.random() * pings.length)]
+                return randomReply
+            }
+        },
+        respond: async ({message, testResult}) => {
+            await message.channel.send(testResult).catch(e => console.error(e));
+        }
+    },
+    mentions: {
+        check: async ({message}) => { //birdbox responding to pings
+            for (const mentionType of mentions) {
+                const mentionTriggers = mentionType[0]
+                const mentionReplies = mentionType[1]
+
+                if (mentionTriggers.some(trigger => message.content.includes(trigger))) {
+                    const randomReply = mentionReplies[Math.floor(Math.random() * mentionReplies.length)]
+                    return randomReply
+                }
+            }
+        },
+        respond: async ({message, testResult}) => {
+            await message.reply(testResult).catch(e => console.error(e));
         }
     }
 }
