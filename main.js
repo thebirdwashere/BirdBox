@@ -83,9 +83,9 @@ let commands = Array.from(client.commands.values());
 commands = commands.filter((item) => { if (item.data.options) return item; });
 
 commands.sort((a, b) => { // Put commands in alphabetical order.
-	if (a.data.name < b.data.name) { return -1 }
-	else if (a.data.name > b.data.name) { return 1 }
-	else { return 0 }
+	if (a.data.name < b.data.name) return -1 
+	else if (a.data.name > b.data.name) return 1 
+	else return 0
 });
 
 vars.commands = commands;
@@ -181,13 +181,6 @@ client.on(Events.InteractionCreate, async (interaction) => {
 client.on(Events.MessageCreate, async (message) => {
     if (message.author.id == client.user.id) return;
     if (!message.content) return;
-	
-	for (const [_, test] of Object.entries(messageTests)) {
-		const testResult = await test.check({message, vars})
-		if (testResult) {
-			await test.respond({message, vars, testResult})
-		}
-	}
 
 	if (message.content.startsWith(classicPrefix)) {
 		
@@ -251,6 +244,15 @@ client.on(Events.MessageCreate, async (message) => {
 		} else {
 			message.reply(`The command \`${classicPrefix}${command}\` was not found.`);
 		};
+		
+		return;
+	}
+
+	for (const [_, test] of Object.entries(messageTests)) {
+		const testResult = await test.check({message, vars})
+		if (testResult) {
+			await test.respond({message, vars, testResult})
+		}
 	}
 });
 
