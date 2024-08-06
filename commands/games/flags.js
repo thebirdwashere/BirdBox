@@ -2,7 +2,7 @@ const { sampleArray, shuffleArray, sleep } = require("../../utils/scripts/util_s
 const { flags, difficulties } = require("../../utils/json/flags.json");
 const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, StringSelectMenuBuilder, StringSelectMenuOptionBuilder} = require("discord.js");
 
-module.exports = { //MARK: command data
+module.exports = { //MARK: COMMAND DATA
   data: new SlashCommandBuilder()
     .setName("flags")
     .setDescription("Guess some stuff about flags.")
@@ -64,6 +64,9 @@ module.exports = { //MARK: command data
             .setDescription("The person to view stats of")
         )
     ),
+  
+  //MARK: MODERN MODE
+  
   async execute(interaction, { client, embedColors, db }) {
     
     switch (interaction.options.getSubcommand()) { // Switch to handle different subcommands.
@@ -524,14 +527,17 @@ module.exports = { //MARK: command data
           }
         );
         await interaction.reply({ embeds: [statsEmbed] });
-        break;
+        break; 
       }
     }
   },
-  async executeClassic({message, args}, { client, embedColors, db }) {
+
+  //MARK: CLASSIC MODE
+  
+  async executeClassic({message, args}, { client, embedColors, db }) { 
 
     switch (args[0]) { // Switch to handle different subcommands.
-      case 'quiz': {
+      case 'quiz': { //MARK: quiz subcommand
         const difficultyOptions = difficulties.map(difficulty => difficulty.name.toLowerCase()).reduce((acc, current, i) => {
           acc[current] = i;
           return acc;
@@ -764,7 +770,7 @@ module.exports = { //MARK: command data
 
         break;
       }
-      case "leaderboard": { //MARK: leaderboard subcommand
+      case "leaderboard": { //MARK: board subcommand
         const statisticChoice = args[0].toLowerCase()
         if (!["points", "win%", "streak"].includes(statisticChoice)) {
           return await message.reply(`idk what stat ${statisticChoice} is lol \ni can show you points, win%, or streak`)

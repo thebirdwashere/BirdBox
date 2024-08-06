@@ -5,7 +5,7 @@ const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, Butt
 //variable used for storing active wordle games
 let wordleSessions = {};
 
-module.exports = { //MARK: command data
+module.exports = { //MARK: COMMAND DATA
     data: new SlashCommandBuilder()
 		.setName('wordle')
 		.setDescription('Play the iconic daily game anytime on BirdBox!')
@@ -17,12 +17,6 @@ module.exports = { //MARK: command data
                     option
                         .setName('code')
                         .setDescription('Use a code from a friend to start the game with a specific word.')
-                )
-                .addStringOption(option =>
-                    option
-                        .setName('guess')
-                        .setDescription('Make your first guess without wasting time running two commands.')
-                        .setAutocomplete(true)
                 )
                 .addStringOption(option =>
                     option
@@ -73,7 +67,7 @@ module.exports = { //MARK: command data
                         .setRequired(true)
                 )
         ),
-    async autocomplete(interaction) { //MARK: autocomplete
+    async autocomplete(interaction) { //MARK: AUTOCOMPLETE
         const focusedOption = interaction.options.getFocused(true);
         const guessedWord = focusedOption.value.toLowerCase();
         
@@ -102,11 +96,14 @@ module.exports = { //MARK: command data
         await interaction.respond([{name: responseText, value: responseText}]);
 
     },
+
+    //MARK: MODERN MODE
+
     async execute(interaction, {embedColors, client, db}) {
+
         switch (interaction.options.getSubcommand()) { // Switch to handle different subcommands.
             case 'start': { //MARK: start subcommand
                 const code = interaction.options?.getString('code');
-                const guess = interaction.options?.getString('guess')?.toLowerCase();
                 const moreSolutions = interaction.options?.getString('solutions') ?? 'wordle';
 
                 //do some checking that the code is valid
@@ -118,17 +115,6 @@ module.exports = { //MARK: command data
                 //get the solution and its code form
                 const solutionWord = code ? decryptWordCode(code) : randomMsg(moreSolutions);
                 const encryptedSolution = encryptWordCode(solutionWord);
-
-                //get whether the guess is invalid or correct
-                //note: autocomplete does NOT make invalid checks redundant if you're quick about it
-                const guessInvalid = !guesses.includes(guess) && !extras.includes(guess);
-                const guessCorrect = (guess == solutionWord);
-
-                //check if the guess is invalid, and if it is invalid, that it's not also correct
-                //(as stated above, seemingly invalid guesses can be correct with custom codes)
-                if (guess && guessInvalid && !guessCorrect) {
-                    return interaction.reply({content: `bruh "${guess}" is definitely not a word, try again`, ephemeral: true});
-                }
 
                 //initalize the number of guesses thus far
                 let numberOfGuesses = 0;
@@ -143,12 +129,6 @@ module.exports = { //MARK: command data
                     {boxes: emptyBoxRow, word: ""},
                     {boxes: emptyBoxRow, word: ""}
                 ]
-
-                
-                if (guess) { //get the guess results and increment guess count
-                    gameFields[0] = {boxes: getLetterColors(solutionWord, guess), word: guess.toUpperCase()};
-                    numberOfGuesses++;
-                }
 
                 //create embed
                 const wordleEmbed = createWordleEmbed(embedColors, numberOfGuesses, encryptedSolution, gameFields);
@@ -557,13 +537,457 @@ module.exports = { //MARK: command data
                 break;
             }
         }
+    },
+
+    //MARK: CLASSIC MODE
+
+    async executeClassic({message, args}, {embedColors, client, db}) {
+        
+        switch (args[0]) { // Switch to handle different subcommands.
+            case 'start': { //MARK: start subcommand
+                const code = args[1]
+                const moreSolutions = {"curated":"wordle","all":"wordle all"}[code]
+
+                //do some checking that the code is valid
+                const codeRegex = /^[0-9A-F]{10}$/i;
+                if (code && !codeRegex.test(code) && !moreSolutions) {
+                        return await message.reply(`idk what ${code} is lol \nyou can put in "curated", "all", or a custom answer code for starting`)
+                }
+
+                //get the solution and its code form
+                const solutionWord = codeRegex.test(code) ? decryptWordCode(code) : randomMsg(moreSolutions);
+                const encryptedSolution = encryptWordCode(solutionWord);
+
+                //initalize the number of guesses thus far
+                let numberOfGuesses = 0;
+
+                //create the wordle box data
+                const emptyBoxRow = ["🔲", "🔲", "🔲", "🔲", "🔲"];
+                const gameFields = [
+                    {boxes: emptyBoxRow, word: ""},
+                    {boxes: emptyBoxRow, word: ""},
+                    {boxes: emptyBoxRow, word: ""},
+                    {boxes: emptyBoxRow, word: ""},
+                    {boxes: emptyBoxRow, word: ""},
+                    {boxes: emptyBoxRow, word: ""}
+                ]
+
+                //create embed
+                const wordleEmbed = createWordleEmbed(embedColors, numberOfGuesses, encryptedSolution, gameFields);
+
+                //create button to see used letters thus far
+                const usedLettersButton = new ButtonBuilder()
+                    .setCustomId("wordle-used-letters")
+                    .setLabel("See Used Letters")
+                    .setStyle(ButtonStyle.Secondary);
+        
+                const wordleActionRow = new ActionRowBuilder()
+                    .addComponents(usedLettersButton);
+                
+                //send message
+                const response = await message.reply({embeds: [wordleEmbed], components: [wordleActionRow]});
+
+                const buttonCollector = response.createMessageComponentCollector({ componentType: ComponentType.Button, time: 600000 });
+
+                buttonCollector.on('collect', async i => {
+                    //get used letters and display it
+                    const keyboardString = handleUsedLettersDisplay(gameFields);
+            
+                    await i.reply({content: keyboardString, emphemeral: true});
+                })
+            
+                buttonCollector.on('end', async () => {
+                    //disable the button
+                    wordleActionRow.components[0].setDisabled(true);
+                    await response.edit({ components: [wordleActionRow] });
+                })
+
+                //set wordle data in the variable
+                wordleSessions[message.author.id] = {
+                    solution: solutionWord, 
+                    guesses: numberOfGuesses,
+                    fields: gameFields,
+                    usedCode: !!code //this is somehow the recommended way to convert to a bool lol
+                };
+
+                break;
+            }
+            case 'guess': {//MARK: guess subcommand
+                const currentSession = wordleSessions[message.author.id];
+
+                if (!currentSession) {
+                    return message.reply(`how bout you start a game before trying to guess lol`);
+                }
+                
+                //get guess and set to lower case
+                const guess = args[1].toLowerCase();
+                if (!guess) return await message.reply(`consider actually guessing a word lol`)
+
+                //get useful variables from current session
+                const solutionWord = currentSession.solution;
+                const gameFields = currentSession.fields;
+                const numberOfGuesses = currentSession.guesses + 1; //increment because you just guessed
+
+                //get whether the guess is invalid or correct
+                const guessInvalid = !guesses.includes(guess) && !extras.includes(guess);
+                const guessCorrect = (guess == solutionWord);
+
+                //check if the guess is invalid, and if it is invalid, that it's not also correct
+                if (guessInvalid && !guessCorrect) {
+                    return message.reply(`bruh ${guess} is definitely not a word, try again`);
+                }
+
+                //get box colors for new guess and set them
+                const letterColors = getLetterColors(solutionWord, guess);
+                gameFields[numberOfGuesses - 1] = {boxes: letterColors, word: guess.toUpperCase()};
+
+                //get solution code for display
+                const encryptedSolution = encryptWordCode(solutionWord);
+
+                //create embed
+                const wordleEmbed = createWordleEmbed(embedColors, numberOfGuesses, encryptedSolution, gameFields);
+
+                //win/loss detection
+                const userHasWon = letterColors.every(char => char === "🟩");
+                const userHasLost = (!userHasWon && numberOfGuesses == 6);
+
+                if (userHasWon || userHasLost) { //MARK: game ended
+                    //remove empty fields
+                    let updatedGameFields = [];
+                    for (let i = 0; i < gameFields.length; i++) {
+                        if (!gameFields[i].boxes.every(char => char === "🔲")) {
+                            updatedGameFields[i] = gameFields[i];
+                        }
+                    }
+
+                    //add a button to copy game results
+                    const copyResultsButton = new ButtonBuilder()
+                        .setCustomId("wordle-copy-results")
+                        .setLabel("Copy Results")
+                        .setStyle(ButtonStyle.Success);
+                    
+                    const wordleActionRow = new ActionRowBuilder()
+                        .addComponents(copyResultsButton);
+
+                    //reply to message
+                    const response = await message.reply({embeds: [wordleEmbed], components: [wordleActionRow]});
+                    if (userHasLost) {
+                        await response.reply({content: `bruh it was ${solutionWord.toLowerCase()} how did you not get that`})
+                    }
+
+                    const buttonCollector = response.createMessageComponentCollector({ componentType: ComponentType.Button, time: 600000 });
+
+                    buttonCollector.on('collect', async i => {
+                        //create string of wordle results (looks weird but is fine in output)
+                        const resultsString = `\`\`\`\nBirdBox Wordle \nCode: ${encryptedSolution}\n${updatedGameFields.map(field => field?.boxes.join("")).join("\n")}\n\`\`\``;
+
+                        //create embed for it
+                        const resultsEmbed = new EmbedBuilder()
+                            .setTitle("Results")
+                            .setDescription(`Copy in the top right corner! \n${resultsString}`);
+
+                        //send embed
+                        await i.reply({embeds: [resultsEmbed]});
+                    })
+
+                    buttonCollector.on('end', async () => {
+                        //disable the button
+                        wordleActionRow.components[0].setDisabled(true);
+                        await response.edit({ components: [wordleActionRow] });
+                    })
+
+                    //remove active session
+                    wordleSessions[message.author.id] = undefined;
+                    
+                    //update statistics, but only if there was no word code (to avoid cheating)
+                    if (!currentSession.usedCode) { //MARK: update statistics
+                        let userStats = await db.get(`wordle_stats.random_6letter.${message.author.id}`);
+
+                        //default stats layout
+                        if (!userStats) userStats = {
+                            guess_stats: {
+                                "1": 0, "2": 0, "3": 0,
+                                "4": 0, "5": 0, "6": 0,
+                                "loss": 0
+                            },
+                            current_streak: 0,
+                            best_streak: 0
+                        }
+
+                        //change statistics based on game outcome
+                        if (userHasWon) {
+                            userStats.guess_stats[numberOfGuesses]++;
+                            userStats.current_streak++;
+
+                            if (userStats.current_streak > userStats.best_streak) {
+                                userStats.best_streak = userStats.current_streak;
+                            }
+                        } else if (userHasLost) {
+                            userStats.guess_stats["loss"]++;
+                            userStats.current_streak = 0;
+                        }
+                        
+                        //set new statistics
+                        await db.set(`wordle_stats.random_6letter.${message.author.id}`, userStats);
+                    }
+
+                } else { //MARK: game continuing
+
+                    //create button to see used letters thus far
+                    const usedLettersButton = new ButtonBuilder()
+                        .setCustomId("wordle-used-letters")
+                        .setLabel("See Used Letters")
+                        .setStyle(ButtonStyle.Secondary);
+            
+                    const wordleActionRow = new ActionRowBuilder()
+                        .addComponents(usedLettersButton);
+                    
+                    //send message
+                    const response = await message.reply({embeds: [wordleEmbed], components: [wordleActionRow]});
+
+                    const buttonCollector = response.createMessageComponentCollector({ componentType: ComponentType.Button, time: 60000 });
+
+                    buttonCollector.on('collect', async i => {
+                        //get used letters and display it
+                        const keyboardString = handleUsedLettersDisplay(gameFields);
+                
+                        i.reply(keyboardString);
+                    })
+                
+                    buttonCollector.on('end', async () => {
+                        //disable the button
+                        wordleActionRow.components[0].setDisabled(true);
+                        response.edit({ components: [wordleActionRow] });
+                    })
+
+                    //set new data in session
+                    wordleSessions[message.author.id] = {
+                        solution: solutionWord, 
+                        guesses: numberOfGuesses,
+                        fields: gameFields,
+                        usedCode: currentSession.usedCode
+                    }
+                }
+
+                break;
+            }
+            case 'leaderboard': case 'board': { //MARK: board subcommand
+                const statisticChoice = args[1];
+                if (!["average", "win%", "streak"].includes(statisticChoice)) {
+                    return await message.reply(`idk what stat ${statisticChoice} is lol \ni can show you average, win%, or streak`)
+                  }
+
+                //create embed with default data used across all leaderboards
+                const leaderboardEmbed = new EmbedBuilder()
+                .setColor(embedColors.purple)
+                .setFooter({ text: "look at all these amateurs"});
+
+                //get game statistics
+                const gameStats = await db.get(`wordle_stats.random_6letter`);
+
+                if (!gameStats) {
+                    leaderboardEmbed
+                        .setTitle("Wordle Game")
+                        .setDescription("huh, looks like there's nothing here");
+                    
+                    return await message.reply({ embeds: [leaderboardEmbed] });
+                }
+
+                //statistic display functions (decided not to use a switch for no particular reason)
+                const statisticDisplays = {
+                    'average': async () => { //MARK: average statistic
+                        leaderboardEmbed.setTitle("Wordle Game - Average Guesses per Game");
+                        
+                        //array will be compressed into text later on
+                        let averageLeaderboardArray = [];
+                        let averageLeaderboardText = "";
+                        
+                        //for every user in the game stats
+                        for (const userId of Object.keys(gameStats)) {
+                            //get username for display
+                            const userInfo = await client.users.fetch(userId);
+                            const userName = userInfo.username;
+                            gameStats[userId].name = userName;
+
+                            //get number of played games for average calculation
+                            const guessStats = gameStats[userId].guess_stats;
+                            const numberOfGames = guessStats[1] + guessStats[2] + guessStats[3] + guessStats[4] + guessStats[5] + guessStats[6];
+
+                            //get number of guesses made across all games for average calculation
+                            let numberOfGuesses = 0;
+                            for (const [key, val] of Object.entries(guessStats)) {
+
+                                if (key != "loss") {
+                                    //multiply the number of instances where it took x many guesses
+                                    //by x to get the number of guesses, then add it to running total
+                                    numberOfGuesses += (val * key);
+                                }
+                            }
+
+                            //calculate average and set
+                            const averageGuessesPerGame = (numberOfGuesses / numberOfGames).toFixed(2);
+                            gameStats[userId].avg = averageGuessesPerGame;
+
+                            averageLeaderboardArray.push(gameStats[userId]);
+                        }
+        
+                        //sort by lowest average (kinda confusing)
+                        averageLeaderboardArray.sort((a, b) => {
+                            if (a.avg < b.avg) return -1;
+                            else if (a.avg > a.avg) return 1;
+                            else return 0;
+                        });
+                        
+                        //create text based on array data
+                        for (user of averageLeaderboardArray) {
+                            averageLeaderboardText += `${user.name}: **${user.avg} guesses**\n`;
+                        }
+        
+                        leaderboardEmbed.setDescription(averageLeaderboardText);
+                    },
+                    'win%': async () => { //MARK: win% statistic
+                        leaderboardEmbed.setTitle("Wordle Game - Highest Win Percentage");
+                        
+                        //array will be compressed into text later on
+                        let percentLeaderboardArray = [];
+                        let percentLeaderboardText = "";
+
+                        for (const userId of Object.keys(gameStats)) {
+                            //get username for display
+                            const userInfo = await client.users.fetch(userId);
+                            const userName = userInfo.username;
+                            gameStats[userId].name = userName;
+
+                            //calculate win percentage from won games / total games and display as percentage
+                            const guessStats = gameStats[userId].guess_stats;
+                            const numberOfWonGames = guessStats[1] + guessStats[2] + guessStats[3] + guessStats[4] + guessStats[5] + guessStats[6];
+                            const numberOfGames = numberOfWonGames + guessStats["loss"];
+                            const winPercentage = Number(numberOfWonGames / numberOfGames).toLocaleString(undefined,{style: 'percent', minimumFractionDigits:2});
+                            
+                            //set win percentage
+                            gameStats[userId].win_percent = winPercentage;
+                            percentLeaderboardArray.push(gameStats[userId]);
+                        }
+
+                        //sort by most points (kinda confusing)
+                        percentLeaderboardArray.sort((a, b) => {
+                            if (a.win_percent < b.win_percent) return -1;
+                            else if (a.win_percent > a.win_percent) return 1;
+                            else return 0;
+                        });
+
+                        //create text based on array data
+                        for (user of percentLeaderboardArray) {
+                            percentLeaderboardText += `${user.name}: **${user.win_percent} of games**\n`;
+                        }
+
+                        leaderboardEmbed.setDescription(percentLeaderboardText);
+                    },
+                    'streak': async () => { //MARK: best streak statistic
+                        leaderboardEmbed.setTitle("Wordle Game - Longest Win Streak");
+      
+                        //array will be compressed into text later on
+                        let streakLeaderboardArray = [];
+                        let streakLeaderboardText = "";
+
+                        for (const userId of Object.keys(gameStats)) {
+                            //get username for display
+                            const userInfo = await client.users.fetch(userId);
+                            const userName = userInfo.username;
+                            gameStats[userId].name = userName;
+
+                            //no further calculation here; best streak is handled on win/loss
+                            streakLeaderboardArray.push(gameStats[userId]);
+                        }
+
+                        //sort by most points (kinda confusing)
+                        streakLeaderboardArray.sort((a, b) => {
+                            if (a.best_streak > b.best_streak) return -1;
+                            else if (a.best_streak < a.best_streak) return 1;
+                            else return 0;
+                        });
+
+                        //create text
+                        for (user of streakLeaderboardArray) {
+                            if (user.best_streak == 1) { //for game/games pluralization
+                                streakLeaderboardText += `${user.name}: **${user.best_streak} game**\n`;
+                            } else {
+                                streakLeaderboardText += `${user.name}: **${user.best_streak} games**\n`;
+                            }
+                        }
+
+                        leaderboardEmbed.setDescription(streakLeaderboardText);
+                    }
+                }
+
+                //MARK: handling stat selector
+                await statisticDisplays[statisticChoice]();
+
+                //create statistics selector of all stats
+                const statSelector = new StringSelectMenuBuilder()
+                    .setCustomId('statSelector')
+                    .setPlaceholder('Select statistic...')
+                    .addOptions([
+                        new StringSelectMenuOptionBuilder()
+                            .setLabel("points")
+                            .setValue("points"),
+                        new StringSelectMenuOptionBuilder()
+                            .setLabel("win percentage")
+                            .setValue("win percentage"),
+                        new StringSelectMenuOptionBuilder()
+                            .setLabel("best streak")
+                            .setValue("best streak")
+                    ]);
+
+                const selectorRow = new ActionRowBuilder()
+                    .addComponents(statSelector);
+                
+                //send message
+                const response = await message.reply({ embeds: [leaderboardEmbed], components: [selectorRow] });
+
+                const menuCollector = response.createMessageComponentCollector({ componentType: ComponentType.StringSelect, time: 60000 });
+                
+                menuCollector.on('collect', async i => {
+                    //get new statistic and data
+                    const newStatisticChoice = i.values[0];
+                    await statisticDisplays[newStatisticChoice]();
+
+                    //edit leaderboard
+                    await response.edit({ embeds: [leaderboardEmbed] });
+                    await i.deferUpdate();
+                })
+
+                menuCollector.on('end', async () => {
+                    //disable the selector
+                    selectorRow.components[0].setDisabled(true);
+                    response.edit({ components: [selectorRow] });
+                })
+
+                break;
+            }
+            case 'code': { //MARK: code subcommand
+                const word = args[1];
+
+                //any 5 letter string works, even ones not in the json
+                if (word.length != 5) return await message.reply(`bruh we need a 5 letter word for wordle`);
+
+                //get the word code (duh)
+                const encryptedCode = encryptWordCode(word.toLowerCase());
+
+                //tell em what the code is
+                const responseText = `The Wordle code for ${word} is \`${encryptedCode}\`. \nUse \`/wordle start\` to play your custom game!`;
+                await message.reply(responseText);
+
+                break;
+            }
+        }
     }
 }
 
 //for code encryption and decryption (shuffled for the tiniest bit of protection)
 const shuffledAlphabet = "rlzwvefuognicapqmytbjksxdh".split("");
 
-//MARK: code encryption functions
+//MARK: encryption functions
 function encryptWordCode(word) {
     //get each letter of the word
     const splitWord = word.split("");
