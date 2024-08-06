@@ -523,7 +523,7 @@ module.exports = { //MARK: command data
             inline: true,
           }
         );
-        await message.reply({ embeds: [statsEmbed] });
+        await interaction.reply({ embeds: [statsEmbed] });
         break;
       }
     }
@@ -532,14 +532,12 @@ module.exports = { //MARK: command data
 
     switch (args[0]) { // Switch to handle different subcommands.
       case 'quiz': {
-        const difficultyOptions = difficulties.map(difficulty => difficulty.name).reduce((acc, current, i) => {
+        const difficultyOptions = difficulties.map(difficulty => difficulty.name.toLowerCase()).reduce((acc, current, i) => {
           acc[current] = i;
           return acc;
         }, {});
 
-        console.log(args[1], "|", difficultyOptions[args[1]])
-
-        if (args[1] && !difficultyOptions[args[1]]) {
+        if (args[1] && !difficultyOptions[args[1].toLowerCase()]) {
           const optionsFormatter = new Intl.ListFormat("en", {
             type: "conjunction",
           });
@@ -547,7 +545,7 @@ module.exports = { //MARK: command data
           return message.reply(`what kinda difficulty is ${args[1]} lol \nyour options are ${difficultyOptionsList}, alright?`)
         }
         
-        const difficulty = difficulties[difficultyOptions[args[1]]] ?? difficulties[0]
+        const difficulty = difficulties[difficultyOptions[args[1].toLowerCase()]] ?? difficulties[0]
         const flagsNum = difficulty.flags;
         
         //get all flag names and emojis
@@ -767,7 +765,7 @@ module.exports = { //MARK: command data
         break;
       }
       case "leaderboard": { //MARK: leaderboard subcommand
-        const statisticChoice = args[0]
+        const statisticChoice = args[0].toLowerCase()
         if (!["points", "win%", "streak"].includes(statisticChoice)) {
           return await message.reply(`idk what stat ${statisticChoice} is lol \ni can show you points, win%, or streak`)
         }
@@ -949,7 +947,7 @@ module.exports = { //MARK: command data
         break;
       }
       case "stats": { //MARK: stats subcommand
-        const userId = args[1].replace(`<@`,"").replace(">","") ?? message.author.id;
+        const userId = args[1]?.replace(`<@`,"")?.replace(">","") ?? message.author.id;
         let userChoice
         try {
           userChoice = await client.users.fetch(userId);
