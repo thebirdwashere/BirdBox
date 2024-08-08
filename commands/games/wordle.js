@@ -330,7 +330,7 @@ module.exports = { //MARK: COMMAND DATA
 
                 break;
             }
-            case 'leaderboard': { //MARK: leaderboard subcommand
+            case 'leaderboard': { //MARK: board subcommand
                 const statisticChoice = interaction.options?.getString('statistic');
 
                 //create embed with default data used across all leaderboards
@@ -351,7 +351,7 @@ module.exports = { //MARK: COMMAND DATA
 
                 //statistic display functions (decided not to use a switch for no particular reason)
                 const statisticDisplays = {
-                    'average guesses': async () => { //MARK: average guesses statistic
+                    'average guesses': async () => { //MARK: average statistic
                         leaderboardEmbed.setTitle("Wordle Game - Average Guesses per Game");
                         
                         //array will be compressed into text later on
@@ -401,7 +401,7 @@ module.exports = { //MARK: COMMAND DATA
         
                         leaderboardEmbed.setDescription(averageLeaderboardText);
                     },
-                    'win percentage': async () => { //MARK: win percentage statistic
+                    'win percentage': async () => { //MARK: win% statistic
                         leaderboardEmbed.setTitle("Wordle Game - Highest Win Percentage");
                         
                         //array will be compressed into text later on
@@ -476,7 +476,7 @@ module.exports = { //MARK: COMMAND DATA
                     }
                 }
 
-                //MARK: handling statistic selector
+                //MARK: handling stat selector
                 await statisticDisplays[statisticChoice]();
 
                 //create statistics selector of all stats
