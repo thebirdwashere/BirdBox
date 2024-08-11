@@ -51,17 +51,19 @@ module.exports = {
             if (!/[^0-9\u{0080}-\u{FFFF}\p{M}]+/u.test(content)) return;
 
             const splitContent = content.split(" ").filter(word => word !== "");
+            
+            const uniqueItems = [...new Set(splitContent)];
+            if (uniqueItems.length < 5) return;
 
-            if (splitContent.length < 5) return;
             if (splitContent.some(word => word.startsWith(":"))) return;
             if (splitContent.every( (val, i, arr) => val === arr[0] )) return;
             if ((new Set(splitContent)).size !== splitContent.length) return;
             
             const sortedContent = [...splitContent].sort();
 
-            if (splitContent.join(" ") === sortedContent.join(" ")) { 
+            if (splitContent.join(" ") === sortedContent.join(" ")) {
                 return splitContent.map(word => {return word[0].toUpperCase() + word.substring(1)}); //bolden each first letter
-            } else return;
+            }
         },
         respond: async ({message, vars, testResult}) => {
             const randomWord = testResult[Math.floor(Math.random() * testResult.length)];
@@ -160,7 +162,13 @@ module.exports = {
 
             const tableArray = periodicCheck([], 0);
 
-            if (tableArray) return tableArray.join(""); //must be true at this point
+            if (tableArray) { //if a value was returned
+                const uniqueItems = [...new Set(tableArray)];
+
+                if (uniqueItems.length > 5) {
+                    return tableArray.join("");
+                }
+            }
         },
         respond: async ({message, vars, testResult}) => {
             const randomFooter = footers.periodic[Math.floor(Math.random() * footers.periodic.length)];
