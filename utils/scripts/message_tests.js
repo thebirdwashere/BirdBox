@@ -117,16 +117,24 @@ module.exports = {
             const ones = ["h","b","c","n","o","f","p","s","k","v","y","i","w","u"]; 
             const twos = ["he","li","be","ne","na","mg","al","si","cl","ar","ca","sc","ti","cr","mn","fe","co","ni","cu","zn","ga","ge","as","se","br","kr","rb","sr","zr","nb","mo","tc","ru","rh","pd","ag","cd","in","sn","sb","te","xe","cs","ba","la","ce","pr","nd","pm","sm","eu","gd","tb","dy","ho","er","tm","yb","lu","hf","ta","re","os","ir","pt","au","hg","tl","pb","bi","po","at","rn","fr","ra","ac","th","pa","np","pu","am","cm","bk","cf","es","fm","md","no","lr","rf","db","sg","bh","hs","mt","ds","rg","cn","nh","fl","mc","lv","ts","og"];
 
-            content = content.replaceAll(" ", "");
-
             function periodicCheck(array, index) {
                 if (content.length <= index) return array;
 
                 let oneChar = content[index].toUpperCase();
                 let twoChar = content[index].toUpperCase().concat(content[index + 1]?.toLowerCase());
 
+                if (/\s/.test(oneChar)) {
+                    array.push(oneChar);
+                    return periodicCheck([...array], index + 1);
+                }
+
+                let spacedTwoChar = twoChar
+                if (/\s/.test(twoChar)) {
+                    spacedTwoChar = content[index].toUpperCase().concat(content[index + 1]?.toLowerCase()).concat(content[index + 2]?.toLowerCase());
+                }
+
                 if (twos.includes(twoChar.toLowerCase()) && ones.includes(oneChar.toLowerCase())) { 
-                    array.push(twoChar);
+                    array.push(spacedTwoChar);
 
                     const twoCheck = periodicCheck([...array], index + 2);
 
@@ -136,7 +144,7 @@ module.exports = {
                     }
 
                 } else if (twos.includes(twoChar.toLowerCase())) { 
-                    array.push(twoChar);
+                    array.push(spacedTwoChar);
 
                     return periodicCheck([...array], index + 2);
                 } else if (ones.includes(oneChar.toLowerCase())) {
@@ -150,7 +158,7 @@ module.exports = {
 
             const tableArray = periodicCheck([], 0);
 
-            if (tableArray) return tableArray.join(" "); //must be true at this point
+            if (tableArray) return tableArray.join(""); //must be true at this point
         },
         respond: async ({message, vars, testResult}) => {
             const randomFooter = footers.periodic[Math.floor(Math.random() * footers.periodic.length)];
@@ -210,7 +218,7 @@ module.exports = {
         }
     },
     interrupting: {
-        check: async ({message}) => { //entirely random responses
+        check: async () => { //entirely random responses
             const chanceOfInterrupting = 1000;
             const randomInt = Math.floor(Math.random() * chanceOfInterrupting) + 1;
 
