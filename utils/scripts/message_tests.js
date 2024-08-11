@@ -117,6 +117,8 @@ module.exports = {
             const ones = ["h","b","c","n","o","f","p","s","k","v","y","i","w","u"]; 
             const twos = ["he","li","be","ne","na","mg","al","si","cl","ar","ca","sc","ti","cr","mn","fe","co","ni","cu","zn","ga","ge","as","se","br","kr","rb","sr","zr","nb","mo","tc","ru","rh","pd","ag","cd","in","sn","sb","te","xe","cs","ba","la","ce","pr","nd","pm","sm","eu","gd","tb","dy","ho","er","tm","yb","lu","hf","ta","re","os","ir","pt","au","hg","tl","pb","bi","po","at","rn","fr","ra","ac","th","pa","np","pu","am","cm","bk","cf","es","fm","md","no","lr","rf","db","sg","bh","hs","mt","ds","rg","cn","nh","fl","mc","lv","ts","og"];
 
+            content = content.replace(/\s+/g, " ").trim() //https://stackoverflow.com/questions/6163169/replace-multiple-whitespaces-with-single-whitespace-in-javascript-string
+
             function periodicCheck(array, index) {
                 if (content.length <= index) return array;
 
@@ -130,7 +132,7 @@ module.exports = {
 
                 let spacedTwoChar = twoChar
                 if (/\s/.test(twoChar)) {
-                    spacedTwoChar = content[index].toUpperCase().concat(content[index + 1]?.toLowerCase()).concat(content[index + 2]?.toLowerCase());
+                    spacedTwoChar = content[index].toUpperCase().concat(" ").concat(content[index + 2]?.toLowerCase());
                 }
 
                 if (twos.includes(twoChar.toLowerCase()) && ones.includes(oneChar.toLowerCase())) { 
