@@ -3,33 +3,87 @@ const footers = require("../json/footers.json")
 const { messages, lyrics, interruptions, pings, mentions } = require("../json/messages.json")
 
 module.exports = {
-    keywords: {
-        check: async ({message}) => { //function for message/lyric responses
+    messages: {
+        check: async ({message}) => { //MARK: messages
+            //filter and get message content for detection
             const filterRegex = /[^A-Za-z\s!?]/g;
             const content = message.content.toLowerCase().replace(filterRegex,'').trim();
 
+            //get message-type responses and sort by length
             const messagesMap = new Map([...new Map(Object.entries(messages))].sort((a, b) => a[1].length - b[1].length));
 
+            //test for message-type responses
             for (let [key, val] of messagesMap) {
                 if (content.includes(key)) {
                     return val;
                 }
             }
+        },
+        respond: async ({message, testResult}) => {
+            await message.reply(testResult).catch(e => console.error(e));
+        }
+    },
+    lyrics: {
+        check: async ({message}) => { //MARK: lyrics
+            //filter and get message content for detection
+            const filterRegex = /[^A-Za-z\s!?]/g;
+            const content = message.content.toLowerCase().replace(filterRegex,'').trim();
 
+            /*/
+                * first, previous lyric detection
+                * to explain what's going on here, consider the chorus of all star
+                *
+                * -> hey now / you're an allstar
+                *    get your game on / go play
+                * -> hey now / you're a rockstar
+                *    get the show on / get paid
+                * 
+                * notice how the same lyric appears twice?
+                * without intervention, soneone naively trying to recite the chorus
+                * would reset back to the beginning every time "hey now" comes up
+                * 
+                * this can be fixed by considering the place we are in the song
+                * here, before anything else, we're looking at the previous message
+                * to determine our place
+                * 
+                * to demonstrate, all-star:
+                * you: get your game on
+                * birdbox: go play
+                * you: hey now
+                * 
+                * birdbox sees the previous message was a lyric, 
+                * and sees that this one comes right after it
+                * so it correctly follows up with "you're a rockstar"
+                * 
+                * ok agentnebulator yapfest over
+                * this comes to you from a vc on 8/11/2024, bisly and kek are in the back
+                * listening to kirin j callinan - big enough, schlatt's my way, and assorted memes
+                * good times all around
+                * 
+            /*/
+
+            //get lyric responses in a flattened form (to facilitate a broad lyric check)
             const flattenedLyrics = lyrics.reduce((a, b) => a.concat(b));
+
+            //get the message before this one
             const previousMessages = await message.channel.messages.fetch({limit:2});
             const lastMessage = previousMessages.last();
 
+            //if the previous message was a lyric (tested using flattened lyrics)...
             if (flattenedLyrics.includes(lastMessage.content)) {
+                //and if this message matches what should come next...
                 const previousLyricIndex = flattenedLyrics.indexOf(lastMessage.content);
                 if (message.content == flattenedLyrics[previousLyricIndex + 1].replace(filterRegex,'').trim()) {
+                    //return the lyric after
                     return flattenedLyrics[previousLyricIndex + 2];
                 }
             }
 
+            //check lyrics normally
             let decidedLyric = "";
             for (const song of lyrics) { for (const lyric of song) {
                 if (content.endsWith(lyric.replace(filterRegex,'').trim())) {
+                    //ensure the chosen lyric is the longest one that fits
                     if (lyric.length >= decidedLyric?.length) {
                         const lyricIndex = song.indexOf(lyric);
                         decidedLyric = song[lyricIndex + 1];
@@ -37,6 +91,7 @@ module.exports = {
                 }
             }}
 
+            //return lyric
             return decidedLyric;
         },
         respond: async ({message, testResult}) => {
@@ -44,36 +99,39 @@ module.exports = {
         }
     },
     alphabetical: {
-        check: ({message}) => { //alphabetical order checker
+        check: ({message}) => { //MARK: alphabetical
             const content = message.content.toLowerCase();
 
-            if (content.length > 1935) return; //this checks if the message is too long for embeds
-            if (!/[^0-9\u{0080}-\u{FFFF}\p{M}]+/u.test(content)) return;
+            if (content.length > 1935) return;       //message is too long for embeds
+            if (/[^a-zA-Z\s]/.test(content)) return; //check for non-alphabetic characters
 
             const splitContent = content.split(" ").filter(word => word !== "");
             
-            const uniqueItems = [...new Set(splitContent)];
-            if (uniqueItems.length < 5) return;
-
-            if (splitContent.some(word => word.startsWith(":"))) return;
-            if (splitContent.every( (val, i, arr) => val === arr[0] )) return;
-            if ((new Set(splitContent)).size !== splitContent.length) return;
+            if (splitContent.length < 5) return;                              //stop if less than 5 words
+            if (splitContent.some(word => word.startsWith(":"))) return;      //stop if any emojis
+            if ((new Set(splitContent)).size !== splitContent.length) return; //stop if any duplicate words
             
-            const sortedContent = [...splitContent].sort();
+            //sort content alphabetically
+            const sortedContent = [...splitContent].sort(); 
 
-            if (splitContent.join(" ") === sortedContent.join(" ")) {
+            //if the sorted content is the same, logically,
+            //the original message was in alphabetical order
+            if (splitContent.join(" ") === sortedContent.join(" ")) { 
                 return splitContent.map(word => {return word[0].toUpperCase() + word.substring(1)}); //bolden each first letter
             }
         },
         respond: async ({message, vars, testResult}) => {
+            //get the random footer for the embed
             const randomWord = testResult[Math.floor(Math.random() * testResult.length)];
             const randomLetter = randomWord[0].toUpperCase();
-            const randomFooter = footers.alphabetical[Math.floor(Math.random() * footers.alphabetical.length)].replace("(randomWord)", randomWord).replace("(randomLetter)", randomLetter);
+            const randomFooter = footers.alphabetical[Math.floor(Math.random() * footers.alphabetical.length)]
+                .replace("(randomWord)", randomWord).replace("(randomLetter)", randomLetter);
             
+            //get alphabetical version
             const alphabeticalString = testResult.join(" ");
             
             if (await vars.db.get(`setting_notifs_${message.author.id}`) !== "log") { //other cases require a reply
-                message.reply(`:capital_abcd: Your message is in perfect alphabetical order! \n\`${alphabeticalString}\``);
+                message.reply(`:capital_abcd: Your message is in perfect alphabetical order! \n\`${alphabeticalString}\``).catch(e => console.error(e));
             }
 
             let notifchannel = false //by default, do not log
@@ -103,7 +161,7 @@ module.exports = {
         }
     },
     periodictable: {
-        check: ({message}) => {
+        check: ({message}) => { //MARK: periodic
             let content = message.content.toLowerCase();
 
             if (content.length > 973) return;                             //this checks if the message is empty or too long
@@ -176,7 +234,7 @@ module.exports = {
             const periodicString = testResult;
             
             if (await vars.db.get(`setting_notifs_${message.author.id}`) !== "log") { //other cases require a reply
-                await message.reply(`:test_tube: Your message is on the periodic table! \n\`${periodicString}\``);
+                await message.reply(`:test_tube: Your message is on the periodic table! \n\`${periodicString}\``).catch(e => console.error(e));
             }
 
             let notifchannel = false //by default, do not log
@@ -206,7 +264,7 @@ module.exports = {
         }
     },
     jinx: {
-        check: async ({message}) => { //jinx checker
+        check: async ({message}) => { //MARK: jinx
             const previousMessages = await message.channel.messages.fetch({limit:2});
             const lastMessage = previousMessages.last();
 
@@ -227,8 +285,8 @@ module.exports = {
             await message.channel.send(testResult).catch(e => console.error(e));
         }
     },
-    interrupting: {
-        check: async () => { //entirely random responses
+    interruption: {
+        check: async () => { //MARK: interruption
             const chanceOfInterrupting = 1000;
             const randomInt = Math.floor(Math.random() * chanceOfInterrupting) + 1;
 
@@ -242,7 +300,7 @@ module.exports = {
         },
     },
     pings: {
-        check: async ({message, vars}) => { //birdbox responding to pings
+        check: async ({message, vars}) => { //MARK: pings
             const clientId = vars.client.user.id;
             if (message.content.includes(`<@${clientId}>`)) {
                 const randomReply = pings[Math.floor(Math.random() * pings.length)];
@@ -254,7 +312,7 @@ module.exports = {
         }
     },
     mentions: {
-        check: async ({message}) => { //birdbox responding to mentions
+        check: async ({message}) => { //MARK: mentions
             for (const mentionType of mentions) {
                 const mentionTriggers = mentionType[0];
                 const mentionReplies = mentionType[1];
