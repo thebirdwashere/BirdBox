@@ -3,22 +3,23 @@ const { SlashCommandBuilder } = require("discord.js");
 module.exports = {
     data: new SlashCommandBuilder()
 		.setName('pin')
-		.setDescription('Pin a message by ID or link.')
+		.setDescription('Pin a message by link.')
         .addStringOption(option =>
 			option
 				.setName('message')
-				.setDescription('The message ID or link to pin.')
+				.setDescription('The message link to pin.')
 				.setRequired(true)
         ),
     async execute(interaction, {admins}) {
 
-        const targetMessageId = interaction.options.getString('message').replace(`https://discord.com/channels/${interaction.guildId}/${interaction.channel.id}/`, "");
-        let targetMessage
+        const [targetChannelId, targetMessageId] = interaction.options.getString('message').replace(`https://discord.com/channels/${interaction.guildId}/`, "").split("/");
+        let targetChannel, targetMessage
 
         try {
-            targetMessage = await interaction.channel.messages.fetch(targetMessageId)
+            targetChannel = await interaction.guild.channels.fetch(targetChannelId)
+            targetMessage = await targetChannel.messages.fetch(targetMessageId)
         } catch {
-            return interaction.reply({ content: "that's not a message id or link lol", ephemeral: true });
+            return interaction.reply({ content: "couldn't find that message. are you sure it's in this server?", ephemeral: true });
         }
         
         const channelOwner = targetMessage.channel.ownerId
@@ -60,16 +61,18 @@ module.exports = {
     },
     async executeClassic({message, args}, {admins}) {
 
-        const targetMessageId = args[0]?.replace(`https://discord.com/channels/${message.guildId}/${message.channel.id}/`, "")
-        let targetMessage
+        const [targetChannelId, targetMessageId] = args[0] ? args[0].replace(`https://discord.com/channels/${message.guildId}/`, "").split("/") : [0, 0];
+
+        let targetChannel, targetMessage
 
         try {
             targetMessage = await message.fetchReference();
         } catch (err) {
             try {
+                targetChannel = await message.guild.channels.fetch(targetChannelId)
                 targetMessage = await message.channel.messages.fetch(targetMessageId)
             } catch (err) {
-                return message.reply("try again, either reply to the message you want pinned or give me its id/link");
+                return message.reply("try again, either reply to the message you want pinned or give me its link");
             }
         }
         
@@ -81,7 +84,7 @@ module.exports = {
 
             //if it's a thread
             if (!userIsAdmin && channelOwner && channelOwner !== pinningUser) 
-                { return message.reply("sorry, you can only pin messages in a thread you own"); }
+                { return message.reply("sorry, you can only pin messages in a thread you own").catch(e => console.error(e)); }
 
             try { 
                 await targetMessage.pin()
@@ -91,23 +94,22 @@ module.exports = {
 
             //if it's a thread
             if (!userIsAdmin && channelOwner && channelOwner !== pinningUser) {
-                return message.reply("sorry, you can only unpin messages in a thread you own"); }
+                return message.reply("sorry, you can only unpin messages in a thread you own").catch(e => console.error(e)); }
             //if it's not a thread
             if (!userIsAdmin && !channelOwner) { 
-                return interaction.reply("sorry, you can't unpin messages here"); }
+                return message.reply("sorry, you can't unpin messages here").catch(e => console.error(e)); }
 
             try {
                 await targetMessage.unpin()
                 if (targetMessage.content) {
-                    await message.reply(`"${targetMessage.content}" unpinned successfully!`);
+                    const targetMessageContent = targetMessage.content.replace("\n", " ")
+                    const maxMessageLength = 50
+                    await message.reply(`"${(targetMessageContent > maxMessageLength ? targetMessageContent : `${targetMessageContent.substring(0, maxMessageLength)}...`)}" unpinned successfully!`).catch(e => console.error(e));
                 } else {
-                    await message.reply(`Unpinned successfully!`);
+                    await message.reply(`Unpinned successfully!`).catch(e => console.error(e));
                 }
                 
             } catch (err) { console.error(err) }
         }
     }
 }
-
-
-
