@@ -156,7 +156,7 @@ module.exports = {
         const alphabeticalness = tests.alphabetical(content)
         if (alphabeticalness) { //alphabetical order checker
             const randomWord = randomChoice(alphabeticalness)
-            const randomfooters = [
+            const randomFooter = [
                 `now i know my abc's, next time won't you sing with me`,
                 `perfectly sorted, as all things should be`,
                 `remember kids, ${randomWord[0].toUpperCase()} is for "${randomWord}"`]
@@ -169,7 +169,7 @@ module.exports = {
             }
             const alpha_joined = alphabeticalness.join(" ");
             
-            const notif = await tests.responsetemplate(message, db, randomfooters, 
+            const notif = await tests.responsetemplate(message, db, randomFooter, 
                 `:capital_abcd: Your message is in ${isItTechnical} alphabetical order! \n\`${alpha_joined}\``, 
                 `:capital_abcd:`, `is in ${isItTechnical} alphabetical order!`, 
                 0x3b88c3, alpha_joined)
@@ -185,12 +185,12 @@ module.exports = {
     
         const periodicness = tests.periodictable(content)
         if (periodicness) { //periodic table checker
-            const randomfooters = [
+            const randomFooter = [
                 `${message.author.username} nye the science guy fr`,
                 `i wonder if this is a real compound, probably not but still`,
                 `one could say, this only happens... periodically`]
             
-                const notif = await tests.responsetemplate(message, db, randomfooters, 
+                const notif = await tests.responsetemplate(message, db, randomFooter, 
                 `:test_tube: Your message is on the periodic table! \n\`${periodicness}\``, 
                 `:test_tube:`, `is on the periodic table!`, 
                 0x21c369, periodicness)

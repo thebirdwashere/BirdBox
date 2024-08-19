@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
-const { randomFooters } = require("../../utils/scripts/util_scripts.js");
+const { randomFooter } = require("../../utils/scripts/util_scripts.js");
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -19,7 +19,7 @@ module.exports = {
             .setTitle(`Deleted from: #${interaction.channel.name}`)
             .setAuthor({ name: snipe.author.tag, iconURL: sniped.displayAvatarURL() })
             .setColor(embedColors.blue)
-            .setFooter({ text: randomFooters('snipe') })
+            .setFooter({ text: randomFooter('snipe') })
             .setTimestamp(messageDate);
 
         if (snipe.content) snipeEmbed.setDescription(snipe.content);
@@ -42,7 +42,7 @@ module.exports = {
             .setTitle(`Deleted from: #${message.channel.name}`)
             .setAuthor({ name: snipe.author.tag, iconURL: sniped.displayAvatarURL() })
             .setColor(embedColors.blue)
-            .setFooter({ text: randomFooters('snipe') })
+            .setFooter({ text: randomFooter('snipe') })
             .setTimestamp(messageDate);
 
         if (snipe.content) snipeEmbed.setDescription(snipe.content);

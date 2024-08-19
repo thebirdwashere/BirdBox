@@ -1,5 +1,5 @@
 const { ContextMenuCommandBuilder, ApplicationCommandType, EmbedBuilder } = require('discord.js');
-const { randomFooters, randomMsg } = require("../../utils/scripts/util_scripts.js");
+const { randomFooter, randomMsg } = require("../../utils/scripts/util_scripts.js");
 
 module.exports = {
     data: new ContextMenuCommandBuilder()
@@ -16,7 +16,7 @@ module.exports = {
             .addFields(
 				{ name: 'You asked:', value: `"${targetMessageContent}"`}
 			)
-            .setFooter({ text: randomFooters('ball') });
+            .setFooter({ text: randomFooter('ball') });
 
         await interaction.reply({ embeds: [responseEmbed] });
 

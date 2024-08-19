@@ -1,5 +1,5 @@
 const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
-const { randomFooters, randomMsg } = require("../../utils/scripts/util_scripts.js");
+const { randomFooter, randomMsg } = require("../../utils/scripts/util_scripts.js");
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -23,7 +23,7 @@ module.exports = {
             .addFields(
 				{ name: 'You asked:', value: `"${message}"`}
 			)
-            .setFooter({ text: randomFooters('ball') });
+            .setFooter({ text: randomFooter('ball') });
 
         await interaction.reply({ embeds: [responseEmbed] });
 
@@ -33,7 +33,7 @@ module.exports = {
             .setTitle(randomMsg('ball'))
             .setAuthor({ name: 'BirdBox', iconURL: 'https://cdn.discordapp.com/avatars/803811104953466880/5bce4f0ba438015ec65f5b9cac11c8e3.png?size=256' })
             .setColor(embedColors.blue)
-            .setFooter({ text: randomFooters('ball') });
+            .setFooter({ text: randomFooter('ball') });
         
         if (content) {responseEmbed.addFields({ name: 'You asked:', value: content})}
 

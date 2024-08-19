@@ -1,4 +1,5 @@
 const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
+const { randomFooter } = require("../../utils/scripts/util_scripts.js");
 
 module.exports = {
     data: new SlashCommandBuilder()
@@ -7,7 +8,7 @@ module.exports = {
         .addStringOption(option =>
 			option
 				.setName('message')
-				.setDescription('The message ID or link being quoted.')
+				.setDescription('The message link being quoted.')
 				.setRequired(true)
         )
         .addStringOption(option =>
@@ -38,12 +39,11 @@ module.exports = {
             }
         }
 
-        if (targetChannel.id !== endChannel.id) return interaction.reply({ content: "those messages arent even in the same channel lol, i cant quote that", ephemeral: true });
+        if (endMessage && (targetChannel?.id !== endChannel?.id)) return interaction.reply({ content: "those messages arent even in the same channel lol, i cant quote that", ephemeral: true });
 
-
-        if (!endMessage) return replicateMessage(interaction, targetMessage, embedColors, {firstEmbed: true, lastEmbed: true})
+        if (!endMessage) return interaction.reply({ embeds: [replicateMessage(targetMessage, embedColors)]})
         
-        const recentMessagesList = await interaction.channel.messages.fetch({ before: endMessage.id, limit: 10 }) //not max limit but the spam potential was looking high
+        const recentMessagesList = await interaction.channel.messages.fetch({ before: endMessage.id, limit: 50 }) //max allowed limit
 
         if (recentMessagesList.find(msg => msg === targetMessage)) {
             let recentMessagesArray = recentMessagesList.map(item => item)
@@ -84,7 +84,7 @@ function replicateMessage(message, embedColors) {
         .setDescription(message.content)
         .setColor(embedColors.blue)
         .setTimestamp(message.createdTimestamp)
-        .setFooter({ text: "a wise man once said (unverified)" })
+        .setFooter({ text: randomFooter("quote") })
 
     if (message.attachments.length) {
         const imageAttachment = message.attachments.filter(attachment => attachment.contentType.startsWith("image"))[0]

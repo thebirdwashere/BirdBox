@@ -2,15 +2,16 @@ const responses = require('../../utils/json/responses.json');
 const footers = require('../../utils/json/footers.json');
 const defaults = require('../../utils/json/defaults.json');
 const wordle = require('../../utils/json/wordle.json');
-const {flags} = require('../../utils/json/wordle.json');
 
 module.exports = {
-    randomFooters: (type) => {
+    randomFooter: (type) => {
         switch (type) {
             case 'snipe':
                 return footers.snipe[Math.floor(Math.random() * footers.snipe.length)];
             case 'ball':
                 return footers.ball[Math.floor(Math.random() * footers.ball.length)];
+            case 'quote':
+                return footers.quote[Math.floor(Math.random() * footers.quote.length)];
             default:
                 // Put code here for default footers to use across functions
                 break;
@@ -26,8 +27,6 @@ module.exports = {
                 return wordle.solutions[Math.floor(Math.random() * wordle.solutions.length)];
             case 'wordle all':
                 return wordle.guesses[Math.floor(Math.random() * wordle.guesses.length)];
-            case 'flags':
-                return Object.values(flags)[Math.floor(Math.random() * wordle.guesses.length)];
         }
     },
     sleep: (ms) => {
