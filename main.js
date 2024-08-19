@@ -238,7 +238,7 @@ client.on(Events.MessageCreate, async (message) => {
 				message.reply(`The command \`/${command}\` does not support Classic mode yet.`);
 			}
 
-			console.log(client.cooldowns)
+			//console.log(client.cooldowns)
 
 			return;
 		} else {
