@@ -1,6 +1,6 @@
 const { EmbedBuilder } = require("discord.js")
 const footers = require("../json/footers.json")
-const { messages, lyrics, interruptions, pings, mentions } = require("../json/messages.json")
+const { messages, lyrics, interruptions, pings, mentionEmojis } = require("../json/messages.json")
 
 module.exports = {
     messages: {
@@ -313,18 +313,12 @@ module.exports = {
     },
     mentions: {
         check: async ({message}) => { //MARK: mentions
-            for (const mentionType of mentions) {
-                const mentionTriggers = mentionType[0];
-                const mentionReplies = mentionType[1];
-
-                if (mentionTriggers.some(trigger => message.content.includes(trigger))) {
-                    const randomReply = mentionReplies[Math.floor(Math.random() * mentionReplies.length)];
-                    return randomReply;
-                }
+            if (message.content.toLowerCase().includes("birdbox")) {
+                return mentionEmojis[Math.floor(Math.random() * mentionEmojis.length)]
             }
         },
         respond: async ({message, testResult}) => {
-            await message.reply(testResult).catch(e => console.error(e));
+            await message.react(testResult).catch(e => console.error(e));
         }
     }
 }
