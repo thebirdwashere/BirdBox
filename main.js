@@ -178,7 +178,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
 /* ON MESSAGE CREATION */
 
-client.on(Events.MessageCreate, async (message) => {	
+client.on(Events.MessageCreate, async (message) => {
     if (message.author.id == client.user.id) return;
     if (!message.content) return;
 
