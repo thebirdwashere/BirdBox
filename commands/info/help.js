@@ -58,7 +58,7 @@ module.exports = {
                 }
             } else {
                 commandEmbed.addFields({
-                    name: `No options available`, value: ` `
+                    name: `No command options`, value: ` `
                 })
             }
             
