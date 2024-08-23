@@ -65,7 +65,7 @@ module.exports = {
       }
 
       const focusedOption = interaction.options.getFocused(true);
-      const value = focusedOption.value.charAt(0).toLowerCase() + focusedOption.value.slice(1)
+      const value = focusedOption.value.toLowerCase()
       let filtered = petBreeds.filter(breed => breed.name.toLowerCase().startsWith(value));
       filtered = filtered.map(breed => ({ name: breed.name, value: breed.id.toString() }));
       filtered = filtered.slice(0, 25);

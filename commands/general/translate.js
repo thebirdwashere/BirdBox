@@ -45,7 +45,7 @@ module.exports = {
         const choices = langs.map(item => item.name);
 
         const focusedOption = interaction.options.getFocused(true);
-        const value = focusedOption.value.charAt(0).toUpperCase() + focusedOption.value.slice(1)
+        const value = focusedOption.value.charAt(0).toUpperCase() + focusedOption.value.slice(1).toLowerCase()
         let filtered = choices.filter(choice => choice.startsWith(value));
         filtered = filtered.map(choice => ({ name: choice, value: choice }));
         filtered = filtered.slice(0, 25);

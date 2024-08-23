@@ -18,7 +18,7 @@ module.exports = {
         const choices = [].concat(rps.map(item => item.names[0]));
 
         const focusedOption = interaction.options.getFocused(true);
-        const value = focusedOption.value.charAt(0).toLowerCase() + focusedOption.value.slice(1)
+        const value = focusedOption.value.toLowerCase()
         let filtered = choices.filter(choice => choice.startsWith(value));
         filtered = filtered.map(choice => ({ name: choice, value: choice }));
         filtered = filtered.slice(0, 25);

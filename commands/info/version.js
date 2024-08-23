@@ -16,7 +16,7 @@ module.exports = { // this is messy but i literally dont care at the moment
         const choices = patchNotes.map(item => item.version);
 
         const focusedOption = interaction.options.getFocused(true);
-        const value = focusedOption.value.charAt(0).toUpperCase() + focusedOption.value.slice(1)
+        const value = focusedOption.value.charAt(0).toUpperCase() + focusedOption.value.slice(1).toLowerCase()
         let filtered = choices.filter(choice => choice.startsWith(value));
         filtered = filtered.map(choice => ({ name: choice, value: choice }));
         filtered = filtered.slice(0, 25);

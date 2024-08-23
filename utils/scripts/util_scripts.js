@@ -12,6 +12,8 @@ module.exports = {
                 return footers.ball[Math.floor(Math.random() * footers.ball.length)];
             case 'quote':
                 return footers.quote[Math.floor(Math.random() * footers.quote.length)];
+            case 'help':
+                return footers.help[Math.floor(Math.random() * footers.help.length)];
             default:
                 // Put code here for default footers to use across functions
                 break;

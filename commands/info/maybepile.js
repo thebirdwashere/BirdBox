@@ -93,7 +93,7 @@ module.exports = { //MARK: command data
         if (interaction.options.getSubcommand() !== "view") choices.shift()
 
         const focusedOption = interaction.options.getFocused(true);
-        const value = focusedOption.value.charAt(0).toLowerCase() + focusedOption.value.slice(1)
+        const value = focusedOption.value.toLowerCase()
         let filtered = choices.filter(choice => choice.startsWith(value));
         filtered = filtered.map(choice => ({ name: choice, value: choice }));
         filtered = filtered.slice(0, 25);
