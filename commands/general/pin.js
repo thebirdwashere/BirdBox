@@ -3,7 +3,7 @@ const { SlashCommandBuilder } = require("discord.js");
 module.exports = {
     data: new SlashCommandBuilder()
 		.setName('pin')
-		.setDescription('Pin a message by link.')
+		.setDescription('Pin a message by link. May be disabled depending on configuration.')
         .addStringOption(option =>
 			option
 				.setName('message')

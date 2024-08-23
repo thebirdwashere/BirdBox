@@ -4,7 +4,7 @@ const { patchNotes } = require("../../utils/json/updates.json");
 module.exports = { // this is messy but i literally dont care at the moment
     data: new SlashCommandBuilder()
 		.setName('version')
-		.setDescription('Information on BirdBox patch notes.')
+		.setDescription('View new BirdBox patch notes or peruse past releases.')
         .addStringOption(option =>
 			option
 				.setName('version')

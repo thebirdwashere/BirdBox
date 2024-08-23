@@ -4,7 +4,7 @@ const { patchNotes } = require("../../utils/json/updates.json");
 module.exports = {
     data: new SlashCommandBuilder()
 		.setName('info')
-		.setDescription('General information about the bot and resources.'),
+		.setDescription('A summary of BirdBox information and resources.'),
     async execute(interaction, {embedColors, prefix}) {
 
         const infoEmbed = new EmbedBuilder()

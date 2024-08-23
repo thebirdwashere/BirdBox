@@ -4,7 +4,7 @@ const { randomFooter, randomMsg } = require("../../utils/scripts/util_scripts.js
 module.exports = {
     data: new SlashCommandBuilder()
 		.setName('8ball')
-		.setDescription('Magic 8ball command.')
+		.setDescription('Magic 8ball command: ask anything, but don\'t expect a straight answer.')
         .addStringOption(option =>
 			option
 				.setName('message')

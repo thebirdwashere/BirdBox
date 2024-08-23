@@ -4,7 +4,7 @@ const { SlashCommandBuilder } = require("discord.js");
 module.exports = {
     data: new SlashCommandBuilder()
 		.setName('diceroll')
-		.setDescription('Get the bot to roll a die!')
+		.setDescription('Roll a die to get a random number quickly (or maybe not so quickly).')
         .addStringOption(option =>
 			option
 				.setName('sides')

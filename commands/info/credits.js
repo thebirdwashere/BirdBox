@@ -3,7 +3,7 @@ const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
 module.exports = {
     data: new SlashCommandBuilder()
 		.setName('credits')
-		.setDescription('Credits to the people who work/worked on this bot.'),
+		.setDescription('Give some due credit to the people who worked on this bot.'),
     async execute(interaction, {embedColors, devs}) {
 
         const creditsEmbed = new EmbedBuilder()

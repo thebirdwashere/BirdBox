@@ -4,11 +4,11 @@ const { rps } = require("../../utils/json/responses.json");
 module.exports = {
     data: new SlashCommandBuilder()
 		.setName('rps')
-		.setDescription('Play Rock, Paper, Scissors with the bot.')
+		.setDescription('Play Rock, Paper, Scissors with the bot. Simple and pure fun.')
         .addStringOption(option =>
 			option
 				.setName('move')
-				.setDescription('Your move to play (r/p/s or rock/paper/scissors).')
+				.setDescription('Your move to play.')
                 .setMaxLength(1024)
 				.setRequired(true)
                 .setAutocomplete(true)

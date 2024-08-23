@@ -3,7 +3,7 @@ const { SlashCommandBuilder } = require("discord.js");
 module.exports = {
     data: new SlashCommandBuilder()
 		.setName('echo')
-		.setDescription('Sends the message to echo, either as a reply or not.')
+		.setDescription('BirdBox replicates a custom message. Not too useful, but certainly fun!')
         .addStringOption(option =>
 			option
 				.setName('message')

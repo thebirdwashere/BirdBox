@@ -3,7 +3,7 @@ const { SlashCommandBuilder, EmbedBuilder, ChannelType } = require("discord.js")
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("announce")
-    .setDescription("Announce to another channel. May be disabled depending on server.")
+    .setDescription("Echo a message to another channel.")
     .addStringOption(option => 
       option
         .setName("message")

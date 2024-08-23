@@ -4,7 +4,7 @@ const { SlashCommandBuilder } = require("discord.js");
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("tictactoe")
-    .setDescription("play tic tac toe")
+    .setDescription("Play tic-tac-toe, as developed by Aniket of discord-gamecord.")
     .addUserOption((option) =>
       option.setName("user").setDescription("the opponent").setRequired(true)
     ),

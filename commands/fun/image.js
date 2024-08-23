@@ -3,7 +3,7 @@ const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
 module.exports = {
     data: new SlashCommandBuilder()
 		.setName('image')
-		.setDescription('Picks a random image for your enjoyment.')
+		.setDescription('Enjoy some images handpicked (randomly) by BirdBox.')
     .addSubcommand(subcommand =>
       subcommand
           .setName('cat')

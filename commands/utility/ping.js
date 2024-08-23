@@ -3,7 +3,7 @@ const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName('ping')
-		.setDescription('Ping the bot, get a response.'),
+		.setDescription('Ping the bot. Useful for checking latency or downtime.'),
 	async execute(interaction, {client, embedColors}) {
 
 		const pingEmbed = new EmbedBuilder()

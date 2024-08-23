@@ -3,7 +3,7 @@ const { SlashCommandBuilder, ModalBuilder, TextInputBuilder, TextInputStyle, Emb
 module.exports = { //MARK: command data
     data: new SlashCommandBuilder()
 		.setName('maybepile')
-		.setDescription('Contribute to a list of features that may or may not happen.')
+		.setDescription('A list of possible features.')
         .addSubcommand(subcommand =>
             subcommand
                 .setName("view")

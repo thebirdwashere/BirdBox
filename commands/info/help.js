@@ -4,7 +4,7 @@ const { chunk } = require("../../utils/scripts/util_scripts.js");
 module.exports = {
     data: new SlashCommandBuilder()
 		.setName('help')
-		.setDescription('Returns a list of commands with command descriptions.'),
+		.setDescription('Browse and learn about everything BirdBox has to offer.'),
     async execute(interaction, {embedColors, commands, prefix}) {
 
         let page = 0;

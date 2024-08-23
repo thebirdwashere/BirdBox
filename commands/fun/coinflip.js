@@ -4,7 +4,7 @@ const { SlashCommandBuilder } = require("discord.js");
 module.exports = {
     data: new SlashCommandBuilder()
 		.setName('coinflip')
-		.setDescription('Get the bot to flip a coin!')
+		.setDescription('Flip a coin to make a decision easily (or maybe not so easily).')
         .addStringOption(option =>
 			option
 				.setName('heads')

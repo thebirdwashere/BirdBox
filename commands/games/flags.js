@@ -5,7 +5,7 @@ const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, Butt
 module.exports = { //MARK: COMMAND DATA
   data: new SlashCommandBuilder()
     .setName("flags")
-    .setDescription("Guess some stuff about flags.")
+    .setDescription("Compete to guess a country's flag quickly.")
     .addSubcommand((subcommand) =>
       subcommand
         .setName("quiz")
