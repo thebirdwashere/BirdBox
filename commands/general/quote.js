@@ -1,4 +1,4 @@
-const { SlashCommandBuilder, EmbedBuilder } = require("discord.js");
+const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle } = require("discord.js");
 const { randomFooter } = require("../../utils/scripts/util_scripts.js");
 
 module.exports = {
@@ -40,7 +40,10 @@ module.exports = {
 
         if (endMessage && (targetChannel?.id !== endChannel?.id)) return interaction.reply({ content: "those messages arent even in the same channel lol, i cant quote that", ephemeral: true });
 
-        if (!endMessage) return interaction.reply({ embeds: [replicateMessage(targetMessage, embedColors)]})
+        if (!endMessage) {
+            const [replicatedEmbed, buttonRow] = replicateMessage(targetMessage, embedColors)
+            return interaction.reply({ embeds: [replicatedEmbed], components: [buttonRow]})
+        }
         
         const recentMessagesList = await interaction.channel.messages.fetch({ before: endMessage.id, limit: 50 }) //max allowed limit
 
@@ -65,8 +68,8 @@ module.exports = {
             replicationMessage.content = recentMessagesString
             replicationMessage.attachments = recentMessagesAttachments
 
-            const replicatedEmbed = replicateMessage(replicationMessage, embedColors)
-            return await interaction.reply({embeds: [replicatedEmbed]})
+            const [replicatedEmbed, buttonRow] = replicateMessage(replicationMessage, embedColors)
+            return await interaction.reply({embeds: [replicatedEmbed], components: [buttonRow]})
 
         } else {
             return await interaction.reply({ content: "couldn't find all the messages being quoted, make sure there aren't too many", ephemeral: true });
@@ -96,7 +99,10 @@ module.exports = {
 
         if (endMessage && (targetChannel?.id !== endChannel?.id)) return message.reply("those messages arent even in the same channel lol, i cant quote that");
 
-        if (!endMessage) return message.reply({ embeds: [replicateMessage(targetMessage, embedColors)]})
+        if (!endMessage) {
+            const [replicatedEmbed, buttonRow] = replicateMessage(targetMessage, embedColors)
+            return message.reply({ embeds: [replicatedEmbed], components: [buttonRow]})
+        }
         
         const recentMessagesList = await message.channel.messages.fetch({ before: endMessage.id, limit: 50 }) //max allowed limit
 
@@ -117,12 +123,14 @@ module.exports = {
                 return await message.reply("sorry, that's too many characters to fit into a single quote; try splitting it up a bit");
             }
 
+            //TODO: JUMP BUTTON SUPPORT
+
             let replicationMessage = targetMessage
             replicationMessage.content = recentMessagesString
             replicationMessage.attachments = recentMessagesAttachments
 
-            const replicatedEmbed = replicateMessage(replicationMessage, embedColors)
-            return await message.reply({embeds: [replicatedEmbed]})
+            const [replicatedEmbed, buttonRow] = replicateMessage(replicationMessage, embedColors)
+            return await message.reply({embeds: [replicatedEmbed], components: [buttonRow]})
 
         } else {
             return await message.reply("couldn't find all the messages being quoted, make sure there aren't too many");
@@ -147,5 +155,13 @@ function replicateMessage(message, embedColors) {
         }
     }
 
-    return embed
+    const buttonRow = new ActionRowBuilder()
+    .addComponents(
+        new ButtonBuilder()
+            .setStyle(ButtonStyle.Link)
+            .setURL(message.url)
+            .setLabel("Jump")
+    )
+
+    return [embed, buttonRow]
 }
