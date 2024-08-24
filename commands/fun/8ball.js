@@ -22,16 +22,27 @@ module.exports = {
             .setColor(embedColors.blue)
             .addFields(
 				{ name: 'You asked:', value: `"${message}"`}
-			)
-            .setFooter({ text: randomFooter('ball') });
+			);
         
+        if (typeof randomResponse == "string") {
+            responseEmbed.setTitle(randomResponse);
+            responseEmbed.setFooter({ text: randomFooter('ball') });
+        }
+
         if (randomResponse.text && randomResponse.url) {
             responseEmbed
                 .setTitle(randomResponse.text)
                 .setURL(randomResponse.url);
+        }
 
-        } else if (typeof randomResponse == "string") {
-            responseEmbed.setTitle(randomResponse);
+        if (randomResponse.text && randomResponse.image) {
+            responseEmbed
+                .setTitle(randomResponse.text)
+                .setImage(randomResponse.image);
+        } 
+
+        if (randomResponse.credit) {
+            responseEmbed.setFooter({ text: `${randomResponse.credit} - ${randomFooter('ball')}` });
         }
 
         await interaction.reply({ embeds: [responseEmbed] });
@@ -48,13 +59,25 @@ module.exports = {
         
         if (content) {responseEmbed.addFields({ name: 'You asked:', value: content})}
         
+        if (typeof randomResponse == "string") {
+            responseEmbed.setTitle(randomResponse);
+            responseEmbed.setFooter({ text: randomFooter('ball') });
+        }
+
         if (randomResponse.text && randomResponse.url) {
             responseEmbed
                 .setTitle(randomResponse.text)
                 .setURL(randomResponse.url);
+        }
 
-        } else if (typeof randomResponse == "string") {
-            responseEmbed.setTitle(randomResponse);
+        if (randomResponse.text && randomResponse.image) {
+            responseEmbed
+                .setTitle(randomResponse.text)
+                .setImage(randomResponse.image);
+        } 
+
+        if (randomResponse.credit) {
+            responseEmbed.setFooter({ text: `${randomResponse.credit} - ${randomFooter('ball')}` });
         }
 
         await message.reply({ embeds: [responseEmbed] });
