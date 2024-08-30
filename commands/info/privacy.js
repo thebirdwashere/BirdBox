@@ -11,13 +11,13 @@ module.exports = {
 			.setTitle('Privacy Policy')
 			.setAuthor({ name: 'BirdBox', iconURL: 'https://cdn.discordapp.com/avatars/803811104953466880/5bce4f0ba438015ec65f5b9cac11c8e3.png?size=256' })
 			.setFooter({text: 'User data and license information.'})
-			.setURL('https://thebirdwashere.thejasperhouse.net/birdbox/privacy.html');
+			.setURL('https://thebirdwashere.com/birdbox/privacy.html');
 		
 		const linkButton = new ButtonBuilder()
 			.setLabel('Link')
 			.setStyle(ButtonStyle.Link)
 			.setDisabled(false)
-			.setURL('https://thebirdwashere.thejasperhouse.net/birdbox/privacy.html');
+			.setURL('https://thebirdwashere.com/birdbox/privacy.html');
 		
 		const linkButtonRow = new ActionRowBuilder()
 			.addComponents(linkButton);
@@ -32,7 +32,7 @@ module.exports = {
 			.setTitle('Privacy Policy')
 			.setAuthor({ name: 'BirdBox', iconURL: 'https://cdn.discordapp.com/avatars/803811104953466880/5bce4f0ba438015ec65f5b9cac11c8e3.png?size=256' })
 			.setFooter({text: 'User data and license information.'})
-			.setURL('https://thebirdwashere.thejasperhouse.net/birdbox/privacy.html');
+			.setURL('https://thebirdwashere.com/birdbox/privacy.html');
 
         await message.reply({ embeds: [privacyEmbed] }).catch(e => console.error(e));
         
