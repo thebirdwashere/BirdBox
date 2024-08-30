@@ -1,4 +1,5 @@
 const { SlashCommandBuilder, ModalBuilder, TextInputBuilder, TextInputStyle, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, StringSelectMenuBuilder, StringSelectMenuOptionBuilder} = require("discord.js");
+const { interruption } = require("../../utils/scripts/message_tests");
 
 module.exports = { //MARK: command data
     data: new SlashCommandBuilder()
@@ -84,7 +85,7 @@ module.exports = { //MARK: command data
                         )
                 )
         ),
-    cooldown: 5000,
+    cooldown: 60000,
     async autocomplete(interaction, {db}) { //MARK: autocomplete
 
         const maybeArray = await db.get('maybepile') ?? ["Table of Contents"]
@@ -101,22 +102,18 @@ module.exports = { //MARK: command data
         await interaction.respond(filtered);
 
     },
+
+    //MARK: MODERN MODE
+    
     async execute(interaction, {db, admins, embedColors}) {
 
-        let maybeArray = await db.get('maybepile') 
-        const defaultArray = ["Table of Contents"]
-
-        if (!maybeArray) {
-            await db.set('maybepile', defaultArray); //default array if nothing is present
-            maybeArray = defaultArray
-        }
+        let maybeArray = await db.get('maybepile') ?? ["Table of Contents"]
 
         console.table(maybeArray)
 
         switch (interaction.options.getSubcommand()) { // Switch to handle different subcommands.
             case 'view': { //MARK: view subcommand
-                let pageNum = interaction.options?.getString('page')[0] ?? 0
-                console.log(pageNum)
+                let pageNum = interaction.options?.getString('page').split(":")[0] ?? 0
 
                 if (pageNum == 0) { //table of contents
 
@@ -127,8 +124,8 @@ module.exports = { //MARK: command data
                         .setAuthor({ name: 'BirdBox', iconURL: 'https://cdn.discordapp.com/avatars/803811104953466880/5bce4f0ba438015ec65f5b9cac11c8e3.webp'})
                         .setFooter({text: 'Page 0 ● Also a bot that doesn\'t run on spaghetti code.'})
                     
-                    for (const maybepileItem of maybeArray.slice(1, 24)) {
-                        tableOfContentsEmbed.addFields({name: maybepileItem.title, value: `Suggested by ${maybepileItem.suggester} (*${maybepileItem.claim?.text ?? `unclaimed`}*)`, inline: true})
+                    for (const [itemKey, item] of maybeArray.slice(1, 24)) {
+                        tableOfContentsEmbed.addFields({name: `${itemKey}: ${item.title}`, value: `Suggested by ${item.suggester} (*${item.claim?.text ?? `unclaimed`}*)`, inline: true})
                     }
 
                     if (maybeArray[25]) {
@@ -180,8 +177,6 @@ module.exports = { //MARK: command data
                     if (pageNum == 1) {
                         buttonRow.components[0].setDisabled(true)
                     }
-
-                    console.log("yep its running")
                     
                     const response = await interaction.reply({embeds: [generateItemEmbed(chosenItem)], components: [buttonRow]});
 
@@ -243,9 +238,350 @@ module.exports = { //MARK: command data
                 const userIsAdmin = admins.map(user => user.userId).includes(interaction.user.id)
                     
                 if (userIsAdmin) {
-                    const itemNum = interaction.options?.getString('item')[0]
+                    const itemNum = interaction.options?.getString('item').split(":")[0]
                     const originalItem = maybeArray[itemNum]
 
+                    const modalFields = [
+                        new ActionRowBuilder()
+                            .addComponents(
+                                new TextInputBuilder()
+                                    .setCustomId('maybepile-title')
+                                    .setLabel(`Title`)
+                                    .setStyle(TextInputStyle.Short)
+                                    .setPlaceholder(`Title of the item.`)
+                                    .setValue(originalItem.title)
+                                    .setRequired(true)
+                            ),
+                        new ActionRowBuilder()
+                            .addComponents(
+                                new TextInputBuilder()
+                                    .setCustomId('maybepile-description')
+                                    .setLabel('Description')
+                                    .setStyle(TextInputStyle.Paragraph)
+                                    .setPlaceholder(`The description of the item, displayed on the item's page.`)
+                                    .setValue(originalItem.description)
+                                    .setRequired(true)
+                            ),
+                        new ActionRowBuilder()
+                            .addComponents(
+                                new TextInputBuilder()
+                                    .setCustomId('maybepile-suggester')
+                                    .setLabel(`Suggester`)
+                                    .setStyle(TextInputStyle.Short)
+                                    .setPlaceholder(`User who suggested this item. Credit where it's due!`)
+                                    .setValue(originalItem.suggester)
+                                    .setRequired(true)
+                            )
+                    ]
+                        
+                    const editModal = new ModalBuilder()
+                        .setCustomId("maybepile-edit")
+                        .setTitle("Edit Maybepile Item")
+                        .addComponents(modalFields)
+                    
+                    await interaction.showModal(editModal).catch(err => console.error(err));
+                    
+                    const editFilter = interaction => interaction.customId === 'maybepile-edit';
+                    await interaction.awaitModalSubmit({ filter: editFilter, time: 15_000 })
+                        .then(
+                            async i => {
+                                let newItem = {};
+                                newItem.title = i.fields.getTextInputValue('maybepile-title')
+                                newItem.description = i.fields.getTextInputValue('maybepile-description')
+                                newItem.suggester = i.fields.getTextInputValue('maybepile-suggester')
+
+                                maybeArray[itemNum] = newItem
+                                await i.reply({content: `**${maybeArray[itemNum].title}** has been edited successfully!`});
+                            }
+                        )
+                } else {
+                    await interaction.reply({content: `bruh, only devs can edit stuff`, ephemeral: true});
+                }
+
+                break;
+            }
+            case 'delete': { //MARK: delete subcommand
+                const itemNum = interaction.options?.getString('item').split(":")[0]
+
+                const userIsAdmin = admins.map(user => user.userId).includes(interaction.user.id)
+                    
+                if (userIsAdmin) {
+                    const removedItem = maybeArray.splice(itemNum, 1)[0]
+                    await interaction.reply({content: `**${removedItem.title}** has been deleted from the maybepile!`});
+                } else {
+                    await interaction.reply({content: `bruh, only devs can delete stuff`, ephemeral: true});
+                }
+
+                break;
+            }
+            case 'claim': { //MARK: claim subcommand
+                const itemNum = interaction.options?.getString('item').split(":")[0]
+                const claimStatus = interaction.options?.getString('status') ?? "claimed"
+
+                const alreadyClaimed = maybeArray[itemNum]?.claim?.id
+                const claimerNotCommandUser = interaction.user.id != maybeArray[itemNum]?.claim?.id
+
+                if (alreadyClaimed && claimerNotCommandUser) {
+                    return await interaction.reply({content: `sorry, that's already been claimed`})
+                }
+
+                if (!maybeArray[itemNum].claim) maybeArray[itemNum].claim = {text: "Unclaimed"}
+
+                if (claimStatus == "claimed") {
+                    maybeArray[itemNum].claim.text = `claimed`
+                    maybeArray[itemNum].claim.claimer = interaction.user.username
+                    maybeArray[itemNum].claim.id = interaction.user.id
+                    await interaction.reply({content: `${interaction.user.username} has claimed **${maybeArray[itemNum].title}**!`})
+                } else if (claimStatus == "indev") {
+                    maybeArray[itemNum].claim.text = `in development`
+                    maybeArray[itemNum].claim.claimer = interaction.user.username
+                    maybeArray[itemNum].claim.id = interaction.user.id
+                    await interaction.reply({content: `${interaction.user.username} has started work on **${maybeArray[itemNum].title}**!`})
+                } else if (claimStatus == "deprior") {
+                    maybeArray[itemNum].claim.text = `deprioritized`
+                    maybeArray[itemNum].claim.claimer = null
+                    maybeArray[itemNum].claim.id = null
+                    await interaction.reply({content: `${interaction.user.username} has deprioritized **${maybeArray[itemNum].title}**!`})
+                } else if (claimStatus == "unclaimed") {
+                    maybeArray[itemNum].claim.text = `unclaimed`
+                    maybeArray[itemNum].claim.claimer = null
+                    maybeArray[itemNum].claim.id = null
+                    await interaction.reply({content: `${interaction.user.username} has unclaimed **${maybeArray[itemNum].title}**!`})
+                }
+
+                break;
+            }
+        }
+
+        await db.set('maybepile', maybeArray) 
+        console.table(maybeArray)
+
+    },
+
+    //MARK: CLASSIC MODE
+
+    async executeClassic({message, args, strings}, {db, admins, embedColors}) {
+
+        let maybeArray = await db.get('maybepile') ?? ["Table of Contents"]
+
+        switch (args[0]) { // Switch to handle different subcommands.
+            case 'view': { //MARK: view subcommand
+                let pageNum = args[1] ?? 0
+
+                if (pageNum == 0) { //table of contents
+
+                    const tableOfContentsEmbed = new EmbedBuilder()
+                        .setColor(embedColors.purple)
+                        .setTitle("The Maybe Pile")
+                        .setDescription('Take a look at and suggest potential features!')
+                        .setAuthor({ name: 'BirdBox', iconURL: 'https://cdn.discordapp.com/avatars/803811104953466880/5bce4f0ba438015ec65f5b9cac11c8e3.webp'})
+                        .setFooter({text: 'Page 0 ● Also a bot that doesn\'t run on spaghetti code.'})
+                    
+                    let iterator = 1
+                    for (const maybepileItem of maybeArray.slice(1, 24)) {
+                        tableOfContentsEmbed.addFields({name: `${iterator}: ${maybepileItem.title}`, value: `Suggested by ${maybepileItem.suggester} (*${maybepileItem.claim?.text ?? `unclaimed`}*)`, inline: true})
+                        iterator++;
+                    }
+
+                    if (maybeArray[25]) {
+                        tableOfContentsEmbed.addFields({name: `...and ${maybeArray.length - 24} more`, value: `See their individual pages!`, inline: true})
+                    }
+
+                    await message.reply({embeds: [tableOfContentsEmbed]});
+
+                } else { //specific item
+
+                    let chosenItem = maybeArray[pageNum]
+
+                    function generateItemEmbed(item) {
+                        const suggestedStatus = `Suggested by ${item.suggester}`
+                        let claimStatus = "Claimed by WILL ADD LATER"
+    
+                        if (item.claim?.text == "claimed") {
+                            claimStatus = `Claimed by ${item.claim?.claimer}`
+                        } else if (item.claim?.text == "in development") {
+                            claimStatus = `In development by ${item.claim?.claimer}`
+                        } else if (item.claim?.text == "deprioritized") {
+                            claimStatus = `Deprioritized`
+                        } else {
+                            claimStatus = `Unclaimed`
+                        }
+    
+                        const itemEmbed = new EmbedBuilder()
+                            .setColor(embedColors.purple)
+                            .setTitle("The Maybe Pile")
+                            .setDescription('Take a look at and suggest potential features!')
+                            .addFields({name: item.title, value: item.description})
+                            .setAuthor({ name: 'BirdBox', iconURL: 'https://cdn.discordapp.com/avatars/803811104953466880/5bce4f0ba438015ec65f5b9cac11c8e3.webp'})
+                            .setFooter({text: `Page ${pageNum} ● ${suggestedStatus} ● ${claimStatus}`})
+                        
+                        return itemEmbed
+                    }
+
+                    const leftButton = new ButtonBuilder()
+                        .setStyle(ButtonStyle.Primary)
+                        .setCustomId("maybepile-left")
+                        .setLabel("🡨")
+                    const rightButton = new ButtonBuilder()
+                        .setStyle(ButtonStyle.Primary)
+                        .setCustomId("maybepile-right")
+                        .setLabel("🡪")
+                    const buttonRow = new ActionRowBuilder()
+                        .addComponents(leftButton, rightButton)
+                    
+                    if (pageNum == 1) {
+                        buttonRow.components[0].setDisabled(true)
+                    }
+                    
+                    const response = await message.reply({embeds: [generateItemEmbed(chosenItem)], components: [buttonRow]});
+
+                    const buttonCollector = response.createMessageComponentCollector({
+                        componentType: ComponentType.Button,
+                        time: 15000,
+                    });
+                    
+                    buttonCollector.on("collect", async (i) => {
+                        const customId = i.customId
+                        if (customId == "maybepile-left") {
+                            pageNum--
+                        } else if (customId == "maybepile-right") {
+                            pageNum++
+                        } else { //huh what
+                            await response.edit({content: "what did you just press. how did this happen."})
+                        }
+
+                        chosenItem = maybeArray[pageNum]
+
+                            if (pageNum == 1) {
+                                buttonRow.components[0].setDisabled(true)
+                            } else {
+                                buttonRow.components[0].setDisabled(false)
+                            }
+
+                            if (pageNum == maybeArray.length - 1) {
+                                buttonRow.components[1].setDisabled(true)
+                            } else {
+                                buttonRow.components[1].setDisabled(false)
+                            }
+
+                            await response.edit({embeds: [generateItemEmbed(chosenItem)], components: [buttonRow]})
+
+                        await i.deferUpdate()
+                    })
+
+                    buttonCollector.on("end", async () => {
+                        //disable the buttons
+                        buttonRow.components.forEach(item => item.setDisabled(true))
+                        await response.edit({ components: [buttonRow] })
+                    });
+                }
+
+                break;
+            }
+            case 'suggest': { //MARK: suggest subcommand
+                const suggestButton = new ButtonBuilder()
+                    .setCustomId('maybepile-suggest-button')
+                    .setLabel("Suggest")
+                    .setStyle(ButtonStyle.Primary)
+                const buttonRow = new ActionRowBuilder().addComponents(suggestButton)
+
+                const response = await message.reply({ components: [buttonRow]})
+
+                const buttonCollector = response.createMessageComponentCollector({
+                    componentType: ComponentType.Button,
+                    time: 600_000,
+                });
+                
+                buttonCollector.on("collect", async (interaction) => {
+                    const modalFields = [
+                        new ActionRowBuilder()
+                            .addComponents(
+                                new TextInputBuilder()
+                                    .setCustomId('maybepile-title')
+                                    .setLabel(`Title`)
+                                    .setStyle(TextInputStyle.Short)
+                                    .setPlaceholder(`Title of the item.`)
+                                    .setValue(strings[0])
+                                    .setRequired(true)
+                            ),
+                        new ActionRowBuilder()
+                            .addComponents(
+                                new TextInputBuilder()
+                                    .setCustomId('maybepile-description')
+                                    .setLabel('Description')
+                                    .setStyle(TextInputStyle.Paragraph)
+                                    .setPlaceholder(`The description of the item, displayed on the item's page.`)
+                                    .setValue(strings[1])
+                                    .setRequired(true)
+                            ),
+                        new ActionRowBuilder()
+                            .addComponents(
+                                new TextInputBuilder()
+                                    .setCustomId('maybepile-suggester')
+                                    .setLabel(`Suggester`)
+                                    .setStyle(TextInputStyle.Short)
+                                    .setPlaceholder(`User who suggested this item. Credit where it's due!`)
+                                    .setValue(strings[2])
+                                    .setRequired(false)
+                            )
+                    ]
+                        
+                    const suggestModal = new ModalBuilder()
+                        .setCustomId("maybepile-suggest")
+                        .setTitle("Suggest Maybepile Item")
+                        .addComponents(modalFields)
+                    
+                    await interaction.showModal(suggestModal).catch(err => console.error(err));
+                    
+                    const editFilter = interaction => interaction.customId === 'maybepile-suggest';
+                    await interaction.awaitModalSubmit({ filter: editFilter, time: 600_000 })
+                        .then(
+                            async i => {
+                                const title = i.fields.getTextInputValue('maybepile-title')
+                                const description = i.fields.getTextInputValue('maybepile-description')
+                                const suggester = i.fields.getTextInputValue('maybepile-suggester') ?? interaction.user.username
+                                const claim = {text: "unclaimed"}
+    
+                                maybeArray[maybeArray.length] = {title, description, suggester, claim}
+                                await db.set('maybepile', maybeArray)
+                                console.table(maybeArray)
+
+                                await i.reply({content: `**${maybeArray[maybeArray.length - 1].title}** has been added to the maybepile!`});
+                            }
+                        )
+                })
+
+                buttonCollector.on("end", async () => {
+                    //disable the buttons
+                    buttonRow.components.forEach(item => item.setDisabled(true))
+                    await response.edit({ components: [buttonRow] })
+                });
+
+                break;
+            }
+            case 'edit': { //MARK: edit subcommand
+                const userIsAdmin = admins.map(user => user.userId).includes(message.author.id)
+                if (!userIsAdmin) return await message.reply(`bruh, only devs can edit stuff`);
+
+                const itemNum = args[1]
+                const originalItem = maybeArray[itemNum]
+                if (!originalItem) return await message.reply("bruh, you gotta give me an item number to edit first");
+                
+                const editButton = new ButtonBuilder()
+                    .setCustomId('maybepile-edit-button')
+                    .setLabel("Edit")
+                    .setStyle(ButtonStyle.Primary)
+                const buttonRow = new ActionRowBuilder().addComponents(editButton)
+
+                const response = await message.reply({ components: [buttonRow]})
+
+                const buttonCollector = response.createMessageComponentCollector({
+                    componentType: ComponentType.Button,
+                    time: 15000,
+                });
+
+                
+                buttonCollector.on("collect", async (interaction) => {
                     const modalFields = [
                         new ActionRowBuilder()
                             .addComponents(
@@ -296,70 +632,97 @@ module.exports = { //MARK: command data
                                 newItem.suggester = i.fields.getTextInputValue('maybepile-suggester')
 
                                 maybeArray[itemNum] = newItem
+                                await db.set('maybepile', maybeArray)
+                                console.table(maybeArray)
+
                                 await i.reply({content: `**${maybeArray[itemNum].title}** has been edited successfully!`});
                             }
                         )
-                } else {
-                    await interaction.reply({content: `bruh, only devs can edit stuff`, ephemeral: true});
-                }
+                })
+
+                buttonCollector.on("end", async () => {
+                    //disable the buttons
+                    buttonRow.components.forEach(item => item.setDisabled(true))
+                    await response.edit({ components: [buttonRow] })
+                });
 
                 break;
             }
             case 'delete': { //MARK: delete subcommand
-                const itemNum = interaction.options?.getString('item')[0]
+                const userIsAdmin = admins.map(user => user.userId).includes(message.author.id)
+                if (!userIsAdmin) return await message.reply({content: `bruh, only devs can delete stuff`, ephemeral: true});
 
-                const userIsAdmin = admins.map(user => user.userId).includes(interaction.user.id)
-                    
-                if (userIsAdmin) {
-                    const removedItem = maybeArray.splice(itemNum, 1)[0]
-                    await interaction.reply({content: `**${removedItem.title}** has been deleted from the maybepile!`});
-                } else {
-                    await interaction.reply({content: `bruh, only devs can delete stuff`, ephemeral: true});
-                }
+                const itemNum = args[1];
+                if (!maybeArray[itemNum]) return await message.reply("bruh, you gotta give me an item number to delete first");
+
+                const removedItem = maybeArray.splice(itemNum, 1)[0]
+                await db.set('maybepile', maybeArray)
+                console.table(maybeArray)
+
+                await message.reply({content: `**${removedItem.title}** has been deleted from the maybepile!`});
 
                 break;
             }
-            case 'claim': { //MARK: claim subcommand
-                const itemNum = interaction.options?.getString('item')[0]
-                const claimStatus = interaction.options?.getString('status') ?? "claimed"
+            case 'claim': { //MARK: status subcommand
+                const itemNum = args[1];
+                if (!maybeArray[itemNum]) return await message.reply("bruh, you gotta give me an item number to delete first");
+
+                const claimStatus = args[2] ?? "claimed";
 
                 const alreadyClaimed = maybeArray[itemNum]?.claim?.id
-                const claimerNotCommandUser = interaction.user.id != maybeArray[itemNum]?.claim?.id
+                const claimerNotCommandUser = message.author.id != maybeArray[itemNum]?.claim?.id
 
                 if (alreadyClaimed && claimerNotCommandUser) {
-                    return await interaction.reply({content: `sorry, that's already been claimed`})
+                    return await message.reply({content: `sorry, that's already been claimed`})
                 }
 
                 if (!maybeArray[itemNum].claim) maybeArray[itemNum].claim = {text: "Unclaimed"}
 
-                if (claimStatus == "claimed") {
-                    maybeArray[itemNum].claim.text = `claimed`
-                    maybeArray[itemNum].claim.claimer = interaction.user.username
-                    maybeArray[itemNum].claim.id = interaction.user.id
-                    await interaction.reply({content: `${interaction.user.username} has claimed **${maybeArray[itemNum].title}**!`})
-                } else if (claimStatus == "indev") {
-                    maybeArray[itemNum].claim.text = `in development`
-                    maybeArray[itemNum].claim.claimer = interaction.user.username
-                    maybeArray[itemNum].claim.id = interaction.user.id
-                    await interaction.reply({content: `${interaction.user.username} has started work on **${maybeArray[itemNum].title}**!`})
-                } else if (claimStatus == "deprior") {
-                    maybeArray[itemNum].claim.text = `deprioritized`
-                    maybeArray[itemNum].claim.claimer = null
-                    maybeArray[itemNum].claim.id = null
-                    await interaction.reply({content: `${interaction.user.username} has deprioritized **${maybeArray[itemNum].title}**!`})
-                } else if (claimStatus == "unclaimed") {
-                    maybeArray[itemNum].claim.text = `unclaimed`
-                    maybeArray[itemNum].claim.claimer = null
-                    maybeArray[itemNum].claim.id = null
-                    await interaction.reply({content: `${interaction.user.username} has unclaimed **${maybeArray[itemNum].title}**!`})
+                switch (claimStatus) {
+                    case "claim": case "claimed": {
+                        maybeArray[itemNum].claim.text = `claimed`;
+                        maybeArray[itemNum].claim.claimer = message.author.username;
+                        maybeArray[itemNum].claim.id = message.author.id;
+                        await message.reply(`${message.author.username} has claimed **${maybeArray[itemNum].title}**!`);
+
+                        break;
+                    }
+                    case "indev": case "indevelopment": {
+                        maybeArray[itemNum].claim.text = `in development`;
+                        maybeArray[itemNum].claim.claimer = message.author.username;
+                        maybeArray[itemNum].claim.id = message.author.id;
+                        await message.reply(`${message.author.username} has started work on **${maybeArray[itemNum].title}**!`);
+
+                        break;
+                    }
+                    case "deprior": case "deprioritized": {
+                        maybeArray[itemNum].claim.text = `deprioritized`;
+                        maybeArray[itemNum].claim.claimer = null;
+                        maybeArray[itemNum].claim.id = null;
+                        await message.reply(`${message.author.username} has deprioritized **${maybeArray[itemNum].title}**!`);
+
+                        break;
+                    }
+                    case "unclaim": case "unclaimed": {
+                        maybeArray[itemNum].claim.text = `unclaimed`;
+                        maybeArray[itemNum].claim.claimer = null;
+                        maybeArray[itemNum].claim.id = null;
+                        await message.reply(`${message.author.username} has unclaimed **${maybeArray[itemNum].title}**!`);
+
+                        break;
+                    }
+                    default: {
+                        await message.reply(`available claim statuses are "claim," "indev," "deprior," and "unclaim"`)
+
+                        break;
+                    }
                 }
+
+                await db.set('maybepile', maybeArray)
+                console.table(maybeArray)
 
                 break;
             }
         }
-
-        await db.set('maybepile', maybeArray) 
-        console.table(maybeArray)
-
     }
 }
