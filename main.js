@@ -117,21 +117,26 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
 		vars.prefix = '/'; // Pass the proper prefix to slash commands.
 
-		if (Array.isArray(command.filter)) { // Permission filter for commands. Defined in the module.exports on a command-by-command basis.
+		if (typeof command.filter === 'object') { // Permission filter for commands. Defined in the module.exports on a command-by-command basis.
+
+			const commandFilter = command.filter[interaction.options.getSubcommand()] ?? command.filter
 			let authorized = [];
 
-			command.filter.forEach(item => {
-				if (!devs[item]) return;
-				let usersWithPermission = devs[item].map(item => item.userId);
-				authorized = authorized.concat(usersWithPermission);
-			});
-
-			if (authorized.length == 0) return interaction.reply({ content: `The permission levels for this command are empty or are not valid. Please contact a developer.`, ephemeral: true });
-        	if (!authorized.includes(interaction.user.id)) {
-				const permissionLevelFormatter = new Intl.ListFormat("en", { type: "disjunction" })
-				const permissionLevels = permissionLevelFormatter.format(command.filter.map(item => `\`${item}\``))
-				return interaction.reply({ content: `You do not have the required permission level to use this command. This command requires a permisson level of ${permissionLevels}. If you believe this is an error, please contact a developer.`, ephemeral: true });
+			if (commandFilter !== "all") {
+				commandFilter?.forEach(item => {
+					if (!devs[item]) return;
+					let usersWithPermission = devs[item].map(item => item.userId);
+					authorized = authorized.concat(usersWithPermission);
+				});
+	
+				if (authorized.length == 0) return interaction.reply({ content: `The permission levels for this command are empty or are not valid. Please contact a developer.`, ephemeral: true });
+				if (!authorized.includes(interaction.user.id)) {
+					const permissionLevelFormatter = new Intl.ListFormat("en", { type: "disjunction" })
+					const permissionLevels = permissionLevelFormatter.format(commandFilter.map(item => `\`${item}\``))
+					return interaction.reply({ content: `You do not have the required permission level to use this command. This command requires a permisson level of ${permissionLevels}. If you believe this is an error, please contact a developer.`, ephemeral: true });
+				}
 			}
+
 		} else if (command.filter) { return interaction.reply({ content: `The permission levels for this command have been incorrectly configured. Please contact a developer.`, ephemeral: true }); }
 
 		if (typeof(command.cooldown) === "number") {
@@ -195,21 +200,24 @@ client.on(Events.MessageCreate, async (message) => {
 
         if (client.commands.has(command)) {
 
-			if (Array.isArray(client.commands.get(command).filter)) { // Permission filter for commands. Defined in the module.exports on a command-by-command basis.
+			if (typeof client.commands.get(command).filter === 'object') { // Permission filter for commands. Defined in the module.exports on a command-by-command basis.
 
+				const commandFilter = client.commands.get(command).filter[args[0]] ?? client.commands.get(command).filter
 				let authorized = [];
-	
-				client.commands.get(command).filter.forEach(item => {
-					if (!devs[item]) return;
-					let usersWithPermission = devs[item].map(item => item.userId);
-					authorized = authorized.concat(usersWithPermission);
-				});
-	
-				if (authorized.length == 0) return message.reply(`The permission levels for this command are empty or are not valid. Please contact a developer.`);
-				if (!authorized.includes(message.author.id)) {
-					const permissionLevelFormatter = new Intl.ListFormat("en", { type: "disjunction" })
-					const permissionLevels = permissionLevelFormatter.format(client.commands.get(command).filter.map(item => `\`${item}\``))
-					return message.reply(`You do not have the required permission level to use this command. This command requires a permisson level of ${permissionLevels}. If you believe this is an error, please contact a developer.`);
+
+				if (commandFilter !== "all") {
+					commandFilter?.forEach(item => {
+						if (!devs[item]) return;
+						let usersWithPermission = devs[item].map(item => item.userId);
+						authorized = authorized.concat(usersWithPermission);
+					});
+		
+					if (authorized.length == 0) return message.reply(`The permission levels for this command are empty or are not valid. Please contact a developer.`);
+					if (!authorized.includes(message.author.id)) {
+						const permissionLevelFormatter = new Intl.ListFormat("en", { type: "disjunction" })
+						const permissionLevels = permissionLevelFormatter.format(commandFilter.map(item => `\`${item}\``))
+						return message.reply(`You do not have the required permission level to use this command. This command requires a permisson level of ${permissionLevels}. If you believe this is an error, please contact a developer.`);
+					}
 				}
 			} else if (client.commands.get(command).filter) { return message.reply(`The permission levels for this command have been incorrectly configured. Please contact a developer.`); }
 

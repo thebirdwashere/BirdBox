@@ -85,6 +85,13 @@ module.exports = { //MARK: command data
                         )
                 )
         ),
+    filter: {
+        'view': 'all',
+        'suggest': 'all',
+        'edit': ['host', 'developer'],
+        'delete': ['host', 'developer'],
+        'claim': 'all'
+    },
     cooldown: 60000,
     async autocomplete(interaction, {db}) { //MARK: autocomplete
 
@@ -108,12 +115,11 @@ module.exports = { //MARK: command data
     async execute(interaction, {db, admins, embedColors}) {
 
         let maybeArray = await db.get('maybepile') ?? ["Table of Contents"]
-
         console.table(maybeArray)
 
         switch (interaction.options.getSubcommand()) { // Switch to handle different subcommands.
             case 'view': { //MARK: view subcommand
-                let pageNum = interaction.options?.getString('page').split(":")[0] ?? 0
+                let pageNum = interaction.options?.getString('page')?.split(":")?.[0] ?? 0
 
                 if (pageNum == 0) { //table of contents
 
@@ -124,8 +130,10 @@ module.exports = { //MARK: command data
                         .setAuthor({ name: 'BirdBox', iconURL: 'https://cdn.discordapp.com/avatars/803811104953466880/5bce4f0ba438015ec65f5b9cac11c8e3.webp'})
                         .setFooter({text: 'Page 0 ● Also a bot that doesn\'t run on spaghetti code.'})
                     
-                    for (const [itemKey, item] of maybeArray.slice(1, 24)) {
-                        tableOfContentsEmbed.addFields({name: `${itemKey}: ${item.title}`, value: `Suggested by ${item.suggester} (*${item.claim?.text ?? `unclaimed`}*)`, inline: true})
+                    let iterator = 1
+                    for (const item of maybeArray.slice(1, 24)) {
+                        tableOfContentsEmbed.addFields({name: `${iterator}: ${item.title}`, value: `Suggested by ${item.suggester} (*${item.claim?.text ?? `unclaimed`}*)`, inline: true})
+                        iterator++;
                     }
 
                     if (maybeArray[25]) {
