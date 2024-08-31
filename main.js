@@ -119,7 +119,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
 		if (typeof command.filter === 'object') { // Permission filter for commands. Defined in the module.exports on a command-by-command basis.
 
-			const commandFilter = command.filter[interaction.options.getSubcommand()] ?? command.filter
+			const commandFilter = command.filter[interaction?.options?.getSubcommand()] ?? command.filter
 			let authorized = [];
 
 			if (commandFilter !== "all") {
@@ -139,12 +139,12 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
 		} else if (command.filter) { return interaction.reply({ content: `The permission levels for this command have been incorrectly configured. Please contact a developer.`, ephemeral: true }); }
 
-		if (typeof(command.cooldown) === "number") {
+		if (typeof(command.cooldown) === "number" || typeof(command.cooldown) === "object") {
 			
 			const cooldowns = client.cooldowns.get(command.data.name)
 			const lastUsedTime = cooldowns[interaction.user.id] ?? 0
 			const currentTime = Date.now()
-			const cooldownTime = command.cooldown ?? 0
+			const cooldownTime = command.cooldown[interaction?.options?.getSubcommand()] ?? command.cooldown ?? 0
 
 			const userIsAdmin = vars.admins.map(user => user.userId).includes(interaction.user.id)
 
@@ -228,8 +228,10 @@ client.on(Events.MessageCreate, async (message) => {
 				const lastUsedTime = cooldowns[message.author.id] ?? 0
 				const currentTime = Date.now()
 				const cooldownTime = client.commands.get(command).cooldown[args[0]] ?? client.commands.get(command).cooldown ?? 0
+
+				const userIsAdmin = vars.admins.map(user => user.userId).includes(message.author.id)
 	
-				if ((currentTime - lastUsedTime) < cooldownTime) {
+				if ((currentTime - lastUsedTime) < cooldownTime && !userIsAdmin) {
 					const timeWhenAvailable = Math.floor((lastUsedTime + cooldownTime) / 1000)
 					return message.reply(`You're going too fast! This command will be available <t:${timeWhenAvailable}:R>`);
 				} else {
