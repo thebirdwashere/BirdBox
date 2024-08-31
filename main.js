@@ -200,33 +200,34 @@ client.on(Events.MessageCreate, async (message) => {
 
         if (client.commands.has(command)) {
 
-			if (typeof client.commands.get(command).filter === 'object') { // Permission filter for commands. Defined in the module.exports on a command-by-command basis.
-
-				const commandFilter = client.commands.get(command).filter[args[0]] ?? client.commands.get(command).filter
-				let authorized = [];
-
-				if (commandFilter !== "all") {
-					commandFilter?.forEach(item => {
-						if (!devs[item]) return;
-						let usersWithPermission = devs[item].map(item => item.userId);
-						authorized = authorized.concat(usersWithPermission);
-					});
-		
-					if (authorized.length == 0) return message.reply(`The permission levels for this command are empty or are not valid. Please contact a developer.`);
-					if (!authorized.includes(message.author.id)) {
-						const permissionLevelFormatter = new Intl.ListFormat("en", { type: "disjunction" })
-						const permissionLevels = permissionLevelFormatter.format(commandFilter.map(item => `\`${item}\``))
-						return message.reply(`You do not have the required permission level to use this command. This command requires a permisson level of ${permissionLevels}. If you believe this is an error, please contact a developer.`);
+			if (typeof(client.commands.get(command).filter) === 'object') { // Permission filter for commands. Defined in the module.exports on a command-by-command basis.
+				if (!(Object.values(client.commands.get(command).filter) && !args[0])) { //check for a case where the user used a command with subcommands but didn't add a subcommand
+					const commandFilter = client.commands.get(command).filter[args[0]] ?? client.commands.get(command).filter
+					let authorized = [];
+	
+					if (commandFilter !== "all") {
+						commandFilter?.forEach?.(item => {
+							if (!devs[item]) return;
+							let usersWithPermission = devs[item].map(item => item.userId);
+							authorized = authorized.concat(usersWithPermission);
+						});
+			
+						if (authorized.length == 0) return message.reply(`The permission levels for this command are empty or are not valid. Please contact a developer.`);
+						if (!authorized.includes(message.author.id)) {
+							const permissionLevelFormatter = new Intl.ListFormat("en", { type: "disjunction" })
+							const permissionLevels = permissionLevelFormatter.format(commandFilter.map(item => `\`${item}\``))
+							return message.reply(`You do not have the required permission level to use this command. This command requires a permisson level of ${permissionLevels}. If you believe this is an error, please contact a developer.`);
+						}
 					}
 				}
 			} else if (client.commands.get(command).filter) { return message.reply(`The permission levels for this command have been incorrectly configured. Please contact a developer.`); }
 
-			if (typeof(client.commands.get(command).cooldown) === "number") {
-			
+			if (typeof(client.commands.get(command).cooldown) === "number" || typeof(client.commands.get(command).cooldown) === "object") {
+
 				const cooldowns = client.cooldowns.get(command)
 				const lastUsedTime = cooldowns[message.author.id] ?? 0
 				const currentTime = Date.now()
-				const cooldownTime = client.commands.get(command).cooldown ?? 0
+				const cooldownTime = client.commands.get(command).cooldown[args[0]] ?? client.commands.get(command).cooldown ?? 0
 	
 				if ((currentTime - lastUsedTime) < cooldownTime) {
 					const timeWhenAvailable = Math.floor((lastUsedTime + cooldownTime) / 1000)

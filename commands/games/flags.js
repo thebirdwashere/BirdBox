@@ -290,7 +290,7 @@ module.exports = { //MARK: COMMAND DATA
 
         break;
       }
-      case "leaderboard": { //MARK: leaderboard subcommand
+      case "leaderboard": case "board": { //MARK: leaderboard subcommand
         const statisticChoice = interaction.options?.getString("statistic");
 
         //initialize leaderboard embed
@@ -547,7 +547,7 @@ module.exports = { //MARK: COMMAND DATA
           const optionsFormatter = new Intl.ListFormat("en", {
             type: "conjunction",
           });
-          const difficultyOptionsList = optionsFormatter.format(difficulties.map(difficulty => difficulty.name));
+          const difficultyOptionsList = optionsFormatter.format(difficulties.map(difficulty => `\`${difficulty.name}\``));
           return message.reply(`what kinda difficulty is ${args[1]} lol \nyour options are ${difficultyOptionsList}, alright?`)
         }
         
@@ -770,7 +770,7 @@ module.exports = { //MARK: COMMAND DATA
 
         break;
       }
-      case "leaderboard": { //MARK: board subcommand
+      case "leaderboard": case "board": { //MARK: board subcommand
         const statisticChoice = args[0].toLowerCase()
         if (!["points", "win%", "streak"].includes(statisticChoice)) {
           return await message.reply(`idk what stat ${statisticChoice} is lol \ni can show you points, win%, or streak`)
@@ -1016,6 +1016,12 @@ module.exports = { //MARK: COMMAND DATA
           }
         );
         await message.reply({ embeds: [statsEmbed] });
+        break;
+      }
+      default: {
+
+        await message.reply("available sucommands are `quiz`, `leaderboard`, and `stats`");
+
         break;
       }
     }

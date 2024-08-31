@@ -90,7 +90,7 @@ module.exports = {
 
             default: {
 
-                message.reply('Invalid subcommand. Please try again.');
+                message.reply('available subcommands are `database` and `permissions`');
 
             } break;
         }

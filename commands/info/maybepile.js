@@ -92,7 +92,13 @@ module.exports = { //MARK: command data
         'delete': ['host', 'developer'],
         'claim': 'all'
     },
-    cooldown: 60000,
+    cooldown: {
+        'view': 0,
+        'suggest': 60000,
+        'edit': 0,
+        'delete': 0,
+        'claim': 60000
+    },
     async autocomplete(interaction, {db}) { //MARK: autocomplete
 
         const maybeArray = await db.get('maybepile') ?? ["Table of Contents"]
@@ -671,7 +677,7 @@ module.exports = { //MARK: command data
 
                 break;
             }
-            case 'claim': { //MARK: status subcommand
+            case 'claim': { //MARK: claim subcommand
                 const itemNum = args[1];
                 if (!maybeArray[itemNum]) return await message.reply("bruh, you gotta give me an item number to delete first");
 
@@ -720,7 +726,7 @@ module.exports = { //MARK: command data
                         break;
                     }
                     default: {
-                        await message.reply(`available claim statuses are "claim," "indev," "deprior," and "unclaim"`)
+                        await message.reply("available claim statuses are `claim`, `indev`, `deprior`, and `unclaim`")
 
                         break;
                     }
@@ -728,6 +734,12 @@ module.exports = { //MARK: command data
 
                 await db.set('maybepile', maybeArray)
                 console.table(maybeArray)
+
+                break;
+            }
+            default: {
+
+                await message.reply("available sucommands are `view`, `suggest`, `edit`, `delete`, and `claim`");
 
                 break;
             }

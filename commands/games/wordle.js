@@ -980,6 +980,12 @@ module.exports = { //MARK: COMMAND DATA
 
                 break;
             }
+            default: {
+
+                await message.reply("available sucommands are `start`, `guess`, `leaderboard`, and `code`");
+
+                break;
+            }
         }
     }
 }
