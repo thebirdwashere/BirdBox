@@ -24,27 +24,21 @@ module.exports = {
           ChannelType.GuildStageVoice
       )
   ),
-  async execute(interaction, { db }) {
-    await interaction.deferReply();
-
-    let announce_channel = interaction.options?.getChannel("channel")?.id ?? (await db.get(`setting_announce_channel_${interaction.guildId}`) ?? interaction.channelId);
+  async execute(interaction, {db}) {
+    let announce_channel = interaction.options?.getChannel("channel")?.id ?? await db.get(`setting_announce_channel_${interaction.guildId}`) ?? interaction.channelId;
 
     if (!announce_channel) {
-      return interaction.editReply({ content: `announce disable 1`, ephemeral: true});
+      return await interaction.reply({ content: `something went very wrong and i couldn't find a channel to announce to`, ephemeral: true});
     }
 
     try {
       const channel = interaction.guild.channels.cache.get(announce_channel);
       if (!channel) {
-        return interaction.editReply({ content: `announce disable 2`, ephemeral: true});
+        return await interaction.reply({ content: `announcement channel could not be found (somehow), try a different one`, ephemeral: true});
       }
       announce_channel = channel;
     } catch {
-      return interaction.editReply({ content: `announce disable 2`, ephemeral: true});
-    }
-
-    if (!announce_channel.id) {
-      return interaction.editReply({ content: `announce disable 3`, ephemeral: true});
+      return await interaction.reply({ content: `announcement channel could not be found, try a different one`, ephemeral: true});
     }
 
     const announceEmbed = new EmbedBuilder()
@@ -55,9 +49,41 @@ module.exports = {
      .setTimestamp(interaction.createdTimestamp);
 
     announce_channel.send({ embeds: [announceEmbed] }).then(() => {
-      interaction.editReply({ content: "Announcement sent!", ephemeral: true });
-    }).catch((error) => {
-      interaction.editReply({ content: `Error sending announcement: ${error}`, ephemeral: true });
+      interaction.reply({ content: "Announcement sent!", ephemeral: true });
+    }).catch(() => {
+      interaction.reply({ content: `error sending announcement, make sure i can speak in your chosen channel`, ephemeral: true });
+    });
+  },
+  async executeClassic({message, args, strings}, {db}) {
+    if (!strings[0]) return await messag.reply('you need to enter an announcement surrounded by quotes')
+
+    let announce_channel = args[0]?.replace(`https://discord.com/channels/${message.guildId}/`, "") ?? await db.get(`setting_announce_channel_${message.guildId}`) ?? message.channelId;
+
+    if (!announce_channel) {
+      return await message.reply({ content: `something went very wrong and i couldn't find a channel to announce to`, ephemeral: true});
+    }
+
+    try {
+      const channel = message.guild.channels.cache.get(announce_channel);
+      if (!channel) {
+        return await message.reply({ content: `announcement channel could not be found, try a different one`, ephemeral: true});
+      }
+      announce_channel = channel;
+    } catch {
+      return await message.reply({ content: `announcement channel could not be found (somehow), try a different one`, ephemeral: true});
+    }
+
+    const announceEmbed = new EmbedBuilder()
+     .setTitle(`${message.channel.name}'s Announcement`)
+     .setDescription(strings[0].trim())
+     .setAuthor({ name: message.author.tag, iconURL: message.author.displayAvatarURL() })
+     .setColor(0xAA00FF)
+     .setTimestamp(message.createdTimestamp);
+
+    announce_channel.send({ embeds: [announceEmbed] }).then(() => {
+      message.reply({ content: "Announcement sent!", ephemeral: true });
+    }).catch(() => {
+      message.reply({ content: `error sending announcement, make sure i can speak in your chosen channel`, ephemeral: true });
     });
   }
 }

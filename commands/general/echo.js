@@ -33,9 +33,9 @@ module.exports = {
     async executeClassic({message, args, strings}) {
 
         if (args[0] !== 'noreply') {
-            await message.reply(strings[0] || 'You need to enter a message surrounded by quotes.');
+            await message.reply(strings[0] || 'you need to enter an echo message surrounded by quotes');
         } else {
-            await message.channel.send(strings[0] || 'You need to enter a message surrounded by quotes.');
+            await message.channel.send(strings[0] || 'you need to enter an echo message surrounded by quotes');
             await message.delete();
         }
 
