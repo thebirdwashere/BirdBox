@@ -119,7 +119,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
 		if (typeof command.filter === 'object') { // Permission filter for commands. Defined in the module.exports on a command-by-command basis.
 
-			const commandFilter = command.filter[interaction?.options?.getSubcommand()] ?? command.filter
+			const commandFilter = interaction.options.data.find(option => option.type == 1) ? command.filter[interaction?.options?.getSubcommand?.()] : command.filter
 			let authorized = [];
 
 			if (commandFilter !== "all") {
@@ -144,7 +144,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 			const cooldowns = client.cooldowns.get(command.data.name)
 			const lastUsedTime = cooldowns[interaction.user.id] ?? 0
 			const currentTime = Date.now()
-			const cooldownTime = command.cooldown[interaction?.options?.getSubcommand()] ?? command.cooldown ?? 0
+			const cooldownTime = interaction.options.data.find(option => option.type == 1) ? command.cooldown[interaction?.options?.getSubcommand?.()] : (command.cooldown ?? 0)
 
 			const userIsAdmin = vars.admins.map(user => user.userId).includes(interaction.user.id)
 
