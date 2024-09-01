@@ -30,5 +30,8 @@ module.exports = {
 	        await interaction.reply({ content: `There was an error while reloading a command \`${command.data.name}\`:\n\`${error.message}\``, ephemeral: true });
 		}
 
+	},
+	async executeClassic({message}) {
+		return await message.reply("This command is only planned to be supported on Modern mode.")
 	}
 };
