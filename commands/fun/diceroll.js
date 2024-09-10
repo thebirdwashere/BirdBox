@@ -91,6 +91,7 @@ module.exports = {
     async executeClassic({message, args}) {
         
         let sides = args[0] ?? 6
+        if (sides > 1500) return message.channel.send("bro that is WAY too many sides, tone it down a bit")
 
         if (sides < 1) {
             message.reply(`bro i kinda need a positive number of faces`);
