@@ -38,7 +38,7 @@ module.exports = {
       
       Game.startGame();
       Game.on('gameover', result => {
-          console.log(result);
+          //console.log(result);
       })
 
   }
