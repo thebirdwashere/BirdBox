@@ -264,7 +264,7 @@ module.exports = {
         }
     },
     pangrams: {
-        check: async ({message}) => { //MARK: pangram
+        check: async ({message}) => { //MARK: pangrams
             const alphabet = "abcdefghijklmnopqrstuvwxyz".split("")
             let content = message.content.toLowerCase()
             
