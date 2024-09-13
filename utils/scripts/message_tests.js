@@ -56,8 +56,8 @@ module.exports = {
                 * so it correctly follows up with "you're a rockstar"
                 * 
                 * ok agentnebulator yapfest over
-                * this comes to you from a vc on 8/11/2024, bisly and kek are in the back
-                * listening to kirin j callinan - big enough, schlatt's my way, and assorted memes
+                * this comes to you from a vc on august 11th 2024, bisly and kek are in the back
+                * listening to kirin j callinan's big enough, schlatt's my way, and assorted memes
                 * good times all around
                 * 
             /*/
@@ -131,7 +131,7 @@ module.exports = {
             const alphabeticalString = testResult.join(" ");
             
             if (await vars.db.get(`setting_notifs_${message.author.id}`) !== "log") { //other cases require a reply
-                message.reply(`:capital_abcd: Your message is in perfect alphabetical order! \n\`${alphabeticalString}\``).catch(e => console.error(e));
+                message.reply(`:abc: Your message is in perfect alphabetical order! \n\`${alphabeticalString}\``).catch(e => console.error(e));
             }
 
             let notifchannel = false //by default, do not log
@@ -145,7 +145,7 @@ module.exports = {
                 const alphabeticalSplit = alphabeticalString.match(/(.{1,1000})/g); //make sure we don't go over embed char limits
         
                 const newEmbed = new EmbedBuilder().setColor(0x3b88c3)
-                    .setTitle(`| :capital_abcd: | ${message.author.displayName}'s message`)
+                    .setTitle(`| :abc: | ${message.author.displayName}'s message`)
                     .setDescription(`is in perfect alphabetical order! Take a look:`)
                     .addFields({name: " ", value: " "})
                     .setURL(message.url)
@@ -255,6 +255,54 @@ module.exports = {
                     .setFooter({text: randomFooter});
         
                     periodicSplit.forEach(str => { //embed char limits once again
+                        newEmbed.addFields({name: " ", value: `\`${str}\``});
+                    })
+                    newEmbed.addFields({name: " ", value: " "});
+        
+                await notifchannel.send({content: ping, embeds: [newEmbed]}).catch(e => console.error(e)); //only send notif if there is a log channel
+            }
+        }
+    },
+    pangrams: {
+        check: async ({message}) => { //MARK: pangram
+            const alphabet = "abcdefghijklmnopqrstuvwxyz".split("")
+            let content = message.content.toLowerCase()
+            
+            for (const letter of alphabet) {
+                if (!content.includes(letter)) return;
+                const letterIndex = content.indexOf(letter)
+                content = `${content.slice(0, letterIndex)}${letter.toUpperCase()}${content.slice(letterIndex + 1)}`
+            }
+
+            return content
+        },
+        respond: async ({message, vars, testResult}) => {
+            const randomFooter = footers.pangrams[Math.floor(Math.random() * footers.pangrams.length)].replace("(username)", message.author.username);
+
+            const pangramString = testResult;
+            
+            if (await vars.db.get(`setting_notifs_${message.author.id}`) !== "log") { //other cases require a reply
+                await message.reply(`:capital_abcd: Your message contains every letter in the alphabet! \n\`${pangramString}\``).catch(e => console.error(e));
+            }
+
+            let notifchannel = false //by default, do not log
+            await message.guild.channels.fetch(await vars.db.get(`setting_notif_channel_${message.guildId}`)).then(channel => {
+                if (!(channel instanceof vars.Discord.Collection)) notifchannel = channel; //for logged responses, overwrites default if found
+            }) 
+            
+            if (notifchannel) {
+                const ping = await vars.db.get(`setting_notifs_${message.author.id}`) == "log" ? `<@${message.author.id}>` : ""; //only ping if no reply
+                
+                const pangramSplit = pangramString.match(/(.{1,1000})/g); //make sure we don't go over embed char limits
+        
+                const newEmbed = new EmbedBuilder().setColor(0x21c369)
+                    .setTitle(`| :capital_abcd: | ${message.author.displayName}'s message`)
+                    .setDescription(`contains every letter in the alphabet! Take a look:`)
+                    .addFields({name: " ", value: " "})
+                    .setURL(message.url)
+                    .setFooter({text: randomFooter});
+        
+                    pangramSplit.forEach(str => { //embed char limits once again
                         newEmbed.addFields({name: " ", value: `\`${str}\``});
                     })
                     newEmbed.addFields({name: " ", value: " "});
