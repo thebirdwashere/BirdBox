@@ -130,17 +130,17 @@ module.exports = {
             //get alphabetical version
             const alphabeticalString = testResult.join(" ");
             
-            if (await vars.db.get(`setting_notifs_${message.author.id}`) !== "log") { //other cases require a reply
+            if (await vars.db.get(`settings.notifs.${message.author.id}`) !== "log") { //other cases require a reply
                 message.reply(`:abc: Your message is in perfect alphabetical order! \n\`${alphabeticalString}\``).catch(e => console.error(e));
             }
 
             let notifchannel = false //by default, do not log
-            await message.guild.channels.fetch(await vars.db.get(`setting_notif_channel_${message.guildId}`)).then(channel => {
+            await message.guild.channels.fetch(await vars.db.get(`settings.notif_channel.${message.guildId}`)).then(channel => {
                 if (!(channel instanceof vars.Discord.Collection)) notifchannel = channel; //for logged responses, overwrites default if found
             }) 
             
             if (notifchannel) {
-                const ping = await vars.db.get(`setting_notifs_${message.author.id}`) == "log" ? `<@${message.author.id}>` : ""; //only ping if no reply
+                const ping = await vars.db.get(`settings.notifs.${message.author.id}`) == "log" ? `<@${message.author.id}>` : ""; //only ping if no reply
                 
                 const alphabeticalSplit = alphabeticalString.match(/(.{1,1000})/g); //make sure we don't go over embed char limits
         
@@ -233,17 +233,17 @@ module.exports = {
 
             const periodicString = testResult;
             
-            if (await vars.db.get(`setting_notifs_${message.author.id}`) !== "log") { //other cases require a reply
+            if (await vars.db.get(`settings.notifs.${message.author.id}`) !== "log") { //other cases require a reply
                 await message.reply(`:test_tube: Your message is on the periodic table! \n\`${periodicString}\``).catch(e => console.error(e));
             }
 
             let notifchannel = false //by default, do not log
-            await message.guild.channels.fetch(await vars.db.get(`setting_notif_channel_${message.guildId}`)).then(channel => {
+            await message.guild.channels.fetch(await vars.db.get(`settings.notif_channel.${message.guildId}`)).then(channel => {
                 if (!(channel instanceof vars.Discord.Collection)) notifchannel = channel; //for logged responses, overwrites default if found
             }) 
             
             if (notifchannel) {
-                const ping = await vars.db.get(`setting_notifs_${message.author.id}`) == "log" ? `<@${message.author.id}>` : ""; //only ping if no reply
+                const ping = await vars.db.get(`settings.notifs.${message.author.id}`) == "log" ? `<@${message.author.id}>` : ""; //only ping if no reply
                 
                 const periodicSplit = periodicString.match(/(.{1,1000})/g); //make sure we don't go over embed char limits
         
@@ -281,17 +281,17 @@ module.exports = {
 
             const pangramString = testResult;
             
-            if (await vars.db.get(`setting_notifs_${message.author.id}`) !== "log") { //other cases require a reply
+            if (await vars.db.get(`settings.notifs.${message.author.id}`) !== "log") { //other cases require a reply
                 await message.reply(`:capital_abcd: Your message contains every letter in the alphabet! \n\`${pangramString}\``).catch(e => console.error(e));
             }
 
             let notifchannel = false //by default, do not log
-            await message.guild.channels.fetch(await vars.db.get(`setting_notif_channel_${message.guildId}`)).then(channel => {
+            await message.guild.channels.fetch(await vars.db.get(`settings.notif_channel.${message.guildId}`)).then(channel => {
                 if (!(channel instanceof vars.Discord.Collection)) notifchannel = channel; //for logged responses, overwrites default if found
             }) 
             
             if (notifchannel) {
-                const ping = await vars.db.get(`setting_notifs_${message.author.id}`) == "log" ? `<@${message.author.id}>` : ""; //only ping if no reply
+                const ping = await vars.db.get(`settings.notifs.${message.author.id}`) == "log" ? `<@${message.author.id}>` : ""; //only ping if no reply
                 
                 const pangramSplit = pangramString.match(/(.{1,1000})/g); //make sure we don't go over embed char limits
         

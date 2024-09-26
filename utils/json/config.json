@@ -1,0 +1,98 @@
+{
+    "user": {
+        "notifs": {
+            "name": "Notifications",
+            "desc": "Change notifications for when BirdBox notices something about your message. \nDefaults to `reply` if not set.",
+            "displayOptionsAs": "buttons",
+            "options": [
+                { "name": "Reply", "value": "reply" },
+                { "name": "Ping", "value": "ping" },
+                { "name": "Neither", "value": "neither" }
+            ],
+            "default": "reply",
+            "value": "notifs"
+        },
+        "snipes": {
+            "name": "Snipe Logging",
+            "desc": "Change whether your deleted messages are logged for the snipe command. \nDefaults to `disable` if not set.",
+            "displayOptionsAs": "toggle",
+            "default": "disable",
+            "value": "snipes"
+        },
+        "selTest": {
+            "name": "Bird",
+            "desc": "lorem ipsum",
+            "displayOptionsAs": "select",
+            "options": [
+                { "name": "test1", "value": "test1" },
+                { "name": "test2", "value": "test2" },
+                { "name": "test3", "value": "test3" }
+            ],
+            "value": "selTest"
+        },
+        "channelTest": {
+            "name": "Channel Select Test",
+            "desc": "lorem ipsum",
+            "displayOptionsAs": "channel",
+            "value": "channelTest"
+        },
+        "userTest": {
+            "name": "User Select Test",
+            "desc": "lorem ipsum",
+            "displayOptionsAs": "user",
+            "value": "userTest"
+        },
+        "mentionableTest": {
+            "name": "Mentionable Select Test",
+            "desc": "lorem ipsum",
+            "displayOptionsAs": "mentionable",
+            "value": "mentionableTest"
+        },
+        "roleTest": {
+            "name": "Role Select Test",
+            "desc": "lorem ipsum",
+            "displayOptionsAs": "role",
+            "value": "roleTest"
+        },
+        "modalTest": {
+            "name": "Modal Test",
+            "desc": "lorem ipsum",
+            "displayOptionsAs": "modal",
+            "options": [
+                {
+                "name": "test1",
+                "type": "short",
+                "placeholder": "test1",
+                "value": "test1"
+                },
+                {
+                "name": "test2",
+                "type": "paragraph",
+                "placeholder": "test2",
+                "value": "test2"
+                }
+            ],
+            "value": "modalTest"
+        },
+        "errorTest": {
+            "name": "Error Test",
+            "desc": "lorem ipsum",
+            "displayOptionsAs": "",
+            "value": "errorTest"
+        }
+    },
+    "server": {
+        "notifs": {
+            "name": "Notifications Channel",
+            "desc": "Change the channel notification logs are sent to. \nIf not set, logs will be disabled.",
+            "value": "notifs"
+        }
+    },
+    "bot": {
+        "notifs": {
+            "name": "Test",
+            "desc": "Testing",
+            "value": "notifs"
+        }
+    }
+}
