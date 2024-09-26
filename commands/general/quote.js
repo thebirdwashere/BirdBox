@@ -123,7 +123,6 @@ module.exports = {
                 return await message.reply("sorry, that's too many characters to fit into a single quote; try splitting it up a bit");
             }
 
-            //TODO: JUMP BUTTON SUPPORT
 
             let replicationMessage = targetMessage
             replicationMessage.content = recentMessagesString
