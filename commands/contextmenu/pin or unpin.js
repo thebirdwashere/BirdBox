@@ -1,16 +1,29 @@
 const { ContextMenuCommandBuilder, ApplicationCommandType } = require('discord.js');
+const { getSettingValue } = require("../../utils/scripts/util_scripts")
 
 module.exports = {
     data: new ContextMenuCommandBuilder()
 		.setName('pin or unpin')
         .setType(ApplicationCommandType.Message),
-    async execute(interaction, {admins}) {
+    async execute(interaction, {admins, db}) {
 
         const targetMessage = interaction.targetMessage
+        
+        const channelOwner = targetMessage.channel.ownerId
+        const interactionUser = interaction.member.id
+        const userIsAdmin = admins.map(user => user.userId).includes(interactionUser) //admins get bypass on any check
 
-        //decide to use pin or unpin
+        const pinSetting = await getSettingValue(`settings.pinning.${interaction.guildId}`, db)
+        const anyoneCanPin = pinSetting == "everyone"
+        const nobodyCanPin = pinSetting == "nobody"
+
+        if (nobodyCanPin) return interaction.reply({ content: "sorry, the admins disabled pin functions in this server", ephemeral: true });
+        
         if (!targetMessage.pinned) {
-            if (!userCanPin(interaction, targetMessage, admins)) return;
+
+            //if it's a thread
+            if (!anyoneCanPin && !userIsAdmin && channelOwner && channelOwner !== interactionUser)
+                { return interaction.reply({ content: "sorry, you can only pin messages in a thread you own", ephemeral: true }); }
 
             try { 
                 await targetMessage.pin()
@@ -19,8 +32,14 @@ module.exports = {
             await interaction.reply({ content: 'pinning...', ephemeral: true });
             await interaction.deleteReply(); //had to use bailey's code and yep it's janky
 
-        } else {
-            if (!userCanUnpin(interaction, targetMessage, admins)) return;
+        } else { //if it's already pinned
+
+            //if it's a thread
+            if (!anyoneCanPin && !userIsAdmin && channelOwner && channelOwner !== interactionUser) {
+                return interaction.reply({ content: "sorry, you can only unpin messages in a thread you own", ephemeral: true }); }
+            //if it's not a thread
+            if (!anyoneCanPin && !userIsAdmin && !channelOwner) { 
+                return interaction.reply({ content: "sorry, you can't unpin messages here", ephemeral: true }); }
 
             try {
                 await targetMessage.unpin()
@@ -37,35 +56,4 @@ module.exports = {
         //they'll never know (not that they should see this anyway)
         message.reply(`The command \`${prefix}pin or unpin\` was not found.`)
     }
-}
-
-function userCanPin(interaction, targetMessage, admins) {
-    const channelOwner = targetMessage.channel.ownerId
-    const interactionUser = interaction.member.id
-  
-    //if it's already pinned
-    if (targetMessage.pinned) { interaction.reply({ content: "bruh that message is already pinned", ephemeral: true }); return false;}
-  
-    //override if birdbox developer
-    if (admins.map(user => user.userId).includes(interactionUser)) {return true;}
-  
-    //if it's a thread
-    if (channelOwner && channelOwner !== interactionUser) { interaction.reply({ content: "sorry, you can only pin messages in a thread you own", ephemeral: true }); return false; }
-  
-    return true;
-}
-
-function userCanUnpin(interaction, targetMessage, admins) {
-    const channelOwner = targetMessage.channel.ownerId
-    const interactionUser = interaction.member.id
-
-    //override if birdbox developer
-    if (admins.map(user => user.userId).includes(interactionUser)) {return true;}
-  
-    //if it's a thread
-    if (channelOwner && channelOwner !== interactionUser) { interaction.reply({ content: "sorry, you can only unpin messages in a thread you own", ephemeral: true }); return false; }
-    //if it's not a thread
-    if (!channelOwner) { interaction.reply({ content: "sorry, you can't unpin messages here", ephemeral: true }); return false; }
-  
-    return true;
 }
