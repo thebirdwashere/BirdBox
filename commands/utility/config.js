@@ -46,9 +46,11 @@ module.exports = { //MARK: COMMAND DATA
     // Reject the user if the configuration option does not exist.
     if (!configOptions[scope][name] && !("default" === name)) return await interaction.reply("The requested setting option does not exist. Please try again.");
 
+    const settingId = scope == "user" ? interaction.user.id : interaction.guild.id
+
     const response = await interaction.reply({
       embeds: await updateEmbed(scope, name),
-      components: await updateRow(interaction, db, scope, name),
+      components: await updateRow(settingId, db, scope, name),
     });
 
     const filter = (i) => i.user.id === interaction.user.id;
@@ -69,7 +71,7 @@ module.exports = { //MARK: COMMAND DATA
 
       const settingId = scope == "user" ? i.user.id : i.guild.id
       await setSetting(settingId, db, configOptions[scope][name], i.customId);
-      await interaction.editReply({components: await updateRow(interaction, db, scope, name)})
+      await message.editReply({components: await updateRow(settingId, db, scope, name)})
     });
     
     buttonCollector.on("end", async () => {
@@ -89,9 +91,11 @@ module.exports = { //MARK: COMMAND DATA
 
       if (i.customId == "settingSelect") {
         name = nameCollect
+
+        const settingId = scope == "user" ? interaction.user.id : interaction.guild.id
         await i.message.edit({
           embeds: await updateEmbed(scope, nameCollect),
-          components: await updateRow(i, db, scope, nameCollect),
+          components: await updateRow(settingId, db, scope, nameCollect),
           content: `settings.${nameCollect}.${interaction.user.id}`,
         });
 
@@ -101,13 +105,184 @@ module.exports = { //MARK: COMMAND DATA
     });
 
     /* RESPOND TO CONFIG OPTIONS */
-    const channelCollector = response.createMessageComponentCollector({
+    const channelCollector = response.createMessageComponentCollector({ //MARK: channel responses
       componentType: ComponentType.ChannelSelect,
       time: 3_600_000,
       filter,
     });
 
-    channelCollector.on("collect", async (i) => { //MARK: selector response
+    channelCollector.on("collect", async (i) => {
+      const nameCollect = i.values[0];
+      await i.deferUpdate();
+
+      const settingId = scope == "user" ? i.user.id : i.guild.id
+      await setSetting(settingId, db, configOptions[scope][name], nameCollect);
+    });
+
+    const MentionableCollector = response.createMessageComponentCollector({ //MARK: mention responses
+      componentType: ComponentType.MentionableSelect,
+      time: 3_600_000,
+      filter,
+    });
+
+    MentionableCollector.on("collect", async (i) => { 
+      const nameCollect = i.values[0];
+      await i.deferUpdate();
+
+      const settingId = scope == "user" ? i.user.id : i.guild.id
+      await setSetting(settingId, db, configOptions[scope][name], nameCollect);
+    });
+
+    const RoleCollector = response.createMessageComponentCollector({ //MARK: role responses
+      componentType: ComponentType.RoleSelect,
+      time: 3_600_000,
+      filter,
+    });
+
+    RoleCollector.on("collect", async (i) => { 
+      const nameCollect = i.values[0];
+      await i.deferUpdate();
+
+      const settingId = scope == "user" ? i.user.id : i.guild.id
+      await setSetting(settingId, db, configOptions[scope][name], nameCollect);
+    });
+
+    const UserCollector = response.createMessageComponentCollector({ //MARK: user responses
+      componentType: ComponentType.UserSelect,
+      time: 3_600_000,
+      filter,
+    });
+
+    UserCollector.on("collect", async (i) => { 
+      const nameCollect = i.values[0];
+      await i.deferUpdate();
+
+      const settingId = scope == "user" ? i.user.id : i.guild.id
+      await setSetting(settingId, db, configOptions[scope][name], nameCollect);
+    });
+  },
+  async executeClassic({message, args}, {db, admins}) { //MARK: CLASSIC MODE
+    admins = admins.map((item) => item.userId);
+
+    const scope = args[0] ?? "user";
+    let name = args[1] ?? "default";
+
+    if (!["user", "server", "bot"].includes(scope)) return message.reply("thats not even close to a command scope, try using `user`, `server`, or `bot`");
+
+    // Reject the user if they are not included in the devs list.
+    if (scope != "user" && !admins.includes(message.author.id)) return message.reply("sorry, you must be a birdbox admin to modify those settings");
+
+    // Reject the user if the configuration option does not exist.
+    if (!configOptions[scope][name] && !("default" === name)) return await message.reply("The requested setting option does not exist. Please try again.");
+
+    const settingId = scope == "user" ? message.author.id : message.guild.id
+
+    const response = await message.reply({
+      embeds: await updateEmbed(scope, name),
+      components: await updateRow(settingId, db, scope, name),
+    });
+
+    const filter = (i) => i.user.id === message.author.id;
+
+    /* RESPOND TO BUTTONS */
+    const buttonCollector = response.createMessageComponentCollector({
+      componentType: ComponentType.Button,
+      time: 3_600_000,
+      filter,
+    });
+
+    buttonCollector.on("collect", async (i) => { //MARK: button response
+      if (i.customId === "modal") {
+        await customModal(i, configOptions[scope][name]);
+        return;
+      }
+      await i.deferUpdate();
+
+      const settingId = scope == "user" ? i.user.id : i.guild.id
+      await setSetting(settingId, db, configOptions[scope][name], i.customId);
+      await response.edit({components: await updateRow(settingId, db, scope, name)})
+    });
+    
+    buttonCollector.on("end", async () => {
+      await response.edit({ components: [] })
+    });
+
+    /* RESPOND TO SELECTS */
+    const selectCollector = response.createMessageComponentCollector({
+      componentType: ComponentType.StringSelect,
+      time: 3_600_000,
+      filter,
+    });
+
+    selectCollector.on("collect", async (i) => { //MARK: selector response
+      const nameCollect = i.values[0];
+      await i.deferUpdate();
+
+      if (i.customId == "settingSelect") {
+        name = nameCollect
+        
+        const settingId = scope == "user" ? i.user.id : i.guild.id
+        await i.message.edit({
+          embeds: await updateEmbed(scope, nameCollect),
+          components: await updateRow(settingId, db, scope, nameCollect),
+          content: `settings.${nameCollect}.${message.author.id}`,
+        });
+
+      } else if (i.customId == "settingOptionsSelect") {
+        console.log(nameCollect);
+      }
+    });
+
+    /* RESPOND TO CONFIG OPTIONS */
+    const channelCollector = response.createMessageComponentCollector({ //MARK: channel responses
+      componentType: ComponentType.ChannelSelect,
+      time: 3_600_000,
+      filter,
+    });
+
+    channelCollector.on("collect", async (i) => {
+      const nameCollect = i.values[0];
+      await i.deferUpdate();
+
+      const settingId = scope == "user" ? i.user.id : i.guild.id
+      await setSetting(settingId, db, configOptions[scope][name], nameCollect);
+    });
+
+    const MentionableCollector = response.createMessageComponentCollector({ //MARK: mention responses
+      componentType: ComponentType.MentionableSelect,
+      time: 3_600_000,
+      filter,
+    });
+
+    MentionableCollector.on("collect", async (i) => { 
+      const nameCollect = i.values[0];
+      await i.deferUpdate();
+
+      const settingId = scope == "user" ? i.user.id : i.guild.id
+      await setSetting(settingId, db, configOptions[scope][name], nameCollect);
+    });
+
+    const RoleCollector = response.createMessageComponentCollector({ //MARK: role responses
+      componentType: ComponentType.RoleSelect,
+      time: 3_600_000,
+      filter,
+    });
+
+    RoleCollector.on("collect", async (i) => { 
+      const nameCollect = i.values[0];
+      await i.deferUpdate();
+
+      const settingId = scope == "user" ? i.user.id : i.guild.id
+      await setSetting(settingId, db, configOptions[scope][name], nameCollect);
+    });
+
+    const UserCollector = response.createMessageComponentCollector({ //MARK: user responses
+      componentType: ComponentType.UserSelect,
+      time: 3_600_000,
+      filter,
+    });
+
+    UserCollector.on("collect", async (i) => { 
       const nameCollect = i.values[0];
       await i.deferUpdate();
 
@@ -134,7 +309,7 @@ async function updateEmbed(scope, name) { //MARK: update embed
   }
   return [configEmbed];
 }
-async function updateRow(interaction, db, scope, name) { //MARK: update row
+async function updateRow(settingId, db, scope, name) { //MARK: update row
   // Returns an updated row on request.
 
   /* STRINGSELECT ROW */
@@ -159,7 +334,7 @@ async function updateRow(interaction, db, scope, name) { //MARK: update row
 
   /* BUTTON ROW */
   const configButtonRow = new ActionRowBuilder();
-  const optionsList = await optionsBuilder(interaction, db, scope, name)
+  const optionsList = await optionsBuilder(settingId, db, scope, name)
 
   optionsList.forEach((item) => {
     configButtonRow.addComponents(item);
@@ -168,10 +343,10 @@ async function updateRow(interaction, db, scope, name) { //MARK: update row
   /* LET 'ER RIP */
   return [configSelectRow, configButtonRow];
 }
-async function optionsBuilder(interaction, db, scope, name) { //MARK: options builder
+
+async function optionsBuilder(settingId, db, scope, name) { //MARK: options builder
   const currentSetting = configOptions[scope][name];
   const displayOptionsAs = currentSetting.displayOptionsAs; // Get preset option
-  const settingId = scope == "user" ? interaction.user.id : interaction.guild.id
   const currentSelection = await getSetting(settingId, db, currentSetting)
   
   switch (displayOptionsAs) { // Switch by preset option  - TODO IN FUTURE: ADD OPTION FOR ADDING CUSTOM MULTI-ROW OPTIONS
@@ -248,7 +423,8 @@ async function optionsBuilder(interaction, db, scope, name) { //MARK: options bu
       .setDisabled(true),
   ];
 }
-async function customModal(interaction, setting) { //MARK: custom modal
+
+async function customModal(i, setting) { //MARK: custom modal
   const modal = new ModalBuilder()
     .setCustomId("settingsModal")
     .setTitle(setting.name);
@@ -270,7 +446,7 @@ async function customModal(interaction, setting) { //MARK: custom modal
 
   modal.addComponents(new ActionRowBuilder().addComponents(optionInput));
 
-  await interaction.showModal(modal);
+  await i.showModal(modal);
 }
 
 async function setSetting(id, db, setting, value) { //MARK: set/get setting

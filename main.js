@@ -178,7 +178,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
 		try { await command.autocomplete(interaction, vars); } catch (error) { console.error(error); }
 
-	} else if (interaction.isModalSubmit()) {
+	} else if (interaction.isModalSubmit()) { //TODO: this is hardcoded to only work with bot settings, figure out some way around that
 		if (interaction.customId == "settingsModal") {
 			const enteredField = interaction.fields.fields.first()
 			await interaction.deferUpdate();
