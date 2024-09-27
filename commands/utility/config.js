@@ -35,7 +35,6 @@ module.exports = { //MARK: COMMAND DATA
     await interaction.respond(filtered);
   },
   async execute(interaction, { embedColors, prefix, db, admins, client }) { //MARK: MODERN MODE
-
     admins = admins.map((item) => item.userId);
 
     const scope = interaction.options?.getString("scope") ?? "user";
@@ -68,7 +67,9 @@ module.exports = { //MARK: COMMAND DATA
         await i.deferUpdate();
         return;
       }
-      await setSetting(i, db, configOptions[scope][name], i.customId);
+
+      const settingId = scope == "user" ? i.user.id : i.guild.id
+      await setSetting(settingId, db, configOptions[scope][name], i.customId);
       await interaction.editReply({components: await updateRow(interaction, db, scope, name)})
     });
 
@@ -87,13 +88,28 @@ module.exports = { //MARK: COMMAND DATA
         name = nameCollect
         await i.message.edit({
           embeds: await updateEmbed(prefix, scope, nameCollect),
-          components: await updateRow( i, db, scope, nameCollect),
+          components: await updateRow(i, db, scope, nameCollect),
           content: `settings.${nameCollect}.${interaction.user.id}`,
         });
 
       } else if (i.customId == "settingOptionsSelect") {
         console.log(nameCollect);
       }
+    });
+
+    /* RESPOND TO CONFIG OPTIONS */
+    const channelCollector = response.createMessageComponentCollector({
+      componentType: ComponentType.ChannelSelect,
+      time: 3_600_000,
+      filter,
+    });
+
+    channelCollector.on("collect", async (i) => { //MARK: selector response
+      const nameCollect = i.values[0];
+      await i.deferUpdate();
+
+      const settingId = scope == "user" ? i.user.id : i.guild.id
+      await setSetting(settingId, db, configOptions[scope][name], nameCollect);
     });
   },
 };
@@ -152,7 +168,8 @@ async function updateRow(interaction, db, scope, name) { //MARK: update row
 async function optionsBuilder(interaction, db, scope, name) { //MARK: options builder
   const currentSetting = configOptions[scope][name];
   const displayOptionsAs = currentSetting.displayOptionsAs; // Get preset option
-  const currentSelection = await getSetting(interaction, db, currentSetting)
+  const settingId = scope == "user" ? interaction.user.id : interaction.guild.id
+  const currentSelection = await getSetting(settingId, db, currentSetting)
   
   switch (displayOptionsAs) { // Switch by preset option  - TODO IN FUTURE: ADD OPTION FOR ADDING CUSTOM MULTI-ROW OPTIONS
     case "toggle":
@@ -248,12 +265,12 @@ async function customModal(interaction) { //MARK: custom modal
   await interaction.showModal(modal);
 }
 
-async function setSetting(interaction, db, setting, value) { //MARK: set/get setting
-  await db.set(`settings.${setting.value}.${interaction.user.id}`, value);
+async function setSetting(id, db, setting, value) { //MARK: set/get setting
+  await db.set(`settings.${setting.value}.${id}`, value);
 }
 
-async function getSetting(interaction, db, setting) {
-  let settingValue = await db.get(`settings.${setting.value}.${interaction.user.id}`);
+async function getSetting(id, db, setting) {
+  let settingValue = await db.get(`settings.${setting.value}.${id}`);
   if (!settingValue) return setting.default;
   return settingValue;
 }

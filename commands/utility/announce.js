@@ -1,4 +1,5 @@
 const { SlashCommandBuilder, EmbedBuilder, ChannelType } = require("discord.js");
+const { getSettingValue } = require("../../utils/scripts/util_scripts")
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -25,7 +26,7 @@ module.exports = {
       )
   ),
   async execute(interaction, {db}) {
-    let announce_channel = interaction.options?.getChannel("channel")?.id ?? await db.get(`settings.announce_channel.${interaction.guildId}`) ?? interaction.channelId;
+    let announce_channel = interaction.options?.getChannel("channel")?.id ?? getSettingValue(`settings.announce_channel.${interaction.guildId}`, db) ?? interaction.channelId;
 
     if (!announce_channel) {
       return await interaction.reply({ content: `something went very wrong and i couldn't find a channel to announce to`, ephemeral: true});
@@ -57,7 +58,7 @@ module.exports = {
   async executeClassic({message, args, strings}, {db}) {
     if (!strings[0]) return await messag.reply('you need to enter an announcement surrounded by quotes')
 
-    let announce_channel = args[0]?.replace(`https://discord.com/channels/${message.guildId}/`, "") ?? await db.get(`settings.announce_channel.${message.guildId}`) ?? message.channelId;
+    let announce_channel = args[0]?.replace(`https://discord.com/channels/${message.guildId}/`, "") ?? getSettingValue(`settings.announce_channel.${message.guildId}`, db) ?? message.channelId;
 
     if (!announce_channel) {
       return await message.reply({ content: `something went very wrong and i couldn't find a channel to announce to`, ephemeral: true});

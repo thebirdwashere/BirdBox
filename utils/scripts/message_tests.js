@@ -1,10 +1,13 @@
 const { EmbedBuilder } = require("discord.js")
 const footers = require("../json/footers.json")
 const { messages, lyrics, interruptions, pings, mentionEmojis } = require("../json/messages.json")
+const { getSettingValue } = require("./util_scripts")
 
 module.exports = {
     messages: {
-        check: async ({message}) => { //MARK: messages
+        check: async ({message, vars}) => { //MARK: messages
+            if (!(await getSettingValue(`settings.responses.${message.guildId}`, vars.db))) return;
+
             //filter and get message content for detection
             const filterRegex = /[^A-Za-z\s!?]/g;
             const content = message.content.toLowerCase().replace(filterRegex,'').trim();
@@ -24,7 +27,9 @@ module.exports = {
         }
     },
     lyrics: {
-        check: async ({message}) => { //MARK: lyrics
+        check: async ({message, vars}) => { //MARK: lyrics
+            if (!(await getSettingValue(`settings.responses.${message.guildId}`, vars.db))) return;
+
             //filter and get message content for detection
             const filterRegex = /[^A-Za-z\s!?]/g;
             const content = message.content.toLowerCase().replace(filterRegex,'').trim();
@@ -129,18 +134,21 @@ module.exports = {
             
             //get alphabetical version
             const alphabeticalString = testResult.join(" ");
+
+            const notifSetting = await getSettingValue(`settings.notifs.${message.author.id}`, vars.db)
+            const notifChannel = await getSettingValue(`settings.notif_channel.${message.guildId}`, vars.db)
             
-            if (await vars.db.get(`settings.notifs.${message.author.id}`) !== "log") { //other cases require a reply
+            if (notifSetting == "reply") { //other cases require a reply
                 message.reply(`:abc: Your message is in perfect alphabetical order! \n\`${alphabeticalString}\``).catch(e => console.error(e));
             }
 
             let notifchannel = false //by default, do not log
-            await message.guild.channels.fetch(await vars.db.get(`settings.notif_channel.${message.guildId}`)).then(channel => {
+            await message.guild.channels.fetch(notifChannel).then(channel => {
                 if (!(channel instanceof vars.Discord.Collection)) notifchannel = channel; //for logged responses, overwrites default if found
             }) 
             
             if (notifchannel) {
-                const ping = await vars.db.get(`settings.notifs.${message.author.id}`) == "log" ? `<@${message.author.id}>` : ""; //only ping if no reply
+                const ping = notifSetting == "log" ? `<@${message.author.id}>` : ""; //only ping if no reply
                 
                 const alphabeticalSplit = alphabeticalString.match(/(.{1,1000})/g); //make sure we don't go over embed char limits
         
@@ -233,17 +241,17 @@ module.exports = {
 
             const periodicString = testResult;
             
-            if (await vars.db.get(`settings.notifs.${message.author.id}`) !== "log") { //other cases require a reply
+            if (await getSettingValue(`settings.notifs.${message.author.id}`, vars.db) !== "log") { //other cases require a reply
                 await message.reply(`:test_tube: Your message is on the periodic table! \n\`${periodicString}\``).catch(e => console.error(e));
             }
 
             let notifchannel = false //by default, do not log
-            await message.guild.channels.fetch(await vars.db.get(`settings.notif_channel.${message.guildId}`)).then(channel => {
+            await message.guild.channels.fetch(await getSettingValue(`settings.notif_channel.${message.guildId}`, vars.db)).then(channel => {
                 if (!(channel instanceof vars.Discord.Collection)) notifchannel = channel; //for logged responses, overwrites default if found
             }) 
             
             if (notifchannel) {
-                const ping = await vars.db.get(`settings.notifs.${message.author.id}`) == "log" ? `<@${message.author.id}>` : ""; //only ping if no reply
+                const ping = await getSettingValue(`settings.notifs.${message.author.id}`, vars.db) == "log" ? `<@${message.author.id}>` : ""; //only ping if no reply
                 
                 const periodicSplit = periodicString.match(/(.{1,1000})/g); //make sure we don't go over embed char limits
         
@@ -281,17 +289,17 @@ module.exports = {
 
             const pangramString = testResult;
             
-            if (await vars.db.get(`settings.notifs.${message.author.id}`) !== "log") { //other cases require a reply
+            if (await getSettingValue(`settings.notifs.${message.author.id}`) !== "log") { //other cases require a reply
                 await message.reply(`:capital_abcd: Your message contains every letter in the alphabet! \n\`${pangramString}\``).catch(e => console.error(e));
             }
 
             let notifchannel = false //by default, do not log
-            await message.guild.channels.fetch(await vars.db.get(`settings.notif_channel.${message.guildId}`)).then(channel => {
+            await message.guild.channels.fetch(await getSettingValue(`settings.notif_channel.${message.guildId}`, vars.db)).then(channel => {
                 if (!(channel instanceof vars.Discord.Collection)) notifchannel = channel; //for logged responses, overwrites default if found
             }) 
             
             if (notifchannel) {
-                const ping = await vars.db.get(`settings.notifs.${message.author.id}`) == "log" ? `<@${message.author.id}>` : ""; //only ping if no reply
+                const ping = await getSettingValue(`settings.notifs.${message.author.id}`, vars.db) == "log" ? `<@${message.author.id}>` : ""; //only ping if no reply
                 
                 const pangramSplit = pangramString.match(/(.{1,1000})/g); //make sure we don't go over embed char limits
         
@@ -312,7 +320,9 @@ module.exports = {
         }
     },
     jinx: {
-        check: async ({message}) => { //MARK: jinx
+        check: async ({message, vars}) => { //MARK: jinx
+            if (!(await getSettingValue(`settings.jinxes.${message.guildId}`, vars.db))) return;
+
             const previousMessages = await message.channel.messages.fetch({limit:2});
             const lastMessage = previousMessages.last();
 

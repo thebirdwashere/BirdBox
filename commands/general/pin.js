@@ -1,16 +1,17 @@
 const { SlashCommandBuilder } = require("discord.js");
+const { getSettingValue } = require("../../utils/scripts/util_scripts")
 
 module.exports = {
     data: new SlashCommandBuilder()
 		.setName('pin')
-		.setDescription('Pin a message by link. May be disabled depending on configuration.')
+		.setDescription('Pin/unpin a message by link. May be disabled depending on config.')
         .addStringOption(option =>
 			option
 				.setName('message')
 				.setDescription('The message link to pin.')
 				.setRequired(true)
         ),
-    async execute(interaction, {admins}) {
+    async execute(interaction, {db, admins}) {
 
         const [targetChannelId, targetMessageId] = interaction.options.getString('message').replace(`https://discord.com/channels/${interaction.guildId}/`, "").split("/");
         let targetChannel, targetMessage
@@ -25,11 +26,17 @@ module.exports = {
         const channelOwner = targetMessage.channel.ownerId
         const interactionUser = interaction.member.id
         const userIsAdmin = admins.map(user => user.userId).includes(interactionUser) //admins get bypass on any check
+
+        const pinSetting = await getSettingValue(`settings.pinning.${interaction.guildId}`, db)
+        const anyoneCanPin = pinSetting == "everyone"
+        const nobodyCanPin = pinSetting == "nobody"
+
+        if (nobodyCanPin) return interaction.reply({ content: "sorry, the admins disabled pin functions in this server", ephemeral: true });
         
         if (!targetMessage.pinned) {
 
             //if it's a thread
-            if (!userIsAdmin && channelOwner && channelOwner !== interactionUser) 
+            if (!anyoneCanPin && !userIsAdmin && channelOwner && channelOwner !== interactionUser)
                 { return interaction.reply({ content: "sorry, you can only pin messages in a thread you own", ephemeral: true }); }
 
             try { 
@@ -42,10 +49,10 @@ module.exports = {
         } else { //if it's already pinned
 
             //if it's a thread
-            if (!userIsAdmin && channelOwner && channelOwner !== interactionUser) {
+            if (!anyoneCanPin && !userIsAdmin && channelOwner && channelOwner !== interactionUser) {
                 return interaction.reply({ content: "sorry, you can only unpin messages in a thread you own", ephemeral: true }); }
             //if it's not a thread
-            if (!userIsAdmin && !channelOwner) { 
+            if (!anyoneCanPin && !userIsAdmin && !channelOwner) { 
                 return interaction.reply({ content: "sorry, you can't unpin messages here", ephemeral: true }); }
 
             try {

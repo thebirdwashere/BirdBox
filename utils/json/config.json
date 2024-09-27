@@ -18,81 +18,55 @@
             "displayOptionsAs": "toggle",
             "default": "disable",
             "value": "snipes"
-        },
-        "selTest": {
-            "name": "Bird",
-            "desc": "lorem ipsum",
-            "displayOptionsAs": "select",
-            "options": [
-                { "name": "test1", "value": "test1" },
-                { "name": "test2", "value": "test2" },
-                { "name": "test3", "value": "test3" }
-            ],
-            "value": "selTest"
-        },
-        "channelTest": {
-            "name": "Channel Select Test",
-            "desc": "lorem ipsum",
-            "displayOptionsAs": "channel",
-            "value": "channelTest"
-        },
-        "userTest": {
-            "name": "User Select Test",
-            "desc": "lorem ipsum",
-            "displayOptionsAs": "user",
-            "value": "userTest"
-        },
-        "mentionableTest": {
-            "name": "Mentionable Select Test",
-            "desc": "lorem ipsum",
-            "displayOptionsAs": "mentionable",
-            "value": "mentionableTest"
-        },
-        "roleTest": {
-            "name": "Role Select Test",
-            "desc": "lorem ipsum",
-            "displayOptionsAs": "role",
-            "value": "roleTest"
-        },
-        "modalTest": {
-            "name": "Modal Test",
-            "desc": "lorem ipsum",
-            "displayOptionsAs": "modal",
-            "options": [
-                {
-                "name": "test1",
-                "type": "short",
-                "placeholder": "test1",
-                "value": "test1"
-                },
-                {
-                "name": "test2",
-                "type": "paragraph",
-                "placeholder": "test2",
-                "value": "test2"
-                }
-            ],
-            "value": "modalTest"
-        },
-        "errorTest": {
-            "name": "Error Test",
-            "desc": "lorem ipsum",
-            "displayOptionsAs": "",
-            "value": "errorTest"
         }
     },
     "server": {
-        "notifs": {
+        "notif_channel": {
             "name": "Notifications Channel",
             "desc": "Change the channel notification logs are sent to. \nIf not set, logs will be disabled.",
-            "value": "notifs"
+            "displayOptionsAs": "channel",
+            "value": "notif_channel"
+        },
+        "announce_channel": {
+            "name": "Announcements Channel",
+            "desc": "Change the default channel the announce command sends to. \nIf not set, defaults to the channel announce is run in.",
+            "displayOptionsAs": "channel",
+            "value": "announce_channel"
+        },
+        "responses": {
+            "name": "Keyword/Lyric Responses",
+            "desc": "Toggle whether keyword and lyric responses are enabled for this server. \nDefaults to `enable` if not set.",
+            "displayOptionsAs": "toggle",
+            "default": "enable",
+            "value": "responses"
+        },
+        "jinxes": {
+            "name": "Jinx Responses",
+            "desc": "Toggle whether BirdBox responds to two identical messages sent in quick succession. \nDefaults to `enable` if not set.",
+            "displayOptionsAs": "toggle",
+            "default": "enable",
+            "value": "jinxes"
+        },
+        "pinning": {
+            "name": "Pin/Unpin Permissions",
+            "desc": "Change who can use the pin command. Under the `restricted` option, anyone can pin but not unpin in channels, and only thread owners can do either in threads. \nDefaults to `restricted` if not set.",
+            "displayOptionsAs": "buttons",
+            "options": [
+                { "name": "Everyone", "value": "everyone" },
+                { "name": "Restricted", "value": "restricted" },
+                { "name": "Nobody", "value": "nobody" }
+            ],
+            "default": "restricted",
+            "value": "pinning"
         }
     },
     "bot": {
-        "notifs": {
+        "test": {
             "name": "Test",
             "desc": "Testing",
-            "value": "notifs"
+            "displayOptionsAs": "toggle",
+            "default": "enable",
+            "value": "test"
         }
     }
 }

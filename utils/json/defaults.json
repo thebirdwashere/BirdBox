@@ -1,3 +1,9 @@
 {
-    "status": "SLASHING ALL COMMANDS - EVERYTHING MUST GO!"
+    "status": "SLASHING ALL COMMANDS - EVERYTHING MUST GO!",
+    "notifs": "reply",
+    "snipes": "disable",
+    "notif_channel": null,
+    "announce_channel": null,
+    "responses": "enable",
+    "jinxes": "enable"
 }
