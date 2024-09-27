@@ -23,6 +23,7 @@ const classicPrefix = 'd;';
 const defaults = require('./utils/json/defaults.json');
 const devs = require('./utils/json/devs.json');
 const messageTests = require("./utils/scripts/message_tests.js");
+const { getSettingValue } = require("./utils/scripts/util_scripts.js");
 
 /* VARS PASSED TO COMMANDS */
 
@@ -271,6 +272,13 @@ client.on(Events.MessageCreate, async (message) => {
 
 client.on(Events.MessageDelete, async (message) => {
     if (!message.author || !message.createdAt) return; // Don't log broken messages.
+	
+	const userSnipesSetting = await getSettingValue(`settings.snipes.${message.author.id}`, db)
+	const serverSnipesSetting = await getSettingValue(`settings.server_snipes.${message.guild.id}`, db)
+
+	console.log(userSnipesSetting, serverSnipesSetting)
+
+	if (!userSnipesSetting || !serverSnipesSetting) return; //Don't log when members opt out.
 
 	await db.set(`snipe_${message.channelId}`, {
 		content: message?.content,

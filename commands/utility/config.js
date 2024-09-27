@@ -34,7 +34,7 @@ module.exports = { //MARK: COMMAND DATA
 
     await interaction.respond(filtered);
   },
-  async execute(interaction, { embedColors, prefix, db, admins, client }) { //MARK: MODERN MODE
+  async execute(interaction, {db, admins}) { //MARK: MODERN MODE
     admins = admins.map((item) => item.userId);
 
     const scope = interaction.options?.getString("scope") ?? "user";
@@ -47,7 +47,7 @@ module.exports = { //MARK: COMMAND DATA
     if (!configOptions[scope][name] && !("default" === name)) return await interaction.reply("The requested setting option does not exist. Please try again.");
 
     const response = await interaction.reply({
-      embeds: await updateEmbed(prefix, scope, name),
+      embeds: await updateEmbed(scope, name),
       components: await updateRow(interaction, db, scope, name),
     });
 
@@ -72,6 +72,10 @@ module.exports = { //MARK: COMMAND DATA
       await setSetting(settingId, db, configOptions[scope][name], i.customId);
       await interaction.editReply({components: await updateRow(interaction, db, scope, name)})
     });
+    
+    buttonCollector.on("end", async () => {
+      await response.edit({ components: [] })
+    });
 
     /* RESPOND TO SELECTS */
     const selectCollector = response.createMessageComponentCollector({
@@ -87,7 +91,7 @@ module.exports = { //MARK: COMMAND DATA
       if (i.customId == "settingSelect") {
         name = nameCollect
         await i.message.edit({
-          embeds: await updateEmbed(prefix, scope, nameCollect),
+          embeds: await updateEmbed(scope, nameCollect),
           components: await updateRow(i, db, scope, nameCollect),
           content: `settings.${nameCollect}.${interaction.user.id}`,
         });
@@ -115,7 +119,7 @@ module.exports = { //MARK: COMMAND DATA
 };
 
 /* UTIL FUNCTIONS */
-async function updateEmbed(prefix, scope, name) { //MARK: update embed
+async function updateEmbed(scope, name) { //MARK: update embed
   // Returns an updated embed on request.
   let configEmbed = new EmbedBuilder()
     .setColor(0xffffff)
