@@ -68,12 +68,18 @@
         }
     },
     "bot": {
-        "test": {
-            "name": "Test",
-            "desc": "Testing",
-            "displayOptionsAs": "toggle",
-            "default": "enable",
-            "value": "test"
+        "status": {
+            "name": "Status",
+            "desc": "Change the bot's status to display on its profile.",
+            "displayOptionsAs": "modal",
+            "options": {
+                "name": "Status",
+                "type": "short",
+                "placeholder": "Powered by Foof Logic™",
+                "value": "status"
+            },
+            "default": "Powered by Foof Logic™",
+            "value": "status"
         }
     }
 }

@@ -98,7 +98,7 @@ client.once(Events.ClientReady, async () => {
     console.log(`Logged in as ${client.user.tag}!`);
     console.log('Logs will be shown in this terminal.');
 
-    let status = await db.get("status") || defaults.status;
+    let status = await db.get("settings.status") || defaults.status;
 
     client.user.setPresence({ activities: [{ name: status, type: ActivityType.Custom }] });
 });
@@ -177,6 +177,18 @@ client.on(Events.InteractionCreate, async (interaction) => {
 		}
 
 		try { await command.autocomplete(interaction, vars); } catch (error) { console.error(error); }
+
+	} else if (interaction.isModalSubmit()) {
+		if (interaction.customId == "settingsModal") {
+			const enteredField = interaction.fields.fields.first()
+			await interaction.deferUpdate();
+
+			await db.set(`settings.${enteredField.customId}`, enteredField.value);
+
+			if (enteredField.customId == "status") {
+				client.user.setPresence({ activities: [{ name: enteredField.value, type: ActivityType.Custom }] });
+			}
+		}
 
 	}
 

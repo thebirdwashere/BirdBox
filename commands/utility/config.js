@@ -41,7 +41,7 @@ module.exports = { //MARK: COMMAND DATA
     let name = interaction.options?.getString("name") ?? "default";
 
     // Reject the user if they are not included in the devs list.
-    if (scope == "server" && !admins.includes(interaction.user.id)) return interaction.reply({content:"sorry, you must be a birdbox admin to modify server settings", ephemeral: true});
+    if (scope != "user" && !admins.includes(interaction.user.id)) return interaction.reply({content:"sorry, you must be a birdbox admin to modify those settings", ephemeral: true});
 
     // Reject the user if the configuration option does not exist.
     if (!configOptions[scope][name] && !("default" === name)) return await interaction.reply("The requested setting option does not exist. Please try again.");
@@ -61,12 +61,11 @@ module.exports = { //MARK: COMMAND DATA
     });
 
     buttonCollector.on("collect", async (i) => { //MARK: button response
-      await i.deferUpdate();
       if (i.customId === "modal") {
-        await customModal(i);
-        await i.deferUpdate();
+        await customModal(i, configOptions[scope][name]);
         return;
       }
+      await i.deferUpdate();
 
       const settingId = scope == "user" ? i.user.id : i.guild.id
       await setSetting(settingId, db, configOptions[scope][name], i.customId);
@@ -249,23 +248,28 @@ async function optionsBuilder(interaction, db, scope, name) { //MARK: options bu
       .setDisabled(true),
   ];
 }
-async function customModal(interaction) { //MARK: custom modal
+async function customModal(interaction, setting) { //MARK: custom modal
   const modal = new ModalBuilder()
-    .setCustomId("modal")
-    .setTitle("Modal Test");
-  const favoriteColorInput = new TextInputBuilder()
-    .setCustomId("favoriteColorInput")
-    .setLabel("What's your favorite color?")
-    .setStyle(TextInputStyle.Short);
-  const hobbiesInput = new TextInputBuilder()
-    .setCustomId("hobbiesInput")
-    .setLabel("What's some of your favorite hobbies?")
-    .setStyle(TextInputStyle.Paragraph);
-  const firstActionRow = new ActionRowBuilder().addComponents(
-    favoriteColorInput
-  );
-  const secondActionRow = new ActionRowBuilder().addComponents(hobbiesInput);
-  modal.addComponents(firstActionRow, secondActionRow);
+    .setCustomId("settingsModal")
+    .setTitle(setting.name);
+  
+  const optionInput = new TextInputBuilder()
+    .setCustomId(setting.options.value)
+    .setLabel(setting.options.name)
+    .setPlaceholder(setting.options.placeholder)
+  
+  const setInputStyle = (styleName) => {
+    if (styleName == "short") {
+      optionInput.setStyle(TextInputStyle.Short)
+    } else {
+      optionInput.setStyle(TextInputStyle.Paragraph)
+    }
+  }
+
+  setInputStyle(setting.options.type)
+
+  modal.addComponents(new ActionRowBuilder().addComponents(optionInput));
+
   await interaction.showModal(modal);
 }
 
