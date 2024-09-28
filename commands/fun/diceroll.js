@@ -14,12 +14,12 @@ module.exports = {
         
         let sides = interaction.options?.getString('sides') ?? 6; 
 
-        if (sides < 1) {
-            interaction.reply({content: `bro i kinda need a positive number of faces`, ephemeral: true});
-            return;
-        } else if (sides !== Math.floor(sides)) {
-            interaction.reply({content: `bro i kinda need an integer number of faces`, ephemeral: true});
-            return;
+        if (sides > 2147483647) {
+            return interaction.reply({content: "bro that is WAY too many sides, tone it down a bit", ephemeral: true});
+        } else if (sides < 1) {
+            return interaction.reply({content: `bro i kinda need a positive number of faces`, ephemeral: true});
+        } else if (sides != Math.floor(sides)) {
+            return interaction.reply({content: `bro i kinda need an integer number of faces`, ephemeral: true});
         }
 
         //calculate random roll
@@ -58,7 +58,7 @@ module.exports = {
                 "*still shaking*",
                 "*how long will this shaking last*",
                 "*vigorous shaking*",
-                "*the shaketh continues*",
+                "*the shaketh perserveres*",
                 "*con los terroristas*"
                 ]
 
@@ -91,7 +91,7 @@ module.exports = {
     async executeClassic({message, args}) {
         
         let sides = args[0] ?? 6
-        if (sides > 1500) return message.channel.send("bro that is WAY too many sides, tone it down a bit")
+        if (sides > 2147483647) return message.channel.send("bro that is WAY too many sides, tone it down a bit")
 
         if (sides < 1) {
             message.reply(`bro i kinda need a positive number of faces`);
