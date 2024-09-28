@@ -21,17 +21,18 @@
         }
     },
     "server": {
-        "notif_channel": {
-            "name": "Notifications Channel",
-            "desc": "Change the channel notification logs are sent to. \nIf not set, logs will be disabled.",
-            "displayOptionsAs": "channel",
-            "value": "notif_channel"
-        },
         "announce_channel": {
             "name": "Announcements Channel",
             "desc": "Change the default channel the announce command sends to. \nIf not set, defaults to the channel announce is run in.",
             "displayOptionsAs": "channel",
             "value": "announce_channel"
+        },
+        "jinxes": {
+            "name": "Jinx Responses",
+            "desc": "Toggle whether BirdBox responds to two identical messages sent in quick succession. \nDefaults to `enable` if not set.",
+            "displayOptionsAs": "toggle",
+            "default": "enable",
+            "value": "jinxes"
         },
         "responses": {
             "name": "Keyword/Lyric Responses",
@@ -40,12 +41,11 @@
             "default": "enable",
             "value": "responses"
         },
-        "jinxes": {
-            "name": "Jinx Responses",
-            "desc": "Toggle whether BirdBox responds to two identical messages sent in quick succession. \nDefaults to `enable` if not set.",
-            "displayOptionsAs": "toggle",
-            "default": "enable",
-            "value": "jinxes"
+        "notif_channel": {
+            "name": "Notifications Channel",
+            "desc": "Change the channel notification logs are sent to. \nIf not set, logs will be disabled.",
+            "displayOptionsAs": "channel",
+            "value": "notif_channel"
         },
         "pinning": {
             "name": "Pin/Unpin Permissions",
