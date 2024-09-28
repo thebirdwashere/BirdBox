@@ -24,8 +24,7 @@ module.exports = { // this is messy but i literally dont care at the moment
         await interaction.respond(filtered);
 
     },
-    // Modern Mode
-    async execute(interaction, {embedColors, prefix}) {
+    async execute(interaction, {embedColors, prefix}) { //MARK: MODERN MODE
 
         let version = interaction.options?.getString('version') ?? patchNotes[0].version;
 
@@ -121,8 +120,7 @@ module.exports = { // this is messy but i literally dont care at the moment
             await interaction.deferUpdate();
         });
     },
-    // Classic Mode
-    async executeClassic({message, args}, {prefix, embedColors}) {
+    async executeClassic({message, args}, {prefix, embedColors}) { //MARK: CLASSIC MODE
 
         let version = args[0] ?? patchNotes[0].version;
 
