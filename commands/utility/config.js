@@ -44,7 +44,7 @@ module.exports = { //MARK: COMMAND DATA
     if (scope != "user" && !admins.includes(interaction.user.id)) return interaction.reply({content:"sorry, you must be a birdbox admin to modify those settings", ephemeral: true});
 
     // Reject the user if the configuration option does not exist.
-    if (!configOptions[scope][name] && !("default" === name)) return await interaction.reply("The requested setting option does not exist. Please try again.");
+    if (!configOptions[scope][name] && !("default" === name)) return await interaction.reply("thats not a setting lol, please try again");
 
     const settingId = scope == "user" ? interaction.user.id : interaction.guild.id
 
@@ -173,7 +173,7 @@ module.exports = { //MARK: COMMAND DATA
     if (scope != "user" && !admins.includes(message.author.id)) return message.reply("sorry, you must be a birdbox admin to modify those settings");
 
     // Reject the user if the configuration option does not exist.
-    if (!configOptions[scope][name] && !("default" === name)) return await message.reply("The requested setting option does not exist. Please try again.");
+    if (!configOptions[scope][name] && !("default" === name)) return await message.reply("thats not a setting lol, please try again");
 
     const settingId = scope == "user" ? message.author.id : message.guild.id
 
