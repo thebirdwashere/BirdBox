@@ -16,11 +16,12 @@
                 "`e;unpin` has been merged into `e;pin`",
                 "`e;announce` can now announce to any channel",
                 "`e;help` can now give more detailed info by passing a command",
+                "Notifications config option now supports no notification at all",
+                "`e;diceroll` now enforces an upper limit on the number of die faces",
                 "Anyone can now suggest to the maybepile",
                 "Added pangram and mentions detection",
                 "Lyric responses now only work if the message ends with the lyric",
-                "Alphabetical and periodic responses detect less ",
-                "Notifications config option now supports no notification at all"
+                "Alphabetical/periodic responses now only check messages with A-Z content"
             ]
         },
         {
