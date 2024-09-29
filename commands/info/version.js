@@ -28,7 +28,7 @@ module.exports = { // this is messy but i literally dont care at the moment
 
         let version = interaction.options?.getString('version') ?? patchNotes[0].version;
 
-        if (!patchNotes.map(item => item.version).includes(version)) return interaction.reply({ content: 'that was not a version we released lol', ephemeral: true });
+        if (!patchNotes.map(item => item.version).includes(version)) return interaction.reply({ content: 'we have not released that version lol', ephemeral: true });
         let page = patchNotes.map(item => item.version).indexOf(version);
 
         if(page + 1 > patchNotes.length) return interaction.reply({ content: 'bruh the pages dont even go that far back it up buddy', ephemeral: true }); // how did you even trigger this
@@ -124,7 +124,7 @@ module.exports = { // this is messy but i literally dont care at the moment
 
         let version = args[0] ?? patchNotes[0].version;
 
-        if (!patchNotes.map(item => item.version).includes(version)) return message.reply('that was not a version we released lol');
+        if (!patchNotes.map(item => item.version).includes(version)) return message.reply('we have not released that version lol');
         let page = patchNotes.map(item => item.version).indexOf(version);
 
         if(page + 1 > patchNotes.length) return message.reply('bruh the pages dont even go that far back it up buddy'); // how did you even trigger this

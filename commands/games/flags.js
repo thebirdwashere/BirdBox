@@ -773,7 +773,7 @@ module.exports = { //MARK: COMMAND DATA
       case "leaderboard": case "board": { //MARK: board subcommand
         const statisticChoice = args[1].toLowerCase()
         if (!["points", "win%", "streak"].includes(statisticChoice)) {
-          return await message.reply(`idk what stat ${statisticChoice} is lol \ni can show you points, win%, or streak`)
+          return await message.reply(`idk what stat \`${statisticChoice}\` is lol \ni can show you \`points\`, \`win%\`, or \`streak\``)
         }
 
         //initialize leaderboard embed

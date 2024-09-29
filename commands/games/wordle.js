@@ -551,7 +551,7 @@ module.exports = { //MARK: COMMAND DATA
                 //do some checking that the code is valid
                 const codeRegex = /^[0-9A-F]{10}$/i;
                 if (code && !codeRegex.test(code) && !moreSolutions) {
-                        return await message.reply(`idk what ${code} is lol \nyou can put in "curated", "all", or a custom answer code for starting`)
+                        return await message.reply(`idk what \`${code}\` is lol \nyou can put in \`curated\`, \`all\`, or a custom answer code for starting`)
                 }
 
                 //get the solution and its code form
@@ -774,7 +774,7 @@ module.exports = { //MARK: COMMAND DATA
             case 'leaderboard': case 'board': { //MARK: board subcommand
                 const statisticChoice = args[1];
                 if (!["average", "win%", "streak"].includes(statisticChoice)) {
-                    return await message.reply(`idk what stat ${statisticChoice} is lol \ni can show you average, win%, or streak`)
+                    return await message.reply(`idk what stat \`${statisticChoice}\` is lol \ni can show you \`average\`, \`win%\`, or \`streak\``)
                   }
 
                 //create embed with default data used across all leaderboards
