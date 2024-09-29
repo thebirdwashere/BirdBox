@@ -58,7 +58,9 @@ module.exports = {
             try {
                 await targetMessage.unpin()
                 if (targetMessage.content) {
-                    await interaction.reply(`"${targetMessage.content}" unpinned successfully!`);
+                    const targetMessageContent = targetMessage.content.replace("\n", " ")
+                    const maxMessageLength = 50
+                    await interaction.reply(`\`${(targetMessageContent.length > maxMessageLength ? `${targetMessageContent.substring(0, maxMessageLength)}...` : targetMessageContent)}\` unpinned successfully!`).catch(e => console.error(e));
                 } else {
                     await interaction.reply(`Unpinned successfully!`);
                 }
@@ -111,7 +113,7 @@ module.exports = {
                 if (targetMessage.content) {
                     const targetMessageContent = targetMessage.content.replace("\n", " ")
                     const maxMessageLength = 50
-                    await message.reply(`"${(targetMessageContent > maxMessageLength ? targetMessageContent : `${targetMessageContent.substring(0, maxMessageLength)}...`)}" unpinned successfully!`).catch(e => console.error(e));
+                    await message.reply(`\`${(targetMessageContent.length > maxMessageLength ? `${targetMessageContent.substring(0, maxMessageLength)}...` : targetMessageContent)}\` unpinned successfully!`).catch(e => console.error(e));
                 } else {
                     await message.reply(`Unpinned successfully!`).catch(e => console.error(e));
                 }

@@ -9,11 +9,13 @@ module.exports = {
 			option
 				.setName('heads')
 				.setDescription('The first option to choose from.')
+                .setMaxLength(1000)
         )
         .addStringOption(option =>
 			option
 				.setName('tails')
 				.setDescription('The second option to choose from.')
+                .setMaxLength(1000)
         ),
     async execute(interaction) {
         
@@ -68,6 +70,8 @@ module.exports = {
         
     },
     async executeClassic({message, args, strings}) {
+
+        if (message.content.length > 2000) return message.reply("bro your options are WAY too long, i aint reading allat")
         
         let heads = strings[0];
         let tails = strings[1];

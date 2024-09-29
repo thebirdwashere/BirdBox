@@ -9,7 +9,7 @@ module.exports = {
 			option
 				.setName('message')
 				.setDescription('Get a wise response...')
-                .setMaxLength(1024)
+                .setMaxLength(1000)
 				.setRequired(true)
         ),
     async execute(interaction, {embedColors}) {
@@ -50,8 +50,10 @@ module.exports = {
     }, 
     async executeClassic({message, content}, {embedColors}) {
 
-        const randomResponse = randomMsg('ball')
+        if (content.length > 1000) return message.reply("bro that message is WAY too long, i aint reading allat")
 
+        const randomResponse = randomMsg('ball')
+    
         const responseEmbed = new EmbedBuilder()
             .setAuthor({ name: 'BirdBox', iconURL: 'https://cdn.discordapp.com/avatars/803811104953466880/5bce4f0ba438015ec65f5b9cac11c8e3.png?size=256' })
             .setColor(embedColors.blue)

@@ -290,7 +290,7 @@ module.exports = { //MARK: COMMAND DATA
 
         break;
       }
-      case "leaderboard": case "board": { //MARK: leaderboard subcommand
+      case "leaderboard": case "board": { //MARK: board subcommand
         const statisticChoice = interaction.options?.getString("statistic");
 
         //initialize leaderboard embed
@@ -771,7 +771,7 @@ module.exports = { //MARK: COMMAND DATA
         break;
       }
       case "leaderboard": case "board": { //MARK: board subcommand
-        const statisticChoice = args[0].toLowerCase()
+        const statisticChoice = args[1].toLowerCase()
         if (!["points", "win%", "streak"].includes(statisticChoice)) {
           return await message.reply(`idk what stat ${statisticChoice} is lol \ni can show you points, win%, or streak`)
         }

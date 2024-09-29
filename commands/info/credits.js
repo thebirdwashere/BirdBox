@@ -17,7 +17,7 @@ module.exports = {
 				{ name: 'Bot Testers', value: devs.botTester.map(item => item.name).join(", ") },
 				{ name: 'Other', value: devs.misc.map(item => item.name).join(", ") }
 			)
-			.setFooter({ text: 'Special thanks to users like you!' });
+			.setFooter({ text: 'And an extra-special thanks to users like you!' });
 
         await interaction.reply({ embeds: [creditsEmbed] });
         
@@ -35,7 +35,7 @@ module.exports = {
 				{ name: 'Bot Testers', value: devs.botTester.map(item => item.name).join(", ") },
 				{ name: 'Other', value: devs.misc.map(item => item.name).join(", ") }
 			)
-			.setFooter({ text: 'Special thanks to users like you!' });
+			.setFooter({ text: 'And an extra-special thanks to users like you!' });
 
         await message.reply({ embeds: [creditsEmbed] });
         

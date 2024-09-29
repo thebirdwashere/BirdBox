@@ -96,7 +96,7 @@ module.exports = {
         if (sides < 1) {
             message.reply(`bro i kinda need a positive number of faces`);
             return;
-        } else if (sides !== Math.floor(sides)) {
+        } else if (sides != Math.floor(sides)) {
             message.reply(`bro i kinda need an integer number of faces`);
             return;
         }

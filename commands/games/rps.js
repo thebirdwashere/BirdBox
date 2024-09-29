@@ -72,7 +72,7 @@ module.exports = {
 		if (emojifiedChoices[playerChoice]) playerChoice = emojifiedChoices[playerChoice]
 
 		//pick a random choice from the first three of validChoices, then use the emoji version
-		const computerChoice = emojifiedChoices[validChoices[Math.floor(Math.random() * 2)]]
+		const computerChoice = emojifiedChoices[validChoices[Math.floor(Math.random() * 3)]]
 
 		//determine match result based on choices
 		const matchResults = {

@@ -8,8 +8,11 @@ module.exports = {
     async execute(interaction, {embedColors}) {
 
         const targetMessageContent = interaction.targetMessage.content
-        const randomResponse = randomMsg('ball')
 
+        if (targetMessageContent.length > 1000) return interaction.reply({ content: "bro that message doesnt even have any content lol", ephemeral: true })
+        if (targetMessageContent.length > 1000) return interaction.reply({ content: "bro that message is WAY too long, i aint reading allat", ephemeral: true })
+
+        const randomResponse = randomMsg('ball')
         const responseEmbed = new EmbedBuilder()
             .setAuthor({ name: 'BirdBox', iconURL: 'https://cdn.discordapp.com/avatars/803811104953466880/5bce4f0ba438015ec65f5b9cac11c8e3.png?size=256' })
             .setColor(embedColors.blue)

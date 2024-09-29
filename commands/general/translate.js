@@ -110,8 +110,8 @@ module.exports = {
                     await interaction.deferUpdate();
                 });
 
-            } break;
-
+                break;
+            } 
             case 'message': {
 
                 let translateFrom = interaction.options.getString('from');
@@ -147,14 +147,15 @@ module.exports = {
                     interaction.reply({ content: 'You have either entered an invalid language code/name or broke the command in some other way. Consult the help command for more information on how to use this command.', ephemeral: true });
 
                 });
-            } break;
+                break;
+            }
         }
     },
-    async executeClassic({message, args}, {embedColors, prefix}){
+    async executeClassic({message, args, strings}, {embedColors, prefix}){
         if (args[0] === 'codes') {
             const lettersList = 'abcdefghijklmnopqrstuvwxyz'.split('');
             const charList = 'abdefghijklmnprstuvwxyz'.split('');
-            const requestedPage = args[1].toLowerCase()
+            const requestedPage = args[1]?.toLowerCase?.()
 
             if (!requestedPage) {
                 message.reply(`use ${prefix}translate codes A-Z to go to a page`).catch(e => console.error(e));
@@ -188,7 +189,10 @@ module.exports = {
 
         const langTypeFrom = args[0];
         const langTypeTo = args[1];
-        const rawMessage = message.content.replace(`${prefix}translate ${langTypeFrom} ${langTypeTo}`, '');
+        const rawMessage = strings[0];
+
+        if (!langTypeFrom || !langTypeTo) return message.reply("consider adding language codes, its really helpful (use `translate codes` to see them)")
+        if (!rawMessage) return message.reply("try adding a message to translate between quotes, \"like this\"")
 
         translate(rawMessage, {from: langTypeFrom, to: langTypeTo}).then(res => {
 

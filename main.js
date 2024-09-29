@@ -288,8 +288,6 @@ client.on(Events.MessageDelete, async (message) => {
 	const userSnipesSetting = await getSettingValue(`settings.snipes.${message.author.id}`, db)
 	const serverSnipesSetting = await getSettingValue(`settings.server_snipes.${message.guild.id}`, db)
 
-	console.log(userSnipesSetting, serverSnipesSetting)
-
 	if (!userSnipesSetting || !serverSnipesSetting) return; //Don't log when members opt out.
 
 	await db.set(`snipe_${message.channelId}`, {

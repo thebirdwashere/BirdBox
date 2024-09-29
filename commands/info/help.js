@@ -1,6 +1,5 @@
 const { SlashCommandBuilder, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType } = require("discord.js");
 const { chunk } = require("../../utils/scripts/util_scripts.js");
-const { autocomplete } = require("./version.js");
 const { vars } = require("../../main.js")
 const { randomFooter } = require("../../utils/scripts/util_scripts.js")
 

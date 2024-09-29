@@ -17,7 +17,7 @@ module.exports = {
                 { name: 'Last Updated', value: patchNotes[0].date },
 				{ name: 'Credits', value: `\`${prefix}credits\`` },
                 { name: 'Server', value: `\`${prefix}neofetch\`` },
-				{ name: 'Github', value: 'https://github.com/grumpzalt/BirdBox' },
+				{ name: 'Github', value: 'https://github.com/thebirdwashere/BirdBox' },
 			)
 			.setFooter({ text: 'Special thanks to users like you!' });
 
@@ -36,7 +36,7 @@ module.exports = {
                 { name: 'Last Updated', value: patchNotes[0].date },
 				{ name: 'Credits', value: `\`${prefix}credits\`` },
                 { name: 'Server', value: `\`${prefix}neofetch\`` },
-				{ name: 'Github', value: 'https://github.com/grumpzalt/BirdBox' },
+				{ name: 'Github', value: 'https://github.com/thebirdwashere/BirdBox' },
 			)
 			.setFooter({ text: 'Special thanks to users like you!' });
 

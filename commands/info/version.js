@@ -100,57 +100,120 @@ module.exports = { // this is messy but i literally dont care at the moment
 
         const buttonCollector = response.createMessageComponentCollector({ componentType: ComponentType.Button, time: 3_600_000, filter });
 
-        buttonCollector.on('collect', async (interaction) => {
-            if (interaction.customId === 'backButton') {
+        buttonCollector.on('collect', async (i) => {
+            if (i.customId === 'backButton') {
                 page -= 1; if(page < 0) page = 0; if(page + 1 > patchNotes.length) page = patchNotes.length - 1;
-                await interaction.deferUpdate();
-                await interaction.message.edit({ embeds: updateEmbed(page), components: updateRow(page) });
-            } else if (interaction.customId === 'forwardButton') {
+                await i.deferUpdate();
+                await i.message.edit({ embeds: updateEmbed(page), components: updateRow(page) });
+            } else if (i.customId === 'forwardButton') {
                 page += 1; if(page < 0) page = 0; if(page + 1 > patchNotes.length) page = patchNotes.length - 1;
-                await interaction.deferUpdate();
-                await interaction.message.edit({ embeds: updateEmbed(page), components: updateRow(page) });
+                await i.deferUpdate();
+                await i.message.edit({ embeds: updateEmbed(page), components: updateRow(page) });
             }
         });
 
         const selectCollector = response.createMessageComponentCollector({ componentType: ComponentType.StringSelect, time: 3_600_000, filter });
 
-        selectCollector.on('collect', async (interaction) => {
-            const page = parseInt(interaction.values[0]);
-            await interaction.message.edit({ embeds: updateEmbed(page), components: updateRow(page) });
-            await interaction.deferUpdate();
+        selectCollector.on('collect', async (i) => {
+            const page = parseInt(i.values[0]);
+            await i.message.edit({ embeds: updateEmbed(page), components: updateRow(page) });
+            await i.deferUpdate();
         });
     },
     async executeClassic({message, args}, {prefix, embedColors}) { //MARK: CLASSIC MODE
 
         let version = args[0] ?? patchNotes[0].version;
 
-        if (!patchNotes.map(item => item.version).includes(version)) return interaction.reply({ content: 'that was not a version we released lol', ephemeral: true });
+        if (!patchNotes.map(item => item.version).includes(version)) return message.reply('that was not a version we released lol');
         let page = patchNotes.map(item => item.version).indexOf(version);
 
-        if(page + 1 > patchNotes.length) return interaction.reply({ content: 'bruh the pages dont even go that far back it up buddy', ephemeral: true }); // how did you even trigger this
+        if(page + 1 > patchNotes.length) return message.reply('bruh the pages dont even go that far back it up buddy'); // how did you even trigger this
 
-        let infoEmbed;
+        function updateEmbed(page) { // Returns the updated embed
+            let infoEmbed;
 
-        try {
-        
-            infoEmbed = new EmbedBuilder()
-                .setTitle(`${patchNotes[page].type} ${patchNotes[page].version}`)
-                .setAuthor({ name: 'BirdBox', iconURL: 'https://cdn.discordapp.com/avatars/803811104953466880/5bce4f0ba438015ec65f5b9cac11c8e3.webp' })
-                .setColor(embedColors.white)
-                .addFields({ name: `Update by ${patchNotes[page].devs.join(', ')}`, value: patchNotes[page]?.contribs?.join(', ') ?? ' ' })
-                .addFields({ name: `v${patchNotes[page].version} Patch Notes`, value: `● ${patchNotes[page].notes.join('\n● ').replaceAll('e;', prefix)}` })
-                .setFooter({ text: `Release Date: ${patchNotes[page].date}` });
-
+            try {
             
-        } catch(err) { // Failsafe, something triggered this so putting a catch in to be safe
+                infoEmbed = new EmbedBuilder()
+                    .setTitle(`${patchNotes[page].type} ${patchNotes[page].version}`)
+                    .setAuthor({ name: 'BirdBox', iconURL: 'https://cdn.discordapp.com/avatars/803811104953466880/5bce4f0ba438015ec65f5b9cac11c8e3.webp' })
+                    .setColor(embedColors.white)
+                    .addFields({ name: `Update by ${patchNotes[page].devs.join(', ')}`, value: patchNotes[page]?.contribs?.join(', ') ?? ' ' })
+                    .addFields({ name: `v${patchNotes[page].version} Patch Notes`, value: `● ${patchNotes[page].notes.join('\n● ').replaceAll('e;', prefix)}` })
+                    .setFooter({ text: `Release Date: ${patchNotes[page].date}` });
 
-            infoEmbed = new EmbedBuilder()
-                .setTitle('ERROR')
-                .setColor(embedColors.white)
-                .setDescription('There was an error while trying to read data.' );
+                
+            } catch(err) { // Failsafe, something triggered this so putting a catch in to be safe
 
+                infoEmbed = new EmbedBuilder()
+                    .setTitle('ERROR')
+                    .setColor(embedColors.white)
+                    .setDescription('There was an error while trying to read data.' );
+
+            }
+
+            return [infoEmbed];
         }
 
-        message.reply({ embeds: [infoEmbed] });
+        function updateRow(page) { // Returns the updated row
+            const backButton = new ButtonBuilder()
+                .setCustomId('backButton')
+                .setLabel('🠈')
+                .setStyle(ButtonStyle.Primary);
+            
+            const forwardButton = new ButtonBuilder()
+                .setCustomId('forwardButton')
+                .setLabel('🠊')
+                .setStyle(ButtonStyle.Primary);
+            
+            const versionSelect = new StringSelectMenuBuilder()
+                .setCustomId('versionSelect')
+                .setPlaceholder('Select version...');
+
+            patchNotes.forEach((item) => {
+                versionSelect.addOptions([
+                    new StringSelectMenuOptionBuilder()
+                        .setLabel(item.version)
+                        .setValue(patchNotes.indexOf(item).toString())
+                ]);
+            })
+
+            if(page <= 0) { backButton.setDisabled(true) } else { backButton.setDisabled(false) };
+            if(page >= patchNotes.length - 1) { forwardButton.setDisabled(true) } else { forwardButton.setDisabled(false) };
+
+            const infoButtonRow = new ActionRowBuilder()
+                .addComponents(backButton, forwardButton);
+            
+            const infoSelectRow = new ActionRowBuilder()
+                .addComponents(versionSelect);
+
+            return [infoSelectRow, infoButtonRow];
+        }
+
+        const response = await message.reply({ embeds: updateEmbed(page), components: updateRow(page) });
+
+        const filter = (i) => i.user.id === message.author.id;
+
+        const buttonCollector = response.createMessageComponentCollector({ componentType: ComponentType.Button, time: 3_600_000, filter });
+
+        buttonCollector.on('collect', async (i) => {
+            if (i.customId === 'backButton') {
+                page -= 1; if(page < 0) page = 0; if(page + 1 > patchNotes.length) page = patchNotes.length - 1;
+                await i.deferUpdate();
+                await i.message.edit({ embeds: updateEmbed(page), components: updateRow(page) });
+            } else if (i.customId === 'forwardButton') {
+                page += 1; if(page < 0) page = 0; if(page + 1 > patchNotes.length) page = patchNotes.length - 1;
+                await i.deferUpdate();
+                await i.message.edit({ embeds: updateEmbed(page), components: updateRow(page) });
+            }
+        });
+
+        const selectCollector = response.createMessageComponentCollector({ componentType: ComponentType.StringSelect, time: 3_600_000, filter });
+
+        selectCollector.on('collect', async (i) => {
+            const page = parseInt(i.values[0]);
+            await i.message.edit({ embeds: updateEmbed(page), components: updateRow(page) });
+            await i.deferUpdate();
+        });
     }
 }
