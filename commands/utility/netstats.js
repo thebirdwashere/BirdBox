@@ -10,12 +10,12 @@ module.exports = {
 
             if (error) {
                 //console.log(`error: ${error.message}`);
-                interaction.reply({ content: 'Could not run netstats', ephemeral: true });
+                interaction.reply({ content: 'couldn\'t run netstats', ephemeral: true });
                 return;
             }
 
             if (stderr) {
-                interaction.reply({ content: `There was an error: ${stderr}`, ephemeral: true });
+                interaction.reply({ content: `there was an error: ${stderr}`, ephemeral: true });
                 console.log(`stderr: ${stderr}`);
                 return;
             }
@@ -28,12 +28,12 @@ module.exports = {
 
             if (error) {
                 //console.log(`error: ${error.message}`);
-                message.reply({ content: 'Could not run netstats', ephemeral: true });
+                message.reply({ content: 'couldn\'t run netstats', ephemeral: true });
                 return;
             }
 
             if (stderr) {
-                message.reply({ content: `There was an error: ${stderr}`, ephemeral: true });
+                message.reply({ content: `there was an error: ${stderr}`, ephemeral: true });
                 console.log(`stderr: ${stderr}`);
                 return;
             }
