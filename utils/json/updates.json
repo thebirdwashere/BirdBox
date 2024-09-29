@@ -21,7 +21,8 @@
                 "Anyone can now suggest to the maybepile",
                 "Added pangram and mentions detection",
                 "Lyric responses now only work if the message ends with the lyric",
-                "Alphabetical/periodic responses now only check messages with A-Z content"
+                "Alphabetical/periodic responses now only check messages with A-Z content",
+                "Plus far too many more small fixes and rewrites"
             ]
         },
         {
