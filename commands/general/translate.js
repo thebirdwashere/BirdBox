@@ -19,7 +19,7 @@ module.exports = {
                 .addStringOption(option =>
                     option
                         .setName('from')
-                        .setDescription('Language to translate from')
+                        .setDescription('The language to translate from.')
                         .setMaxLength(24)
                         .setRequired(true)
                         .setAutocomplete(true)
@@ -27,7 +27,7 @@ module.exports = {
                 .addStringOption(option =>
                     option
                         .setName('to')
-                        .setDescription('Language to translate to')
+                        .setDescription('The language to translate to.')
                         .setMaxLength(24)
                         .setRequired(true)
                         .setAutocomplete(true)
@@ -35,7 +35,7 @@ module.exports = {
                 .addStringOption(option =>
                     option
                         .setName('text')
-                        .setDescription('Message to translate')
+                        .setDescription('The message you want translated.')
                         .setMaxLength(1024)
                         .setRequired(true)
                 )
