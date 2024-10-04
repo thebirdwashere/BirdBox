@@ -71,7 +71,7 @@ module.exports = { //MARK: COMMAND DATA
 
       const settingId = scope == "user" ? i.user.id : i.guild.id
       await setSetting(settingId, db, configOptions[scope][name], i.customId);
-      await message.editReply({components: await updateRow(settingId, db, scope, name)})
+      await interaction.editReply({components: await updateRow(settingId, db, scope, name)})
     });
     
     buttonCollector.on("end", async () => {
