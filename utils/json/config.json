@@ -1,0 +1,85 @@
+{
+    "user": {
+        "notifs": {
+            "name": "Notifications",
+            "desc": "Change notifications for when BirdBox notices something about your message. \nDefaults to `reply` if not set.",
+            "displayOptionsAs": "buttons",
+            "options": [
+                { "name": "Reply", "value": "reply" },
+                { "name": "Ping", "value": "ping" },
+                { "name": "Neither", "value": "neither" }
+            ],
+            "default": "reply",
+            "value": "notifs"
+        },
+        "snipes": {
+            "name": "Snipe Logging",
+            "desc": "Change whether your deleted messages are logged for the snipe command. Both the member and server must consent for the message to be logged. \nDefaults to `disable` if not set.",
+            "displayOptionsAs": "toggle",
+            "default": "disable",
+            "value": "snipes"
+        }
+    },
+    "server": {
+        "announce_channel": {
+            "name": "Announcements Channel",
+            "desc": "Change the default channel the announce command sends to. \nIf not set, defaults to the channel announce is run in.",
+            "displayOptionsAs": "channel",
+            "value": "announce_channel"
+        },
+        "jinxes": {
+            "name": "Jinx Responses",
+            "desc": "Toggle whether BirdBox responds to two identical messages sent in quick succession. \nDefaults to `enable` if not set.",
+            "displayOptionsAs": "toggle",
+            "default": "enable",
+            "value": "jinxes"
+        },
+        "responses": {
+            "name": "Keyword/Lyric Responses",
+            "desc": "Toggle whether keyword and lyric responses are enabled for this server. \nDefaults to `enable` if not set.",
+            "displayOptionsAs": "toggle",
+            "default": "enable",
+            "value": "responses"
+        },
+        "notif_channel": {
+            "name": "Notifications Channel",
+            "desc": "Change the channel notification logs are sent to. \nIf not set, logs will be disabled.",
+            "displayOptionsAs": "channel",
+            "value": "notif_channel"
+        },
+        "pinning": {
+            "name": "Pin/Unpin Permissions",
+            "desc": "Change who can use the pin command. Under the `restricted` option, anyone can pin but not unpin in channels, and only thread owners can do either in threads. \nDefaults to `restricted` if not set.",
+            "displayOptionsAs": "buttons",
+            "options": [
+                { "name": "Everyone", "value": "everyone" },
+                { "name": "Restricted", "value": "restricted" },
+                { "name": "Nobody", "value": "nobody" }
+            ],
+            "default": "restricted",
+            "value": "pinning"
+        },
+        "server_snipes": {
+            "name": "Snipe Logging",
+            "desc": "Change whether this server's deleted messages are logged for the snipe command. Both the member and server must consent for the message to be logged. \nDefaults to `enable` if not set.",
+            "displayOptionsAs": "toggle",
+            "default": "enable",
+            "value": "server_snipes"
+        }
+    },
+    "bot": {
+        "status": {
+            "name": "Status",
+            "desc": "Change the bot's status to display on its profile.",
+            "displayOptionsAs": "modal",
+            "options": {
+                "name": "Status",
+                "type": "short",
+                "placeholder": "Powered by Foof Logic™",
+                "value": "status"
+            },
+            "default": "Powered by Foof Logic™",
+            "value": "status"
+        }
+    }
+}

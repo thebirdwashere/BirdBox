@@ -1,0 +1,246 @@
+{
+    "patchNotes": [
+        {
+            "version": "6.0.0",
+            "type": "Releaes",
+            "date": "10/3/2024",
+            "devs": ["AgentNebulator", "Bislij", "Umadkek"],
+            "notes": [
+                "Every command has been rewritten to support slash commands",
+                "Added `e;flags`, `e;image`, `e;quote`, `e;reload`, `e;tictactoe`, and `e;wordle`",
+                "Removed `e;admintest`, `e;embedtest`, `e;modaltest`, and `e;responses`",
+                "Added context menu options `ask 8ball` and `pin or unpin`",
+                "`e;version` has been split from `e;info`, which now shows a basic bot description",
+                "`e;setstatus` has been merged into `e;config`",
+                "`e;translatecodes` has been merged into `e;help`",
+                "`e;unpin` has been merged into `e;pin`",
+                "`e;announce` can now announce to any channel",
+                "`e;help` can now give more detailed info by passing a command",
+                "Notifications config option now supports no notification at all",
+                "`e;diceroll` now enforces an upper limit on the number of die faces",
+                "Anyone can now suggest to the maybepile",
+                "Added pangram and mentions detection",
+                "Lyric responses now only work if the message ends with the lyric",
+                "Alphabetical/periodic responses now only check messages with A-Z content",
+                "Plus far too many more small fixes and rewrites"
+            ]
+        },
+        {
+            "version": "5.1.4", 
+            "type": "Release",
+            "date": "4/23/2024", 
+            "devs": ["AgentNebulator"],
+            "notes": [
+                "Updated e;info to show initial version and hotfixes",
+                "Fixed crash when using e;unpin",
+                "Minor changes to ping responses"
+            ]
+        },
+        {
+            "version": "5.1.3", 
+            "type": "Release",
+            "date": "4/23/2024", 
+            "devs": ["AgentNebulator"],
+            "notes": [
+                "Fixed crash when testing for alphabetical messages"
+            ]
+        },
+        {
+            "version": "5.1.2", 
+            "type": "Release",
+            "date": "4/22/2024", 
+            "devs": ["AgentNebulator"],
+            "notes": [
+                "e;maybepile view now always lists either the author or the claimer",
+                "Claimers can now unclaim or deprioritize things on maybepile",
+                "Added 15 new random conversation interruptions",
+                "Decreased the chances of BirdBox interrupting to 1/5000",
+                "BirdBox now responds to being pinged (currently 15 responses)"
+            ]
+        },
+        {
+            "version": "5.1.1",
+            "type": "Release",
+            "date": "4/12/2024", 
+            "devs": ["AgentNebulator", "TheBirdWasHere"],
+            "notes": [
+                "BirdBox no longer responds to messages sent by any bot",
+                "Fixed pin permissions not working in threads",
+                "Added embed to e;announce"
+            ]
+        },
+        {
+            "version": "5.1.0",
+            "type": "Release",
+            "date": "3/24/2024", 
+            "devs": ["AgentNebulator", "Umadkek"],
+            "notes": [
+                "Added new serverside config options for response types and pin command",
+                "Added claim, edit, and delete buttons to e;maybepile view",
+                "Added claim system to maybepile to establish development status",
+                "e;coinflip now has a small change to land on the edge",
+                "e;maybepile item selector no longer disables after one use",
+                "Alphabetical order response now changes if all words are the same",
+                "Added randomChoice utils function for choosing a random array element",
+                "Most commands now reply to command use",
+                "Added 15 new 8ball responses"
+            ]
+        },
+        {
+            "version": "5.0.1",
+            "type": "Release",
+            "date": "3/12/2024", 
+            "devs": ["AgentNebulator", "Bislij", "Umadkek"],
+            "notes": [
+                "e;8ball, e;ping, e;rr, and e;translate now use an embed",
+                "Added help description for diceroll & updated others",
+                "Rewrote help command to import from command info",
+                "Ported remaining modernmode functions to their respective files",
+                "Renamed modernmode file to be more descriptive about its function",
+                "Fixed issue with both canary and main responding to messages",
+                "Fixed crashes due to missing message send perms",
+                "Fixed typo in 8ball response"
+            ]
+        },
+        {
+            "version": "5.0.0",
+            "type": "Release",
+            "date": "3/9/2024",
+            "devs": ["AgentNebulator", "Bislij"],
+            "notes": [
+                "Added `e;coinflip` and `e;diceroll` commands",
+                "Added `e;setstatus` to change bot status",
+                "Added snipe image support for cached images",
+                "Added privacy policy and `e;privacy` command",
+                "Added utils file for utility functions",
+                "Changed dev storage to use a JSON file",
+                "Changed the way arguments are passed to commands",
+                "Changed pin/unpin so devs can pin in any channel",
+                "Fixed message saying \"added\" when editing responses",
+                "Actually actually deleted db-test and noreply"
+            ]
+        },
+        {
+            "version": "4.3.4",
+            "type": "Release",
+            "date": "2/13/2024",
+            "devs": ["AgentNebulator"],
+            "notes": [
+                "User config can no longer be changed by any user during modification",
+                "`e;config` now defaults to user as the initial mode",
+                "Fixed occasional misspellings in periodic table notifications",
+                "Fixed inconsistent placement of lyric responses"
+            ]
+        },
+        {
+            "version": "4.3.3",
+            "type": "Release",
+            "date": "1/25/2024",
+            "devs": ["AgentNebulator"],
+            "contribs": ["Crisby", "TheBirdWasHere"],
+            "notes": [
+                "`e;maybepile`, `e;responses`, `e;help`, and `e;config` now use modals/buttons",
+                "Added a new config setting, Birdbox Classic, to use old text interfaces",
+                "Added e;settings as an alternative name for `e;config`",
+                "`e;config` no longer shows server settings unless requested",
+                "Reordered message detection with respect to canary status",
+                "Merged noreply into echo as the initial argument",
+                "Reduced the time window for jinx detection",
+                "Certain error messages no longer say undefined when no input is provided",
+                "Fixed a crash when attempting to send something in a restricted channel",
+                "Fixed some instances where periodic table detection would fail",
+                "Fixed issue where non-dev users can delete responses",
+                "Fixed a typo in `e;help` regarding e;info",
+                "Fixed a typo in `e;config`",
+                "Actually removed e;db-test this time"
+            ]
+        },
+        {
+            "version": "4.3.2",
+            "type": "Release",
+            "date": "1/8/2024",
+            "devs": ["AgentNebulator"],
+            "contribs": ["Anpun", "Crisby"],
+            "notes": [
+                "Added jinx detector for two people saying the same thing at a similar time",
+                "Added element detector for messages made of periodic table abbreviations",
+                "Added a log system for detected messages to put them in their own channel",
+                "Added `e;config` command to configure user and server settings",
+                "Added 8ball emoji to the beginning of e;8ball responses",
+                "Added randomized footer text to e;snipe responses",
+                "e;info now takes \"all\" after the command to see past patches",
+                "Snipes are now opt-in rather than being required (use `e;config`)",
+                "Moved message-parsing functions out of main.js and into their own file",
+                "Removed useless variable declaration from translate help",
+                "Removed useless function call from `e;maybepile`",
+                "Trimmed unnecessary data that was being stored by snipes",
+                "Fixed bugged error message when a response keyword is already in use",
+                "Fixed several edge cases with alphabetical detection, including emojis",
+                "Fixed a crash when snipes are missing data"
+            ]
+        },
+        {
+            "version": "4.3.1",
+            "type": "Release",
+            "date": "1/1/2024",
+            "devs": ["AgentNebulator"],
+            "notes": [
+                "Fixed bug where maybepile edits would call the title a desc or author",
+                "Fixed bug where response additions would detect all keywords as duplicates",
+                "Removed leftover code from `e;maybepile` in `e;responses`",
+                "Added more descriptive error messages to `e;responses`",
+                "Fixed old e;info notes having spaces in command names",
+                "Fixed undefined in patch notes when contribs is empty"
+            ]
+        },
+        {
+            "version": "4.3.0",
+            "type": "Release",
+            "date": "12/25/2023",
+            "devs": ["AgentNebulator"],
+            "contribs": ["Crisby", "TheBirdWasHere"],
+            "notes": [
+                "Added dates to e;info patch notes",
+                "Added 15 e;8ball messages, bringing the total to 100",
+                "Made maybepile embeds inline for cleaner display",
+                "Fixed `e;maybepile` breaking if item count is over 25",
+                "Replaced all instances of string concatenation with template literals",
+                "Removed e;db-test because it was useless",
+                "Added `e;responses` to manage stickers and lyrics",
+                "Added lyric response functionality",
+                "Removed hardcoded sticker responses",
+                "Updated `e;help` to reflect these changes"
+            ]
+        },
+        {
+            "version": "4.2.2",
+            "type": "Release",
+            "date": "11/30/2023",
+            "devs": ["AgentNebulator"],
+            "notes": [
+                "Reworked e;info internally to allow for multiple patches",
+                "Fixed `e;maybepile` bug where page numbers would not work if \"view\" is assumed",
+                "Leading spaces are no longer included in maybepile titles if created using the initial command",
+                "`e;help` maybepile now accurately reflects these changes"
+            ]
+        },
+        {
+            "version": "4.2.1",
+            "type": "Release",
+            "date": "11/24/2023",
+            "devs": ["AgentNebulator"],
+            "notes": [
+                "Added e;info to display bot info, version, and patch notes",
+                "`e;help` is now reformatted to be shorter and easier to read",
+                "`e;help` can now take arguments for certain command-specific pages",
+                "Rewrote `e;maybepile` to be modifiable with Discord commands",
+                "Reworked translation codes directory so pages are alphabetized",
+                "Translation codes are now found under `e;help` translate (page) and e;translate codes (page)",
+                "Added array of dev user ids, to be passed to commands like `e;maybepile` for perm checks",
+                "e;command name are once again case-sensitive (this fixes bugs with echo-based commands)",
+                "Fixed bug where pinning a pinned message would return successful (and likewise with unpinning)",
+                "Updated bot credits to be more accurate"
+            ]
+        }
+    ]
+}

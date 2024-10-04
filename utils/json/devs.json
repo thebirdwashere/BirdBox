@@ -1,0 +1,52 @@
+{
+    "host": [
+        {
+            "name": "thebirdwashere",
+            "userId": "747501068631670835"
+        }
+    ],
+    "developer": [
+        {
+            "name": "agentnebulator",
+            "userId": "742843630120730701"
+        },
+        {
+            "name": "bislij",
+            "userId": "904868840511524885"
+        }
+    ],
+    "contributor": [
+        {
+            "name": "umadkek",
+            "userId": "476123353229426688"
+        }
+    ],
+    "botTester": [
+        {
+            "name": "anpun",
+            "userId": "764597453810171984"
+        },
+        {
+            "name": "crisby",
+            "userId": "668589151909838908"
+        },
+        {
+            "name": "helthy",
+            "userId": "764597453810171984"
+        },
+        {
+            "name": "stable",
+            "userId": "1102697421672288286"
+        } 
+    ],
+    "misc": [
+        {
+            "name": "kieran.thejasperhouse (former host)",
+            "userId": "572454519246553089"
+        } ,
+        {
+            "name": "aniket of discord-gamecord (tic-tac-toe code)",
+            "userId": null
+        }
+    ]
+}
