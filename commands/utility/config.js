@@ -225,7 +225,7 @@ module.exports = { //MARK: COMMAND DATA
         await i.message.edit({
           embeds: await updateEmbed(scope, nameCollect),
           components: await updateRow(settingId, db, scope, nameCollect),
-          content: `settings.${nameCollect}.${message.author.id}`,
+          //content: `settings.${nameCollect}.${message.author.id}`,
         });
 
       } else if (i.customId == "settingOptionsSelect") {
