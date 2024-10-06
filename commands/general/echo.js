@@ -32,7 +32,7 @@ module.exports = {
     },
     async executeClassic({message, args, strings}) {
 
-        if (strings[0].length > 1000) return await message.reply("bruh do you really expect me to say allat");
+        if (strings[0]?.length > 1000) return await message.reply("bruh do you really expect me to say allat");
 
         if (args[0] !== 'noreply') {
             await message.reply(strings[0] || 'you need to enter an echo message surrounded by quotes');
