@@ -8,7 +8,7 @@ module.exports = {
 			option.setName('command')
 				.setDescription('The command to reload.')
 				.setRequired(true)),
-    filter: ['host', 'developer'],
+	filter: ['host', 'developer'],
 	async execute(interaction) {
 
 		const commandName = interaction.options.getString('command', true).toLowerCase();
