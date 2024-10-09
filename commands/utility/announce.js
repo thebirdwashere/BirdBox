@@ -56,7 +56,7 @@ module.exports = {
     });
   },
   async executeClassic({message, args, strings}, {db}) {
-    if (!strings[0]) return await messag.reply('you need to enter an announcement surrounded by quotes')
+    if (!strings[0]) return await message.reply('you need to enter an announcement surrounded by quotes')
 
     let announce_channel = args[0]?.replace(`https://discord.com/channels/${message.guildId}/`, "") ?? getSettingValue(`settings.announce_channel.${message.guildId}`, db) ?? message.channelId;
 
