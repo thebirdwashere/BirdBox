@@ -288,7 +288,7 @@ module.exports = {
 
             const pangramString = testResult;
             
-            if (await getSettingValue(`settings.notifs.${message.author.id}`) !== "log") { //other cases require a reply
+            if (await getSettingValue(`settings.notifs.${message.author.id}`, vars.db) !== "log") { //other cases require a reply
                 await message.reply(`:capital_abcd: Your message contains every letter in the alphabet! \n\`${pangramString}\``).catch(e => console.error(e));
             }
 
