@@ -1,6 +1,18 @@
 {
     "patchNotes": [
         {
+            "version": "6.0.1",
+            "type": "Release",
+            "date": "10/10/2024",
+            "devs": ["AgentNebulator"],
+            "notes": [
+                "Fixed debug prefix still being in use",
+                "Fixed message tests crash due to missing function argument",
+                "Fixed several crashes caused by `e;config`",
+                "Fixed a typo causing a crash in `e;announce`"
+            ]
+        },
+        {
             "version": "6.0.0",
             "type": "Release",
             "date": "10/3/2024",
