@@ -31,6 +31,7 @@ To set up BirdBox you will need
 - child_process (used for netstats and neofetch commands)
 - google-translate-api (for translate command)
 - bindings
+
 All of these packages are available using NPM.
 
 BirdBox will run on pretty much any Linux system (I have used both Arch Linux and Ubuntu Server). Other operating systems may work with some testing (Windows has been confirmed to work by a fellow developer with some tweaking)
@@ -58,7 +59,7 @@ For the neofetch command to work, you will need to have neofetch installed on yo
 
 To make the netstats command work, you will need ifconfig installed (should be by default) and you will probably need to change the network interface BirdBox is checking.
 
-To do so, go to the netstats.js file in the cmds directory, and edit line 9 [begins with exec("ifconfig enp5s0 ] to show your actual network interface instead of the default "enp5s0" which is set for my server. To check network interfaces, type "ip a" into your terminal and look for something beginning with "enp" if using Ethernet or "wlp" if using WiFi. Take the name of the interface you found and use it to replace the default.
+To do so, go to the netstats.js file in the cmds directory, and edit line 9 [begins with exec("ifconfig enpXs0 ] (may be subject to change in the future, so the actual number has been replaced with "X") to show your actual network interface instead of the default "enpXs0" which is set for my server. To check network interfaces, type "ip a" into your terminal and look for something beginning with "enp" if using Ethernet or "wlp" if using WiFi. Take the name of the interface you found and use it to replace the default.
 
 Other configuration changes can be made using the e;config command built into BirdBox.
 
