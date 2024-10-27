@@ -171,7 +171,7 @@ module.exports = {
         check: ({message}) => { //MARK: periodic
             let content = message.content.toLowerCase();
 
-            if (content.length > 973) return;                             //this checks if the message is empty or too long
+            if (content.length > 950) return;                             //this checks if the message is empty or too long
             if (content.match(/[^a-zA-Z\s]/)) return;                     //this tests for non-alphabetical characters
             if (content.includes("j") || content.includes("q")) return;   //no j or q on the periodic table, fun fact
 
@@ -274,6 +274,9 @@ module.exports = {
         check: async ({message}) => { //MARK: pangrams
             const alphabet = "abcdefghijklmnopqrstuvwxyz".split("")
             let content = message.content.toLowerCase()
+
+            if (message.content.length > 950) return; //this checks if the message is empty or too long
+            if (content.includes("https://")) return; //this checks for contained links (which trivialize detection)
             
             for (const letter of alphabet) {
                 if (!content.includes(letter)) return;
