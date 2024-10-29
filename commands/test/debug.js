@@ -16,7 +16,10 @@ module.exports = {
                 .setDescription('Checks the permissions of a command.')
                 .addStringOption(option => option.setName('command').setDescription('The command to check the permissions of.').setRequired(true).setAutocomplete(true))
         ),
-    filter: ['host', 'developer'],
+    filter: {
+        'database': ['host', 'developer'],
+        'permissions': ['host', 'developer']
+    },
     async autocomplete(interaction, {commands}) {
 
         const choices = commands.map(item => item.data.name);
