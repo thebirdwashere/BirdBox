@@ -43,8 +43,9 @@ module.exports = {
                 
                 if (database_item) {
                     let itemstring = JSON.stringify(database_item);
-                    itemstring = itemstring.match(/.{1,2000}/g);
-                    itemstring.forEach(element => { interaction.reply({ content: `Value: ${element}`, ephemeral: true }) });
+                    itemstring = itemstring.match(/.{1,1900}/g);
+                    interaction.reply(`Database request: \`${item}\``)
+                    itemstring.forEach(element => { interaction.channel.send(`\`\`\`${element}\`\`\``) });
                 } else { interaction.reply({ content: `Failed to locate item: \`${item}\` in the database. Please try again.`, ephemeral: true }) };
 
             } break;
