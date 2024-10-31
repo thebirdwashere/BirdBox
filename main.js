@@ -275,6 +275,7 @@ client.on(Events.MessageCreate, async (message) => {
 	for (const [_, test] of Object.entries(messageTests)) {
 		const testResult = await test.check({message, vars})
 		if (testResult) {
+			console.log("Message test passed: \n", message.content, "\n", testResult)
 			await test.respond({message, vars, testResult})
 		}
 	}
@@ -289,6 +290,8 @@ client.on(Events.MessageDelete, async (message) => {
 	const serverSnipesSetting = await getSettingValue(`settings.server_snipes.${message.guild.id}`, db)
 
 	if (!userSnipesSetting || !serverSnipesSetting) return; //Don't log when members opt out.
+
+	console.log("Snipe settings:", userSnipesSetting, serverSnipesSetting)
 
 	await db.set(`snipe_${message.channelId}`, {
 		content: message?.content,
