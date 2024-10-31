@@ -101,6 +101,9 @@ client.once(Events.ClientReady, async () => {
     let status = await db.get("settings.status") || defaults.status;
 
     client.user.setPresence({ activities: [{ name: status, type: ActivityType.Custom }] });
+
+	const lastMessage = await db.get("lastmsg")
+	console.log("Last message before shutdown:", lastMessage?.content, lastMessage?.id)
 });
 
 /* INTERACTION HANDLER */
@@ -197,6 +200,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 /* ON MESSAGE CREATION */
 
 client.on(Events.MessageCreate, async (message) => {
+	await db.set("lastmsg", message)
     if (message.author.id == client.user.id) return;
     if (!message.content) return;
 
