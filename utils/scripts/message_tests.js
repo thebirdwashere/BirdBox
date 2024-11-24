@@ -6,7 +6,8 @@ const { getSettingValue } = require("./util_scripts")
 module.exports = {
     messages: {
         check: async ({message, vars}) => { //MARK: messages
-            if (!(await getSettingValue(`settings.responses.${message.guildId}`, vars.db))) return;
+            const settingValue = await getSettingValue(`settings.responses.${message.guildId}`, vars.db)
+            if (!settingValue) return;
 
             //filter and get message content for detection
             const filterRegex = /[^A-Za-z\s!?]/g;
@@ -28,7 +29,8 @@ module.exports = {
     },
     lyrics: {
         check: async ({message, vars}) => { //MARK: lyrics
-            if (!(await getSettingValue(`settings.responses.${message.guildId}`, vars.db))) return;
+            const settingValue = await getSettingValue(`settings.responses.${message.guildId}`, vars.db)
+            if (!settingValue) return;
 
             //filter and get message content for detection
             const filterRegex = /[^A-Za-z\s!?]/g;
@@ -36,7 +38,7 @@ module.exports = {
 
             /*/
                 * first, previous lyric detection
-                * to explain what's going on here, consider the chorus of all star
+                * to explain what's going on here, consider the chorus of all-star
                 *
                 * -> hey now / you're an allstar
                 *    get your game on / go play
@@ -44,7 +46,7 @@ module.exports = {
                 *    get the show on / get paid
                 * 
                 * notice how the same lyric appears twice?
-                * without intervention, soneone naively trying to recite the chorus
+                * without intervention, someone naively trying to recite the chorus
                 * would reset back to the beginning every time "hey now" comes up
                 * 
                 * this can be fixed by considering the place we are in the song
