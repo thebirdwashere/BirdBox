@@ -27,6 +27,12 @@
             "displayOptionsAs": "channel",
             "value": "announce_channel"
         },
+        "guesswho_channel": {
+            "name": "Guess Who Channel",
+            "desc": "Change the channel the Guess Who game searches. \nIf not set, defaults to the channel Guess Who is run in.",
+            "displayOptionsAs": "channel",
+            "value": "guesswho_channel"
+        },
         "jinxes": {
             "name": "Jinx Responses",
             "desc": "Toggle whether BirdBox responds to two identical messages sent in quick succession. \nDefaults to `enable` if not set.",

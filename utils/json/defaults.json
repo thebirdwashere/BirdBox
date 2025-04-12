@@ -4,6 +4,7 @@
     "snipes": "disable",
     "notif_channel": null,
     "announce_channel": null,
+    "guesswho_channel": null,
     "responses": "enable",
     "jinxes": "enable",
     "server_snipes": "enable"
