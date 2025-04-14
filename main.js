@@ -19,11 +19,11 @@ const path = require('path');
 const token = process.env.DISCORD_TOKEN;
 const { QuickDB } = require("quick.db");
 const db = new QuickDB();
-const classicPrefix = 'e;';
 const defaults = require('./utils/json/defaults.json');
 const devs = require('./utils/json/devs.json');
 const messageTests = require("./utils/scripts/message_tests.js");
-const { getSettingValue } = require("./utils/scripts/util_scripts.js");
+const { getSettingValue, getPrefix } = require("./utils/scripts/util_scripts.js");
+let classicPrefix; //will set later
 
 /* VARS PASSED TO COMMANDS */
 
@@ -99,6 +99,7 @@ client.once(Events.ClientReady, async () => {
     console.log('Logs will be shown in this terminal.');
 
     let status = await db.get("settings.status") || defaults.status;
+	classicPrefix = getPrefix(client);
 
     client.user.setPresence({ activities: [{ name: status, type: ActivityType.Custom }] });
 

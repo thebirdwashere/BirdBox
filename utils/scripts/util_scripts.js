@@ -72,5 +72,14 @@ module.exports = {
         }
 
         return [...chunkSplit(arr, size)];
+    },
+    getPrefix: (client) => {
+        const clientId = client.user.id;
+        switch (clientId) {
+            case "803811104953466880": return "e;";   //main birdbox
+            case "911696357356617759": return "ec;";  //canary birdbox
+            case "1009116059112063067": return "d;";  //canary squared devbot
+            default: return "e;";                     //default case
+        }
     }
 }
