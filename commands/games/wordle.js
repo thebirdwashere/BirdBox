@@ -546,7 +546,8 @@ module.exports = { //MARK: COMMAND DATA
         switch (args[0]) { // Switch to handle different subcommands.
             case 'start': { //MARK: start subcommand
                 const code = args[1]
-                const moreSolutions = {"curated":"wordle","all":"wordle all"}[code]
+                let moreSolutions = {"curated":"wordle","all":"wordle all"}[code]
+                if (!moreSolutions) {moreSolutions = "wordle"}
 
                 //do some checking that the code is valid
                 const codeRegex = /^[0-9A-F]{10}$/i;
