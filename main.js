@@ -205,7 +205,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 
 client.on(Events.MessageCreate, async (message) => {
 	await db.set("lastmsg", message)
-    if (message.author.id == client.user.id) return;
+    if (message.author.bot) return; //no bot messages will be checked (this includes itself!)
     if (!message.content) return;
 
 	if (message.content.startsWith(classicPrefix)) {
