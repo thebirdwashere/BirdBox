@@ -106,8 +106,8 @@ client.once(Events.ClientReady, async () => {
 	const lastMessage = await db.get("lastmsg")
 	console.log("Last message before shutdown:", lastMessage?.content, lastMessage?.id)
 
-	const settingValue = await getSettingValue(`settings.responses.774021162115006475`, vars.db)
-	console.log("Messages/lyrics setting:", settingValue)
+	// const settingValue = await getSettingValue(`settings.responses.774021162115006475`, vars.db)
+	// console.log("Messages/lyrics setting:", settingValue)
 });
 
 /* INTERACTION HANDLER */
@@ -291,14 +291,14 @@ client.on(Events.MessageCreate, async (message) => {
 /* ON MESSAGE DELETION */
 
 client.on(Events.MessageDelete, async (message) => {
-	console.log("Snipe values:", message.author, message.createdAt)
+	//console.log("Snipe values:", message.author, message.createdAt)
 
     if (!message.author || !message.createdAt) return; // Don't log broken messages.
 	
 	const userSnipesSetting = await getSettingValue(`settings.snipes.${message.author.id}`, db)
 	const serverSnipesSetting = await getSettingValue(`settings.server_snipes.${message.guild.id}`, db)
-	
-	console.log("Snipe settings:", userSnipesSetting, serverSnipesSetting)
+
+	//console.log("Snipe settings:", userSnipesSetting, serverSnipesSetting)
 
 	if (!userSnipesSetting || !serverSnipesSetting) return; //Don't log when members opt out.
 

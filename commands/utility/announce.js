@@ -26,14 +26,14 @@ module.exports = {
       )
   ),
   async execute(interaction, {db}) {
-    let announce_channel = interaction.options?.getChannel("channel")?.id ?? getSettingValue(`settings.announce_channel.${interaction.guildId}`, db) ?? interaction.channelId;
+    let announce_channel = await interaction.options?.getChannel("channel")?.id ?? await getSettingValue(`settings.announce_channel.${interaction.guildId}`, db) ?? interaction.channelId;
 
     if (!announce_channel) {
       return await interaction.reply({ content: `something went very wrong and i couldn't find a channel to announce to`, ephemeral: true});
     }
 
     try {
-      const channel = interaction.guild.channels.cache.get(announce_channel);
+      const channel = await interaction.guild.channels.cache.get(announce_channel);
       if (!channel) {
         return await interaction.reply({ content: `announcement channel could not be found (somehow), try a different one`, ephemeral: true});
       }
