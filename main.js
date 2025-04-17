@@ -292,12 +292,13 @@ client.on(Events.MessageCreate, async (message) => {
 
 client.on(Events.MessageDelete, async (message) => {
 	console.log("Snipe values:", message.author, message.createdAt)
-	console.log("Snipe settings:", userSnipesSetting, serverSnipesSetting)
 
     if (!message.author || !message.createdAt) return; // Don't log broken messages.
 	
 	const userSnipesSetting = await getSettingValue(`settings.snipes.${message.author.id}`, db)
 	const serverSnipesSetting = await getSettingValue(`settings.server_snipes.${message.guild.id}`, db)
+	
+	console.log("Snipe settings:", userSnipesSetting, serverSnipesSetting)
 
 	if (!userSnipesSetting || !serverSnipesSetting) return; //Don't log when members opt out.
 
