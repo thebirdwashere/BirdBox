@@ -4,29 +4,6 @@ const { messages, lyrics, interruptions, pings, mentionEmojis } = require("../js
 const { getSettingValue } = require("./util_scripts")
 
 module.exports = {
-    messages: {
-        check: async ({message, vars}) => { //MARK: messages
-            const settingValue = await getSettingValue(`settings.responses.${message.guildId}`, vars.db)
-            if (!settingValue) return;
-
-            //filter and get message content for detection
-            const filterRegex = /[^A-Za-z\s!?]/g;
-            const content = message.content.toLowerCase().replace(filterRegex,'').trim();
-
-            //get message-type responses and sort by length
-            const messagesMap = new Map([...new Map(Object.entries(messages))].sort((a, b) => a[1].length - b[1].length));
-
-            //test for message-type responses
-            for (let [key, val] of messagesMap) {
-                if (content.includes(key)) {
-                    return val;
-                }
-            }
-        },
-        respond: async ({message, testResult}) => {
-            await message.reply(testResult).catch(e => console.error(e));
-        }
-    },
     lyrics: {
         check: async ({message, vars}) => { //MARK: lyrics
             const settingValue = await getSettingValue(`settings.responses.${message.guildId}`, vars.db)
@@ -104,6 +81,30 @@ module.exports = {
         respond: async ({message, testResult}) => {
             await message.reply(testResult).catch(e => console.error(e));
         }
+    },
+    messages: {
+        check: async ({message, vars}) => { //MARK: messages
+            const settingValue = await getSettingValue(`settings.responses.${message.guildId}`, vars.db)
+            if (!settingValue) return;
+
+            //filter and get message content for detection
+            const filterRegex = /[^A-Za-z\s!?]/g;
+            const content = message.content.toLowerCase().replace(filterRegex,'').trim();
+
+            //get message-type responses and sort by length
+            const messagesMap = new Map([...new Map(Object.entries(messages))].sort((a, b) => a[1].length - b[1].length));
+
+            //test for message-type responses
+            for (let [key, val] of messagesMap) {
+                if (content.includes(key)) {
+                    return val;
+                }
+            }
+        },
+        respond: async ({message, testResult}) => {
+            await message.reply(testResult).catch(e => console.error(e));
+        }
+
     },
     alphabetical: {
         check: ({message}) => { //MARK: alphabetical

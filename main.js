@@ -311,7 +311,7 @@ client.on(Events.MessageCreate, async (message) => {
 	for (const [_, test] of Object.entries(messageTests)) {
 		const testResult = await test.check({message, vars})
 		if (testResult) {
-			await test.respond({message, vars, testResult})
+			return await test.respond({message, vars, testResult});
 		}
 	}
 });
