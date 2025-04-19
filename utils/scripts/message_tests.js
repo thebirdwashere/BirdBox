@@ -4,6 +4,28 @@ const { messages, lyrics, interruptions, pings, mentionEmojis } = require("../js
 const { getSettingValue } = require("./util_scripts")
 
 module.exports = {
+    pings: {
+        check: async ({message, vars}) => { //MARK: pings
+            const clientId = vars.client.user.id;
+            if (message.content.includes(`<@${clientId}>`)) {
+                const randomReply = pings[Math.floor(Math.random() * pings.length)];
+                return randomReply;
+            }
+        },
+        respond: async ({message, testResult}) => {
+            await message.channel.send(testResult).catch(e => console.error(e));
+        }
+    },
+    mentions: {
+        check: async ({message}) => { //MARK: mentions
+            if (message.content.toLowerCase().includes("birdbox")) {
+                return mentionEmojis[Math.floor(Math.random() * mentionEmojis.length)]
+            }
+        },
+        respond: async ({message, testResult}) => {
+            await message.react(testResult).catch(e => console.error(e));
+        }
+    },
     lyrics: {
         check: async ({message, vars}) => { //MARK: lyrics
             const settingValue = await getSettingValue(`settings.responses.${message.guildId}`, vars.db)
@@ -361,27 +383,5 @@ module.exports = {
         respond: async ({message, testResult}) => {
             await message.channel.send(testResult).catch(e => console.error(e));
         },
-    },
-    pings: {
-        check: async ({message, vars}) => { //MARK: pings
-            const clientId = vars.client.user.id;
-            if (message.content.includes(`<@${clientId}>`)) {
-                const randomReply = pings[Math.floor(Math.random() * pings.length)];
-                return randomReply;
-            }
-        },
-        respond: async ({message, testResult}) => {
-            await message.channel.send(testResult).catch(e => console.error(e));
-        }
-    },
-    mentions: {
-        check: async ({message}) => { //MARK: mentions
-            if (message.content.toLowerCase().includes("birdbox")) {
-                return mentionEmojis[Math.floor(Math.random() * mentionEmojis.length)]
-            }
-        },
-        respond: async ({message, testResult}) => {
-            await message.react(testResult).catch(e => console.error(e));
-        }
     }
 }
