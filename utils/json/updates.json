@@ -1,6 +1,25 @@
 {
     "patchNotes": [
         {
+            "version": "6.0.2",
+            "type": "Release",
+            "date": "4/25/2025",
+            "devs": ["AgentNebulator"],
+            "notes": [
+                "Added two new lyric response types",
+                "Added three new keyword response types",
+                "Added 6 new ping responses, for a total of 19",
+                "Added 152 new random interruptions, for a total of 166",
+                "Only one response type will now trigger on a given message",
+                "Prevented pangram detection from going off due to links",
+                "Bot prefix is now once again determined dynamically",
+                "Added debug print of the last seen message before shutdown",
+                "Fixed a problem with permissions in `e;debug`",
+                "Fixed a problem with the `e;announce` default channel",
+                "Fixed a crash when starting a game in `e;wordle` classic"
+            ]
+        },
+        {
             "version": "6.0.1",
             "type": "Release",
             "date": "10/10/2024",
