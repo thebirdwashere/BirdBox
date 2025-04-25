@@ -13,6 +13,7 @@
                 "Only one response type will now trigger on a given message",
                 "Prevented pangram detection from going off due to links",
                 "Bot prefix is now once again determined dynamically",
+                "Ensured the bot no longer responds to messages from other bots",
                 "Added debug print of the last seen message before shutdown",
                 "Fixed a problem with permissions in `e;debug`",
                 "Fixed a problem with the `e;announce` default channel",
