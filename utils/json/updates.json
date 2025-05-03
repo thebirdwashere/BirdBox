@@ -1,6 +1,15 @@
 {
     "patchNotes": [
         {
+            "version": "6.0.3",
+            "type": "Release",
+            "date": "5/3/2025",
+            "devs": ["AgentNebulator"],
+            "notes": [
+                "Fixed interruptions not properly handling included pings"
+            ]
+        },
+        {
             "version": "6.0.2",
             "type": "Release",
             "date": "4/25/2025",
