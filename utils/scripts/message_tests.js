@@ -371,13 +371,13 @@ module.exports = {
         }
     },
     interruption: {
-        check: async () => { //MARK: interruption
-            const chanceOfInterrupting = 1000;
+        check: async ({message}) => { //MARK: interruption
+            const chanceOfInterrupting = 1;
             const randomInt = Math.floor(Math.random() * chanceOfInterrupting) + 1;
 
             if (randomInt == chanceOfInterrupting) {
                 const randomInterruption = interruptions[Math.floor(Math.random() * interruptions.length)];
-                return randomInterruption;
+                return randomInterruption.replace("(userPing)", `<@${message.author.id}>`);
             }
         },
         respond: async ({message, testResult}) => {
