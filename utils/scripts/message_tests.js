@@ -79,7 +79,7 @@ module.exports = {
             if (flattenedLyrics.includes(lastMessage.content)) {
                 //and if this message matches what should come next...
                 const previousLyricIndex = flattenedLyrics.indexOf(lastMessage.content);
-                if (message.content == flattenedLyrics[previousLyricIndex + 1].replace(filterRegex,'').trim()) {
+                if (message.content == flattenedLyrics[previousLyricIndex + 1]?.replace(filterRegex,'')?.trim()) {
                     //return the lyric after
                     return flattenedLyrics[previousLyricIndex + 2];
                 }
