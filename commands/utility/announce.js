@@ -58,14 +58,14 @@ module.exports = {
   async executeClassic({message, args, strings}, {db}) {
     if (!strings[0]) return await message.reply('you need to enter an announcement surrounded by quotes')
 
-    let announce_channel = args[0]?.replace(`https://discord.com/channels/${message.guildId}/`, "") ?? getSettingValue(`settings.announce_channel.${message.guildId}`, db) ?? message.channelId;
+    let announce_channel = args[0]?.replace(`https://discord.com/channels/${message.guildId}/`, "") ?? await getSettingValue(`settings.announce_channel.${message.guildId}`, db) ?? message.channelId;
 
     if (!announce_channel) {
       return await message.reply({ content: `something went very wrong and i couldn't find a channel to announce to`, ephemeral: true});
     }
 
     try {
-      const channel = message.guild.channels.cache.get(announce_channel);
+      const channel = await message.guild.channels.cache.get(announce_channel);
       if (!channel) {
         return await message.reply({ content: `announcement channel could not be found, try a different one`, ephemeral: true});
       }

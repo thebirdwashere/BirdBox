@@ -3,10 +3,11 @@
         {
             "version": "6.0.3",
             "type": "Release",
-            "date": "5/10/2025",
+            "date": "5/11/2025",
             "devs": ["AgentNebulator"],
             "notes": [
                 "Added 2 new interruptions and removed one, for a total of 167",
+                "Fixed `e;announce` classic being unable to access the configured channel",
                 "Fixed interruptions not properly handling included pings",
                 "Fixed a crash when not specifying echoed message in `e;echo` classic",
                 "Fixed a crash when sending the beginning of a lyric set after the end"
