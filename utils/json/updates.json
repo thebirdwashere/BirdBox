@@ -6,7 +6,7 @@
             "date": "5/11/2025",
             "devs": ["AgentNebulator"],
             "notes": [
-                "Added 2 new interruptions and removed one, for a total of 167",
+                "Added 6 new interruptions and removed one, for a total of 171",
                 "Fixed `e;announce` classic being unable to access the configured channel",
                 "Fixed interruptions not properly handling included pings",
                 "Fixed a crash when not specifying echoed message in `e;echo` classic",
