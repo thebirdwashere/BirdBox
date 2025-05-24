@@ -108,34 +108,6 @@ client.once(Events.ClientReady, async () => {
 
 	// const settingValue = await getSettingValue(`settings.responses.774021162115006475`, vars.db)
 	// console.log("Messages/lyrics setting:", settingValue)
-
-	if (!(await db.get("info_copied"))) {
-		//agent
-		await db.set(`flags_stats.flag_quiz.742843630120730701.wins`, 159+74);
-		await db.set(`flags_stats.flag_quiz.742843630120730701.losses`, 80+41);
-		await db.set(`flags_stats.flag_quiz.742843630120730701.points`, 46241+6750);
-		await db.set(`flags_stats.flag_quiz.742843630120730701.best_streak`, 53);
-
-		//bird
-		await db.set(`flags_stats.flag_quiz.747501068631670835.wins`, 12+0);
-		await db.set(`flags_stats.flag_quiz.747501068631670835.losses`, 18+0);
-		await db.set(`flags_stats.flag_quiz.747501068631670835.points`, 410+0);
-		await db.set(`flags_stats.flag_quiz.747501068631670835.best_streak`, 3);
-
-		//bislij
-		await db.set(`flags_stats.flag_quiz.904868840511524885.wins`, 18+0);
-		await db.set(`flags_stats.flag_quiz.904868840511524885.losses`, 3+0);
-		await db.set(`flags_stats.flag_quiz.904868840511524885.points`, 10000+0);
-		await db.set(`flags_stats.flag_quiz.904868840511524885.best_streak`, 12);
-
-		//kek
-		await db.set(`flags_stats.flag_quiz.476123353229426688.wins`, 491+13);
-		await db.set(`flags_stats.flag_quiz.476123353229426688.losses`, 18+1);
-		await db.set(`flags_stats.flag_quiz.476123353229426688.points`, 178290+6100);
-		await db.set(`flags_stats.flag_quiz.476123353229426688.best_streak`, 127);
-
-		await db.set("info_copied", true)
-	}
 });
 
 /* INTERACTION HANDLER */
