@@ -543,7 +543,7 @@ module.exports = { //MARK: COMMAND DATA
           return acc;
         }, {});
 
-        if (args[1] && !difficultyOptions[args[1].toLowerCase()]) {
+        if (args[1] && !difficultyOptions[args[1]?.toLowerCase()]) {
           const optionsFormatter = new Intl.ListFormat("en", {
             type: "conjunction",
           });
@@ -551,7 +551,7 @@ module.exports = { //MARK: COMMAND DATA
           return message.reply(`what kinda difficulty is ${args[1]} lol \nyour options are ${difficultyOptionsList}, alright?`)
         }
         
-        const difficulty = difficulties[difficultyOptions[args[1].toLowerCase()]] ?? difficulties[0]
+        const difficulty = difficulties[difficultyOptions[args[1]?.toLowerCase()]] ?? difficulties[0]
         const flagsNum = difficulty.flags;
         
         //get all flag names and emojis
