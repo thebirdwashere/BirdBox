@@ -495,12 +495,12 @@ module.exports = { //MARK: COMMAND DATA
         statsEmbed.addFields(
           {
             name: "Wins",
-            value: `${userStats.wins} ${userStats.current_streak === 1 ? "win" : "wins"}\n`,
+            value: `${userStats.wins} ${userStats.wins === 1 ? "win" : "wins"}\n`,
             inline: true,
           },
           {
             name: "Losses",
-            value: `${userStats.losses} ${userStats.current_streak === 1 ? "loss" : "losses"}\n`,
+            value: `${userStats.losses} ${userStats.losses === 1 ? "loss" : "losses"}\n`,
             inline: true,
           },
           {
@@ -984,12 +984,12 @@ module.exports = { //MARK: COMMAND DATA
         statsEmbed.addFields(
           {
             name: "Wins",
-            value: `${userStats.wins} ${userStats.current_streak === 1 ? "win" : "wins"}\n`,
+            value: `${userStats.wins} ${userStats.wins === 1 ? "win" : "wins"}\n`,
             inline: true,
           },
           {
             name: "Losses",
-            value: `${userStats.losses} ${userStats.current_streak === 1 ? "loss" : "losses"}\n`,
+            value: `${userStats.losses} ${userStats.losses === 1 ? "loss" : "losses"}\n`,
             inline: true,
           },
           {

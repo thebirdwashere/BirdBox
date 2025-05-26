@@ -8,6 +8,7 @@
             "notes": [
                 "Added 8 new interruptions and removed one, for a total of 173",
                 "Updated the Lose Yourself lyric response to be less intrusive",
+                "Rectified an occasional pluralization issue in `e;flags stats`",
                 "Fixed `e;announce` classic being unable to access the configured channel",
                 "Fixed interruptions not properly handling included pings",
                 "Fixed a crash when not specifying echoed message in `e;echo` classic",
