@@ -97,7 +97,7 @@ module.exports = { //MARK: COMMAND DATA
             //ensure this decoy isn't already an option
             //if it is, redo this step of the loop
             if (guessFlags.includes(chosenDecoy)) {
-              i--; console.log(guessFlags, chosenDecoy); continue;
+              i--; /*console.log(guessFlags, chosenDecoy);*/ continue;
             };
 
             //set decoy and remove it from the decoy options
@@ -577,7 +577,7 @@ module.exports = { //MARK: COMMAND DATA
             //ensure this decoy isn't already an option
             //if it is, redo this step of the loop
             if (guessFlags.includes(chosenDecoy)) {
-              i--; console.log(guessFlags, chosenDecoy); continue;
+              i--; /*console.log(guessFlags, chosenDecoy);*/ continue;
             };
 
             //set decoy and remove it from the decoy options
