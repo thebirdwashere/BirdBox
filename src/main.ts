@@ -1,27 +1,14 @@
-import {
-  Client,
-  Collection,
-  Events,
-  GatewayIntentBits,
-  InteractionType,
-  Message,
-  SlashCommandBuilder,
-} from "discord.js";
+import { Client, Events, GatewayIntentBits } from "discord.js";
 import path from "path";
 import "dotenv/config";
 import yaml from "yaml";
 import { promises as fs } from "fs";
-import { panic, toPosixPath } from "./utility/utility.js";
+import { panic } from "./utility/utility.js";
+import { CommandRegistry, isSubcommandArray } from "./utility/command.js";
 import {
   ChatInputCommandInteractionContext,
   MessageContext,
 } from "./utility/context.js";
-import {
-  CommandOption,
-  CommandRegistry,
-  isSubcommandArray,
-  Subcommand,
-} from "./utility/command.js";
 
 // Define top-level constants
 const BOT_TOKEN =
