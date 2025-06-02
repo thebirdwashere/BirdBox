@@ -1,0 +1,19 @@
+host: &host
+  - thebirdwashere: 747501068631670835
+
+developer: &dev
+  - agentnebulator: 742843630120730701
+  - bislij: 904868840511524885
+
+contributor:
+  - umadkek: 476123353229426688
+
+botTester:
+  - anpun: 764597453810171984
+  - crisby: 668589151909838908
+  - helthy: 764597453810171984
+  - stable: 1102697421672288286
+
+admin:
+  - *host
+  - *dev

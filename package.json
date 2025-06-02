@@ -1,25 +1,28 @@
 {
-  "name": "birdbox-bot",
+  "name": "birdbox",
   "version": "1.0.0",
-  "description": "goofy discord bot",
-  "main": "main.js",
+  "description": "discord bot",
+  "main": "src/main.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "tsx src/main.ts",
+    "watch": "tsx --watch src/main.ts",
+    "build": "tsc"
   },
-  "author": "TheBirdWasHere",
+  "author": "bislij",
   "license": "ISC",
+  "type": "module",
+  "devDependencies": {
+    "@eslint/js": "^9.28.0",
+    "@types/node": "^22.15.29",
+    "eslint": "^9.28.0",
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.33.0"
+  },
   "dependencies": {
-    "better-sqlite3": "^9.4.1",
-    "bindings": "^1.5.0",
-    "child_process": "^1.0.2",
-    "discord-gamecord": "^4.4.1",
-    "discord.js": "^14.14.1",
-    "dotenv": "^10.0.0",
-    "google-translate-api-x": "^10.5.4",
-    "path": "^0.12.7",
-    "pm2": "^5.3.0",
-    "quick-db": "^1.0.5",
-    "quick.db": "^9.1.7",
-    "quickdb": "^1.0.5"
+    "discord.js": "^14.19.3",
+    "dotenv": "^16.5.0",
+    "fast-glob": "^3.3.3",
+    "yaml": "^2.8.0"
   }
 }
