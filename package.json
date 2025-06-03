@@ -6,6 +6,7 @@
   "scripts": {
     "start": "tsx src/main.ts",
     "watch": "tsx --watch src/main.ts",
+    "lint": "eslint src/ --ext .ts",
     "build": "tsc"
   },
   "author": "bislij",

@@ -16,7 +16,7 @@ export default tseslint.config(
       },
     },
     rules: {
-      quote: ["error", "double"],
+      quotes: ["error", "double"],
       "@typescript-eslint/explicit-function-return-type": [
         "error",
         {
