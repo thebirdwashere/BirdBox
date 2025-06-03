@@ -86,7 +86,7 @@ CLIENT.on(Events.MessageCreate, (message) => {
     const options = message.content
       .split(/\s/)
       .filter((str) => str.length !== 0);
-    const commandName = options.shift()?.slice(2);
+    const commandName = options.shift()?.slice(PREFIX.length);
     if (commandName === undefined) return;
     // commandName: string
 
@@ -99,6 +99,29 @@ CLIENT.on(Events.MessageCreate, (message) => {
       command.execute(context).catch(async (error: unknown) => {
         await handleError(context, commandName, error);
       });
+    } else if (command.body !== undefined && isSubcommandArray(command.body)) {
+      const subcommandName = options.shift();
+      if (subcommandName === undefined)
+        void handleError(
+          context,
+          commandName,
+          "This command requires a subcommand.",
+        );
+
+      const subcommand = command.body.find(
+        (sub) => sub.data.name === subcommandName,
+      );
+
+      if (subcommand) {
+        subcommand.execute(context).catch(async (error: unknown) => {
+          await handleError(context, commandName, error);
+        });
+      } else {
+        void handleError(context, commandName, "Unknown subcommand.");
+      }
+    } else {
+      console.log(command.body);
+      panic(`Command is missing a required execute method: /${commandName}.`);
     }
   } catch (error) {
     console.error(error);
