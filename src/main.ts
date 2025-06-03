@@ -1,14 +1,14 @@
 import { Client, Events, GatewayIntentBits } from "discord.js";
 import path from "path";
 import "dotenv/config";
-// import yaml from "yaml";
-// import { promises as fs } from "fs";
 import { panic } from "./utility/utility.js";
 import { CommandRegistry, isSubcommandArray } from "./utility/command.js";
 import {
   ChatInputCommandInteractionContext,
   MessageContext,
 } from "./utility/context.js";
+import perms from "./data/perms.json" with { type: "json" };
+import { Perms } from "./utility/types.js";
 
 // Define top-level constants
 const BOT_TOKEN =
@@ -16,12 +16,7 @@ const BOT_TOKEN =
 const BOT_ID =
   process.env.BOT_ID ?? panic("Failed to find BOT_ID in environment.");
 const PREFIX = "t;";
-// const PERMS = yaml.parse(
-//   await fs.readFile(
-//     path.join(import.meta.dirname, "src/data/perms.yaml"),
-//     "utf-8",
-//   ),
-// );
+const PERMS = perms as Perms;
 const CLIENT = new Client({
   intents: [
     GatewayIntentBits.GuildMessages,
@@ -33,10 +28,12 @@ const CLIENT = new Client({
 const REGISTRY = new CommandRegistry();
 const DATA = {
   prefix: PREFIX,
-  // perms: PERMS,
+  perms: PERMS,
   registry: REGISTRY,
   client: CLIENT,
 };
+
+console.log(PERMS);
 
 await REGISTRY.detectAll(path.join(import.meta.dirname, "commands"));
 
