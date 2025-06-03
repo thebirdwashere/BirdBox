@@ -16,12 +16,12 @@ const BOT_TOKEN =
 const BOT_ID =
   process.env.BOT_ID ?? panic("Failed to find BOT_ID in environment.");
 const PREFIX = "t;";
-const PERMS = yaml.parse(
-  await fs.readFile(
-    path.join(import.meta.dirname, "src/data/perms.yaml"),
-    "utf-8",
-  ),
-);
+// const PERMS = yaml.parse(
+//   await fs.readFile(
+//     path.join(import.meta.dirname, "src/data/perms.yaml"),
+//     "utf-8",
+//   ),
+// );
 const CLIENT = new Client({
   intents: [
     GatewayIntentBits.GuildMessages,
@@ -33,7 +33,7 @@ const CLIENT = new Client({
 const REGISTRY = new CommandRegistry();
 const DATA = {
   prefix: PREFIX,
-  perms: PERMS,
+  // perms: PERMS,
   registry: REGISTRY,
   client: CLIENT,
 };
