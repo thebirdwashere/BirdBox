@@ -1,8 +1,8 @@
 import { Client, Events, GatewayIntentBits } from "discord.js";
 import path from "path";
 import "dotenv/config";
-import yaml from "yaml";
-import { promises as fs } from "fs";
+// import yaml from "yaml";
+// import { promises as fs } from "fs";
 import { panic } from "./utility/utility.js";
 import { CommandRegistry, isSubcommandArray } from "./utility/command.js";
 import {
@@ -38,19 +38,19 @@ const DATA = {
   client: CLIENT,
 };
 
-REGISTRY.detectAll(path.join(import.meta.dirname, "commands"));
+await REGISTRY.detectAll(path.join(import.meta.dirname, "commands"));
 
-CLIENT.on(Events.ClientReady, async (_) => {
-  console.log("BirdBox Unified is now online!");
+CLIENT.on(Events.ClientReady, (_event) => {
+  console.log("Birdbox Rewrite is now online!");
   console.log(
     `Logged in as ${CLIENT.user?.tag ?? "(failed to retrieve tag)"}!`,
   );
   console.log("Logs will be shown in this terminal.");
 
-  await REGISTRY.registerAll(BOT_TOKEN, BOT_ID);
+  REGISTRY.registerAll(BOT_TOKEN, BOT_ID).catch(console.error);
 });
 
-CLIENT.on(Events.InteractionCreate, async (interaction) => {
+CLIENT.on(Events.InteractionCreate, (interaction) => {
   if (interaction.isChatInputCommand()) {
     const commandName = interaction.commandName;
     const command = REGISTRY.commands.get(commandName);
@@ -60,9 +60,9 @@ CLIENT.on(Events.InteractionCreate, async (interaction) => {
     console.log(command);
 
     if (command.execute !== undefined) {
-      command.execute(
-        new ChatInputCommandInteractionContext(interaction, DATA),
-      );
+      command
+        .execute(new ChatInputCommandInteractionContext(interaction, DATA))
+        .catch(console.error);
     } else if (command.body !== undefined && isSubcommandArray(command.body)) {
       const subcommandName = interaction.options.getSubcommand();
       const subcommand = command.body.find(
@@ -70,9 +70,9 @@ CLIENT.on(Events.InteractionCreate, async (interaction) => {
       );
 
       if (subcommand) {
-        await subcommand.execute(
-          new ChatInputCommandInteractionContext(interaction, DATA),
-        );
+        subcommand
+          .execute(new ChatInputCommandInteractionContext(interaction, DATA))
+          .catch(console.error);
       } else {
         panic("Unknown subcommand.");
       }
@@ -83,7 +83,7 @@ CLIENT.on(Events.InteractionCreate, async (interaction) => {
   }
 });
 
-CLIENT.on(Events.MessageCreate, async (message) => {
+CLIENT.on(Events.MessageCreate, (message) => {
   try {
     if (message.content.length === 0) return;
     if (!message.content.startsWith(PREFIX)) return;
@@ -100,7 +100,7 @@ CLIENT.on(Events.MessageCreate, async (message) => {
     // command: Command
 
     if (command.execute !== undefined)
-      command.execute(new MessageContext(message, DATA));
+      command.execute(new MessageContext(message, DATA)).catch(console.error);
   } catch (error) {
     console.error(error);
   }

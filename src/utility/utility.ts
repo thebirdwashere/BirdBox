@@ -12,6 +12,6 @@ export function panic(errorMessage = "A fatal error has occured."): never {
 /**
  * Converts a Windows-style path to a POSIX-style path.
  */
-export function toPosixPath(pathString: string) {
+export function toPosixPath(pathString: string): string {
   return pathString.split(path.sep).join(path.posix.sep);
 }
