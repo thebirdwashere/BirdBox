@@ -16,7 +16,8 @@ const BOT_TOKEN =
   process.env.BOT_TOKEN ?? panic("Failed to find BOT_TOKEN in environment.");
 const BOT_ID =
   process.env.BOT_ID ?? panic("Failed to find BOT_ID in environment.");
-const PREFIX = "t;";
+const BOT_PREFIX =
+  process.env.BOT_PREFIX ?? panic("Failed to find BOT_PREFIX in environment.");
 const PERMS = perms as Perms;
 const CLIENT = new Client({
   intents: [
@@ -28,7 +29,7 @@ const CLIENT = new Client({
 });
 const REGISTRY = new CommandRegistry();
 const DATA = {
-  prefix: PREFIX,
+  prefix: BOT_PREFIX,
   perms: PERMS,
   registry: REGISTRY,
   client: CLIENT,
@@ -81,12 +82,12 @@ CLIENT.on(Events.InteractionCreate, (interaction) => {
 CLIENT.on(Events.MessageCreate, (message) => {
   try {
     if (message.content.length === 0) return;
-    if (!message.content.startsWith(PREFIX)) return;
+    if (!message.content.startsWith(BOT_PREFIX)) return;
 
     const options = message.content
       .split(/\s/)
       .filter((str) => str.length !== 0);
-    const commandName = options.shift()?.slice(PREFIX.length);
+    const commandName = options.shift()?.slice(BOT_PREFIX.length);
     if (commandName === undefined) return;
     // commandName: string
 
