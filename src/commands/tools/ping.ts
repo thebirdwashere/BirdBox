@@ -9,7 +9,7 @@ const Ping = new Command({
 		const pingEmbed = new EmbedBuilder()
 			.setColor(0x5282EC)
 			.addFields(
-				{ name: "Ping Time", value: `${ctx.data.client.ws.ms ?? "Undefined "}ms`}
+				{ name: "Ping Time", value: `${ctx.data?.client?.ws?.ping ?? "Undefined "}ms`}
 			)
 			.setFooter({ text: "pong you bumbling pillock" });
 
