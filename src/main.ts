@@ -33,8 +33,6 @@ const DATA = {
   client: CLIENT,
 };
 
-console.log(PERMS);
-
 await REGISTRY.detectAll(path.join(import.meta.dirname, "commands"));
 
 CLIENT.on(Events.ClientReady, (_event) => {
