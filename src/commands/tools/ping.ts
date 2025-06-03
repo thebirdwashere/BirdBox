@@ -1,5 +1,5 @@
 import { Command } from "src/utility/command.js";
-import { EmbedBuilder } from "discord.js";
+import { Colors, EmbedBuilder } from "discord.js";
 
 const Ping = new Command({
   name: "ping",
@@ -7,7 +7,7 @@ const Ping = new Command({
   execute: async (ctx) => {
     // console.log(ctx.data.client);
     const pingEmbed = new EmbedBuilder()
-      .setColor(0x5282ec)
+      .setColor(Colors.Blue)
       .addFields({
         name: "Ping Time",
         value: `${String(ctx.data.client.ws.ping)}ms`,
