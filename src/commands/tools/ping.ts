@@ -6,12 +6,13 @@ const Ping = new Command({
   description: "Pings the bot and returns the response.",
   execute: async (ctx) => {
     // console.log(ctx.data.client);
-		const pingEmbed = new EmbedBuilder()
-			.setColor(0x5282EC)
-			.addFields(
-				{ name: "Ping Time", value: `${ctx.data?.client?.ws?.ping ?? "Undefined "}ms`}
-			)
-			.setFooter({ text: "pong you bumbling pillock" });
+    const pingEmbed = new EmbedBuilder()
+      .setColor(0x5282ec)
+      .addFields({
+        name: "Ping Time",
+        value: `${String(ctx.data.client.ws.ping)}ms`,
+      })
+      .setFooter({ text: "pong you bumbling pillock" });
 
     await ctx.reply({ embeds: [pingEmbed] });
   },
