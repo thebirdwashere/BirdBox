@@ -9,8 +9,8 @@ export interface CommandContext {
     content:
       | string
       | {
-          content: string;
-          embeds: EmbedBuilder[];
+          content?: string;
+          embeds?: EmbedBuilder[];
         },
   ) => Promise<Message>;
 }
@@ -24,8 +24,8 @@ export class MessageContext implements CommandContext {
     content:
       | string
       | {
-          content: string;
-          embeds: EmbedBuilder[];
+          content?: string;
+          embeds?: EmbedBuilder[];
         },
   ): Promise<Message> {
     return await this.message.reply(content);
@@ -47,8 +47,8 @@ export class ChatInputCommandInteractionContext implements CommandContext {
     content:
       | string
       | {
-          content: string;
-          embeds: EmbedBuilder[];
+          content?: string;
+          embeds?: EmbedBuilder[];
         },
   ): Promise<Message> {
     const message =

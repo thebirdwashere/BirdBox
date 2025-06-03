@@ -9,6 +9,7 @@ import {
 } from "./utility/context.js";
 import perms from "./data/perms.json" with { type: "json" };
 import { Perms } from "./utility/types.js";
+import { handleError } from "./utility/error.js";
 
 // Define top-level constants
 const BOT_TOKEN =
@@ -52,12 +53,11 @@ CLIENT.on(Events.InteractionCreate, (interaction) => {
     if (command === undefined) return;
     // command: Command
 
-    console.log(command);
-
+    const context = new ChatInputCommandInteractionContext(interaction, DATA);
     if (command.execute !== undefined) {
-      command
-        .execute(new ChatInputCommandInteractionContext(interaction, DATA))
-        .catch(console.error);
+      command.execute(context).catch(async (error: unknown) => {
+        await handleError(context, commandName, error);
+      });
     } else if (command.body !== undefined && isSubcommandArray(command.body)) {
       const subcommandName = interaction.options.getSubcommand();
       const subcommand = command.body.find(
@@ -65,9 +65,9 @@ CLIENT.on(Events.InteractionCreate, (interaction) => {
       );
 
       if (subcommand) {
-        subcommand
-          .execute(new ChatInputCommandInteractionContext(interaction, DATA))
-          .catch(console.error);
+        subcommand.execute(context).catch(async (error: unknown) => {
+          await handleError(context, commandName, error);
+        });
       } else {
         panic("Unknown subcommand.");
       }
@@ -94,8 +94,12 @@ CLIENT.on(Events.MessageCreate, (message) => {
     if (command === undefined) return;
     // command: Command
 
-    if (command.execute !== undefined)
-      command.execute(new MessageContext(message, DATA)).catch(console.error);
+    const context = new MessageContext(message, DATA);
+    if (command.execute !== undefined) {
+      command.execute(context).catch(async (error: unknown) => {
+        await handleError(context, commandName, error);
+      });
+    }
   } catch (error) {
     console.error(error);
   }
