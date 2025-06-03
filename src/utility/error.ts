@@ -1,9 +1,9 @@
-import { EmbedBuilder } from "discord.js";
+import { Colors, EmbedBuilder } from "discord.js";
 import { CommandContext } from "./context.js";
 
 export async function handleError(
   ctx: CommandContext,
-  origin: string,
+  originCommand: string,
   error: unknown,
 ): Promise<void> {
   console.error(error);
@@ -12,9 +12,10 @@ export async function handleError(
       new EmbedBuilder()
         .setTitle("Command Error")
         .addFields(
-          { name: "Error:", value: String(error), inline: true },
-          { name: "In command:", value: origin, inline: true },
-        ),
+          { name: "Error message:", value: String(error), inline: true },
+          { name: "In command:", value: originCommand, inline: true },
+        )
+        .setColor(Colors.Red),
     ],
   });
 }

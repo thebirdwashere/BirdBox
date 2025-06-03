@@ -14,26 +14,27 @@ import path from "path";
 import { CommandContext } from "./context.js";
 import { panic, toPosixPath } from "./utility.js";
 import { pathToFileURL } from "url";
+import { Options } from "./types.js";
 
 export class Command {
   data: SlashCommandBuilder;
   body?:
     | readonly [CommandOption, ...CommandOption[]]
     | readonly [Subcommand, ...Subcommand[]];
-  execute?: (ctx: CommandContext) => Promise<void>;
+  execute?: (ctx: CommandContext, opts: Options) => Promise<void>;
 
   constructor(
     args:
       | {
           name: string;
           description: string;
-          execute: (ctx: CommandContext) => Promise<void>;
+          execute: (ctx: CommandContext, opts: Options) => Promise<void>;
         }
       | {
           name: string;
           description: string;
           options: readonly [CommandOption, ...CommandOption[]];
-          execute: (ctx: CommandContext) => Promise<void>;
+          execute: (ctx: CommandContext, opts: Options) => Promise<void>;
         }
       | {
           name: string;
@@ -77,20 +78,21 @@ export class Command {
 
 export class Subcommand {
   data: SlashCommandSubcommandBuilder;
-  execute: (ctx: CommandContext) => Promise<void>;
+  body?: readonly [CommandOption, ...CommandOption[]];
+  execute: (ctx: CommandContext, opts: Options) => Promise<void>;
 
   constructor(
     args:
       | {
           name: string;
           description: string;
-          execute: (ctx: CommandContext) => Promise<void>;
+          execute: (ctx: CommandContext, opts: Options) => Promise<void>;
         }
       | {
           name: string;
           description: string;
           options: readonly [CommandOption];
-          execute: (ctx: CommandContext) => Promise<void>;
+          execute: (ctx: CommandContext, opts: Options) => Promise<void>;
         },
   ) {
     this.data = new SlashCommandSubcommandBuilder()
@@ -98,7 +100,7 @@ export class Subcommand {
       .setDescription(args.description);
     this.execute = args.execute;
 
-    if ("options" in args)
+    if ("options" in args) {
       for (const option of args.options) {
         switch (option.data.type) {
           case ApplicationCommandOptionType.Integer:
@@ -114,6 +116,8 @@ export class Subcommand {
             panic("Unimplemented data type.");
         }
       }
+      this.body = args.options;
+    }
   }
 }
 
@@ -122,6 +126,7 @@ export class CommandOption {
     | SlashCommandIntegerOption
     | SlashCommandBooleanOption
     | SlashCommandStringOption;
+  type: "integer" | "boolean" | "string";
 
   constructor(args: {
     name: string;
@@ -129,6 +134,7 @@ export class CommandOption {
     required?: boolean;
     type: "integer" | "boolean" | "string";
   }) {
+    this.type = args.type;
     switch (args.type) {
       case "integer":
         this.data = new SlashCommandIntegerOption();
@@ -139,14 +145,12 @@ export class CommandOption {
       case "string":
         this.data = new SlashCommandStringOption();
         break;
-      default:
-        panic("Unimplemented data type.");
     }
 
     this.data
       .setName(args.name)
       .setDescription(args.description)
-      .setRequired(args.required ?? false);
+      .setRequired(args.required ?? true);
   }
 }
 
@@ -176,10 +180,10 @@ export class CommandRegistry {
     this.commands = new Collection(commands);
   }
 
-  async registerAll(token: string, id: string) {
+  async registerAll(token: string, id: string): Promise<void> {
     const rest = new REST().setToken(token);
 
-    const data = await rest.put(Routes.applicationCommands(id), {
+    await rest.put(Routes.applicationCommands(id), {
       body: this.commands.map((command) => command.data),
     });
   }

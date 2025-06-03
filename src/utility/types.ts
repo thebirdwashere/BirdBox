@@ -22,3 +22,9 @@ export type PatchNotes = {
   devs: string[];
   notes: string[];
 }[];
+
+export interface Options {
+  number: Map<string, number | null>;
+  boolean: Map<string, boolean | null>;
+  string: Map<string, string | null>;
+}
