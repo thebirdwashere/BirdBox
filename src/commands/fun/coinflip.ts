@@ -1,10 +1,10 @@
 import { Message } from "discord.js";
 import { Command } from "src/utility/command.js";
 
-const Ping = new Command({
-  name: "ping",
-  description: "Pings the bot and returns the response.",
-  execute: async (ctx) => {
+const Coinflip = new Command({
+    name: "coinflip",
+    description: "Flip a coin to make a decision easily (or maybe not so easily).",
+    execute: async (ctx) => {
         //let heads = interaction.options?.getString('heads');
         //let tails = interaction.options?.getString('tails');
         const validOptions = ["heads", "tails"];
@@ -24,10 +24,10 @@ const Ping = new Command({
                 await ctx.reply(`:coin: Your result is "${validOptions[optionNum]}"!`);
             },
             async () => { // Off The Table
-                await ctx.reply(`:coin: Messy flip, and the coin fell on the ground! The result was "${validOptions[optionNum]}", unless you want to try again.`)
+                await ctx.reply(`:coin: Messy flip, and the coin fell on the ground! The result was "${validOptions[optionNum]}", unless you want to try again.`);
             },
             async () => { // Dog Ate My Coin
-                await ctx.reply(`:coin: A dog just ate the coin before I got a good look at it! I think it was "${validOptions[optionNum]}", though... or maybe "${validOptions[optionNum ^ 1]}"...`);
+                await ctx.reply(`:coin: A dog just ate the coin before I got a good look at it! I think it was "${validOptions[optionNum]}", though... or maybe not...`);
             },
             async () => { // Bad Memory
                 const lastReply: Message = await ctx.reply(`:coin: Your result is "${validOptions[optionNum]}"!`);
@@ -40,7 +40,7 @@ const Ping = new Command({
                     await lastReply.reply(`:coin: Wait, no, that would be "${validOptions[optionNum ^ 1]}". I forgot which one was which.`);
                 }
             }
-        ]
+        ];
 
         const trollNum = Math.floor(Math.random() * trollOptions.length);
 
@@ -52,10 +52,10 @@ const Ping = new Command({
         } else {
             await trollOptions[trollNum]();
         }
-  },
+    },
 });
 
-export default Ping;
+export default Coinflip;
 
 function sleep(ms: number) : Promise<void> {
     return new Promise(resolve => setTimeout(resolve, ms));
