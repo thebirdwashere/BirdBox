@@ -35,6 +35,11 @@ export interface CommandContext {
           embeds?: EmbedBuilder[];
         },
   ) => Promise<Message>;
+
+  /**
+   * Attempts to send a typing indicator in the same channel as the command.
+   */
+  sendTyping: () => Promise<void>;
 }
 
 export class MessageContext implements CommandContext {
@@ -65,6 +70,15 @@ export class MessageContext implements CommandContext {
     if (this.channel.isSendable()) {
       return await this.channel.send(content);
     } else throw new Error("Tried to send message in a unsendable channel.");
+  }
+
+  async sendTyping(): Promise<void> {
+    if (this.channel.isSendable()) {
+      await this.channel.sendTyping();
+    } else
+      throw new Error(
+        "Tried to send typing indicator in a unsendable channel.",
+      );
   }
 
   constructor(message: Message, data: Data) {
@@ -106,6 +120,15 @@ export class ChatInputCommandInteractionContext implements CommandContext {
     if (this.channel.isSendable()) {
       return await this.channel.send(content);
     } else throw new Error("Tried to send message in a unsendable channel.");
+  }
+
+  async sendTyping(): Promise<void> {
+    if (this.channel.isSendable()) {
+      await this.channel.sendTyping();
+    } else
+      throw new Error(
+        "Tried to send typing indicator in a unsendable channel.",
+      );
   }
 
   constructor(interaction: ChatInputCommandInteraction, data: Data) {
