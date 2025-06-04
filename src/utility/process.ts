@@ -147,8 +147,8 @@ export async function detectMessageCommand(
         const opt = args.at(index);
         switch (option.type) {
           case "number":
-            if (opt !== undefined && !isNaN(parseInt(opt))) {
-              options.number.set(option.data.name, parseInt(opt));
+            if (opt !== undefined && !isNaN(Number(opt))) {
+              options.number.set(option.data.name, Number(opt));
             } else if (
               opt !== undefined &&
               opt === "!" &&
@@ -236,8 +236,8 @@ export async function detectMessageCommand(
         const opt = args.at(index);
         switch (option.type) {
           case "number":
-            if (opt !== undefined && !isNaN(parseInt(opt))) {
-              options.number.set(option.data.name, parseInt(opt));
+            if (opt !== undefined && !isNaN(Number(opt))) {
+              options.number.set(option.data.name, Number(opt));
             } else if (
               opt !== undefined &&
               opt === "!" &&
