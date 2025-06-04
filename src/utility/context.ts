@@ -1,12 +1,33 @@
-import { ChatInputCommandInteraction, Message, EmbedBuilder } from "discord.js";
+import {
+  ChatInputCommandInteraction,
+  Message,
+  EmbedBuilder,
+  TextBasedChannel,
+} from "discord.js";
 import { panic } from "./utility.js";
 import { Data } from "./types.js";
 
 export interface CommandContext {
   data: Data;
-  options: string[];
+  channel: TextBasedChannel;
 
+  /**
+   * Attempts to respond to the command. Returns the message after completion.
+   */
   reply: (
+    content:
+      | string
+      | {
+          content?: string;
+          embeds?: EmbedBuilder[];
+        },
+  ) => Promise<Message>;
+
+  /**
+   * Attempts to send a message in the same channel as the command. Returns the
+   * message after completion.
+   */
+  send: (
     content:
       | string
       | {
@@ -17,9 +38,10 @@ export interface CommandContext {
 }
 
 export class MessageContext implements CommandContext {
-  data: Data;
   message: Message;
-  options: string[];
+
+  data: Data;
+  channel: TextBasedChannel;
 
   async reply(
     content:
@@ -32,17 +54,31 @@ export class MessageContext implements CommandContext {
     return await this.message.reply(content);
   }
 
+  async send(
+    content:
+      | string
+      | {
+          content?: string;
+          embeds?: EmbedBuilder[];
+        },
+  ): Promise<Message> {
+    if (this.channel.isSendable()) {
+      return await this.channel.send(content);
+    } else throw new Error("Tried to send message in a unsendable channel.");
+  }
+
   constructor(message: Message, data: Data) {
     this.message = message;
-    this.options = [];
     this.data = data;
+    this.channel = message.channel;
   }
 }
 
 export class ChatInputCommandInteractionContext implements CommandContext {
-  data: Data;
   interaction: ChatInputCommandInteraction;
-  options: string[];
+
+  data: Data;
+  channel: TextBasedChannel;
 
   async reply(
     content:
@@ -59,9 +95,26 @@ export class ChatInputCommandInteractionContext implements CommandContext {
     return message.resource?.message ?? panic("Could not find message.");
   }
 
+  async send(
+    content:
+      | string
+      | {
+          content?: string;
+          embeds?: EmbedBuilder[];
+        },
+  ): Promise<Message> {
+    if (this.channel.isSendable()) {
+      return await this.channel.send(content);
+    } else throw new Error("Tried to send message in a unsendable channel.");
+  }
+
   constructor(interaction: ChatInputCommandInteraction, data: Data) {
     this.interaction = interaction;
-    this.options = [];
+
     this.data = data;
+
+    if (interaction.channel === null)
+      throw new Error("Commands must be triggered inside of a guild.");
+    this.channel = interaction.channel;
   }
 }
