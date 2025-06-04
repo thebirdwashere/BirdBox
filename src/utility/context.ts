@@ -1,8 +1,9 @@
 import { ChatInputCommandInteraction, Message, EmbedBuilder } from "discord.js";
 import { panic } from "./utility.js";
+import { Data } from "./types.js";
 
 export interface CommandContext {
-  data: object;
+  data: Data;
   options: string[];
 
   reply: (
@@ -16,7 +17,7 @@ export interface CommandContext {
 }
 
 export class MessageContext implements CommandContext {
-  data: object;
+  data: Data;
   message: Message;
   options: string[];
 
@@ -31,7 +32,7 @@ export class MessageContext implements CommandContext {
     return await this.message.reply(content);
   }
 
-  constructor(message: Message, data: object) {
+  constructor(message: Message, data: Data) {
     this.message = message;
     this.options = [];
     this.data = data;
@@ -39,7 +40,7 @@ export class MessageContext implements CommandContext {
 }
 
 export class ChatInputCommandInteractionContext implements CommandContext {
-  data: object;
+  data: Data;
   interaction: ChatInputCommandInteraction;
   options: string[];
 
@@ -58,7 +59,7 @@ export class ChatInputCommandInteractionContext implements CommandContext {
     return message.resource?.message ?? panic("Could not find message.");
   }
 
-  constructor(interaction: ChatInputCommandInteraction, data: object) {
+  constructor(interaction: ChatInputCommandInteraction, data: Data) {
     this.interaction = interaction;
     this.options = [];
     this.data = data;

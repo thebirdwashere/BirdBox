@@ -1,5 +1,5 @@
 import { Command } from "src/utility/command.js";
-import { EmbedBuilder } from "discord.js";
+import { Colors, EmbedBuilder } from "discord.js";
 
 const Ping = new Command({
   name: "ping",
