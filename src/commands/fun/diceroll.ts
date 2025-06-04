@@ -15,7 +15,7 @@ const Diceroll = new Command({
         }),
     ],
     execute: async (ctx: CommandContext, opts: Options) => {
-        let sides = Number(opts.number.get("sides"));
+        let sides = opts.number.get("sides") ?? 6;
         if (isNaN(sides)) sides = 6;
 
         if (sides > 2147483647) {
