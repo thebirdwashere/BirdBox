@@ -52,17 +52,13 @@ const Diceroll = new Command({
             async () => { // Bad Math
                 const lastReply: Message = await ctx.reply(`:game_die: You rolled ${mainResult.toString()}!`);
 
-                await sleep(Math.floor(Math.random() * (8000 - 2000) + 2000)); // between two and eight seconds
+                await sleep(Math.floor(Math.random() * (8000 - 2000) + 2000)); //between two and eight seconds
 
                 await lastReply.reply(`:game_die: Wait no, that's ${secondaryResult.toString()}. Not too good with numbers.`);
             },
             async () => { // Intense Shaking
                 const lastReply: Message = await ctx.reply(":game_die: Hold on, let me shake them first.")
-                .finally(() => {
-                    if (ctx.channel.isSendable()) {
-                        void ctx.channel.sendTyping(); //make birdbox show as typing
-                    };
-                });  
+                    .finally(() => void ctx.sendTyping()); //make birdbox show as typing
 
                 //some funny commentary
                 const randomSayings = [
@@ -87,11 +83,7 @@ const Diceroll = new Command({
                     //send a random saying
                     const chosenSaying = randomSayings[Math.floor(Math.random() * randomSayings.length)];
                     await ctx.send(chosenSaying)
-                    .finally(() => {
-                        if (ctx.channel.isSendable()) {
-                            void ctx.channel.sendTyping(); //make birdbox show as typing
-                        };
-                    });
+                    .finally(() => void ctx.sendTyping()); //make birdbox show as typing
                 }
 
                 //one last sleep
