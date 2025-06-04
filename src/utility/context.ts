@@ -4,12 +4,12 @@ import {
   EmbedBuilder,
   TextBasedChannel,
 } from "discord.js";
-import { panic } from "./utility.js";
 import { Data } from "./types.js";
 
 export interface CommandContext {
   data: Data;
   channel: TextBasedChannel;
+  lastReply: Message | null;
 
   /**
    * Attempts to respond to the command. Returns the message after completion.
@@ -47,6 +47,7 @@ export class MessageContext implements CommandContext {
 
   data: Data;
   channel: TextBasedChannel;
+  lastReply: Message | null;
 
   async reply(
     content:
@@ -56,7 +57,8 @@ export class MessageContext implements CommandContext {
           embeds?: EmbedBuilder[];
         },
   ): Promise<Message> {
-    return await this.message.reply(content);
+    this.lastReply = await this.message.reply(content);
+    return this.lastReply;
   }
 
   async send(
@@ -85,6 +87,7 @@ export class MessageContext implements CommandContext {
     this.message = message;
     this.data = data;
     this.channel = message.channel;
+    this.lastReply = null;
   }
 }
 
@@ -93,6 +96,7 @@ export class ChatInputCommandInteractionContext implements CommandContext {
 
   data: Data;
   channel: TextBasedChannel;
+  lastReply: Message | null;
 
   async reply(
     content:
@@ -106,7 +110,10 @@ export class ChatInputCommandInteractionContext implements CommandContext {
       typeof content === "string"
         ? await this.interaction.reply({ content: content, withResponse: true })
         : await this.interaction.reply({ ...content, withResponse: true });
-    return message.resource?.message ?? panic("Could not find message.");
+    if (!message.resource?.message)
+      throw new Error("Failed to fetch message from interaction reply.");
+    this.lastReply = message.resource.message;
+    return this.lastReply;
   }
 
   async send(
@@ -133,8 +140,8 @@ export class ChatInputCommandInteractionContext implements CommandContext {
 
   constructor(interaction: ChatInputCommandInteraction, data: Data) {
     this.interaction = interaction;
-
     this.data = data;
+    this.lastReply = null;
 
     if (interaction.channel === null)
       throw new Error("Commands must be triggered inside of a guild.");
