@@ -126,17 +126,17 @@ export class CommandOption {
     | SlashCommandIntegerOption
     | SlashCommandBooleanOption
     | SlashCommandStringOption;
-  type: "integer" | "boolean" | "string";
+  type: "number" | "boolean" | "string";
 
   constructor(args: {
     name: string;
     description: string;
     required?: boolean;
-    type: "integer" | "boolean" | "string";
+    type: "number" | "boolean" | "string";
   }) {
     this.type = args.type;
     switch (args.type) {
-      case "integer":
+      case "number":
         this.data = new SlashCommandIntegerOption();
         break;
       case "boolean":

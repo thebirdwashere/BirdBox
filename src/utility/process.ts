@@ -33,7 +33,7 @@ export async function detectChatInputInteractionCommand(
   if (command.body !== undefined && isOptionArray(command.body))
     for (const option of command.body)
       switch (option.type) {
-        case "integer":
+        case "number":
           {
             const opt = interaction.options.getInteger(
               option.data.name,
@@ -146,7 +146,7 @@ export async function detectMessageCommand(
       for (const [index, option] of command.body.entries()) {
         const opt = args.at(index);
         switch (option.type) {
-          case "integer":
+          case "number":
             if (opt !== undefined && !isNaN(parseInt(opt))) {
               options.number.set(option.data.name, parseInt(opt));
             } else if (
@@ -235,7 +235,7 @@ export async function detectMessageCommand(
       for (const [index, option] of subcommand.body.entries()) {
         const opt = args.at(index);
         switch (option.type) {
-          case "integer":
+          case "number":
             if (opt !== undefined && !isNaN(parseInt(opt))) {
               options.number.set(option.data.name, parseInt(opt));
             } else if (
