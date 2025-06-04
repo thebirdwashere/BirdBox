@@ -6,7 +6,7 @@ const Ping = new Command({
   description: "Pings the bot and returns the response.",
   execute: async (ctx) => {
 		const pingEmbed = new EmbedBuilder()
-			.setColor(0x5282EC)
+			.setColor(Colors.Blue)
 			.addFields(
 				{ name: "Ping Time", value: `${ctx.data?.client?.ws?.ping ?? "Undefined "}ms`}
 			)
