@@ -7,12 +7,12 @@ export async function handleError(
   error: unknown,
 ): Promise<void> {
   console.error(error);
-  await ctx.reply({
+  await ctx.send({
     embeds: [
       new EmbedBuilder()
         .setTitle("Command Error")
         .addFields(
-          { name: "Error message:", value: String(error), inline: true },
+          { name: "Message:", value: String(error), inline: true },
           { name: "In command:", value: originCommand, inline: true },
         )
         .setColor(Colors.Red),
