@@ -158,8 +158,8 @@ export async function detectMessageCommand(
             } else {
               throw new Error(
                 `Argument at position ${String(index)} ` +
-                  `is of type ${typeof args.at(index)} ` +
-                  `when type ${option.type} was expected.`,
+                  `is of type \`${typeof args.at(index)}\` ` +
+                  `when type \`${option.type} was expected.\``,
               );
             }
             break;
@@ -178,8 +178,8 @@ export async function detectMessageCommand(
             } else {
               throw new Error(
                 `Argument at position ${String(index)} ` +
-                  `is of type ${typeof args.at(index)} ` +
-                  `when type ${option.type} was expected.`,
+                  `is of type \`${typeof args.at(index)}\` ` +
+                  `when type \`${option.type} was expected.\``,
               );
             }
             break;
@@ -191,8 +191,8 @@ export async function detectMessageCommand(
             } else {
               throw new Error(
                 `Argument at position ${String(index)} ` +
-                  `is of type ${typeof args.at(index)} ` +
-                  `when type ${option.type} was expected.`,
+                  `is of type \`${typeof args.at(index)}\` ` +
+                  `when type \`${option.type} was expected.\``,
               );
             }
             break;
@@ -247,8 +247,8 @@ export async function detectMessageCommand(
             } else {
               throw new Error(
                 `Argument at position ${String(index)} ` +
-                  `is of type ${typeof args.at(index)} ` +
-                  `when type ${option.type} was expected.`,
+                  `is of type \`${typeof args.at(index)}\` ` +
+                  `when type \`${option.type} was expected.\``,
               );
             }
             break;
@@ -267,8 +267,8 @@ export async function detectMessageCommand(
             } else {
               throw new Error(
                 `Argument at position ${String(index)} ` +
-                  `is of type ${typeof args.at(index)} ` +
-                  `when type ${option.type} was expected.`,
+                  `is of type \`${typeof args.at(index)}\` ` +
+                  `when type \`${option.type} was expected.\``,
               );
             }
             break;
@@ -280,8 +280,8 @@ export async function detectMessageCommand(
             } else {
               throw new Error(
                 `Argument at position ${String(index)} ` +
-                  `is of type ${typeof args.at(index)} ` +
-                  `when type ${option.type} was expected.`,
+                  `is of type \`${typeof args.at(index)}\` ` +
+                  `when type \`${option.type} was expected.\``,
               );
             }
             break;
