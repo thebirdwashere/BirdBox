@@ -1,21 +1,34 @@
 import { Message } from "discord.js";
-import { Command } from "src/utility/command.js";
+import { Command, CommandOption } from "src/utility/command.js";
 
 const Coinflip = new Command({
     name: "coinflip",
     description: "Flip a coin to make a decision easily (or maybe not so easily).",
-    execute: async (ctx) => {
-        //let heads = interaction.options?.getString('heads');
-        //let tails = interaction.options?.getString('tails');
-        const validOptions = ["heads", "tails"];
+    options: [
+        new CommandOption({
+            name: "heads",
+            description: "The first option to choose between. Defaults to \"heads\".",
+            type: "string",
+            required: false,
+        }),
+        new CommandOption({
+            name: "tails",
+            description: "The second option to choose between. Defaults to \"tails\" or, if set, the inverse of heads.",
+            type: "string",
+            required: false,
+        }),
+    ],
+    execute: async (ctx, opts) => {
+        const heads = opts.string.get("heads");
+        const tails = opts.string.get("tails");
+        const onlyHeadsProvided = heads !== null && tails === null;
 
-        // if(heads && tails) {
-        //     validOptions = [heads, tails];
-        // } else if (heads) {
-        //     validOptions = [heads, `**not** ${heads}`];
-        // } else {
-        //        validOptions = ['heads', 'tails'];
-        // }
+        const validOptions: string[] = [];
+        validOptions[0] = heads ?? "heads";
+        validOptions[1] = onlyHeadsProvided ? `**not** ${heads ?? ""}` : (tails ?? "tails");
+
+        await ctx.send(validOptions[0]);
+        await ctx.send(validOptions[1]);
 
         const optionNum = Math.floor(Math.random() * validOptions.length);
 
