@@ -1,6 +1,18 @@
 {
     "patchNotes": [
         {
+            "version": "6.0.4",
+            "type": "Release",
+            "date": "6/6/2025",
+            "devs": ["AgentNebulator"],
+            "notes": [
+                "Updated Privacy Policy website and link",
+                "Changed lyric responses to respect ? and !",
+                "Updated \"crazy\" response to only trigger on \"crazy?\"",
+                "Updated \"massive\" response to only trigger on \"is/it's massive\""
+            ]
+        },
+        {
             "version": "6.0.3",
             "type": "Release",
             "date": "5/25/2025",
