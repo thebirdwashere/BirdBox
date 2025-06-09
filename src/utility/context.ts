@@ -3,13 +3,17 @@ import {
   Message,
   EmbedBuilder,
   TextBasedChannel,
+  Guild,
+  User,
 } from "discord.js";
 import { Data } from "./types.js";
 
 export interface CommandContext {
   data: Data;
-  channel: TextBasedChannel;
+  channel: TextBasedChannel | null;
   lastReply: Message | null;
+  guild: Guild | null;
+  user: User;
 
   /**
    * Attempts to respond to the command. Returns the message after completion.
@@ -46,8 +50,10 @@ export class MessageContext implements CommandContext {
   message: Message;
 
   data: Data;
-  channel: TextBasedChannel;
+  channel: TextBasedChannel | null;
   lastReply: Message | null;
+  guild: Guild | null;
+  user: User;
 
   async reply(
     content:
@@ -69,13 +75,13 @@ export class MessageContext implements CommandContext {
           embeds?: EmbedBuilder[];
         },
   ): Promise<Message> {
-    if (this.channel.isSendable()) {
+    if (this.channel?.isSendable()) {
       return await this.channel.send(content);
     } else throw new Error("Tried to send message in a unsendable channel.");
   }
 
   async sendTyping(): Promise<void> {
-    if (this.channel.isSendable()) {
+    if (this.channel?.isSendable()) {
       await this.channel.sendTyping();
     } else
       throw new Error(
@@ -88,6 +94,8 @@ export class MessageContext implements CommandContext {
     this.data = data;
     this.channel = message.channel;
     this.lastReply = null;
+    this.guild = message.guild;
+    this.user = message.author;
   }
 }
 
@@ -95,8 +103,10 @@ export class ChatInputCommandInteractionContext implements CommandContext {
   interaction: ChatInputCommandInteraction;
 
   data: Data;
-  channel: TextBasedChannel;
+  channel: TextBasedChannel | null;
   lastReply: Message | null;
+  guild: Guild | null;
+  user: User;
 
   async reply(
     content:
@@ -124,13 +134,13 @@ export class ChatInputCommandInteractionContext implements CommandContext {
           embeds?: EmbedBuilder[];
         },
   ): Promise<Message> {
-    if (this.channel.isSendable()) {
+    if (this.channel?.isSendable()) {
       return await this.channel.send(content);
     } else throw new Error("Tried to send message in a unsendable channel.");
   }
 
   async sendTyping(): Promise<void> {
-    if (this.channel.isSendable()) {
+    if (this.channel?.isSendable()) {
       await this.channel.sendTyping();
     } else
       throw new Error(
@@ -142,9 +152,8 @@ export class ChatInputCommandInteractionContext implements CommandContext {
     this.interaction = interaction;
     this.data = data;
     this.lastReply = null;
-
-    if (interaction.channel === null)
-      throw new Error("Commands must be triggered inside of a guild.");
+    this.user = interaction.user;
+    this.guild = interaction.guild;
     this.channel = interaction.channel;
   }
 }
