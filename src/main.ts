@@ -16,7 +16,7 @@ import {
   detectChatInputInteractionCommand,
   detectMessageCommand,
 } from "./utility/process.js";
-import { Perms } from "./utility/types.js";
+import { Data, Perms } from "./utility/types.js";
 
 const BOT_TOKEN =
   process.env.BOT_TOKEN ?? panic("Failed to find BOT_TOKEN in environment.");
@@ -34,8 +34,9 @@ const CLIENT = new Client({
   ],
 });
 const REGISTRY = new CommandRegistry();
-const DATA = {
+const DATA: Data = {
   prefix: BOT_PREFIX,
+  id: BOT_ID,
   perms: PERMS,
   registry: REGISTRY,
   client: CLIENT,

@@ -1,5 +1,6 @@
 import { ChatInputCommandInteraction, Message } from "discord.js";
 import {
+  CommandOption,
   CommandRegistry,
   isOptionArray,
   isSubcommandArray,
@@ -8,7 +9,7 @@ import {
   ChatInputCommandInteractionContext,
   MessageContext,
 } from "./context.js";
-import { Data } from "./types.js";
+import { Data, Options } from "./types.js";
 
 export async function detectChatInputInteractionCommand(
   registry: CommandRegistry,
@@ -113,6 +114,16 @@ export async function detectMessageCommand(
 
   // Split arguments and extract command name.
   const args = message.content.split(/\s/).filter((str) => str.length !== 0);
+
+  // Unify arguments delimited by quotation marks.
+  for (let i = 0; i < args.length - 1; i++) {
+    if (/^".*/.exec(args[i]) && /.*"$/.exec(args[i + 1])) {
+      args[i] = args[i].concat(" ", args[i + 1]);
+      args.splice(i + 1, 1);
+      args[i] = args[i].substring(1, args[i].length - 1);
+    }
+  }
+
   const commandName = args.shift()?.slice(data.prefix.length);
   if (commandName === undefined) return;
   // commandName: string
@@ -127,7 +138,7 @@ export async function detectMessageCommand(
 
   // Handle commands accordingly.
   if (command.execute !== undefined) {
-    const options = {
+    let options = {
       number: new Map<string, number | null>(),
       boolean: new Map<string, boolean | null>(),
       string: new Map<string, string | null>(),
@@ -142,62 +153,7 @@ export async function detectMessageCommand(
             `expected ${String(command.body.length)}, ` +
             `found ${String(args.length)}.`,
         );
-
-      for (const [index, option] of command.body.entries()) {
-        const opt = args.at(index);
-        switch (option.type) {
-          case "number":
-            if (opt !== undefined && !isNaN(Number(opt))) {
-              options.number.set(option.data.name, Number(opt));
-            } else if (
-              opt !== undefined &&
-              opt === "!" &&
-              !option.data.required
-            ) {
-              options.number.set(option.data.name, null);
-            } else {
-              throw new Error(
-                `Argument at position ${String(index)} ` +
-                  `is of type \`${typeof args.at(index)}\` ` +
-                  `when type \`${option.type}\` was expected.`,
-              );
-            }
-            break;
-          case "boolean":
-            if (opt !== undefined && (opt === "true" || opt === "false")) {
-              options.boolean.set(
-                option.data.name,
-                opt === "true" ? true : false,
-              );
-            } else if (
-              opt !== undefined &&
-              opt === "!" &&
-              !option.data.required
-            ) {
-              options.boolean.set(option.data.name, null);
-            } else {
-              throw new Error(
-                `Argument at position ${String(index)} ` +
-                  `is of type \`${typeof args.at(index)}\` ` +
-                  `when type \`${option.type}\` was expected.`,
-              );
-            }
-            break;
-          case "string":
-            if (opt !== undefined && opt !== "!") {
-              options.string.set(option.data.name, opt);
-            } else if (opt !== undefined && !option.data.required) {
-              options.string.set(option.data.name, null);
-            } else {
-              throw new Error(
-                `Argument at position ${String(index)} ` +
-                  `is of type \`${typeof args.at(index)}\` ` +
-                  `when type \`${option.type}\` was expected.`,
-              );
-            }
-            break;
-        }
-      }
+      options = populateMessageOptions(args, command.body);
     }
 
     // Attempt to execute command.
@@ -207,7 +163,7 @@ export async function detectMessageCommand(
     if (subcommandName === undefined)
       throw new Error(`Subcommand missing in command: \`/${commandName}\``);
 
-    const options = {
+    let options = {
       number: new Map<string, number | null>(),
       boolean: new Map<string, boolean | null>(),
       string: new Map<string, string | null>(),
@@ -231,66 +187,80 @@ export async function detectMessageCommand(
             `expected ${String(command.body.length)}, ` +
             `found ${String(args.length)}.`,
         );
-
-      for (const [index, option] of subcommand.body.entries()) {
-        const opt = args.at(index);
-        switch (option.type) {
-          case "number":
-            if (opt !== undefined && !isNaN(Number(opt))) {
-              options.number.set(option.data.name, Number(opt));
-            } else if (
-              opt !== undefined &&
-              opt === "!" &&
-              !option.data.required
-            ) {
-              options.number.set(option.data.name, null);
-            } else {
-              throw new Error(
-                `Argument at position ${String(index)} ` +
-                  `is of type \`${typeof args.at(index)}\` ` +
-                  `when type \`${option.type}\` was expected.`,
-              );
-            }
-            break;
-          case "boolean":
-            if (opt !== undefined && (opt === "true" || opt === "false")) {
-              options.boolean.set(
-                option.data.name,
-                opt === "true" ? true : false,
-              );
-            } else if (
-              opt !== undefined &&
-              opt === "!" &&
-              !option.data.required
-            ) {
-              options.boolean.set(option.data.name, null);
-            } else {
-              throw new Error(
-                `Argument at position ${String(index)} ` +
-                  `is of type \`${typeof args.at(index)}\` ` +
-                  `when type \`${option.type}\` was expected.`,
-              );
-            }
-            break;
-          case "string":
-            if (opt !== undefined && opt !== "!") {
-              options.string.set(option.data.name, opt);
-            } else if (opt !== undefined && !option.data.required) {
-              options.string.set(option.data.name, null);
-            } else {
-              throw new Error(
-                `Argument at position ${String(index)} ` +
-                  `is of type \`${typeof args.at(index)}\` ` +
-                  `when type \`${option.type}\` was expected.`,
-              );
-            }
-            break;
-        }
-      }
+      options = populateMessageOptions(args, subcommand.body);
     }
 
     await subcommand.execute(context, options);
   } else {
     throw new Error(`Missing execute function in command: ${commandName}`);
   }
+}
+
+function populateMessageOptions(
+  sources: string[],
+  targets: readonly [CommandOption, ...CommandOption[]],
+): Options {
+  const options = {
+    number: new Map<string, number | null>(),
+    boolean: new Map<string, boolean | null>(),
+    string: new Map<string, string | null>(),
+  };
+
+  for (const [index, option] of targets.entries()) {
+    let sourceType: "optional" | "number" | "boolean" | "string";
+    const targetType = option.type;
+
+    const source = sources[index];
+
+    if (source === "!") {
+      sourceType = "optional";
+    } else if (!isNaN(Number(sources.at(index)))) {
+      sourceType = "number";
+    } else if (source === "true" || source === "false") {
+      sourceType = "boolean";
+    } else {
+      sourceType = "string";
+    }
+
+    if (sourceType !== targetType && sourceType !== "optional") {
+      throw new Error(
+        `Argument at position ${String(index)} ` +
+          `is of type \`${sourceType}\` ` +
+          `when type \`${targetType}\` was expected.`,
+      );
+    }
+
+    switch (sourceType) {
+      case "number":
+        options.number.set(option.data.name, Number(source));
+        break;
+      case "boolean":
+        options.boolean.set(option.data.name, source === "true" ? true : false);
+        break;
+      case "string":
+        options.string.set(option.data.name, source);
+        break;
+      case "optional":
+        if (!option.data.required) {
+          switch (option.type) {
+            case "number":
+              options.number.set(option.data.name, null);
+              break;
+            case "boolean":
+              options.boolean.set(option.data.name, null);
+              break;
+            case "string":
+              options.string.set(option.data.name, null);
+              break;
+          }
+        } else {
+          throw new Error(
+            `Argument at position ${String(index)} is not optional.`,
+          );
+        }
+        break;
+    }
+  }
+
+  return options;
 }
