@@ -10,6 +10,7 @@ export interface Perms {
 
 export interface Data {
   prefix: string;
+  id: string;
   perms: Perms;
   registry: CommandRegistry;
   client: Client;
