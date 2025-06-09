@@ -8,16 +8,19 @@ const Test = new Command({
       name: "test1",
       description: "a string",
       type: "string",
+      required: false,
     }),
     new CommandOption({
       name: "test2",
       description: "a number",
       type: "number",
+      required: false,
     }),
     new CommandOption({
       name: "test3",
       description: "a boolean",
       type: "boolean",
+      required: false,
     }),
   ],
   execute: async (ctx, opts) => {
