@@ -6,19 +6,16 @@ import { Options } from "src/utility/types.js";
 const Diceroll = new Command({
     name: "diceroll",
     description: "Roll a die to get a random number quickly (or maybe not so quickly).",
-        options: [
-            new CommandOption({
-                name: "sides",
-                description: "The desired number of sides, providing a random number 1-n (inclusive). Defaults to 6.",
-                type: "number",
-            }),
-        ],
+    options: [
+        new CommandOption({
+            name: "sides",
+            description: "The desired number of sides, providing a random number 1-n (inclusive). Defaults to 6.",
+            type: "number",
+            required: false,
+        }),
+    ],
     execute: async (ctx: CommandContext, opts: Options) => {
-        console.log("before");
-        console.log(opts.number.get("sides"));
-        console.log("after");
-        
-        let sides = Number(opts.number.get("sides"));
+        let sides = opts.number.get("sides") ?? 6;
         if (isNaN(sides)) sides = 6;
 
         if (sides > 2147483647) {
