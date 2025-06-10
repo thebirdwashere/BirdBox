@@ -17,8 +17,8 @@ const Info = new Command({
 			.addFields(
                 { name: "Latest Version", value: PATCH_NOTES[0].version },
                 { name: "Last Updated", value: PATCH_NOTES[0].date },
-				{ name: "Credits", value: `\`${ctx.data?.prefix}credits\`` },
-                { name: "Server", value: `\`${ctx.data?.prefix}neofetch\`` },
+				{ name: "Credits", value: `\`${ctx.data.prefix}credits\`` },
+                { name: "Server", value: `\`${ctx.data.prefix}neofetch\`` },
 				{ name: "Github", value: "https://github.com/thebirdwashere/BirdBox" },
 			)
 			.setFooter({ text: "Special thanks to users like you!" });

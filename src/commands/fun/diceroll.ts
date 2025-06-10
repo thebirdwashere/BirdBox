@@ -19,13 +19,13 @@ const Diceroll = new Command({
         if (isNaN(sides)) sides = 6;
 
         if (sides > 2147483647) {
-            await ctx.reply("bro that is WAY too many sides, tone it down a bit"); return;
+            throw new Error("Too many sides provided.");
         } else if (sides < 1) {
-            await ctx.reply("bro i kinda need a positive number of faces"); return;
+            throw new Error("Provided number of sides is not positive.");
         } else if (sides !== Math.floor(sides)) {
-            await ctx.reply("bro i kinda need an integer number of faces"); return;
+            throw new Error("Provided number of sides has a decimal component.");
         } else if (sides === 1) {
-            await ctx.reply("bro i kinda need more than one face"); return;
+            throw new Error("A die needs at least 2 sides.");
         }
 
         //calculate random roll

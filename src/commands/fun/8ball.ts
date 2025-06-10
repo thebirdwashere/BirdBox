@@ -36,13 +36,13 @@ const Magic8Ball = new Command({
             if ("url" in randomResponse) {
                 responseEmbed
                     .setTitle(randomResponse.text)
-                    .setURL(randomResponse.url ?? "undefined");
+                    .setURL(randomResponse.url ?? null);
             }
 
             if ("image" in randomResponse) {
                 responseEmbed
                     .setTitle(randomResponse.text)
-                    .setImage(randomResponse.image ?? "undefined");
+                    .setImage(randomResponse.image ?? null);
             } 
 
             if (randomResponse.credit) {

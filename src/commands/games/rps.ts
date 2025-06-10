@@ -21,7 +21,7 @@ const RPS = new Command({
         const computerMove = moveNames[Math.floor(Math.random() * moveNames.length)];
         let result, footer, color;
 
-        if(!validMoves.includes(playerMove ?? "undefined")) {await ctx.reply("bruh it's literally the title of the game, you gotta use \"rock\", \"paper\", or \"scissors\"."); return;}
+        if(!validMoves.includes(playerMove ?? "undefined")) throw new Error("Move provided is not `rock`, `paper`, `scissors`, `r`, `p`, or `s`.");
         
         const playerMoveNum = validMoves.indexOf(playerMove ?? "undefined") % moveNames.length;
 

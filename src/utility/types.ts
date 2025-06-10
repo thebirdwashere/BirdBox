@@ -32,7 +32,7 @@ export interface Options {
   number: Map<string, number | null>;
   boolean: Map<string, boolean | null>;
   string: Map<string, string | null>;
-}
+};
 
 export interface Responses {
   magic8ball: (string | {text: string; credit?: string; url?: string; image?: string;})[];
