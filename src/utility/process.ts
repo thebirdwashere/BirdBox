@@ -113,16 +113,21 @@ export async function detectMessageCommand(
   if (!message.content.startsWith(data.prefix)) return;
 
   // Split arguments and extract command name.
-  const args = message.content.split(/\s/).filter((str) => str.length !== 0);
+  let args = message.content.split(/\s/).filter((str) => str.length !== 0);
 
   // Unify arguments delimited by quotation marks.
-  for (let i = 0; i < args.length - 1; i++) {
-    if (/^".*/.exec(args[i]) && /.*"$/.exec(args[i + 1])) {
-      args[i] = args[i].concat(" ", args[i + 1]);
-      args.splice(i + 1, 1);
-      args[i] = args[i].substring(1, args[i].length - 1);
-    }
+  let first: number, last: number;
+  for (;;) {
+    first = args.findIndex((str) => /^["“”]/.test(str));
+    last = args.findIndex((str) => /["“”]$/.test(str));
+
+    if (first === -1 || last === -1 || last <= first) break;
+
+    const combined = args.slice(first, last + 1).join(" ");
+    args.splice(first, last - first + 1, combined);
   }
+
+  args = args.map((str) => str.replaceAll(/["“”]/g, ""));
 
   const commandName = args.shift()?.slice(data.prefix.length);
   if (commandName === undefined) return;
@@ -224,7 +229,7 @@ function populateMessageOptions(
 
     if (sourceType !== targetType && sourceType !== "optional") {
       throw new Error(
-        `Argument at position ${String(index)} ` +
+        `Argument at position ${String(index + 1)} ` +
           `is of type \`${sourceType}\` ` +
           `when type \`${targetType}\` was expected.`,
       );
@@ -255,7 +260,7 @@ function populateMessageOptions(
           }
         } else {
           throw new Error(
-            `Argument at position ${String(index)} is not optional.`,
+            `Argument at position ${String(index + 1)} is not optional.`,
           );
         }
         break;
