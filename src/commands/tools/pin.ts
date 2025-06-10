@@ -1,5 +1,6 @@
-import { GuildBasedChannel, Message, Snowflake } from "discord.js";
+import { GuildBasedChannel, Message, Snowflake, TextBasedChannel } from "discord.js";
 import { Command, CommandOption } from "src/utility/command.js";
+import { MessageContext } from "src/utility/context.js";
 
 const Pin = new Command({
     name: "pin",
@@ -7,7 +8,7 @@ const Pin = new Command({
     options: [
         new CommandOption({
             name: "link",
-            description: "The message link to pin. If not provided, will pin the message replied to.",
+            description: "The message link to pin. If not provided, will attempt to pin the message replied to.",
             type: "string",
             required: false,
         }),
@@ -15,18 +16,35 @@ const Pin = new Command({
     execute: async (ctx, opts) => {
         const perms = ctx.data.perms;
         const admins = Object.values(perms.developer).concat(Object.values(perms.host));
-                
+        
         if (ctx.guild === null) throw new Error("Command must be run in a server.");
 
+        const providedLink = opts.string.get("link");
         const [targetChannelId, targetMessageId] = opts.string.get("link")?.replace(`https://discord.com/channels/${ctx.guild.id}/`, "").split("/") ?? ["0", "0"];
 
-        const targetChannel: GuildBasedChannel | null = await ctx.guild.channels.fetch(targetChannelId);
-        if (targetChannel === null) throw new Error("Unable to locate provided channel.");
-        if (!("messages" in targetChannel)) throw new Error("Provided channel cannot hold messages.");
+        let targetChannel: GuildBasedChannel | TextBasedChannel | null, targetMessage;
+        if (providedLink !== null && providedLink !== undefined) {
+            targetChannel = await ctx.guild.channels.fetch(targetChannelId);
+            if (targetChannel === null) throw new Error("Unable to locate provided channel.");
+            if (!("messages" in targetChannel)) throw new Error("Provided channel cannot hold messages.");
 
-        const targetMessage = await targetChannel.messages.fetch(targetMessageId);
-        if (!(targetMessage instanceof Message)) throw new Error("Unable to locate provided message.");
-        
+            targetMessage = await targetChannel.messages.fetch(targetMessageId);
+            if (!(targetMessage instanceof Message)) throw new Error("Unable to locate provided message.");
+        } else if (ctx instanceof MessageContext) {
+            targetChannel = ctx.channel;
+            if (targetChannel === null) throw new Error("Command run in an invalid channel.");
+
+            try {
+                targetMessage = await ctx.message.fetchReference();
+            } catch (_) {
+                throw new Error("Message reply not found.");
+            }
+
+            if (!("id" in targetMessage)) throw new Error("Replied message not found.");
+        } else {
+            throw new Error("No message provided, either by link or reply.");
+        }
+
         const channelOwner: Snowflake | null = "ownerId" in targetChannel ? targetChannel.ownerId : null;
         const interactionUser: Snowflake | null = "id" in ctx.user ? ctx.user.id.toString() : null;
         const userIsAdmin = admins.includes(interactionUser ?? "undefined"); //admins get bypass on any check
