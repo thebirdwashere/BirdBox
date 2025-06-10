@@ -21,11 +21,11 @@ const Coinflip = new Command({
     execute: async (ctx, opts) => {
         const heads = opts.string.get("heads");
         const tails = opts.string.get("tails");
-        const onlyHeadsProvided = heads !== null && tails === null;
+        const onlyHeadsProvided = (heads !== null && heads !== undefined) && (tails === null || tails === undefined);
 
         const validOptions: string[] = [];
         validOptions[0] = heads ?? "heads";
-        validOptions[1] = onlyHeadsProvided ? `**not** ${heads ?? ""}` : (tails ?? "tails");
+        validOptions[1] = onlyHeadsProvided ? `**not** ${heads}` : (tails ?? "tails");
 
         await ctx.send(validOptions[0]);
         await ctx.send(validOptions[1]);
