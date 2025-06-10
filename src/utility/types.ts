@@ -22,10 +22,10 @@ export type PatchNotes = {
 }[];
 
 export interface Perms {
-  host: Record<string, number>;
-  developer: Record<string, number>;
-  contributor: Record<string, number>;
-  botTester: Record<string, number>;
+  host: Record<string, string>;
+  developer: Record<string, string>;
+  contributor: Record<string, string>;
+  botTester: Record<string, string>;
 };
 
 export interface Options {
