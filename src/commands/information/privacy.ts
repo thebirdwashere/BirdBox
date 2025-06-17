@@ -12,6 +12,8 @@ const Privacy = new Command({
 			.setFooter({text: "User data and license information."})
 			.setURL("https://birdbox.thebirdwashere.com/privacy.html");
 		
+		//TODO: Add component row
+
 		// const linkButton = new ButtonBuilder()
 		// 	.setLabel("Link")
 		// 	.setStyle(ButtonStyle.Link)

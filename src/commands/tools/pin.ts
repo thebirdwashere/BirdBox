@@ -49,6 +49,8 @@ const Pin = new Command({
         const interactionUser: Snowflake | null = "id" in ctx.user ? ctx.user.id.toString() : null;
         const userIsAdmin = admins.includes(interactionUser ?? "undefined"); //admins get bypass on any check
 
+        //TODO: Add config support
+
         // const pinSetting = await getSettingValue(`settings.pinning.${interaction.guildId}`, db)
         // const anyoneCanPin = pinSetting == "everyone";
         // const nobodyCanPin = pinSetting == "nobody";

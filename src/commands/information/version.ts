@@ -40,6 +40,8 @@ const Version = new Command({
             return [infoEmbed];
         }
 
+		//TODO: Add component row
+
         // function updateRow(p: number) { // Returns the updated row
         //     const backButton = new ButtonBuilder()
         //         .setCustomId('backButton')

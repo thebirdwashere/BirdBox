@@ -22,6 +22,7 @@ const Announce = new Command({
         if (ctx.guild === null) throw new Error("Command must be run in a server.");
         if (ctx.channel === null || !("name" in ctx.channel)) throw new Error("Command must be run in a valid channel.");
 
+		//TODO: Add config support
         const announce_channel_id = opts.string.get("channel")?.replace(`https://discord.com/channels/${ctx.guild.id}/`, "") /*?? await getSettingValue(`settings.announce_channel.${message.guildId}`, db) ?? message.channelId*/;
 
         if (announce_channel_id === undefined) throw new Error("Announcement channel ID could not be found.");
