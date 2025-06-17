@@ -86,7 +86,7 @@ const Pin = new Command({
                 await ctx.reply("Unpinned successfully!");
             }
         }
-    }
+    },
 });
 
 export default Pin;

@@ -13,7 +13,7 @@ const RR = new Command({
             .setFooter({text: "lol get rekt u been rick rolled, there you go, you happy now?!? please dont do that too much, it is literally spam city here now."});
 
         await ctx.reply({ embeds: [rrEmbed] });
-    }
+    },
 });
 
 export default RR;

@@ -22,7 +22,7 @@ const Privacy = new Command({
 		// 	.addComponents(linkButton);
 
         await ctx.reply({ embeds: [privacyEmbed], /*components: [linkButtonRow]*/ });
-    }
+    },
 });
 
 export default Privacy;

@@ -100,7 +100,7 @@ const Version = new Command({
         //     await i.message.edit({ embeds: updateEmbed(page), components: updateRow(page) });
         //     await i.deferUpdate();
         // });
-    }
+    },
 });
 
 export default Version;

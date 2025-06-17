@@ -52,7 +52,7 @@ const Magic8Ball = new Command({
 
         await ctx.reply({ embeds: [responseEmbed] });
 
-    }
+    },
 });
 
 export default Magic8Ball;

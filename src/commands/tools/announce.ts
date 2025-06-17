@@ -44,7 +44,7 @@ const Announce = new Command({
             }).catch(() => {
                 throw new Error("Announcement could not be sent. Ensure permissions aren't restricted for the provided channel."); 
             });
-    }
+    },
 });
 
 export default Announce;

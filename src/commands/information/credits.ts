@@ -19,7 +19,7 @@ const Credits = new Command({
 			.setFooter({ text: "And an extra-special thanks to users like you!" });
 
         await ctx.reply({ embeds: [creditsEmbed] });
-  },
+  	},
 });
 
 export default Credits;

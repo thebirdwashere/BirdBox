@@ -41,7 +41,7 @@ const RPS = new Command({
             .setFooter({ text: footer });
 
         await ctx.reply({ embeds: [rpsEmbed] });
-    }
+    },
 });
 
 export default RPS;

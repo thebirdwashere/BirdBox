@@ -24,7 +24,7 @@ const Info = new Command({
 			.setFooter({ text: "Special thanks to users like you!" });
 
         await ctx.reply({ embeds: [infoEmbed] });
-    }
+    },
 });
 
 export default Info;
