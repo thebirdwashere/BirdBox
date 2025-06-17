@@ -14,6 +14,7 @@ export interface CommandContext {
   lastReply: Message | null;
   guild: Guild | null;
   user: User;
+  timestamp: number;
 
   /**
    * Attempts to respond to the command. Returns the message after completion.
@@ -54,6 +55,7 @@ export class MessageContext implements CommandContext {
   lastReply: Message | null;
   guild: Guild | null;
   user: User;
+  timestamp: number;
 
   async reply(
     content:
@@ -96,6 +98,7 @@ export class MessageContext implements CommandContext {
     this.lastReply = null;
     this.guild = message.guild;
     this.user = message.author;
+    this.timestamp = message.createdTimestamp;
   }
 }
 
@@ -107,6 +110,7 @@ export class ChatInputCommandInteractionContext implements CommandContext {
   lastReply: Message | null;
   guild: Guild | null;
   user: User;
+  timestamp: number;
 
   async reply(
     content:
@@ -155,5 +159,6 @@ export class ChatInputCommandInteractionContext implements CommandContext {
     this.user = interaction.user;
     this.guild = interaction.guild;
     this.channel = interaction.channel;
+    this.timestamp = interaction.createdTimestamp;
   }
 }
