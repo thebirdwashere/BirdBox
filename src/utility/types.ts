@@ -18,6 +18,7 @@ export type PatchNotes = {
   type: string;
   date: string;
   devs: string[];
+  contribs?: string[];
   notes: string[];
 }[];
 
