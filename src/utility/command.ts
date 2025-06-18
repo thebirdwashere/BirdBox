@@ -91,7 +91,7 @@ export class Subcommand {
       | {
           name: string;
           description: string;
-          options: readonly [CommandOption];
+          options: readonly [CommandOption, ...CommandOption[]];
           execute: (ctx: CommandContext, opts: Options) => Promise<void>;
         },
   ) {
