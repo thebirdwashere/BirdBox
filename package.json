@@ -24,6 +24,7 @@
     "discord.js": "^14.19.3",
     "dotenv": "^16.5.0",
     "fast-glob": "^3.3.3",
+    "google-translate-api-x": "^10.7.2",
     "yaml": "^2.8.0"
   }
 }
