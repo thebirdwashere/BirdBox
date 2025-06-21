@@ -74,6 +74,10 @@ const Translate = new Command({
 
                 if (langTypeFrom == null || langTypeTo == null || rawMessage == null) throw new Error("One or more required fields not filled.");
                 if (rawMessage.length >= 5000) throw new Error("Provided text is too long. Please shorten your request to below 5000 characters.");
+                
+                const validLanguages = LANGUAGES.map(item => item.value).concat(LANGUAGES.map(item => item.name));
+                if (!(validLanguages.includes(langTypeFrom))) throw new Error("Language to translate from is invalid. Ensure you have the right language name or code.");
+                if (!(validLanguages.includes(langTypeTo))) throw new Error("Language to translate to is invalid. Ensure you have the right language name or code.");
 
                 interface Translation {
                     text: string;
