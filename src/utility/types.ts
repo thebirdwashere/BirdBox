@@ -13,6 +13,11 @@ export interface Footers {
   magic8ball: string[];
 };
 
+export type Languages = {
+  value: string;
+  name: string;
+}[];
+
 export type PatchNotes = {
   version: string;
   type: string;
