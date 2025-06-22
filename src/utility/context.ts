@@ -5,6 +5,8 @@ import {
   TextBasedChannel,
   Guild,
   User,
+  ActionRowBuilder,
+  MessageActionRowComponentBuilder,
 } from "discord.js";
 import { Data } from "./types.js";
 
@@ -25,6 +27,7 @@ export interface CommandContext {
       | {
           content?: string;
           embeds?: EmbedBuilder[];
+          components?: ActionRowBuilder<MessageActionRowComponentBuilder>[];
         },
   ) => Promise<Message>;
 
@@ -63,6 +66,7 @@ export class MessageContext implements CommandContext {
       | {
           content?: string;
           embeds?: EmbedBuilder[];
+          components?: ActionRowBuilder<MessageActionRowComponentBuilder>[];
         },
   ): Promise<Message> {
     this.lastReply = await this.message.reply(content);
@@ -118,6 +122,7 @@ export class ChatInputCommandInteractionContext implements CommandContext {
       | {
           content?: string;
           embeds?: EmbedBuilder[];
+          components?: ActionRowBuilder<MessageActionRowComponentBuilder>[];
         },
   ): Promise<Message> {
     const message =
