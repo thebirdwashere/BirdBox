@@ -1,5 +1,5 @@
 import { Command, CommandOption } from "src/utility/command.js";
-import { EmbedBuilder, Colors } from "discord.js";
+import { EmbedBuilder, Colors, ButtonBuilder, ActionRowBuilder, StringSelectMenuBuilder, ButtonStyle, StringSelectMenuOptionBuilder, Interaction, ComponentType, ButtonInteraction, StringSelectMenuInteraction } from "discord.js";
 import patchNotes from "../../data/updates.json" with { type: "json" };
 import { PatchNotes } from "../../utility/types.js";
 
@@ -20,7 +20,7 @@ const Version = new Command({
         const version = opts.string.get("version") ?? PATCH_NOTES[0].version;
 
         if (!PATCH_NOTES.map(item => item.version).includes(version)) throw new Error("Version provided does not exist.");
-        const page: number = PATCH_NOTES.map(item => item.version).indexOf(version);
+        let page: number = PATCH_NOTES.map(item => item.version).indexOf(version);
 
         if(page + 1 > PATCH_NOTES.length) throw new Error("Version provided predates all available versions."); // how did you even trigger this
 
@@ -42,66 +42,69 @@ const Version = new Command({
 
 		//TODO: Add component row
 
-        // function updateRow(p: number) { // Returns the updated row
-        //     const backButton = new ButtonBuilder()
-        //         .setCustomId('backButton')
-        //         .setLabel('🠈')
-        //         .setStyle(ButtonStyle.Primary);
+        function updateRow(p: number): [ActionRowBuilder<ButtonBuilder>, ActionRowBuilder<StringSelectMenuBuilder>] { // Returns the updated row
+            const backButton = new ButtonBuilder()
+                .setCustomId("backButton")
+                .setLabel("🠈")
+                .setStyle(ButtonStyle.Primary);
             
-        //     const forwardButton = new ButtonBuilder()
-        //         .setCustomId('forwardButton')
-        //         .setLabel('🠊')
-        //         .setStyle(ButtonStyle.Primary);
+            const forwardButton = new ButtonBuilder()
+                .setCustomId("forwardButton")
+                .setLabel("🠊")
+                .setStyle(ButtonStyle.Primary);
             
-        //     const versionSelect = new StringSelectMenuBuilder()
-        //         .setCustomId('versionSelect')
-        //         .setPlaceholder('Select version...');
+            const versionSelect = new StringSelectMenuBuilder()
+                .setCustomId("versionSelect")
+                .setPlaceholder("Select version...");
 
-        //     patchNotes.forEach((item) => {
-        //         versionSelect.addOptions([
-        //             new StringSelectMenuOptionBuilder()
-        //                 .setLabel(item.version)
-        //                 .setValue(patchNotes.indexOf(item).toString())
-        //         ]);
-        //     })
+            patchNotes.forEach((item) => {
+                versionSelect.addOptions([
+                    new StringSelectMenuOptionBuilder()
+                        .setLabel(item.version)
+                        .setValue(patchNotes.indexOf(item).toString())
+                ]);
+            });
 
-        //     if(p <= 0) { backButton.setDisabled(true) } else { backButton.setDisabled(false) };
-        //     if(p >= patchNotes.length - 1) { forwardButton.setDisabled(true) } else { forwardButton.setDisabled(false) };
+            if(p <= 0) backButton.setDisabled(true); else backButton.setDisabled(false);
+            if(p >= patchNotes.length - 1) forwardButton.setDisabled(true); else forwardButton.setDisabled(false);
 
-        //     const infoButtonRow = new ActionRowBuilder()
-        //         .addComponents(backButton, forwardButton);
+            const infoButtonRow = new ActionRowBuilder()
+                .addComponents(backButton, forwardButton);
             
-        //     const infoSelectRow = new ActionRowBuilder()
-        //         .addComponents(versionSelect);
+            const infoSelectRow = new ActionRowBuilder()
+                .addComponents(versionSelect);
 
-        //     return [infoSelectRow, infoButtonRow];
-        // }
+            return [infoSelectRow as ActionRowBuilder<ButtonBuilder>, infoButtonRow as ActionRowBuilder<StringSelectMenuBuilder>];
+        }
 
-        await ctx.reply({ embeds: updateEmbed(page), /*components: updateRow(page)*/ });
+        await ctx.reply({ embeds: updateEmbed(page), components: updateRow(page) });
+        if (ctx.lastReply == null) throw new Error("Could not locate last reply.");
 
-        //const filter = (i) => i.user.id === message.author.id;
+        const filter = (i: Interaction): boolean => i.user.id === ctx.user.id;
 
-        //const buttonCollector = response.createMessageComponentCollector({ componentType: ComponentType.Button, time: 3_600_000, filter });
+        async function handleButtonInteraction(i: ButtonInteraction): Promise<void> {
+            if (i.customId === "backButton") {
+                page -= 1; if(page < 0) page = 0; if(page + 1 > patchNotes.length) page = patchNotes.length - 1;
+                await i.deferUpdate();
+                await i.message.edit({ embeds: updateEmbed(page), components: updateRow(page) });
+            } else if (i.customId === "forwardButton") {
+                page += 1; if(page < 0) page = 0; if(page + 1 > patchNotes.length) page = patchNotes.length - 1;
+                await i.deferUpdate();
+                await i.message.edit({ embeds: updateEmbed(page), components: updateRow(page) });
+            }
+        }
 
-        // buttonCollector.on('collect', async (i) => {
-        //     if (i.customId === 'backButton') {
-        //         page -= 1; if(page < 0) page = 0; if(page + 1 > patchNotes.length) page = patchNotes.length - 1;
-        //         await i.deferUpdate();
-        //         await i.message.edit({ embeds: updateEmbed(page), components: updateRow(page) });
-        //     } else if (i.customId === 'forwardButton') {
-        //         page += 1; if(page < 0) page = 0; if(page + 1 > patchNotes.length) page = patchNotes.length - 1;
-        //         await i.deferUpdate();
-        //         await i.message.edit({ embeds: updateEmbed(page), components: updateRow(page) });
-        //     }
-        // });
+        const buttonCollector = ctx.lastReply.createMessageComponentCollector({ componentType: ComponentType.Button, time: 3_600_000, filter });
+        buttonCollector.on("collect", (i: ButtonInteraction): void => void handleButtonInteraction(i) );
 
-        //const selectCollector = response.createMessageComponentCollector({ componentType: ComponentType.StringSelect, time: 3_600_000, filter });
+        async function handleSelectorInteraction(i: StringSelectMenuInteraction): Promise<void> {
+            page = parseInt(i.values[0]);
+            await i.message.edit({ embeds: updateEmbed(page), components: updateRow(page) });
+            await i.deferUpdate();
+        }
 
-        // selectCollector.on('collect', async (i) => {
-        //     const page = parseInt(i.values[0]);
-        //     await i.message.edit({ embeds: updateEmbed(page), components: updateRow(page) });
-        //     await i.deferUpdate();
-        // });
+        const selectCollector = ctx.lastReply.createMessageComponentCollector({ componentType: ComponentType.StringSelect, time: 3_600_000, filter });
+        selectCollector.on("collect", (i: StringSelectMenuInteraction): void => void handleSelectorInteraction(i) );
     },
 });
 
