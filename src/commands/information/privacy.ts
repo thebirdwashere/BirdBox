@@ -1,5 +1,5 @@
 import { Command } from "src/utility/command.js";
-import { EmbedBuilder, Colors, /*ButtonBuilder, ButtonStyle, ActionRowBuilder*/ } from "discord.js";
+import { EmbedBuilder, Colors, ButtonBuilder, ButtonStyle, ActionRowBuilder } from "discord.js";
 
 const Privacy = new Command({
     name: "privacy",
@@ -11,19 +11,16 @@ const Privacy = new Command({
 			.setAuthor({ name: "BirdBox", iconURL: "https://cdn.discordapp.com/avatars/803811104953466880/5bce4f0ba438015ec65f5b9cac11c8e3.png?size=256" })
 			.setFooter({text: "User data and license information."})
 			.setURL("https://birdbox.thebirdwashere.com/privacy.html");
-		
-		//TODO: Add component row
 
-		// const linkButton = new ButtonBuilder()
-		// 	.setLabel("Link")
-		// 	.setStyle(ButtonStyle.Link)
-		// 	.setDisabled(false)
-		// 	.setURL("https://birdbox.thebirdwashere.com/privacy.html");
+		const linkButton = new ButtonBuilder()
+			.setLabel("Link")
+			.setStyle(ButtonStyle.Link)
+			.setDisabled(false)
+			.setURL("https://birdbox.thebirdwashere.com/privacy.html");
 		
-		// const linkButtonRow = new ActionRowBuilder()
-		// 	.addComponents(linkButton);
+		const linkButtonRow: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder().setComponents(linkButton) as ActionRowBuilder<ButtonBuilder>;
 
-        await ctx.reply({ embeds: [privacyEmbed], /*components: [linkButtonRow]*/ });
+        await ctx.reply({ embeds: [privacyEmbed], components: [linkButtonRow] });
     },
 });
 
