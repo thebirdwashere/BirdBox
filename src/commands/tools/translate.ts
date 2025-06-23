@@ -1,8 +1,8 @@
 import { Command, Subcommand, CommandOption } from "src/utility/command.js";
 import { EmbedBuilder, Colors } from "discord.js";
-import { Languages } from "../../utility/types.js";
+import { Languages } from "src/utility/types.js";
 import { translate } from "google-translate-api-x"; // Connect to the Google Translate API
-import languages from "../../data/languages.json" with { type: "json" };
+import languages from "src/data/languages.json" with { type: "json" };
 
 const LANGUAGES = languages as Languages;
 

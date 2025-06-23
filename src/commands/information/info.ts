@@ -1,7 +1,7 @@
 import { Command } from "src/utility/command.js";
 import { EmbedBuilder } from "discord.js";
-import patchNotes from "../../data/updates.json" with { type: "json" };
-import { PatchNotes } from "../../utility/types.js";
+import patchNotes from "src/data/updates.json" with { type: "json" };
+import { PatchNotes } from "src/utility/types.js";
 
 const PATCH_NOTES = patchNotes as PatchNotes;
 
