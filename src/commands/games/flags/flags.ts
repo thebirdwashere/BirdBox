@@ -5,7 +5,7 @@ import flagsStats from "./stats.js";
 
 const Flags = new Command({
   name: "flags",
-  description: "flags game",
+  description: "Compete to guess a country's flag quickly.",
   subcommands: [
     flagsBoard, // "board"
     flagsQuiz, // "quiz"
