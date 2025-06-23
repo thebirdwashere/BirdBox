@@ -1,8 +1,8 @@
 import { Command, CommandOption } from "src/utility/command.js";
 import { Colors, EmbedBuilder } from "discord.js";
-import footers from "../../data/footers.json" with { type: "json" };
-import responses from "../../data/responses.json" with { type: "json" };
-import { Footers, Responses } from "../../utility/types.js";
+import footers from "src/data/footers.json" with { type: "json" };
+import responses from "src/data/responses.json" with { type: "json" };
+import { Footers, Responses } from "src/utility/types.js";
 
 const FOOTERS = footers as Footers;
 const RESPONSES = responses as Responses;
