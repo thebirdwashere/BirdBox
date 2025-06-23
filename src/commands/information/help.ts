@@ -78,7 +78,7 @@ const Help = new Command({
                 inline: boolean;
             }
 
-            const commandsArray: commandEmbedDisplay[][] = chunkArray(
+            const commandsArray = chunkArray<commandEmbedDisplay>(
                 commandsList.map(cmd => ({
                     name: `${ctx.data.prefix}${cmd.data.name}  ${cmd.data.options.map(opt => {
                         return `\`${opt.toJSON().name}\``;
@@ -86,7 +86,7 @@ const Help = new Command({
                     value: cmd.data.description,
                     inline: true
                 })), 12
-            ) as commandEmbedDisplay[][];
+            );
 
             const embedsArray: EmbedBuilder[] = [];
             commandsArray.forEach(cmd => {
@@ -150,8 +150,8 @@ const Help = new Command({
 
 export default Help;
 
-function chunkArray (arr: unknown[], size: number): unknown[][] {
-    const splitArrays: unknown[][] = [];
+function chunkArray<T>(arr: T[], size: number): T[][] {
+    const splitArrays: T[][] = [];
     for (let i = 0; i < arr.length; i += size) {
         splitArrays.push(arr.slice(i, i + size));
     }
