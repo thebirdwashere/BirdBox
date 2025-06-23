@@ -9,6 +9,20 @@ export interface Data {
   client: Client;
 };
 
+export interface Flags {
+  emojis: Record<string, {
+    emoji: string;
+    decoys: string[];
+  }>;
+  difficulties: {
+    name: string;
+    flags: number;
+    earned: number;
+    lost: number;
+    decoysAmount: number;
+  }[];
+};
+
 export interface Footers {
   magic8ball: string[];
   help: string[];
