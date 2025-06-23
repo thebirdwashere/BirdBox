@@ -2,6 +2,7 @@ import { Command, CommandOption } from "src/utility/command.js";
 import { Message } from "discord.js";
 import { CommandContext } from "src/utility/context.js";
 import { Options } from "src/utility/types.js";
+import { sleep } from "src/utility/utility.js";
 
 const Diceroll = new Command({
     name: "diceroll",
@@ -97,7 +98,3 @@ const Diceroll = new Command({
 });
 
 export default Diceroll;
-
-function sleep(ms: number) : Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
-}
