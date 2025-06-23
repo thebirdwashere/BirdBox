@@ -18,7 +18,7 @@ const Privacy = new Command({
 			.setDisabled(false)
 			.setURL("https://birdbox.thebirdwashere.com/privacy.html");
 		
-		const linkButtonRow: ActionRowBuilder<ButtonBuilder> = new ActionRowBuilder().setComponents(linkButton) as ActionRowBuilder<ButtonBuilder>;
+		const linkButtonRow = new ActionRowBuilder().setComponents(linkButton) as ActionRowBuilder<ButtonBuilder>;
 
         await ctx.reply({ embeds: [privacyEmbed], components: [linkButtonRow] });
     },
