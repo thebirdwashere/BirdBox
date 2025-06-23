@@ -1,7 +1,7 @@
 import { Command, CommandOption } from "src/utility/command.js";
 import { EmbedBuilder, Colors, ButtonBuilder, ActionRowBuilder, StringSelectMenuBuilder, ButtonStyle, StringSelectMenuOptionBuilder, Interaction, ComponentType, ButtonInteraction, StringSelectMenuInteraction } from "discord.js";
-import patchNotes from "../../data/updates.json" with { type: "json" };
-import { PatchNotes } from "../../utility/types.js";
+import patchNotes from "src/data/updates.json" with { type: "json" };
+import { PatchNotes } from "src/utility/types.js";
 
 const PATCH_NOTES = patchNotes as PatchNotes;
 
