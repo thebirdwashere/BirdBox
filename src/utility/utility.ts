@@ -24,6 +24,9 @@ export async function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+/**
+ * Map wrapper with various utility functions to ensure values exist or default.
+ */
 export class EnsureMap<T> {
   inner: Map<string, T | null>;
 
