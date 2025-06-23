@@ -11,6 +11,7 @@ export interface Data {
 
 export interface Footers {
   magic8ball: string[];
+  help: string[];
 };
 
 export type Languages = {
