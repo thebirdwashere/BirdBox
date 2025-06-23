@@ -1,7 +1,7 @@
 import { Command, CommandOption } from "src/utility/command.js";
 import { EmbedBuilder, Colors, ButtonBuilder, ButtonStyle, ActionRowBuilder, Interaction, ButtonInteraction, ComponentType } from "discord.js";
-import footers from "../../data/footers.json" with { type: "json" };
-import { Footers } from "../../utility/types.js";
+import footers from "src/data/footers.json" with { type: "json" };
+import { Footers } from "src/utility/types.js";
 
 const FOOTERS = footers as Footers;
 
