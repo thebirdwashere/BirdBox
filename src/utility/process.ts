@@ -31,8 +31,8 @@ export async function detectChatInputInteractionCommand(
     string: new Map<string, string | null>(),
   };
 
-  if (command.body !== undefined && isOptionArray(command.body))
-    for (const option of command.body)
+  if (command.body !== undefined && isOptionArray(command.body)) {
+    for (const option of command.body) {
       switch (option.type) {
         case "number":
           {
@@ -79,13 +79,15 @@ export async function detectChatInputInteractionCommand(
           }
           break;
       }
+    }
 
-  const context = new ChatInputCommandInteractionContext(interaction, data);
+    const context = new ChatInputCommandInteractionContext(interaction, data);
 
-  // Handle commands accordingly.
-  if (command.execute !== undefined) {
-    // Attempt to execute command.
-    await command.execute(context, options);
+    // Handle commands accordingly.
+    if (command.execute !== undefined) {
+      // Attempt to execute command.
+      await command.execute(context, options);
+    }
   } else if (command.body !== undefined && isSubcommandArray(command.body)) {
     const subcommandName = interaction.options.getSubcommand();
 
@@ -93,10 +95,64 @@ export async function detectChatInputInteractionCommand(
     const subcommand = command.body.find(
       (sub) => sub.data.name === subcommandName,
     );
-    if (subcommand === undefined)
+    if (subcommand === undefined) {
       throw new Error(
         `Unknown subcommand: \`/${commandName} ${subcommandName}\``,
       );
+    }
+
+    if (subcommand.body !== undefined && isOptionArray(subcommand.body)) {
+      for (const option of subcommand.body) {
+        switch (option.type) {
+          case "number":
+            {
+              const opt = interaction.options.getInteger(
+                option.data.name,
+                option.data.required,
+              );
+
+              if (opt === null && option.data.required)
+                throw new Error(
+                  `Required option missing: \`${option.data.name}\``,
+                );
+
+              options.number.set(option.data.name, opt);
+            }
+            break;
+          case "boolean":
+            {
+              const opt = interaction.options.getBoolean(
+                option.data.name,
+                option.data.required,
+              );
+
+              if (opt === null && option.data.required)
+                throw new Error(
+                  `Required option missing: \`${option.data.name}\``,
+                );
+
+              options.boolean.set(option.data.name, opt);
+            }
+            break;
+          case "string":
+            {
+              const opt = interaction.options.getString(
+                option.data.name,
+                option.data.required,
+              );
+              if (opt === null && option.data.required)
+                throw new Error(
+                  `Required option missing: \`${option.data.name}\``,
+                );
+
+              options.string.set(option.data.name, opt);
+            }
+            break;
+        }
+      }
+    }
+
+    const context = new ChatInputCommandInteractionContext(interaction, data);
 
     await subcommand.execute(context, options);
   } else {
