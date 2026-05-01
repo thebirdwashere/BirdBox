@@ -101,6 +101,15 @@ export class EnsureMap<T> {
     return this.inner.get(key);
   }
 
+  /**
+   * Returns the value if it exists and is non-null, otherwise returns `undefined`.
+   */
+  fetchNonNullOrUndefined(key: string): T | null | undefined {
+    const inner = this.inner.get(key);
+    if (inner === null) return undefined;
+    return inner;
+  }
+
   constructor() {
     this.inner = new Map();
   }
