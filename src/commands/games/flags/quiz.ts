@@ -14,6 +14,7 @@ const flagsQuiz = new Subcommand({
 			name: "difficulty",
 			description: "Change how many flags are available to guess.",
 			type: "string",
+			required: false,
 		}),
 	],
 	execute: async (ctx, opts) => { //MARK: game setup
@@ -23,12 +24,12 @@ const flagsQuiz = new Subcommand({
 		}, {});
 
 		const providedDifficulty = opts.string.get("difficulty");
-		if (providedDifficulty != null && !difficultyOptions[providedDifficulty.toLowerCase()]) {
-		const optionsFormatter = new Intl.ListFormat("en", {
-			type: "conjunction",
-		});
-		const difficultyOptionsList = optionsFormatter.format(FLAGS.difficulties.map(difficulty => `\`${difficulty.name}\``));
-		throw new Error(`Provided difficulty "${providedDifficulty}" is invalid. The available difficulty options are ${difficultyOptionsList}.`);
+		if (providedDifficulty != null && !(providedDifficulty.toLowerCase() in difficultyOptions)) {
+			const optionsFormatter = new Intl.ListFormat("en", {
+				type: "conjunction",
+			});
+			const difficultyOptionsList = optionsFormatter.format(FLAGS.difficulties.map(difficulty => `\`${difficulty.name}\``));
+			throw new Error(`Provided difficulty "${providedDifficulty}" is invalid. The available difficulty options are ${difficultyOptionsList}.`);
 		}
 		
 		const selectedDifficulty = providedDifficulty != null ? FLAGS.difficulties[difficultyOptions[providedDifficulty.toLowerCase()]] : FLAGS.difficulties[0];

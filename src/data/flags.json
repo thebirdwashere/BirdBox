@@ -1007,35 +1007,35 @@
 			"flags": 4,  
 			"earned": 50,  
 			"lost": 10,  
-            "decoysAmount": 0
+      "decoysAmount": 0
 		},  
 		{
 			"name": "Easy",  
 			"flags": 8,  
 			"earned": 100,  
 			"lost": 20,  
-            "decoysAmount": 0
+      "decoysAmount": 0
 		},  
 		{
 			"name": "Medium",  
 			"flags": 12,  
 			"earned": 250,  
 			"lost": 50,  
-            "decoysAmount": 1
+      "decoysAmount": 1
 		},  
 		{
 			"name": "Hard",  
 			"flags": 16,  
 			"earned": 500,  
 			"lost": 100,  
-            "decoysAmount": 2
+      "decoysAmount": 2
 		},  
 		{
 			"name": "💀",  
 			"flags": 20,  
 			"earned": 750,  
 			"lost": 150,  
-            "decoysAmount": 3
+      "decoysAmount": 3
 		}
 	]
 }
