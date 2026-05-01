@@ -25,7 +25,8 @@ export async function sleep(ms: number): Promise<void> {
 }
 
 /**
- * Map wrapper with various utility functions to ensure values exist or default.
+ * Map wrapper with various utility methods to ensure values exist or optionally
+ * return defaults.
  */
 export class EnsureMap<T> {
   inner: Map<string, T | null>;
