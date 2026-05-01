@@ -1,4 +1,5 @@
 import path from "path";
+import { CommandContext } from "./context.js";
 
 /**
  * Brings the program to a complete halt with the provided error message. Avoid
@@ -22,6 +23,10 @@ export function toPosixPath(pathString: string): string {
  */
 export async function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+export function isSubcommand(ctx: CommandContext): boolean {
+  return "currentSubcommand" in ctx;
 }
 
 /**

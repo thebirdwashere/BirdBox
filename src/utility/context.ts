@@ -106,6 +106,22 @@ export class MessageContext implements CommandContext {
   }
 }
 
+export interface SubcommandContext {
+  currentSubcommand: string;
+  parentCommand: string;
+}
+
+export class MessageSubcommandContext extends MessageContext implements SubcommandContext {
+  currentSubcommand: string;
+  parentCommand: string;
+
+  constructor(message: Message, data: Data, subcommand: string, parent: string) {
+    super(message, data);
+    this.currentSubcommand = subcommand;
+    this.parentCommand = parent;
+  }
+}
+
 export class ChatInputCommandInteractionContext implements CommandContext {
   interaction: ChatInputCommandInteraction;
 
@@ -165,5 +181,16 @@ export class ChatInputCommandInteractionContext implements CommandContext {
     this.guild = interaction.guild;
     this.channel = interaction.channel;
     this.timestamp = interaction.createdTimestamp;
+  }
+}
+
+export class ChatInputCommandInteractionSubcommandContext extends ChatInputCommandInteractionContext implements SubcommandContext {
+  currentSubcommand: string;
+  parentCommand: string;
+
+  constructor(interaction: ChatInputCommandInteraction, data: Data, subcommand: string, parent: string) {
+    super(interaction, data);
+    this.currentSubcommand = subcommand;
+    this.parentCommand = parent;
   }
 }

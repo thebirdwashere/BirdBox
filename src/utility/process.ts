@@ -7,7 +7,9 @@ import {
 } from "./command.js";
 import {
   ChatInputCommandInteractionContext,
+  ChatInputCommandInteractionSubcommandContext,
   MessageContext,
+  MessageSubcommandContext,
 } from "./context.js";
 import { Data, Options } from "./types.js";
 
@@ -152,7 +154,7 @@ export async function detectChatInputInteractionCommand(
       }
     }
 
-    const context = new ChatInputCommandInteractionContext(interaction, data);
+    const context = new ChatInputCommandInteractionSubcommandContext(interaction, data, subcommandName, commandName);
 
     await subcommand.execute(context, options);
   } else {
@@ -195,8 +197,6 @@ export async function detectMessageCommand(
     throw new Error(`Unknown or unregistered command: \`/${commandName}\``);
   // command: Command
 
-  const context = new MessageContext(message, data);
-
   // Handle commands accordingly.
   if (command.execute !== undefined) {
     let options = {
@@ -204,6 +204,8 @@ export async function detectMessageCommand(
       boolean: new Map<string, boolean | null>(),
       string: new Map<string, string | null>(),
     };
+
+    const context = new MessageContext(message, data);
 
     // Populate options if they exist.
     if (command.body !== undefined && isOptionArray(command.body)) {
@@ -230,6 +232,8 @@ export async function detectMessageCommand(
       boolean: new Map<string, boolean | null>(),
       string: new Map<string, string | null>(),
     };
+
+    const context = new MessageSubcommandContext(message, data, subcommandName, commandName);
 
     // Attempt to find and execute subcommand.
     const subcommand = command.body.find(
