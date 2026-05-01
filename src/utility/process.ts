@@ -212,7 +212,8 @@ export async function detectMessageCommand(
           "Incorrect number of arguments in command: " +
             `\`/${commandName}\`; ` +
             `expected ${String(command.body.length)}, ` +
-            `found ${String(args.length)}.`,
+            `found ${String(args.length)}.` +
+            "\n*Help: Try using ! in place of any optional arguments.*",
         );
       options = populateMessageOptions(args, command.body);
     }
@@ -245,8 +246,9 @@ export async function detectMessageCommand(
         throw new Error(
           "Incorrect number of arguments in command: " +
             `\`/${commandName} ${subcommandName}\`; ` +
-            `expected ${String(command.body.length)}, ` +
-            `found ${String(args.length)}.`,
+            `expected ${String(subcommand.body.length)}, ` +
+            `found ${String(args.length)}.` +
+            "\n*Help: Try using ! in place of any optional arguments.*",
         );
       options = populateMessageOptions(args, subcommand.body);
     }
