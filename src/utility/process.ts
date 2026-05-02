@@ -25,7 +25,6 @@ export async function detectChatInputInteractionCommand(
   const command = data.registry.commands.get(commandName);
   if (command === undefined)
     throw new Error(`Unknown or unregistered command: \`/${commandName}\``);
-  // command: Command
 
   // Determine passed command options.
   let options = {
@@ -64,6 +63,10 @@ export async function detectChatInputInteractionCommand(
     const context = new ChatInputCommandInteractionSubcommandContext(interaction, data, subcommandName, commandName);
 
     await subcommand.execute(context, options);
+  } else if (command.execute !== undefined) {
+    const context = new ChatInputCommandInteractionContext(interaction, data);
+
+    await command.execute(context, options);
   } else {
     throw new Error(`Missing execute function in command: \`${commandName}\``);
   }
