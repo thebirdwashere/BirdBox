@@ -28,8 +28,8 @@ const Coinflip = new Command({
         validOptions[0] = heads ?? "heads";
         validOptions[1] = onlyHeadsProvided ? `**not** ${heads}` : (tails ?? "tails");
 
-        await ctx.send(validOptions[0]);
-        await ctx.send(validOptions[1]);
+        // await ctx.send(validOptions[0]);
+        // await ctx.send(validOptions[1]);
 
         const optionNum = Math.floor(Math.random() * validOptions.length);
 

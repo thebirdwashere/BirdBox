@@ -35,7 +35,8 @@ const Diceroll = new Command({
         //secondary result is needed for some trolls
         let secondaryResult = Math.floor(Math.random() * sides) + 1;
         while (secondaryResult === mainResult) { //ensure this is different from main
-            secondaryResult = Math.floor(Math.random() * sides) + 1;}
+          secondaryResult = Math.floor(Math.random() * sides) + 1;
+        }
 
         const trollOptions = [
             async () => { // Normal
