@@ -215,15 +215,15 @@ export class AutocompleteContext implements BaseContext {
   timestamp: number;
 
   async respond(
-    content: 
+    choices: 
     | [ApplicationCommandOptionChoiceData, ...ApplicationCommandOptionChoiceData[]]
     | [string, ...string[]],
   ): Promise<void> {
-    if (typeof content[0] === "string") {
-      const new_content = (content as [string, ...string[]]).map((choice) => ({ name: choice, value: choice }));
-      await this.interaction.respond(new_content);
+    if (typeof choices[0] === "string") {
+      const convertedContent = (choices as [string, ...string[]]).map((choice) => ({ name: choice, value: choice }));
+      await this.interaction.respond(convertedContent);
     } else {
-      await this.interaction.respond(content as [ApplicationCommandOptionChoiceData, ...ApplicationCommandOptionChoiceData[]]);
+      await this.interaction.respond(choices as [ApplicationCommandOptionChoiceData, ...ApplicationCommandOptionChoiceData[]]);
     }
   }
 
