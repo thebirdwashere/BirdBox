@@ -15,8 +15,18 @@ const flagsQuiz = new Subcommand({
 			description: "Change how many flags are available to guess.",
 			type: "string",
 			required: false,
+      autocomplete: true,
 		}),
 	],
+  autocomplete: async (ctx) => {
+		const difficultyOptions = FLAGS.difficulties.map(difficulty => difficulty.name);
+
+    if (difficultyOptions.length === 0)
+      throw new Error("No difficulties provided for `flags` command.");
+
+    console.log(ctx.respond(difficultyOptions as [string, ...string[]]));
+    await sleep(1);
+  },
 	execute: async (ctx, opts) => { //MARK: game setup
 		const difficultyOptions: Record<string, number> = FLAGS.difficulties.map(difficulty => difficulty.name.toLowerCase()).reduce((acc: Record<string, number>, current, i) => {
 			acc[current] = i;
