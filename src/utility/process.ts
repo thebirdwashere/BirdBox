@@ -4,6 +4,8 @@ import {
   CommandRegistry,
   isOptionArray,
   isSubcommandArray,
+  Command,
+  Subcommand,
 } from "./command.js";
 import {
   ChatInputCommandInteractionContext,
@@ -27,61 +29,14 @@ export async function detectChatInputInteractionCommand(
   // command: Command
 
   // Determine passed command options.
-  const options = {
+  let options = {
     number: new Map<string, number | null>(),
     boolean: new Map<string, boolean | null>(),
     string: new Map<string, string | null>(),
   };
 
   if (command.body !== undefined && isOptionArray(command.body)) {
-    for (const option of command.body) {
-      switch (option.type) {
-        case "number":
-          {
-            const opt = interaction.options.getInteger(
-              option.data.name,
-              option.data.required,
-            );
-
-            if (opt === null && option.data.required)
-              throw new Error(
-                `Required option missing: \`${option.data.name}\``,
-              );
-
-            options.number.set(option.data.name, opt);
-          }
-          break;
-        case "boolean":
-          {
-            const opt = interaction.options.getBoolean(
-              option.data.name,
-              option.data.required,
-            );
-
-            if (opt === null && option.data.required)
-              throw new Error(
-                `Required option missing: \`${option.data.name}\``,
-              );
-
-            options.boolean.set(option.data.name, opt);
-          }
-          break;
-        case "string":
-          {
-            const opt = interaction.options.getString(
-              option.data.name,
-              option.data.required,
-            );
-            if (opt === null && option.data.required)
-              throw new Error(
-                `Required option missing: \`${option.data.name}\``,
-              );
-
-            options.string.set(option.data.name, opt);
-          }
-          break;
-      }
-    }
+    options = parseCommandOptions(command, interaction, options);
 
     const context = new ChatInputCommandInteractionContext(interaction, data);
 
@@ -104,54 +59,7 @@ export async function detectChatInputInteractionCommand(
     }
 
     if (subcommand.body !== undefined && isOptionArray(subcommand.body)) {
-      for (const option of subcommand.body) {
-        switch (option.type) {
-          case "number":
-            {
-              const opt = interaction.options.getInteger(
-                option.data.name,
-                option.data.required,
-              );
-
-              if (opt === null && option.data.required)
-                throw new Error(
-                  `Required option missing: \`${option.data.name}\``,
-                );
-
-              options.number.set(option.data.name, opt);
-            }
-            break;
-          case "boolean":
-            {
-              const opt = interaction.options.getBoolean(
-                option.data.name,
-                option.data.required,
-              );
-
-              if (opt === null && option.data.required)
-                throw new Error(
-                  `Required option missing: \`${option.data.name}\``,
-                );
-
-              options.boolean.set(option.data.name, opt);
-            }
-            break;
-          case "string":
-            {
-              const opt = interaction.options.getString(
-                option.data.name,
-                option.data.required,
-              );
-              if (opt === null && option.data.required)
-                throw new Error(
-                  `Required option missing: \`${option.data.name}\``,
-                );
-
-              options.string.set(option.data.name, opt);
-            }
-            break;
-        }
-      }
+      options = parseCommandOptions(subcommand, interaction, options);
     }
 
     const context = new ChatInputCommandInteractionSubcommandContext(interaction, data, subcommandName, commandName);
@@ -160,6 +68,66 @@ export async function detectChatInputInteractionCommand(
   } else {
     throw new Error(`Missing execute function in command: \`${commandName}\``);
   }
+}
+
+function parseCommandOptions(
+  command: Command | Subcommand,
+  interaction: ChatInputCommandInteraction,
+  options: Options,
+): Options {
+
+  if (!command.body || !isOptionArray(command.body)) throw new Error(`parseCommandOptions function used incorrectly to parse command \`${command.data.name}\``);
+
+  for (const option of command.body) {
+    switch (option.type) {
+      case "number":
+        {
+          const opt = interaction.options.getInteger(
+            option.data.name,
+            option.data.required,
+          );
+
+          if (opt === null && option.data.required)
+            throw new Error(
+              `Required option missing: \`${option.data.name}\``,
+            );
+
+          options.number.set(option.data.name, opt);
+        }
+        break;
+      case "boolean":
+        {
+          const opt = interaction.options.getBoolean(
+            option.data.name,
+            option.data.required,
+          );
+
+          if (opt === null && option.data.required)
+            throw new Error(
+              `Required option missing: \`${option.data.name}\``,
+            );
+
+          options.boolean.set(option.data.name, opt);
+        }
+        break;
+      case "string":
+        {
+          const opt = interaction.options.getString(
+            option.data.name,
+            option.data.required,
+          );
+          if (opt === null && option.data.required)
+            throw new Error(
+              `Required option missing: \`${option.data.name}\``,
+            );
+
+          options.string.set(option.data.name, opt);
+        }
+        break;
+    }
+  }
+
+  return options;
 }
 
 export async function detectMessageCommand(
