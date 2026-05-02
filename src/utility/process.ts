@@ -16,11 +16,11 @@ import {
 import { Data, Options } from "./types.js";
 
 export async function detectChatInputInteractionCommand(
-  registry: CommandRegistry,
   data: Data,
   interaction: ChatInputCommandInteraction,
 ): Promise<void> {
   const commandName = interaction.commandName;
+  const registry = data.registry;
 
   // Determine if command exists in registry.
   const command = registry.commands.get(commandName);

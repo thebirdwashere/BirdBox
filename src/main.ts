@@ -54,7 +54,7 @@ CLIENT.on(Events.ClientReady, (_event) => {
 
 CLIENT.on(Events.InteractionCreate, (interaction) => {
   if (interaction.isChatInputCommand()) {
-    detectChatInputInteractionCommand(REGISTRY, DATA, interaction).catch(
+    detectChatInputInteractionCommand(DATA, interaction).catch(
       async (error: unknown) => {
         const context = new ChatInputCommandInteractionContext(
           interaction,
