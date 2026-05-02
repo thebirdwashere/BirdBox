@@ -127,12 +127,14 @@ export class CommandOption {
     | SlashCommandBooleanOption
     | SlashCommandStringOption;
   type: "number" | "boolean" | "string";
+  autocomplete?: boolean;
 
   constructor(args: {
     name: string;
     description: string;
     required?: boolean;
     type: "number" | "boolean" | "string";
+    autocomplete?: boolean;
   }) {
     this.type = args.type;
     switch (args.type) {
@@ -151,6 +153,10 @@ export class CommandOption {
       .setName(args.name)
       .setDescription(args.description)
       .setRequired(args.required ?? true);
+
+    if (this.data instanceof SlashCommandStringOption && args.autocomplete) {
+      this.data.setAutocomplete(args.autocomplete);
+    }
   }
 }
 
