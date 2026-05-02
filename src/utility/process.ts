@@ -20,10 +20,9 @@ export async function detectChatInputInteractionCommand(
   interaction: ChatInputCommandInteraction,
 ): Promise<void> {
   const commandName = interaction.commandName;
-  const registry = data.registry;
 
   // Determine if command exists in registry.
-  const command = registry.commands.get(commandName);
+  const command = data.registry.commands.get(commandName);
   if (command === undefined)
     throw new Error(`Unknown or unregistered command: \`/${commandName}\``);
   // command: Command
