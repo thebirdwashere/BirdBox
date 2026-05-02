@@ -7,15 +7,21 @@ export async function handleError(
   error: unknown,
 ): Promise<void> {
   console.error(error);
-  await ctx.send({
-    embeds: [
-      new EmbedBuilder()
-        .setTitle("Command Error")
-        .addFields(
-          { name: "Message:", value: String(error), inline: true },
-          { name: "In command:", value: originCommand, inline: true },
-        )
-        .setColor(Colors.Red),
-    ],
-  });
+
+  const embeds = [
+    new EmbedBuilder()
+      .setTitle("Command Error")
+      .addFields(
+        { name: "Message:", value: String(error), inline: true },
+        { name: "In command:", value: originCommand, inline: true },
+      )
+      .setColor(Colors.Red),
+  ];
+  
+  //if the reply fails for some reason, send it as a base message
+  try {
+    await ctx.reply({embeds});
+  } catch {
+    await ctx.send({embeds});
+  }
 }
