@@ -11,7 +11,7 @@ import {
 } from "discord.js";
 import fg from "fast-glob";
 import path from "path";
-import { CommandContext } from "./context.js";
+import { CommandContext, AutocompleteContext } from "./context.js";
 import { panic, toPosixPath } from "./utility.js";
 import { pathToFileURL } from "url";
 import { Options } from "./types.js";
@@ -22,6 +22,7 @@ export class Command {
     | readonly [CommandOption, ...CommandOption[]]
     | readonly [Subcommand, ...Subcommand[]];
   execute?: (ctx: CommandContext, opts: Options) => Promise<void>;
+  autocomplete?: (ctx: AutocompleteContext) => Promise<void>;
 
   constructor(
     args:
@@ -80,6 +81,7 @@ export class Subcommand {
   data: SlashCommandSubcommandBuilder;
   body?: readonly [CommandOption, ...CommandOption[]];
   execute: (ctx: CommandContext, opts: Options) => Promise<void>;
+  autocomplete?: (ctx: AutocompleteContext) => Promise<void>;
 
   constructor(
     args:
@@ -93,12 +95,14 @@ export class Subcommand {
           description: string;
           options: readonly [CommandOption, ...CommandOption[]];
           execute: (ctx: CommandContext, opts: Options) => Promise<void>;
+          autocomplete?: (ctx: AutocompleteContext) => Promise<void>;
         },
   ) {
     this.data = new SlashCommandSubcommandBuilder()
       .setName(args.name)
       .setDescription(args.description);
     this.execute = args.execute;
+    if ("autocomplete" in args) this.autocomplete = args.autocomplete;
 
     if ("options" in args) {
       for (const option of args.options) {

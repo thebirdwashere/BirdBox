@@ -1,4 +1,4 @@
-import { ChatInputCommandInteraction, Message } from "discord.js";
+import { AutocompleteInteraction, ChatInputCommandInteraction, Message } from "discord.js";
 import {
   CommandOption,
   CommandRegistry,
@@ -12,8 +12,10 @@ import {
   ChatInputCommandInteractionSubcommandContext,
   MessageContext,
   MessageSubcommandContext,
+  AutocompleteContext
 } from "./context.js";
 import { Data, Options } from "./types.js";
+import { sleep } from "./utility.js";
 
 export async function detectChatInputInteractionCommand(
   data: Data,
@@ -300,4 +302,49 @@ function populateMessageOptions(
   }
 
   return options;
+}
+
+export async function handleAutocomplete(
+  data: Data,
+  interaction: AutocompleteInteraction,
+): Promise<void> {
+  const commandName = interaction.commandName;
+  const command = data.registry.commands.get(commandName);
+
+  if (command === undefined)
+    throw new Error(`Unknown or unregistered command: \`/${commandName}\``);
+  
+  if (command.body === undefined) {
+    throw new Error(`Autocomplete call on command without options: \`/${commandName}\``);
+  } else if (isOptionArray(command.body)) {
+    if (command.autocomplete === undefined)
+      throw new Error(`Missing autocomplete handler: \`/${commandName}\``);
+
+    const context = new AutocompleteContext(interaction, data);
+    await command.autocomplete(context);
+
+  } else if (isSubcommandArray(command.body)) {
+    const subcommandName = interaction.options.getSubcommand();
+
+    // Attempt to find subcommand.
+    const subcommand = command.body.find(
+      (sub) => sub.data.name === subcommandName,
+    );
+
+    if (subcommand === undefined) {
+      throw new Error(
+        `Unknown subcommand: \`/${commandName} ${subcommandName}\``,
+      );
+    }
+  
+    if (subcommand.autocomplete === undefined)
+      throw new Error(`Missing autocomplete handler: \`/${commandName} ${subcommandName}\``);
+
+    const context = new AutocompleteContext(interaction, data);
+    await subcommand.autocomplete(context);
+
+  }
+
+  console.log(command);
+  await sleep(1);
 }

@@ -15,6 +15,7 @@ import {
 import {
   detectChatInputInteractionCommand,
   detectMessageCommand,
+  handleAutocomplete,
 } from "./utility/process.js";
 import { Data, Perms } from "./utility/types.js";
 
@@ -63,6 +64,8 @@ CLIENT.on(Events.InteractionCreate, (interaction) => {
         await handleError(context, interaction.commandName, error);
       },
     );
+  } else if (interaction.isAutocomplete()) {
+    void handleAutocomplete(DATA, interaction);
   }
 });
 

@@ -7,10 +7,20 @@ import {
   User,
   ActionRowBuilder,
   MessageActionRowComponentBuilder,
+  AutocompleteInteraction,
+  ApplicationCommandOptionChoiceData,
 } from "discord.js";
 import { Data } from "./types.js";
 
-export interface CommandContext {
+export interface BaseContext {
+  data: Data;
+  channel: TextBasedChannel | null;
+  guild: Guild | null;
+  user: User;
+  timestamp: number;
+}
+
+export interface CommandContext extends BaseContext {
   data: Data;
   channel: TextBasedChannel | null;
   lastReply: Message | null;
@@ -194,3 +204,36 @@ export class ChatInputCommandInteractionSubcommandContext extends ChatInputComma
     this.parentCommand = parent;
   }
 }
+
+export class AutocompleteContext implements BaseContext {
+  interaction: AutocompleteInteraction;
+
+  data: Data;
+  channel: TextBasedChannel | null;
+  guild: Guild | null;
+  user: User;
+  timestamp: number;
+
+  async respond(
+    content: 
+    | [ApplicationCommandOptionChoiceData, ...ApplicationCommandOptionChoiceData[]]
+    | [string, ...string[]],
+  ): Promise<void> {
+    if (typeof content[0] === "string") {
+      const new_content = (content as [string, ...string[]]).map((choice) => ({ name: choice, value: choice }));
+      await this.interaction.respond(new_content);
+    } else {
+      await this.interaction.respond(content as [ApplicationCommandOptionChoiceData, ...ApplicationCommandOptionChoiceData[]]);
+    }
+  }
+
+  constructor(interaction: AutocompleteInteraction, data: Data) {
+    this.interaction = interaction;
+    this.data = data;
+    this.user = interaction.user;
+    this.guild = interaction.guild;
+    this.channel = interaction.channel;
+    this.timestamp = interaction.createdTimestamp;
+  }
+}
+
