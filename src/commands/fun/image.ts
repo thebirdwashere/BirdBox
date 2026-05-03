@@ -30,7 +30,7 @@ const Image = new Command({
 
                 const catEmbed = new EmbedBuilder()
                     .setTitle("Random Cat")
-                    .setAuthor({ name: "TheCatAPI", iconURL: "https://thecatapi.com/_app/immutable/assets/thecatapi-cat.74a07522.svg" })
+                    .setAuthor({ name: "TheCatAPI", iconURL: "https://i.natgeofe.com/n/eb0f9db1-8b29-4598-ad7e-89716501189f/cat-whisperers-nationalgeographic_1048225_square.jpg" })
                     .setColor(Colors.Blue)
                     .setImage(imageURL);
         
@@ -62,7 +62,7 @@ const Image = new Command({
 
                 const dogEmbed = new EmbedBuilder()
                     .setTitle("Random Dog")
-                    .setAuthor({ name: "TheDogAPI", iconURL: "https://thedogapi.com/_app/immutable/assets/thedogapi-dog.d5d881e0.svg" })
+                    .setAuthor({ name: "TheDogAPI", iconURL: "https://i.natgeofe.com/n/225bafe4-88e7-4f91-ad60-7ff43277ec4b/Conan2_square.jpg" })
                     .setColor(Colors.Blue)
                     .setImage(imageURL);
         
