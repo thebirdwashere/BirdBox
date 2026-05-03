@@ -240,8 +240,8 @@ export class AutocompleteContext implements BaseContext {
   }
 
   /**
-   * Attempts to respond to the autocomplete with a list of strings, 
-   * formatted automatically into choices. 
+   * Attempts to respond to the autocomplete with an array of strings, 
+   * formatted into choice data. 
    * Automatically filters responses based on the user's current input.
    */
   async respondStrings(
