@@ -1,5 +1,5 @@
 import { Command, Subcommand, CommandOption } from "src/utility/command.js";
-import { EmbedBuilder, Colors, ApplicationCommandOptionChoiceData, AutocompleteFocusedOption } from "discord.js";
+import { EmbedBuilder, Colors } from "discord.js";
 
 const CAT_LINK = "api.thecatapi.com";
 const DOG_LINK = "api.thedogapi.com";
@@ -34,9 +34,15 @@ const Image = new Command({
             break;
           }
           case "breed": {
-            const breeds = await getBreedAutocomplete(ctx.option, CAT_LINK);
+            const petBreeds = await getPetBreeds(CAT_LINK);
+            const formattedBreeds = petBreeds.map(breed => {
+              return {
+                name: breed.name,
+                value: breed.id,
+              };
+            });
 
-            await ctx.respond(breeds);
+            await ctx.respond(formattedBreeds);
             break;
           }
         }
@@ -81,9 +87,15 @@ const Image = new Command({
             break;
           }
           case "breed": {
-            const breeds = await getBreedAutocomplete(ctx.option, DOG_LINK);
+            const petBreeds = await getPetBreeds(DOG_LINK);
+            const formattedBreeds = petBreeds.map(breed => {
+              return {
+                name: breed.name,
+                value: breed.id,
+              };
+            });
 
-            await ctx.respond(breeds);
+            await ctx.respond(formattedBreeds);
             break;
           }
         }
@@ -105,24 +117,6 @@ const Image = new Command({
     })
   ],
 });
-
-async function getBreedAutocomplete(option: AutocompleteFocusedOption, link: string): Promise<ApplicationCommandOptionChoiceData[]> {
-  const petBreeds = await getPetBreeds(link);
-  const formattedBreeds = petBreeds.map(breed => {
-    return {
-      name: breed.name,
-      value: breed.id,
-    };
-  });
-
-  const current = option.value.toLowerCase();
-
-  const filteredBreeds = formattedBreeds.filter(breed => breed.name.toLowerCase().startsWith(current));
-  // console.log(current);
-  // console.log(filteredBreeds);
-
-  return filteredBreeds;
-}
 
 async function getPetImage(type: string, breed: string, link: string): Promise<string> {
   let fetchString = `https://${link}/v1/images/search?mime_types=${type}`;

@@ -218,26 +218,41 @@ export class AutocompleteContext implements BaseContext {
 
   /**
    * Attempts to respond to the autocomplete with a list of choices.
+   * Automatically filters responses based on the user's current input.
    */
   async respond(
     choices: ApplicationCommandOptionChoiceData[]
   ): Promise<void> {
-    await this.interaction.respond(choices.slice(0, 25));
+    const current = this.option.value.toLowerCase();
+
+    let responseElements = choices;
+    if (current !== "") {
+      const choicesStartsWith = choices.filter(choice => choice.name.toLowerCase().startsWith(current));
+      const choicesContains = choices.filter(choice => {
+        const name = choice.name.toLowerCase();
+        return name.includes(current) && !name.startsWith(current);
+      });
+
+      responseElements = choicesStartsWith.concat(choicesContains);
+    };
+
+    await this.interaction.respond(responseElements.slice(0, 25));
   }
 
   /**
    * Attempts to respond to the autocomplete with a list of strings, 
-   * formatted automatically into choices.
+   * formatted automatically into choices. 
+   * Automatically filters responses based on the user's current input.
    */
   async respondStrings(
     choices: string[],
   ): Promise<void> {
     const convertedContent = choices.map((choice) => ({ name: choice, value: choice }));
-    await this.interaction.respond(convertedContent.slice(0, 25));
+    await this.respond(convertedContent);
   }
 
   /**
-   * Attempts to respond to the autocomplete with a list of choices. 
+   * Attempts to respond to the autocomplete with a list of choices, with no automatic filtering.
    * Does not cap the length at 25, so this function can error!
    */
   async respondRaw(
