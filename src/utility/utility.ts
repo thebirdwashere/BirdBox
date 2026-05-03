@@ -25,6 +25,9 @@ export async function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
+/**
+ * Tests if a command context is of a subcomamnd.
+ */
 export function isSubcommand(ctx: CommandContext): boolean {
   return "currentSubcommand" in ctx;
 }
