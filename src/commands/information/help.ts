@@ -70,7 +70,7 @@ const Help = new Command({
 
             let page = 0;
 
-            console.log(commandsList[0].data.options[0].toJSON());
+            //console.log(commandsList[0].data.options[0].toJSON());
 
             interface commandEmbedDisplay {
                 name: string;

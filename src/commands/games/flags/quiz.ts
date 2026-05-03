@@ -24,8 +24,7 @@ const flagsQuiz = new Subcommand({
     if (difficultyOptions.length === 0)
       throw new Error("No difficulties provided for `flags` command.");
 
-    console.log(ctx.respondStrings(difficultyOptions));
-    await sleep(1);
+    await ctx.respondStrings(difficultyOptions);
   },
 	execute: async (ctx, opts) => { //MARK: game setup
 		const difficultyOptions: Record<string, number> = FLAGS.difficulties.map(difficulty => difficulty.name.toLowerCase()).reduce((acc: Record<string, number>, current, i) => {

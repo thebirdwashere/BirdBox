@@ -9,6 +9,7 @@ import {
   MessageActionRowComponentBuilder,
   AutocompleteInteraction,
   ApplicationCommandOptionChoiceData,
+  AutocompleteFocusedOption,
 } from "discord.js";
 import { Data } from "./types.js";
 
@@ -207,6 +208,7 @@ export class ChatInputCommandInteractionSubcommandContext extends ChatInputComma
 
 export class AutocompleteContext implements BaseContext {
   interaction: AutocompleteInteraction;
+  option:  AutocompleteFocusedOption;
 
   data: Data;
   channel: TextBasedChannel | null;
@@ -246,6 +248,7 @@ export class AutocompleteContext implements BaseContext {
 
   constructor(interaction: AutocompleteInteraction, data: Data) {
     this.interaction = interaction;
+    this.option = interaction.options.getFocused(true);
     this.data = data;
     this.user = interaction.user;
     this.guild = interaction.guild;

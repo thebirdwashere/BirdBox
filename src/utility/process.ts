@@ -345,6 +345,6 @@ export async function handleAutocomplete(
 
   }
 
-  console.log(command);
+  //console.log(command);
   await sleep(1);
 }
