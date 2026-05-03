@@ -50,17 +50,17 @@ export class Command {
     if ("options" in args) {
       for (const option of args.options) {
         switch (option.data.type) {
-          case ApplicationCommandOptionType.Integer:
-            this.data.addIntegerOption(option.data);
-            break;
-          case ApplicationCommandOptionType.Boolean:
-            this.data.addBooleanOption(option.data);
-            break;
-          case ApplicationCommandOptionType.String:
-            this.data.addStringOption(option.data);
-            break;
-          default:
-            panic("Unimplemented data type.");
+        case ApplicationCommandOptionType.Integer:
+          this.data.addIntegerOption(option.data);
+          break;
+        case ApplicationCommandOptionType.Boolean:
+          this.data.addBooleanOption(option.data);
+          break;
+        case ApplicationCommandOptionType.String:
+          this.data.addStringOption(option.data);
+          break;
+        default:
+          panic("Unimplemented data type.");
         }
       }
       this.body = args.options;
@@ -107,17 +107,17 @@ export class Subcommand {
     if ("options" in args) {
       for (const option of args.options) {
         switch (option.data.type) {
-          case ApplicationCommandOptionType.Integer:
-            this.data.addIntegerOption(option.data);
-            break;
-          case ApplicationCommandOptionType.Boolean:
-            this.data.addBooleanOption(option.data);
-            break;
-          case ApplicationCommandOptionType.String:
-            this.data.addStringOption(option.data);
-            break;
-          default:
-            panic("Unimplemented data type.");
+        case ApplicationCommandOptionType.Integer:
+          this.data.addIntegerOption(option.data);
+          break;
+        case ApplicationCommandOptionType.Boolean:
+          this.data.addBooleanOption(option.data);
+          break;
+        case ApplicationCommandOptionType.String:
+          this.data.addStringOption(option.data);
+          break;
+        default:
+          panic("Unimplemented data type.");
         }
       }
       this.body = args.options;
@@ -142,15 +142,15 @@ export class CommandOption {
   }) {
     this.type = args.type;
     switch (args.type) {
-      case "number":
-        this.data = new SlashCommandIntegerOption();
-        break;
-      case "boolean":
-        this.data = new SlashCommandBooleanOption();
-        break;
-      case "string":
-        this.data = new SlashCommandStringOption();
-        break;
+    case "number":
+      this.data = new SlashCommandIntegerOption();
+      break;
+    case "boolean":
+      this.data = new SlashCommandBooleanOption();
+      break;
+    case "string":
+      this.data = new SlashCommandStringOption();
+      break;
     }
 
     this.data

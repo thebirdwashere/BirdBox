@@ -29,22 +29,22 @@ const Image = new Command({
       ],
       autocomplete: async (ctx) => {
         switch (ctx.option.name) {
-          case "type": {
-            await ctx.respondStrings(["image", "gif"]);
-            break;
-          }
-          case "breed": {
-            const petBreeds = await getPetBreeds(CAT_LINK);
-            const formattedBreeds = petBreeds.map(breed => {
-              return {
-                name: breed.name,
-                value: breed.id,
-              };
-            });
+        case "type": {
+          await ctx.respondStrings(["image", "gif"]);
+          break;
+        }
+        case "breed": {
+          const petBreeds = await getPetBreeds(CAT_LINK);
+          const formattedBreeds = petBreeds.map(breed => {
+            return {
+              name: breed.name,
+              value: breed.id,
+            };
+          });
 
-            await ctx.respond(formattedBreeds);
-            break;
-          }
+          await ctx.respond(formattedBreeds);
+          break;
+        }
         }
       },
       execute: async (ctx, opts) => {
@@ -82,22 +82,22 @@ const Image = new Command({
       ],
       autocomplete: async (ctx) => {
         switch (ctx.option.name) {
-          case "type": {
-            await ctx.respondStrings(["image", "gif"]);
-            break;
-          }
-          case "breed": {
-            const petBreeds = await getPetBreeds(DOG_LINK);
-            const formattedBreeds = petBreeds.map(breed => {
-              return {
-                name: breed.name,
-                value: breed.id,
-              };
-            });
+        case "type": {
+          await ctx.respondStrings(["image", "gif"]);
+          break;
+        }
+        case "breed": {
+          const petBreeds = await getPetBreeds(DOG_LINK);
+          const formattedBreeds = petBreeds.map(breed => {
+            return {
+              name: breed.name,
+              value: breed.id,
+            };
+          });
 
-            await ctx.respond(formattedBreeds);
-            break;
-          }
+          await ctx.respond(formattedBreeds);
+          break;
+        }
         }
       },
       execute: async (ctx, opts) => {

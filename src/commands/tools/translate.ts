@@ -33,10 +33,10 @@ const Translate = new Command({
         }
 
         const codesEmbed = new EmbedBuilder()
-        .setColor(Colors.Blue)
-        .setTitle(`${requestedPage} Codes`)
-        .setAuthor({ name: "Google Translate", iconURL: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Google_Translate_logo.svg/1024px-Google_Translate_logo.svg.png" })
-        .setFooter({ text: "Powered by the Google Translate API!" });
+          .setColor(Colors.Blue)
+          .setTitle(`${requestedPage} Codes`)
+          .setAuthor({ name: "Google Translate", iconURL: "https://upload.wikimedia.org/wikipedia/commons/thumb/d/d7/Google_Translate_logo.svg/1024px-Google_Translate_logo.svg.png" })
+          .setFooter({ text: "Powered by the Google Translate API!" });
 
         LANGUAGES.forEach(item => {
           if (item.name.toLowerCase().startsWith(requestedPage)) {

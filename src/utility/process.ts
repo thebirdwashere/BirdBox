@@ -84,50 +84,50 @@ function parseCommandOptions(
 
   for (const option of command.body) {
     switch (option.type) {
-      case "number":
-        {
-          const opt = interaction.options.getInteger(
-            option.data.name,
-            option.data.required,
+    case "number":
+      {
+        const opt = interaction.options.getInteger(
+          option.data.name,
+          option.data.required,
+        );
+
+        if (opt === null && option.data.required)
+          throw new Error(
+            `Required option missing: \`${option.data.name}\``,
           );
 
-          if (opt === null && option.data.required)
-            throw new Error(
-              `Required option missing: \`${option.data.name}\``,
-            );
+        options.number.set(option.data.name, opt);
+      }
+      break;
+    case "boolean":
+      {
+        const opt = interaction.options.getBoolean(
+          option.data.name,
+          option.data.required,
+        );
 
-          options.number.set(option.data.name, opt);
-        }
-        break;
-      case "boolean":
-        {
-          const opt = interaction.options.getBoolean(
-            option.data.name,
-            option.data.required,
+        if (opt === null && option.data.required)
+          throw new Error(
+            `Required option missing: \`${option.data.name}\``,
           );
 
-          if (opt === null && option.data.required)
-            throw new Error(
-              `Required option missing: \`${option.data.name}\``,
-            );
-
-          options.boolean.set(option.data.name, opt);
-        }
-        break;
-      case "string":
-        {
-          const opt = interaction.options.getString(
-            option.data.name,
-            option.data.required,
+        options.boolean.set(option.data.name, opt);
+      }
+      break;
+    case "string":
+      {
+        const opt = interaction.options.getString(
+          option.data.name,
+          option.data.required,
+        );
+        if (opt === null && option.data.required)
+          throw new Error(
+            `Required option missing: \`${option.data.name}\``,
           );
-          if (opt === null && option.data.required)
-            throw new Error(
-              `Required option missing: \`${option.data.name}\``,
-            );
 
-          options.string.set(option.data.name, opt);
-        }
-        break;
+        options.string.set(option.data.name, opt);
+      }
+      break;
     }
   }
 
@@ -270,34 +270,34 @@ function populateMessageOptions(
     }
 
     switch (sourceType) {
-      case "number":
-        options.number.set(option.data.name, Number(source));
-        break;
-      case "boolean":
-        options.boolean.set(option.data.name, source === "true" ? true : false);
-        break;
-      case "string":
-        options.string.set(option.data.name, source);
-        break;
-      case "optional":
-        if (!option.data.required) {
-          switch (option.type) {
-            case "number":
-              options.number.set(option.data.name, null);
-              break;
-            case "boolean":
-              options.boolean.set(option.data.name, null);
-              break;
-            case "string":
-              options.string.set(option.data.name, null);
-              break;
-          }
-        } else {
-          throw new Error(
-            `Argument at position ${String(index + 1)} is not optional.`,
-          );
+    case "number":
+      options.number.set(option.data.name, Number(source));
+      break;
+    case "boolean":
+      options.boolean.set(option.data.name, source === "true" ? true : false);
+      break;
+    case "string":
+      options.string.set(option.data.name, source);
+      break;
+    case "optional":
+      if (!option.data.required) {
+        switch (option.type) {
+        case "number":
+          options.number.set(option.data.name, null);
+          break;
+        case "boolean":
+          options.boolean.set(option.data.name, null);
+          break;
+        case "string":
+          options.string.set(option.data.name, null);
+          break;
         }
-        break;
+      } else {
+        throw new Error(
+          `Argument at position ${String(index + 1)} is not optional.`,
+        );
+      }
+      break;
     }
   }
 

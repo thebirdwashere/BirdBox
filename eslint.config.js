@@ -17,6 +17,7 @@ export default tseslint.config({
   rules: {
     quotes: ["warn", "double"],
     semi: ["warn", "always"],
+    "indent": ["warn", 2],
     "@typescript-eslint/no-unused-vars": [
       "error",
       {
