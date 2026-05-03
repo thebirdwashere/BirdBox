@@ -1,6 +1,9 @@
 import { Command, Subcommand, CommandOption } from "src/utility/command.js";
 import { EmbedBuilder, Colors } from "discord.js";
 
+const CAT_LINK = "api.thecatapi.com";
+const DOG_LINK = "api.thedogapi.com";
+
 const Image = new Command({
   name: "image",
   description: "Enjoy some images handpicked (randomly) by BirdBox.",
@@ -20,13 +23,31 @@ const Image = new Command({
           description: "Which breed you want images of. If not specified, will choose from all available breeds.",
           type: "string",
           required: false,
+          autocomplete: true,
         }),
       ],
+      autocomplete: async (ctx) => {
+        const petBreeds = await getPetBreeds(CAT_LINK);
+        const formattedBreeds = petBreeds.map(breed => {
+          return {
+            name: breed.name,
+            value: breed.id,
+          };
+        });
+
+        const current = ctx.option.value.toLowerCase();
+
+        const filteredBreeds = formattedBreeds.filter(breed => breed.name.toLowerCase().startsWith(current));
+        // console.log(current);
+        // console.log(filteredBreeds);
+
+        await ctx.respond(filteredBreeds);
+      },
       execute: async (ctx, opts) => {
         const imageType = opts.string.get("type") ?? "image";
-        const selectedBreed = opts.string.get("breed") ?? "test";
+        const selectedBreed = opts.string.get("breed") ?? "";
 
-        const imageURL = await getPetImage(imageType, selectedBreed, "api.thecatapi.com");
+        const imageURL = await getPetImage(imageType, selectedBreed, CAT_LINK);
 
         const catEmbed = new EmbedBuilder()
           .setTitle("Random Cat")
@@ -52,13 +73,31 @@ const Image = new Command({
           description: "Which breed you want images of. If not specified, will choose from all available breeds.",
           type: "string",
           required: false,
+          autocomplete: true,
         }),
       ],
+      autocomplete: async (ctx) => {
+        const petBreeds = await getPetBreeds(DOG_LINK);
+        const formattedBreeds = petBreeds.map(breed => {
+          return {
+            name: breed.name,
+            value: breed.id,
+          };
+        });
+
+        const current = ctx.option.value.toLowerCase();
+
+        const filteredBreeds = formattedBreeds.filter(breed => breed.name.toLowerCase().startsWith(current));
+        // console.log(current);
+        // console.log(filteredBreeds);
+
+        await ctx.respond(filteredBreeds);
+      },
       execute: async (ctx, opts) => {
         const imageType = opts.string.get("type") ?? "image";
-        const selectedBreed = opts.string.get("breed") ?? "test";
+        const selectedBreed = opts.string.get("breed") ?? "";
 
-        const imageURL = await getPetImage(imageType, selectedBreed, "api.thedogapi.com");
+        const imageURL = await getPetImage(imageType, selectedBreed, DOG_LINK);
 
         const dogEmbed = new EmbedBuilder()
           .setTitle("Random Dog")
@@ -74,20 +113,9 @@ const Image = new Command({
 
 async function getPetImage(type: string, breed: string, link: string): Promise<string> {
   let fetchString = `https://${link}/v1/images/search?mime_types=${type}`;
-  
-  interface JsonList<T> {
-    json(): Promise<T[]>;
-  };
 
   if (breed !== "") {
-    interface PetBreed {
-      id: string;
-      name: string;
-    };
-
-    //is this really what banishes the squiggly lines??? type cast to unknown and then my desired type??? weird stuff
-    const breedsList: JsonList<PetBreed> = await fetch(`https://${link}/v1/breeds`) as unknown as JsonList<PetBreed>;
-    const petBreeds: PetBreed[] = await breedsList.json();
+    const petBreeds = await getPetBreeds(link);
 
     //console.log(JSON.stringify(petBreeds, null, 2));
 
@@ -95,11 +123,15 @@ async function getPetImage(type: string, breed: string, link: string): Promise<s
     const petNames = petBreeds.map(breed => breed.name);
 
     let breedId;
-    breedId = petIds.includes(breed) ? breed : undefined;
-    breedId = petNames.includes(breed) ? petIds[petNames.indexOf(breed)] : undefined;
-    if (breedId !== undefined) {
+    if (petIds.includes(breed)) {
+      breedId = breed;
       fetchString += `&breed_ids=${breedId}`;
-    };
+    } else if (petNames.includes(breed)) {
+      breedId = petIds[petNames.indexOf(breed)];
+      fetchString += `&breed_ids=${breedId}`;
+    } else {
+      throw new Error(`Breed ${breed} could not be found.`);
+    }
   }
 
   interface PetData {
@@ -113,5 +145,21 @@ async function getPetImage(type: string, breed: string, link: string): Promise<s
 
   return petData[0].url;
 }
+
+async function getPetBreeds(link: string): Promise<PetBreed[]> {
+  const list: JsonList<PetBreed> = await fetch(`https://${link}/v1/breeds`) as JsonList<PetBreed>;
+  const breeds: PetBreed[] = await list.json();
+
+  return breeds;
+};
+  
+interface JsonList<T> {
+  json(): Promise<T[]>;
+};
+
+interface PetBreed {
+  id: string;
+  name: string;
+};
 
 export default Image;
