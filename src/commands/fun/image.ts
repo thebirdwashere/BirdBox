@@ -148,7 +148,7 @@ async function getPetImage(type: string, breed: string, link: string): Promise<s
   const petFetch: JsonList<PetData> = await fetch(fetchString) as unknown as JsonList<PetData>;
   const petData: PetData[] = await petFetch.json();
 
-  if (petData[0]?.url === undefined) throw new Error("Request could not be found. Try broadening your specifications.");
+  if (petData[0]?.url === undefined) throw new Error(`Could not find ${type} of the requested breed. Try broadening your specifications.`);
 
   return petData[0].url;
 }
