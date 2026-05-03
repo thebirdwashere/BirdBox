@@ -24,7 +24,7 @@ const flagsQuiz = new Subcommand({
     if (difficultyOptions.length === 0)
       throw new Error("No difficulties provided for `flags` command.");
 
-    console.log(ctx.respond(difficultyOptions as [string, ...string[]]));
+    console.log(ctx.respondStrings(difficultyOptions as [string, ...string[]]));
     await sleep(1);
   },
 	execute: async (ctx, opts) => { //MARK: game setup
