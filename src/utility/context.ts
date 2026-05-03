@@ -214,17 +214,34 @@ export class AutocompleteContext implements BaseContext {
   user: User;
   timestamp: number;
 
+  /**
+   * Attempts to respond to the autocomplete with a list of choices.
+   */
   async respond(
-    choices: 
-    | [ApplicationCommandOptionChoiceData, ...ApplicationCommandOptionChoiceData[]]
-    | [string, ...string[]],
+    choices: [ApplicationCommandOptionChoiceData, ...ApplicationCommandOptionChoiceData[]]
   ): Promise<void> {
-    if (typeof choices[0] === "string") {
-      const convertedContent = (choices as [string, ...string[]]).map((choice) => ({ name: choice, value: choice }));
-      await this.interaction.respond(convertedContent);
-    } else {
-      await this.interaction.respond(choices as [ApplicationCommandOptionChoiceData, ...ApplicationCommandOptionChoiceData[]]);
-    }
+    await this.interaction.respond(choices.slice(0, 25));
+  }
+
+  /**
+   * Attempts to respond to the autocomplete with a list of strings, 
+   * formatted automatically into choices.
+   */
+  async respondStrings(
+    choices: [string, ...string[]],
+  ): Promise<void> {
+    const convertedContent = choices.map((choice) => ({ name: choice, value: choice }));
+    await this.interaction.respond(convertedContent.slice(0, 25));
+  }
+
+  /**
+   * Attempts to respond to the autocomplete with a list of choices. 
+   * Does not cap the length at 25, so this function can error!
+   */
+  async respondRaw(
+    choices: [ApplicationCommandOptionChoiceData, ...ApplicationCommandOptionChoiceData[]]
+  ): Promise<void> {
+    await this.interaction.respond(choices);
   }
 
   constructor(interaction: AutocompleteInteraction, data: Data) {
