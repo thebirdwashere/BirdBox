@@ -218,7 +218,7 @@ export class AutocompleteContext implements BaseContext {
    * Attempts to respond to the autocomplete with a list of choices.
    */
   async respond(
-    choices: [ApplicationCommandOptionChoiceData, ...ApplicationCommandOptionChoiceData[]]
+    choices: ApplicationCommandOptionChoiceData[]
   ): Promise<void> {
     await this.interaction.respond(choices.slice(0, 25));
   }
@@ -228,7 +228,7 @@ export class AutocompleteContext implements BaseContext {
    * formatted automatically into choices.
    */
   async respondStrings(
-    choices: [string, ...string[]],
+    choices: string[],
   ): Promise<void> {
     const convertedContent = choices.map((choice) => ({ name: choice, value: choice }));
     await this.interaction.respond(convertedContent.slice(0, 25));
@@ -239,7 +239,7 @@ export class AutocompleteContext implements BaseContext {
    * Does not cap the length at 25, so this function can error!
    */
   async respondRaw(
-    choices: [ApplicationCommandOptionChoiceData, ...ApplicationCommandOptionChoiceData[]]
+    choices: ApplicationCommandOptionChoiceData[]
   ): Promise<void> {
     await this.interaction.respond(choices);
   }
