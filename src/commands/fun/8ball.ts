@@ -1,11 +1,11 @@
 import { Command, CommandOption } from "src/utility/command.js";
 import { Colors, EmbedBuilder } from "discord.js";
 import footers from "src/data/footers.json" with { type: "json" };
-import responses from "src/data/responses.json" with { type: "json" };
-import { Footers, Responses } from "src/utility/types.js";
+import responses from "src/data/8ball.json" with { type: "json" };
+import { Footers, EightBallResponses } from "src/utility/types.js";
 
 const FOOTERS = footers as Footers;
-const RESPONSES = responses as Responses;
+const RESPONSES = responses as EightBallResponses;
 
 const Magic8Ball = new Command({
   name: "8ball",
@@ -21,8 +21,8 @@ const Magic8Ball = new Command({
   execute: async (ctx, opts) => {
     const message = opts.string.get("message");
     const randomResponse =
-      RESPONSES.magic8ball[
-        Math.floor(Math.random() * RESPONSES.magic8ball.length)
+      RESPONSES[
+        Math.floor(Math.random() * RESPONSES.length)
       ];
     const randomFooter =
       FOOTERS.magic8ball[Math.floor(Math.random() * FOOTERS.magic8ball.length)];

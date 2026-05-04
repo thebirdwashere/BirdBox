@@ -55,6 +55,4 @@ export interface Options {
   string: Map<string, string | null>;
 };
 
-export interface Responses {
-  magic8ball: (string | {text: string; credit?: string; url?: string; image?: string;})[];
-};
+export type EightBallResponses = (string | {text: string; credit?: string; url?: string; image?: string;})[];
