@@ -62,7 +62,7 @@ export class Registry {
 
     this.interjections = new Collection(interjections);
 
-    console.log(this.interjections);
+    // console.log(this.interjections);
   }
 
   testInterjections(ctx: MessageContext): void {
