@@ -70,6 +70,8 @@ CLIENT.on(Events.InteractionCreate, (interaction) => {
 });
 
 CLIENT.on(Events.MessageCreate, (message) => {
+  if (message.member?.user.bot === true) return;
+  
   detectMessageCommand(REGISTRY, DATA, message).catch(
     async (error: unknown) => {
       const context = new MessageContext(message, DATA);
