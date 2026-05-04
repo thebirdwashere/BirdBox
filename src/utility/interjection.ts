@@ -1,5 +1,7 @@
 import { MessageContext } from "./context.js";
 
+//TODO: add notification support
+
 export class Interjection {
   name: string;
   test: (ctx: MessageContext) => InterjectionState | undefined;

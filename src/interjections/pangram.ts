@@ -21,7 +21,7 @@ const Pangram = new Interjection({
   },
   respond: async (ctx: MessageContext, state: InterjectionState) => {
     if (state.text === undefined)
-      throw new Error ("No text passed to pangram interjection.");
+      throw new Error ("Expected text for interjection.");
 
     await ctx.reply(`:capital_abcd: Your message contains every letter in the alphabet! \n\`${state.text[0]}\``);
   },

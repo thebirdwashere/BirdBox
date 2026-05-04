@@ -29,7 +29,7 @@ const Alphabetical = new Interjection({
   },
   respond: async (ctx: MessageContext, state: InterjectionState) => {
     if (state.text === undefined)
-      throw new Error ("No text passed to alphabetical interjection.");
+      throw new Error ("Expected text for interjection.");
     
     await ctx.reply(`:abc: Your message is in perfect alphabetical order! \n\`${state.text.join(" ")}\``);
   },

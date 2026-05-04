@@ -28,6 +28,8 @@ export interface Footers {
   help: string[];
 };
 
+export type Keywords = Record<string, string>;
+
 export type Languages = {
   value: string;
   name: string;
