@@ -1,19 +1,13 @@
 import {
   SlashCommandBuilder,
-  Collection,
   SlashCommandSubcommandBuilder,
   ApplicationCommandOptionType,
   SlashCommandBooleanOption,
   SlashCommandStringOption,
   SlashCommandIntegerOption,
-  REST,
-  Routes,
 } from "discord.js";
-import fg from "fast-glob";
-import path from "path";
 import { CommandContext, AutocompleteContext } from "./context.js";
-import { panic, toPosixPath } from "./utility.js";
-import { pathToFileURL } from "url";
+import { panic } from "./utility.js";
 import { Options } from "./types.js";
 
 export class Command {
@@ -161,41 +155,6 @@ export class CommandOption {
     if (this.data instanceof SlashCommandStringOption && args.autocomplete) {
       this.data.setAutocomplete(args.autocomplete);
     }
-  }
-}
-
-export class CommandRegistry {
-  commands: Collection<string, Command>;
-
-  constructor() {
-    this.commands = new Collection();
-  }
-
-  async detectAll(source: string): Promise<void> {
-    const globPattern = toPosixPath(path.join(source, "**/*.{js,ts}"));
-    const fileGlob = await fg(globPattern);
-
-    const files = [];
-    for (const filePath of fileGlob)
-      files.push(await import(pathToFileURL(filePath).href));
-
-    const commands = files
-      .map(({ default: command }) => {
-        if (!(command instanceof Command)) return null;
-        // command: Command
-        return [command.data.name, command] as [string, Command];
-      })
-      .filter((item) => item !== null);
-
-    this.commands = new Collection(commands);
-  }
-
-  async registerAll(token: string, id: string): Promise<void> {
-    const rest = new REST().setToken(token);
-
-    await rest.put(Routes.applicationCommands(id), {
-      body: this.commands.map((command) => command.data),
-    });
   }
 }
 

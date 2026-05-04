@@ -1,7 +1,6 @@
 import { AutocompleteInteraction, ChatInputCommandInteraction, Message } from "discord.js";
 import {
   CommandOption,
-  CommandRegistry,
   isOptionArray,
   isSubcommandArray,
   Command,
@@ -14,6 +13,7 @@ import {
   MessageSubcommandContext,
   AutocompleteContext
 } from "./context.js";
+import { Registry } from "./registry.js";
 import { Data, Options } from "./types.js";
 import { sleep } from "./utility.js";
 
@@ -135,7 +135,7 @@ function parseCommandOptions(
 }
 
 export async function detectMessageCommand(
-  registry: CommandRegistry,
+  registry: Registry,
   data: Data,
   message: Message,
 ): Promise<void> {

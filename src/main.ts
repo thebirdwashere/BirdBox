@@ -6,8 +6,8 @@ import "dotenv/config";
 import perms from "./data/perms.json" with { type: "json" };
 
 import { panic } from "./utility/utility.js";
-import { handleError } from "./utility/error.js";
-import { CommandRegistry } from "./utility/command.js";
+import { handleCommandError } from "./utility/error.js";
+import { Registry } from "./utility/registry.js";
 import {
   ChatInputCommandInteractionContext,
   MessageContext,
@@ -34,7 +34,7 @@ const CLIENT = new Client({
     GatewayIntentBits.MessageContent,
   ],
 });
-const REGISTRY = new CommandRegistry();
+const REGISTRY = new Registry();
 const DATA: Data = {
   prefix: BOT_PREFIX,
   id: BOT_ID,
@@ -43,14 +43,15 @@ const DATA: Data = {
   client: CLIENT,
 };
 
-await REGISTRY.detectAll(path.join(import.meta.dirname, "commands"));
+await REGISTRY.detectCommands(path.join(import.meta.dirname, "commands"));
+await REGISTRY.detectInterjections(path.join(import.meta.dirname, "interjections"));
 
 CLIENT.on(Events.ClientReady, (_event) => {
   console.log("Birdbox Rewrite is now online.");
   console.log(`Logged in as ${CLIENT.user?.tag ?? "(undefined)"}.`);
   console.log("Logs will be shown in this terminal.");
 
-  REGISTRY.registerAll(BOT_TOKEN, BOT_ID).catch(console.error);
+  REGISTRY.registerCommands(BOT_TOKEN, BOT_ID).catch(console.error);
 });
 
 CLIENT.on(Events.InteractionCreate, (interaction) => {
@@ -61,7 +62,7 @@ CLIENT.on(Events.InteractionCreate, (interaction) => {
           interaction,
           DATA,
         );
-        await handleError(context, interaction.commandName, error);
+        await handleCommandError(context, interaction.commandName, error);
       },
     );
   } else if (interaction.isAutocomplete()) {
@@ -71,17 +72,20 @@ CLIENT.on(Events.InteractionCreate, (interaction) => {
 
 CLIENT.on(Events.MessageCreate, (message) => {
   if (message.member?.user.bot === true) return;
+
+  const context = new MessageContext(message, DATA);
   
   detectMessageCommand(REGISTRY, DATA, message).catch(
     async (error: unknown) => {
-      const context = new MessageContext(message, DATA);
-      await handleError(
+      await handleCommandError(
         context,
         message.content.split(" ")[0].slice(BOT_PREFIX.length),
         error,
       );
     },
   );
+
+  REGISTRY.testInterjections(context);
 });
 
 CLIENT.login(BOT_TOKEN).catch(console.error);

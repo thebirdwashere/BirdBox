@@ -1,11 +1,11 @@
 import { Client } from "discord.js";
-import { CommandRegistry } from "./command.js";
+import { Registry } from "./registry.js";
 
 export interface Data {
   prefix: string;
   id: string;
   perms: Perms;
-  registry: CommandRegistry;
+  registry: Registry;
   client: Client;
 };
 

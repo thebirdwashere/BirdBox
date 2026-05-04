@@ -1,19 +1,20 @@
 import { Colors, EmbedBuilder } from "discord.js";
-import { CommandContext } from "./context.js";
+import { CommandContext, MessageContext } from "./context.js";
 
-export async function handleError(
+async function handleError(
   ctx: CommandContext,
   originCommand: string,
   error: unknown,
+  type: string,
 ): Promise<void> {
   console.error(error);
 
   const embeds = [
     new EmbedBuilder()
-      .setTitle("Command Error")
-      .addFields(
+      .setTitle(`${type} Error`)
+      .addFields( 
         { name: "Message:", value: String(error), inline: true },
-        { name: "In command:", value: originCommand, inline: true },
+        { name: `In ${type.toLowerCase()}:`, value: originCommand, inline: true },
       )
       .setColor(Colors.Red),
   ];
@@ -24,4 +25,21 @@ export async function handleError(
   } catch {
     await ctx.send({embeds});
   }
+}
+
+
+export async function handleCommandError(
+  ctx: CommandContext,
+  originCommand: string,
+  error: unknown,
+): Promise<void> {
+  await handleError(ctx, originCommand, error, "Command");
+}
+
+export async function handleInterjectionError(
+  ctx: MessageContext,
+  originCommand: string,
+  error: unknown,
+): Promise<void> {
+  await handleError(ctx, originCommand, error, "Interjection");
 }
