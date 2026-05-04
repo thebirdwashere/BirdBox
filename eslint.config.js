@@ -1,5 +1,6 @@
 import eslint from "@eslint/js";
 import tseslint from "typescript-eslint";
+import { defineConfig, globalIgnores } from "eslint/config"
 
 export default tseslint.config({
   files: ["src/**/*.{ts,js}"],
@@ -40,3 +41,13 @@ export default tseslint.config({
     ],
   },
 });
+
+//attempted to fix deprecated .eslintignore file but it broke
+// export default defineConfig([
+//   globalIgnores([
+//     "dist/*",
+//     "*.config.js",
+//     "*.config.mjs",
+//     ".env",
+//   ])
+// ]);
