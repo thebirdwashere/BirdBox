@@ -51,6 +51,8 @@ export interface Perms {
   botTester: Record<string, string>;
 };
 
+export type PingResponses = string[];
+
 export interface Options {
   number: Map<string, number | null>;
   boolean: Map<string, boolean | null>;
