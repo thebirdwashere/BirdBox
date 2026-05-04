@@ -1,9 +1,9 @@
 import { MessageContext } from "src/utility/context.js";
 import { Interjection, InterjectionState } from "../utility/interjection.js";
 import ping_responses from "../data/ping_responses.json" with { type: "json" };
-import { PingResponses } from "src/utility/types.js";
+import { ResponsesList } from "src/utility/types.js";
 
-const RESPONSES = ping_responses as PingResponses;
+const RESPONSES = ping_responses as ResponsesList;
 
 const Pings = new Interjection({
   name: "pings",
