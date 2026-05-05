@@ -44,7 +44,7 @@ export type PatchNotes = {
   notes: string[];
 }[];
 
-export type PeriodicTable = {
+export interface PeriodicTable {
   ones: string[];
   twos: string[];
   impossible_endings: string[];
