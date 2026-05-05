@@ -5,8 +5,8 @@ import { PeriodicTable } from "src/utility/types.js";
 
 const PERIODIC_TABLE = periodic_table as PeriodicTable;
 
-const MIN_CHAR_LENGTH = 2;
-const MIN_UNIQUE_ELEMENTS = 2;
+const MIN_CHAR_LENGTH = 40;
+const MIN_UNIQUE_ELEMENTS = 6;
 
 const Periodic = new Interjection({
   name: "periodic table",
