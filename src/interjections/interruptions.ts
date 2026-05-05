@@ -1,6 +1,6 @@
 import { MessageContext } from "src/utility/context.js";
-import { Interjection } from "../utility/interjection.js";
-import interruptions from "../data/interruptions.json" with { type: "json" };
+import { Interjection } from "src/utility/interjection.js";
+import interruptions from "src/data/interruptions.json" with { type: "json" };
 import { ResponsesList } from "src/utility/types.js";
 
 const RESPONSES = interruptions as ResponsesList;

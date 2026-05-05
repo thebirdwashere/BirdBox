@@ -1,5 +1,7 @@
 import { MessageContext } from "src/utility/context.js";
-import { Interjection } from "../utility/interjection.js";
+import { Interjection } from "src/utility/interjection.js";
+
+const MIN_WORD_LENGTH = 5;
 
 const Alphabetical = new Interjection({
   name: "alphabetical order",
@@ -11,7 +13,7 @@ const Alphabetical = new Interjection({
 
     const splitContent = content.split(" ").filter(word => word !== "");
     
-    if (splitContent.length < 5) return;                              //stop if less than 5 words
+    if (splitContent.length < MIN_WORD_LENGTH) return;                //stop if less than 5 words
     if (splitContent.some(word => word.startsWith(":"))) return;      //stop if any emojis
     if ((new Set(splitContent)).size !== splitContent.length) return; //stop if any duplicate words
     

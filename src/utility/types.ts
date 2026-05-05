@@ -44,6 +44,12 @@ export type PatchNotes = {
   notes: string[];
 }[];
 
+export type PeriodicTable = {
+  ones: string[];
+  twos: string[];
+  impossible_endings: string[];
+}
+
 export interface Perms {
   host: Record<string, string>;
   developer: Record<string, string>;

@@ -1,6 +1,6 @@
 import { MessageContext } from "src/utility/context.js";
-import { Interjection } from "../utility/interjection.js";
-import keywords from "../data/keywords.json" with { type: "json" };
+import { Interjection } from "src/utility/interjection.js";
+import keywords from "src/data/keywords.json" with { type: "json" };
 import { Keywords } from "src/utility/types.js";
 
 const KEYWORDS = keywords as Keywords;

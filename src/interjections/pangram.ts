@@ -1,5 +1,5 @@
 import { MessageContext } from "src/utility/context.js";
-import { Interjection } from "../utility/interjection.js";
+import { Interjection } from "src/utility/interjection.js";
 
 const Pangram = new Interjection({
   name: "pangrams",
