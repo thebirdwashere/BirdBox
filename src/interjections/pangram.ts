@@ -1,9 +1,9 @@
 import { MessageContext } from "src/utility/context.js";
-import { Interjection, InterjectionState } from "../utility/interjection.js";
+import { Interjection } from "../utility/interjection.js";
 
 const Pangram = new Interjection({
   name: "pangrams",
-  test: (ctx: MessageContext) => {
+  test: async (ctx: MessageContext) => {
     const alphabet = "abcdefghijklmnopqrstuvwxyz".split("");
     const content = ctx.message.content.toLowerCase();
 
@@ -17,14 +17,8 @@ const Pangram = new Interjection({
       capitalizedContent[letterIndex] = capitalizedContent[letterIndex].toUpperCase();
     }
 
-    return { text: [capitalizedContent.join("")] };
-  },
-  respond: async (ctx: MessageContext, state: InterjectionState) => {
-    if (state.text === undefined)
-      throw new Error ("Expected text for interjection.");
-
-    await ctx.reply(`:capital_abcd: Your message contains every letter in the alphabet! \n\`${state.text[0]}\``);
-  },
+    await ctx.reply(`:capital_abcd: Your message contains every letter in the alphabet! \n\`${capitalizedContent.join("")}\``);
+  }
 });
 
 export default Pangram;

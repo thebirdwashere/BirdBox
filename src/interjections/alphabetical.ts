@@ -1,9 +1,9 @@
 import { MessageContext } from "src/utility/context.js";
-import { Interjection, InterjectionState } from "../utility/interjection.js";
+import { Interjection } from "../utility/interjection.js";
 
 const Alphabetical = new Interjection({
   name: "alphabetical order",
-  test: (ctx: MessageContext) => {
+  test: async (ctx: MessageContext) => {
     const content = ctx.message.content.toLowerCase();
 
     if (content.length > 1935) return;       //message is too long for embeds
@@ -21,18 +21,11 @@ const Alphabetical = new Interjection({
     //if the sorted content is the same, logically,
     //the original message was in alphabetical order
     if (splitContent.join(" ") === sortedContent.join(" ")) { 
-      return {
-        //capitalize each first letter
-        text: splitContent.map(word => {return word[0].toUpperCase() + word.substring(1);})
-      };
+      //capitalize each first letter
+      const response = splitContent.map(word => {return word[0].toUpperCase() + word.substring(1);}).join(" ");
+      await ctx.reply(`:abc: Your message is in perfect alphabetical order! \n\`${response}\``);
     };
-  },
-  respond: async (ctx: MessageContext, state: InterjectionState) => {
-    if (state.text === undefined)
-      throw new Error ("Expected text for interjection.");
-    
-    await ctx.reply(`:abc: Your message is in perfect alphabetical order! \n\`${state.text.join(" ")}\``);
-  },
+  }
 });
 
 export default Alphabetical;

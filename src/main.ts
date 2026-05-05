@@ -85,7 +85,7 @@ CLIENT.on(Events.MessageCreate, (message) => {
     },
   );
 
-  REGISTRY.testInterjections(context);
+  void REGISTRY.testInterjections(context);
 });
 
 CLIENT.login(BOT_TOKEN).catch(console.error);

@@ -65,19 +65,17 @@ export class Registry {
     // console.log(this.interjections);
   }
 
-  testInterjections(ctx: MessageContext): void {
-    this.interjections.forEach((interjection) => {
-      const result = interjection.test(ctx);
-      if (result !== undefined) {
-        interjection.respond(ctx, result)
-          .catch(async (error: unknown) => {
-            await handleInterjectionError(
-              ctx,
-              interjection.name,
-              error,
-            );
-          });
+  async testInterjections(ctx: MessageContext): Promise<void> {
+    for (const interjection of this.interjections.values()) {
+      try {
+        await interjection.test(ctx);
+      } catch (error: unknown) {
+        await handleInterjectionError(
+          ctx,
+          interjection.name,
+          error
+        );
       };
-    });
+    };
   }
 }
