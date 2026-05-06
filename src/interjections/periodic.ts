@@ -5,7 +5,7 @@ import { PeriodicTable } from "src/utility/types.js";
 
 const PERIODIC_TABLE = periodic_table as PeriodicTable;
 
-const MIN_CHAR_LENGTH = 40;
+const MIN_CHAR_LENGTH = 35;
 const MIN_UNIQUE_ELEMENTS = 6;
 
 const Periodic = new Interjection({
@@ -26,9 +26,17 @@ const Periodic = new Interjection({
     //another fun fact: x only starts a two-letter combo, so cannot end it
     if (content.endsWith("x")) return;
 
-    //btw i'm bothering to check the ending super well because it's going to take a while to get there with this algorithm, 
-    // and figuring out which endings are impossible is relatively straightforward with another algoritm i made elsewhere. 
-    // it's already super fast so i really don't have to do this, but i am bored on winter break and terrified to push this complicated update
+    //list of clusters that can't happen ever
+    for (const item of PERIODIC_TABLE.impossible_strings) {
+      if (content.includes(item)) return;
+    };
+
+    //btw i'm bothering to check this super well because it's going to take a while
+    // to get to the end with this algorithm, and figuring out which endings are impossible is 
+    // relatively straightforward with another algoritm i made elsewhere. it's already 
+    // super fast so i really don't have to do this, but i am bored on winter break and 
+    // terrified to push this complicated update
+
     if (PERIODIC_TABLE.impossible_endings.includes(content.slice(-2))) return;    
 
     //https://stackoverflow.com/questions/6163169/replace-multiple-whitespaces-with-single-whitespace-in-javascript-string
