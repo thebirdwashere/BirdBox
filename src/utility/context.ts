@@ -110,7 +110,7 @@ export class MessageContext implements CommandContext {
       );
   }
 
-  constructor(message: Message, data: Data, db: Database) {
+  constructor(message: Message, data: Data) {
     this.message = message;
     this.data = data;
     this.channel = message.channel;
@@ -118,7 +118,7 @@ export class MessageContext implements CommandContext {
     this.guild = message.guild;
     this.user = message.author;
     this.timestamp = message.createdTimestamp;
-    this.db = db;
+    this.db = data.db;
   }
 }
 
@@ -131,8 +131,8 @@ export class MessageSubcommandContext extends MessageContext implements Subcomma
   currentSubcommand: string;
   parentCommand: string;
 
-  constructor(message: Message, data: Data, db: Database, subcommand: string, parent: string) {
-    super(message, data, db);
+  constructor(message: Message, data: Data, subcommand: string, parent: string) {
+    super(message, data);
     this.currentSubcommand = subcommand;
     this.parentCommand = parent;
   }
@@ -190,7 +190,7 @@ export class ChatInputCommandInteractionContext implements CommandContext {
       );
   }
 
-  constructor(interaction: ChatInputCommandInteraction, data: Data, db: Database) {
+  constructor(interaction: ChatInputCommandInteraction, data: Data) {
     this.interaction = interaction;
     this.data = data;
     this.lastReply = null;
@@ -198,7 +198,7 @@ export class ChatInputCommandInteractionContext implements CommandContext {
     this.guild = interaction.guild;
     this.channel = interaction.channel;
     this.timestamp = interaction.createdTimestamp;
-    this.db = db;
+    this.db = data.db;
   }
 }
 
@@ -206,8 +206,8 @@ export class ChatInputCommandInteractionSubcommandContext extends ChatInputComma
   currentSubcommand: string;
   parentCommand: string;
 
-  constructor(interaction: ChatInputCommandInteraction, data: Data, db: Database, subcommand: string, parent: string) {
-    super(interaction, data, db);
+  constructor(interaction: ChatInputCommandInteraction, data: Data, subcommand: string, parent: string) {
+    super(interaction, data);
     this.currentSubcommand = subcommand;
     this.parentCommand = parent;
   }
@@ -269,7 +269,7 @@ export class AutocompleteContext implements BaseContext {
     await this.interaction.respond(choices);
   }
 
-  constructor(interaction: AutocompleteInteraction, data: Data, db: Database) {
+  constructor(interaction: AutocompleteInteraction, data: Data) {
     this.interaction = interaction;
     this.option = interaction.options.getFocused(true);
     this.data = data;
@@ -277,7 +277,7 @@ export class AutocompleteContext implements BaseContext {
     this.guild = interaction.guild;
     this.channel = interaction.channel;
     this.timestamp = interaction.createdTimestamp;
-    this.db = db;
+    this.db = data.db;
   }
 }
 

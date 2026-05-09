@@ -45,9 +45,9 @@ interface BaseTableManager {
   tableName: string;
 
   update(id: string, property: string, value: unknown): void;
-  fetch(id: string, property: string): unknown;
+  fetch(id: string, property: string): Exclude<unknown, undefined>;
   fetchOr(id: string, property: string, def: unknown): Exclude<unknown, undefined>;
-  parseData(id: string): DatabaseRecord;
+  parseData(id: string): DatabaseRecord | undefined;
 }
 
 class TableManager implements BaseTableManager {
@@ -66,7 +66,6 @@ class TableManager implements BaseTableManager {
     this.data.createIfNotExists.run({id});
 
     const data = this.parseData(id);
-    //console.log(current[property]);
 
     if (data[property] !== undefined && typeof data[property] !== typeof value)
       throw new Error(`Type "${typeof value}" provided to ${this.tableName.toLowerCase()} database property "${property}", when type "${typeof data}" was expected.`);
@@ -76,18 +75,22 @@ class TableManager implements BaseTableManager {
     this.data.update.run({id, json: JSON.stringify(data)});
   }
 
-  fetch(id: string, property: string): unknown {
+  fetch(id: string, property: string): Exclude<unknown, undefined> {
     const data = this.parseData(id);
+
+    if (data[property] === undefined)
+      throw new Error(`Unable to fetch property ${property} of ${this.tableName.toLowerCase()} data.`);
+
     return data[property];
   }
 
   fetchOr(id: string, property: string, def: unknown): Exclude<unknown, undefined> {
     const data = this.parseData(id);
-    const value = data[property];
-    if (value === undefined || value === null) {
+
+    if (data[property] === undefined) {
       return def;
     } else {
-      return value;
+      return data[property];
     }
   }
 
@@ -95,13 +98,10 @@ class TableManager implements BaseTableManager {
     const databaseFetch = this.data.fetch.get({id});
     const json = databaseFetch?.json;
 
-    if (!json)
-      throw new Error(`Unable to fetch existing ${this.tableName.toLowerCase()} data.`);
-
-    const parsedJSON: DatabaseRecord = JSON.parse(json as string) as DatabaseRecord;
+    const parsedJSON: unknown = JSON.parse(json as string);
     // console.log(parsedJSON);
 
-    return parsedJSON;
+    return (parsedJSON ?? {}) as DatabaseRecord;
   }
 }
 
@@ -135,4 +135,4 @@ class StatementData {
   }
 }
 
-type DatabaseRecord = Record<string, unknown>;
+type DatabaseRecord = Record<string, unknown>
