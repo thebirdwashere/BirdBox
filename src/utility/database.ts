@@ -94,6 +94,16 @@ class TableManager implements BaseTableManager {
     }
   }
 
+  fetchOrElse(id: string, property: string, def: () => unknown): Exclude<unknown, undefined> {
+    const data = this.parseData(id);
+
+    if (data[property] === undefined) {
+      return def();
+    } else {
+      return data[property];
+    }
+  }
+
   parseData(id: string): DatabaseRecord {
     const databaseFetch = this.data.fetch.get({id});
     const json = databaseFetch?.json;
