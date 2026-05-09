@@ -68,7 +68,7 @@ class TableManager implements BaseTableManager {
     //console.log(current[property]);
 
     if (data[property] !== undefined && typeof data[property] !== typeof value)
-      throw new Error(`Database error: Type "${typeof value}" provided to user property "${property}", when type "${typeof data}" was expected.`);
+      throw new Error(`Type "${typeof value}" provided to ${this.tableName.toLowerCase()} database property "${property}", when type "${typeof data}" was expected.`);
     
     data[property] = value;
     
@@ -84,10 +84,11 @@ class TableManager implements BaseTableManager {
   }
 
   parseData(id: string): DatabaseRecord {
-    const json = this.data.fetch.get({id})?.json;
+    const databaseFetch = this.data.fetch.get({id});
+    const json = databaseFetch?.json;
 
     if (!json)
-      throw new Error("Unable to fetch existing user data.");
+      throw new Error(`Unable to fetch existing ${this.tableName.toLowerCase()} data.`);
 
     const parsedJSON: DatabaseRecord = JSON.parse(json as string) as DatabaseRecord;
     // console.log(parsedJSON);

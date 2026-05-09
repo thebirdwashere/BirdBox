@@ -28,6 +28,7 @@ export interface Flags {
 export interface Footers {
   magic8ball: string[];
   help: string[];
+  snipe: string[];
 };
 
 export type Keywords = Record<string, string>;
@@ -61,6 +62,13 @@ export interface Perms {
 };
 
 export type ResponsesList = string[];
+
+export interface SnipedMessage {
+  authorID: string,
+  timestamp: number,
+  content: string,
+  imageURL: string | null,
+}
 
 export interface Options {
   number: Map<string, number | null>;

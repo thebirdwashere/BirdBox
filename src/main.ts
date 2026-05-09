@@ -17,7 +17,7 @@ import {
   detectMessageCommand,
   handleAutocomplete,
 } from "./utility/process.js";
-import { Data, Perms } from "./utility/types.js";
+import { Data, Perms, SnipedMessage } from "./utility/types.js";
 
 import { Database } from "./utility/database.js";
 
@@ -90,6 +90,25 @@ CLIENT.on(Events.MessageCreate, (message) => {
   );
 
   void REGISTRY.testInterjections(context);
+});
+
+CLIENT.on(Events.MessageDelete, (message) => {
+  //TODO: Add config consent here
+  const snipeData = {
+    authorID: message.author?.id,
+    timestamp: message.createdTimestamp,
+    content: message.content,
+    imageURL: null,
+  } as SnipedMessage;
+
+  const attachment = message.attachments.at(0);
+  if (attachment?.height) { //tests for images/videos
+    snipeData.imageURL = attachment.url;
+  }
+
+  DB.channel.update(message.channel.id, "snipe", snipeData);
+  
+  console.log(DB.channel.fetch(message.channel.id, "snipe"));
 });
 
 process.on("exit", (code) => {
