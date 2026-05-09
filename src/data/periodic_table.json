@@ -121,7 +121,7 @@
     "ts",
     "og"
   ],
-  "impossible_strings": [
+  "impossibleStrings": [
     "xa",
     "xb",
     "xc",
@@ -170,7 +170,7 @@
     "zz",
     "z "
   ],
-  "impossible_endings": [
+  "impossibleEndings": [
     "aa",
     "ad",
     "ae",

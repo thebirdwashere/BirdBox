@@ -27,7 +27,7 @@ const Periodic = new Interjection({
     if (content.endsWith("x")) return;
 
     //list of clusters that can't happen ever
-    for (const item of PERIODIC_TABLE.impossible_strings) {
+    for (const item of PERIODIC_TABLE.impossibleStrings) {
       if (content.includes(item)) return;
     };
 
@@ -37,7 +37,7 @@ const Periodic = new Interjection({
     // super fast so i really don't have to do this, but i am bored on winter break and 
     // terrified to push this complicated update
 
-    if (PERIODIC_TABLE.impossible_endings.includes(content.slice(-2))) return;    
+    if (PERIODIC_TABLE.impossibleEndings.includes(content.slice(-2))) return;    
 
     //https://stackoverflow.com/questions/6163169/replace-multiple-whitespaces-with-single-whitespace-in-javascript-string
     const cleanContent = content.replace(/\s+/g, " ").trim(); 
