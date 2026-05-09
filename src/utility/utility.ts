@@ -33,6 +33,13 @@ export function isSubcommand(ctx: CommandContext): boolean {
 }
 
 /**
+ * Returns a random element from the provided array.
+ */
+export function randomChoice<T>(array: T[]): T {
+  return array[Math.floor(Math.random() * array.length)];
+}
+
+/**
  * Map wrapper with various utility methods to ensure values exist or optionally
  * return defaults.
  */

@@ -1,7 +1,7 @@
 import { Subcommand, CommandOption } from "src/utility/command.js";
 import flags from "src/data/flags.json" with { type: "json" };
 import { Flags } from "src/utility/types.js";
-import { sleep } from "src/utility/utility.js";
+import { randomChoice, sleep } from "src/utility/utility.js";
 import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, Colors, ComponentType, EmbedBuilder } from "discord.js";
 
 const FLAGS = flags as Flags;
@@ -62,7 +62,7 @@ const flagsQuiz = new Subcommand({
 
       //starts at 1 so it never overwrites the correct answer
       for (let i = 1; i <= decoyFlagsAmount; i++) {
-        const chosenDecoy = decoyFlags[Math.floor(Math.random() * decoyFlags.length)];
+        const chosenDecoy = randomChoice(decoyFlags);
 
         //ensure this decoy isn't already an option
         //if it is, redo this step of the loop

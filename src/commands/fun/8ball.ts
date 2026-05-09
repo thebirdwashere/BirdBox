@@ -3,6 +3,7 @@ import { Colors, EmbedBuilder } from "discord.js";
 import footers from "src/data/footers.json" with { type: "json" };
 import responses from "src/data/8ball.json" with { type: "json" };
 import { Footers, EightBallResponses } from "src/utility/types.js";
+import { randomChoice } from "src/utility/utility.js";
 
 const FOOTERS = footers as Footers;
 const RESPONSES = responses as EightBallResponses;
@@ -24,8 +25,7 @@ const Magic8Ball = new Command({
       RESPONSES[
         Math.floor(Math.random() * RESPONSES.length)
       ];
-    const randomFooter =
-      FOOTERS.magic8ball[Math.floor(Math.random() * FOOTERS.magic8ball.length)];
+    const randomFooter = randomChoice(FOOTERS.magic8ball);
 
     const responseEmbed = new EmbedBuilder()
       .setAuthor({

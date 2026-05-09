@@ -1,5 +1,6 @@
 import { Command, CommandOption } from "src/utility/command.js";
 import { EmbedBuilder, Colors } from "discord.js";
+import { randomChoice } from "src/utility/utility.js";
 
 const RPS = new Command({
   name: "rps",
@@ -18,7 +19,7 @@ const RPS = new Command({
     const emojis = [":rock:", ":roll_of_paper:", ":scissors:"];
 
     const playerMove = opts.string.get("move");
-    const computerMove = moveNames[Math.floor(Math.random() * moveNames.length)];
+    const computerMove = randomChoice(moveNames);
     let result, footer, color;
 
     if(!validMoves.includes(playerMove ?? "undefined")) throw new Error("Move provided is not `rock`, `paper`, `scissors`, `r`, `p`, or `s`.");

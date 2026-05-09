@@ -2,7 +2,7 @@ import { Command, CommandOption } from "src/utility/command.js";
 import { Message } from "discord.js";
 import { CommandContext } from "src/utility/context.js";
 import { Options } from "src/utility/types.js";
-import { sleep } from "src/utility/utility.js";
+import { randomChoice, sleep } from "src/utility/utility.js";
 
 const Diceroll = new Command({
   name: "diceroll",
@@ -80,7 +80,7 @@ const Diceroll = new Command({
           await sleep(Math.floor(Math.random() * (8000 - 2000) + 2000)); //between two and eight seconds
                 
           //send a random saying
-          const chosenSaying = randomSayings[Math.floor(Math.random() * randomSayings.length)];
+          const chosenSaying = randomChoice(randomSayings);
           await ctx.send(chosenSaying)
             .finally(() => void ctx.sendTyping()); //make birdbox show as typing
         }

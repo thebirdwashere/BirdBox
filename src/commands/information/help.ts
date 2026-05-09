@@ -2,6 +2,7 @@ import { Command, CommandOption } from "src/utility/command.js";
 import { EmbedBuilder, Colors, ButtonBuilder, ButtonStyle, ActionRowBuilder, Interaction, ButtonInteraction, ComponentType } from "discord.js";
 import footers from "src/data/footers.json" with { type: "json" };
 import { Footers } from "src/utility/types.js";
+import { randomChoice } from "src/utility/utility.js";
 
 const FOOTERS = footers as Footers;
 
@@ -32,7 +33,7 @@ const Help = new Command({
       if (requestedCommandData == null) throw new Error("Requested command not found.");
       
       const commandTitle = requestedCommandData.name.charAt(0).toUpperCase() + requestedCommandData.name.slice(1);
-      const randomFooter = FOOTERS.help[Math.floor(Math.random() * FOOTERS.help.length)];
+      const randomFooter = randomChoice(FOOTERS.help);
 
       const commandEmbed = new EmbedBuilder()
         .setColor(Colors.White)
