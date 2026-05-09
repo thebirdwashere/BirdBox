@@ -30,7 +30,7 @@ const Snipe = new Command({
       .setTitle(`Deleted from: <#${ctx.channel.id}>`)
       .setAuthor({ 
         name: (snipedMember.nickname ?? snipedMember.displayName), 
-        iconURL: (snipedMember.user.displayAvatarURL())
+        iconURL: snipedMember.user.displayAvatarURL()
       })
       .setColor(Colors.Blue)
       .setDescription(snipedMessage.content)
