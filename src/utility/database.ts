@@ -45,8 +45,9 @@ interface BaseTableManager {
   tableName: string;
 
   update(id: string, property: string, value: unknown): void;
-  fetch(id: string, property: string): Exclude<unknown, undefined>;
+  fetchOrUndefined(id: string, property: string): Exclude<unknown, undefined>;
   fetchOr(id: string, property: string, def: unknown): Exclude<unknown, undefined>;
+  fetchOrElse(id: string, property: string, def: () => unknown): Exclude<unknown, undefined>;
   parseData(id: string): DatabaseRecord | undefined;
 }
 
@@ -75,7 +76,7 @@ class TableManager implements BaseTableManager {
     this.data.update.run({id, json: JSON.stringify(data)});
   }
 
-  fetch(id: string, property: string): Exclude<unknown, undefined> {
+  fetchOrUndefined(id: string, property: string): Exclude<unknown, undefined> {
     const data = this.parseData(id);
 
     if (data[property] === undefined)
@@ -89,6 +90,16 @@ class TableManager implements BaseTableManager {
 
     if (data[property] === undefined) {
       return def;
+    } else {
+      return data[property];
+    }
+  }
+
+  fetchOrElse(id: string, property: string, def: () => unknown): Exclude<unknown, undefined> {
+    const data = this.parseData(id);
+
+    if (data[property] === undefined) {
+      return def();
     } else {
       return data[property];
     }
