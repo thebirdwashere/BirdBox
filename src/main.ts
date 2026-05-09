@@ -19,6 +19,8 @@ import {
 } from "./utility/process.js";
 import { Data, Perms } from "./utility/types.js";
 
+import { Database } from "./utility/database.js";
+
 const BOT_TOKEN =
   process.env.BOT_TOKEN ?? panic("Failed to find BOT_TOKEN in environment.");
 const BOT_ID =
@@ -26,6 +28,7 @@ const BOT_ID =
 const BOT_PREFIX =
   process.env.BOT_PREFIX ?? panic("Failed to find BOT_PREFIX in environment.");
 const PERMS = perms as Perms;
+const DB = new Database("src/database.sqlite");
 const CLIENT = new Client({
   intents: [
     GatewayIntentBits.GuildMessages,
@@ -41,6 +44,7 @@ const DATA: Data = {
   perms: PERMS,
   registry: REGISTRY,
   client: CLIENT,
+  db: DB,
 };
 
 await REGISTRY.detectCommands(path.join(import.meta.dirname, "commands"));
@@ -71,7 +75,7 @@ CLIENT.on(Events.InteractionCreate, (interaction) => {
 });
 
 CLIENT.on(Events.MessageCreate, (message) => {
-  if (message.member?.user.bot === true) return;
+  if (message.author.bot) return;
 
   const context = new MessageContext(message, DATA);
   
