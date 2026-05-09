@@ -1,6 +1,5 @@
 import { Client } from "discord.js";
 import { Registry } from "./registry.js";
-import { Database } from "./database.js";
 
 export interface Data {
   prefix: string;
@@ -8,7 +7,6 @@ export interface Data {
   perms: Perms;
   registry: Registry;
   client: Client;
-  db: Database;
 };
 
 export interface Flags {

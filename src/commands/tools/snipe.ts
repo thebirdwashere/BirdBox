@@ -13,7 +13,7 @@ const Snipe = new Command({
     if (!ctx.channel)
       throw new Error("Error: Could not find the ID of the current channel.");
 
-    const snipeData = ctx.data.db.channel.fetch(ctx.channel.id, "snipe");
+    const snipeData = ctx.db.channel.fetch(ctx.channel.id, "snipe");
 
     if (snipeData === undefined) {
       await ctx.reply("this command is garbage apparently cause i cant find a dang thing here");

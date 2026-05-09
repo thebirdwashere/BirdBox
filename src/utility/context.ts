@@ -12,6 +12,7 @@ import {
   AutocompleteFocusedOption,
 } from "discord.js";
 import { Data } from "./types.js";
+import { Database } from "./database.js";
 
 export interface BaseContext {
   data: Data;
@@ -19,6 +20,7 @@ export interface BaseContext {
   guild: Guild | null;
   user: User;
   timestamp: number;
+  db: Database;
 }
 
 export interface CommandContext extends BaseContext {
@@ -28,6 +30,7 @@ export interface CommandContext extends BaseContext {
   guild: Guild | null;
   user: User;
   timestamp: number;
+  db: Database;
 
   /**
    * Attempts to respond to the command. Returns the message after completion.
@@ -70,6 +73,7 @@ export class MessageContext implements CommandContext {
   guild: Guild | null;
   user: User;
   timestamp: number;
+  db: Database;
 
   async reply(
     content:
@@ -106,7 +110,7 @@ export class MessageContext implements CommandContext {
       );
   }
 
-  constructor(message: Message, data: Data) {
+  constructor(message: Message, data: Data, db: Database) {
     this.message = message;
     this.data = data;
     this.channel = message.channel;
@@ -114,6 +118,7 @@ export class MessageContext implements CommandContext {
     this.guild = message.guild;
     this.user = message.author;
     this.timestamp = message.createdTimestamp;
+    this.db = db;
   }
 }
 
@@ -126,8 +131,8 @@ export class MessageSubcommandContext extends MessageContext implements Subcomma
   currentSubcommand: string;
   parentCommand: string;
 
-  constructor(message: Message, data: Data, subcommand: string, parent: string) {
-    super(message, data);
+  constructor(message: Message, data: Data, db: Database, subcommand: string, parent: string) {
+    super(message, data, db);
     this.currentSubcommand = subcommand;
     this.parentCommand = parent;
   }
@@ -142,6 +147,7 @@ export class ChatInputCommandInteractionContext implements CommandContext {
   guild: Guild | null;
   user: User;
   timestamp: number;
+  db: Database;
 
   async reply(
     content:
@@ -184,7 +190,7 @@ export class ChatInputCommandInteractionContext implements CommandContext {
       );
   }
 
-  constructor(interaction: ChatInputCommandInteraction, data: Data) {
+  constructor(interaction: ChatInputCommandInteraction, data: Data, db: Database) {
     this.interaction = interaction;
     this.data = data;
     this.lastReply = null;
@@ -192,6 +198,7 @@ export class ChatInputCommandInteractionContext implements CommandContext {
     this.guild = interaction.guild;
     this.channel = interaction.channel;
     this.timestamp = interaction.createdTimestamp;
+    this.db = db;
   }
 }
 
@@ -199,8 +206,8 @@ export class ChatInputCommandInteractionSubcommandContext extends ChatInputComma
   currentSubcommand: string;
   parentCommand: string;
 
-  constructor(interaction: ChatInputCommandInteraction, data: Data, subcommand: string, parent: string) {
-    super(interaction, data);
+  constructor(interaction: ChatInputCommandInteraction, data: Data, db: Database, subcommand: string, parent: string) {
+    super(interaction, data, db);
     this.currentSubcommand = subcommand;
     this.parentCommand = parent;
   }
@@ -215,6 +222,7 @@ export class AutocompleteContext implements BaseContext {
   guild: Guild | null;
   user: User;
   timestamp: number;
+  db: Database;
 
   /**
    * Attempts to respond to the autocomplete with a list of choices.
@@ -261,7 +269,7 @@ export class AutocompleteContext implements BaseContext {
     await this.interaction.respond(choices);
   }
 
-  constructor(interaction: AutocompleteInteraction, data: Data) {
+  constructor(interaction: AutocompleteInteraction, data: Data, db: Database) {
     this.interaction = interaction;
     this.option = interaction.options.getFocused(true);
     this.data = data;
@@ -269,6 +277,7 @@ export class AutocompleteContext implements BaseContext {
     this.guild = interaction.guild;
     this.channel = interaction.channel;
     this.timestamp = interaction.createdTimestamp;
+    this.db = db;
   }
 }
 
