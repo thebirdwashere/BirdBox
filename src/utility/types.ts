@@ -27,7 +27,7 @@ export interface Flags {
   }[];
 };
 
-export interface userFlagStats {
+export interface UserFlagStats {
   wins: number,
   losses: number,
   current_streak: number,

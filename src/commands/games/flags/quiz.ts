@@ -1,6 +1,6 @@
 import { Subcommand, CommandOption } from "src/utility/command.js";
 import flags from "src/data/flags.json" with { type: "json" };
-import { Flags, userFlagStats } from "src/utility/types.js";
+import { Flags, UserFlagStats } from "src/utility/types.js";
 import { randomChoice, sleep } from "src/utility/utility.js";
 import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, Colors, ComponentType, EmbedBuilder } from "discord.js";
 
@@ -209,7 +209,7 @@ const flagsQuiz = new Subcommand({
 
       //runs on every correct user
       for (const userId of correctUsers) {
-      	const userStats = ctx.db.user.fetchOr(userId, "flagStats", defaultStats) as userFlagStats;
+      	const userStats = ctx.db.user.fetchOr(userId, "flagStats", defaultStats) as UserFlagStats;
 
       	//simple stat manipulation
       	userStats.wins++;
@@ -227,7 +227,7 @@ const flagsQuiz = new Subcommand({
 
       //runs on every wrong user
       for (const userId of wrongUsers) {
-      	const userStats = ctx.db.user.fetchOr(userId, "flagStats", defaultStats) as userFlagStats;
+      	const userStats = ctx.db.user.fetchOr(userId, "flagStats", defaultStats) as UserFlagStats;
 
       	//simple stat manipulation
       	userStats.losses++;
