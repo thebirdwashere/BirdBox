@@ -44,11 +44,11 @@ interface BaseTableManager {
   data: StatementData;
   tableName: string;
 
-  update(id: string, property: string, value: unknown): void;
+  parseData(id: string): DatabaseRecord | undefined;
   fetchOrUndefined(id: string, property: string): Exclude<unknown, undefined>;
   fetchOr(id: string, property: string, def: unknown): Exclude<unknown, undefined>;
   fetchOrElse(id: string, property: string, def: () => unknown): Exclude<unknown, undefined>;
-  parseData(id: string): DatabaseRecord | undefined;
+  update(id: string, property: string, value: unknown): void;
 }
 
 class TableManager implements BaseTableManager {
@@ -62,18 +62,17 @@ class TableManager implements BaseTableManager {
     this.tableName = name;
     this.data = new StatementData(db, name);
   }
+  
+  parseData(id: string): DatabaseRecord {
+    const databaseFetch = this.data.fetch.get({id});
+    const json = databaseFetch?.json;
 
-  update(id: string, property: string, value: unknown): void {
-    this.data.createIfNotExists.run({id});
+    if (json === undefined) return {};
 
-    const data = this.parseData(id);
+    const parsedJSON: unknown = JSON.parse(json as string);
+    // console.log(parsedJSON);
 
-    if (data[property] !== undefined && typeof data[property] !== typeof value)
-      throw new Error(`Type "${typeof value}" provided to ${this.tableName.toLowerCase()} database property "${property}", when type "${typeof data}" was expected.`);
-    
-    data[property] = value;
-    
-    this.data.update.run({id, json: JSON.stringify(data)});
+    return parsedJSON as DatabaseRecord;
   }
 
   fetchOrUndefined(id: string, property: string): Exclude<unknown, undefined> {
@@ -105,16 +104,17 @@ class TableManager implements BaseTableManager {
     }
   }
 
-  parseData(id: string): DatabaseRecord {
-    const databaseFetch = this.data.fetch.get({id});
-    const json = databaseFetch?.json;
+  update(id: string, property: string, value: unknown): void {
+    this.data.createIfNotExists.run({id});
 
-    if (json === undefined) return {};
+    const data = this.parseData(id);
 
-    const parsedJSON: unknown = JSON.parse(json as string);
-    // console.log(parsedJSON);
-
-    return parsedJSON as DatabaseRecord;
+    if (data[property] !== undefined && typeof data[property] !== typeof value)
+      throw new Error(`Type "${typeof value}" provided to ${this.tableName.toLowerCase()} database property "${property}", when type "${typeof data}" was expected.`);
+    
+    data[property] = value;
+    
+    this.data.update.run({id, json: JSON.stringify(data)});
   }
 }
 
