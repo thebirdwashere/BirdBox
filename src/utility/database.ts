@@ -45,7 +45,8 @@ interface BaseTableManager {
   tableName: string;
 
   update(id: string, property: string, value: unknown): void;
-  fetch(id: string, property: string): Exclude<unknown, undefined>;
+  fetch(id: string, property: string): unknown;
+  fetchOr(id: string, property: string, def: unknown): Exclude<unknown, undefined>;
   parseData(id: string): DatabaseRecord;
 }
 
@@ -75,11 +76,18 @@ class TableManager implements BaseTableManager {
     this.data.update.run({id, json: JSON.stringify(data)});
   }
 
-  fetch(id: string, property: string): Exclude<unknown, undefined> {
+  fetch(id: string, property: string): unknown {
     const data = this.parseData(id);
+    return data[property];
+  }
 
-    if (!property.includes(".")) {
-      return data[property];
+  fetchOr(id: string, property: string, def: unknown): Exclude<unknown, undefined> {
+    const data = this.parseData(id);
+    const value = data[property];
+    if (value === undefined || value === null) {
+      return def;
+    } else {
+      return value;
     }
   }
 

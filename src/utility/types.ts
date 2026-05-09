@@ -23,6 +23,14 @@ export interface Flags {
   }[];
 };
 
+export interface userFlagStats {
+  wins: number,
+  losses: number,
+  current_streak: number,
+  best_streak: number,
+  points: number,
+}
+
 export interface Footers {
   magic8ball: string[];
   help: string[];
