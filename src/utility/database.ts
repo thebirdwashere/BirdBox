@@ -98,10 +98,12 @@ class TableManager implements BaseTableManager {
     const databaseFetch = this.data.fetch.get({id});
     const json = databaseFetch?.json;
 
+    if (json === undefined) return {};
+
     const parsedJSON: unknown = JSON.parse(json as string);
     // console.log(parsedJSON);
 
-    return (parsedJSON ?? {}) as DatabaseRecord;
+    return parsedJSON as DatabaseRecord;
   }
 }
 
