@@ -108,7 +108,7 @@ CLIENT.on(Events.MessageDelete, (message) => {
 
   DB.channel.update(message.channel.id, "snipe", snipeData);
   
-  console.log(DB.channel.fetch(message.channel.id, "snipe"));
+  console.log(DB.channel.fetchOrUndefined(message.channel.id, "snipe"));
 });
 
 process.on("exit", (code) => {
