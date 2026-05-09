@@ -92,4 +92,9 @@ CLIENT.on(Events.MessageCreate, (message) => {
   void REGISTRY.testInterjections(context);
 });
 
+process.on("exit", (code) => {
+  console.log("\nExiting with code:", code);
+  DB.close();
+});
+
 CLIENT.login(BOT_TOKEN).catch(console.error);
