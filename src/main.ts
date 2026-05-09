@@ -44,6 +44,7 @@ const DATA: Data = {
   perms: PERMS,
   registry: REGISTRY,
   client: CLIENT,
+  db: DB,
 };
 
 await REGISTRY.detectCommands(path.join(import.meta.dirname, "commands"));
@@ -64,7 +65,6 @@ CLIENT.on(Events.InteractionCreate, (interaction) => {
         const context = new ChatInputCommandInteractionContext(
           interaction,
           DATA,
-          DB,
         );
         await handleCommandError(context, interaction.commandName, error);
       },
@@ -77,7 +77,7 @@ CLIENT.on(Events.InteractionCreate, (interaction) => {
 CLIENT.on(Events.MessageCreate, (message) => {
   if (message.author.bot) return;
 
-  const context = new MessageContext(message, DATA, DB);
+  const context = new MessageContext(message, DATA);
   
   detectMessageCommand(REGISTRY, DATA, message).catch(
     async (error: unknown) => {

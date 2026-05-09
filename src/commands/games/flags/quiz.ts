@@ -1,6 +1,6 @@
 import { Subcommand, CommandOption } from "src/utility/command.js";
 import flags from "src/data/flags.json" with { type: "json" };
-import { Flags } from "src/utility/types.js";
+import { Flags, userFlagStats } from "src/utility/types.js";
 import { randomChoice, sleep } from "src/utility/utility.js";
 import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, Colors, ComponentType, EmbedBuilder } from "discord.js";
 
@@ -199,55 +199,43 @@ const flagsQuiz = new Subcommand({
 
       // //MARK: update stats
 
-      // //runs on every correct user
-      // for (const userId of correctUsers) {
-      // 	let userStats = await db.get(`flags_stats.flag_quiz.${userId}`);
+      const defaultStats = {
+        wins: 0,
+        losses: 0,
+        current_streak: 0,
+        best_streak: 0,
+        points: 0,
+      };
 
-      // 	//default stats
-      // 	if (!userStats)
-      // 	userStats = {
-      // 		wins: 0,
-      // 		losses: 0,
-      // 		current_streak: 0,
-      // 		best_streak: 0,
-      // 		points: 0,
-      // 	};
+      //runs on every correct user
+      for (const userId of correctUsers) {
+      	const userStats = ctx.db.user.fetchOr(userId, "flagStats", defaultStats) as userFlagStats;
 
-      // 	//simple stat manipulation
-      // 	userStats.wins++;
-      // 	userStats.current_streak++;
-      // 	userStats.points += pointsEarned;
+      	//simple stat manipulation
+      	userStats.wins++;
+      	userStats.current_streak++;
+      	userStats.points += pointsEarned;
 
-      // 	//set new best streak if needed
-      // 	if (userStats.current_streak > userStats.best_streak) {
-      // 	userStats.best_streak = userStats.current_streak;
-      // 	}
+      	//set new best streak if needed
+      	if (userStats.current_streak > userStats.best_streak) {
+      	userStats.best_streak = userStats.current_streak;
+      	}
 
-      // 	//enter into db
-      // 	await db.set(`flags_stats.flag_quiz.${userId}`, userStats);
-      // }
+      	//enter into db
+      	ctx.db.user.update(userId, "flagStats", userStats);
+      }
 
-      // //runs on every wrong user
-      // for (const userId of wrongUsers) {
-      // 	let userStats = await db.get(`flags_stats.flag_quiz.${userId}`);
+      //runs on every wrong user
+      for (const userId of wrongUsers) {
+      	const userStats = ctx.db.user.fetchOr(userId, "flagStats", defaultStats) as userFlagStats;
 
-      // 	//default stats
-      // 	if (!userStats)
-      // 	userStats = {
-      // 		wins: 0,
-      // 		losses: 0,
-      // 		current_streak: 0,
-      // 		best_streak: 0,
-      // 		points: 0,
-      // 	};
+      	//simple stat manipulation
+      	userStats.losses++;
+      	userStats.current_streak = 0;
+      	userStats.points -= pointsLost;
 
-      // 	//simple stat manipulation
-      // 	userStats.losses++;
-      // 	userStats.current_streak = 0;
-      // 	userStats.points -= pointsLost;
-
-      // 	await db.set(`flags_stats.flag_quiz.${userId}`, userStats);
-      // }
+      	ctx.db.user.update(userId, "flagStats", userStats);
+      }
     }
 		
     buttonCollector.on("collect", (i: ButtonInteraction): void => void handleButtonInteraction(i) );
