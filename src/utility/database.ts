@@ -1,4 +1,7 @@
 import { DatabaseSync, StatementSync } from "node:sqlite";
+import { DatabaseRecord } from "./types.js";
+
+//TODO: support bot-global config
 
 export class Database {
   inner: DatabaseSync;
@@ -145,7 +148,11 @@ class StatementData {
       WHERE (id == @id)
       LIMIT 1
     `);
+
+    this.fetchAll = db.prepare(`
+      SELECT json 
+      FROM ${tableName}
+    `);
   }
 }
 
-type DatabaseRecord = Record<string, unknown>
