@@ -47,7 +47,6 @@ interface BaseTableManager {
   data: StatementData;
   tableName: string;
 
-  parseData(id: string): DatabaseRecord | undefined;
   fetchOrUndefined(id: string, property: string): Exclude<unknown, undefined>;
   fetchOr(id: string, property: string, def: unknown): Exclude<unknown, undefined>;
   fetchOrElse(id: string, property: string, def: () => unknown): Exclude<unknown, undefined>;
@@ -65,30 +64,22 @@ class TableManager implements BaseTableManager {
     this.tableName = name;
     this.data = new StatementData(db, name);
   }
-  
-  parseData(id: string): DatabaseRecord {
-    const databaseFetch = this.data.fetch.get({id});
-    const json = databaseFetch?.json;
 
-    if (json === undefined) return {};
-
-    const parsedJSON: unknown = JSON.parse(json as string);
-    // console.log(parsedJSON);
-
-    return parsedJSON as DatabaseRecord;
-  }
-
+  /**
+   * Returns the property if it exists in the database, otherwise returns `undefined`.
+   */
   fetchOrUndefined(id: string, property: string): Exclude<unknown, undefined> {
-    const data = this.parseData(id);
-
-    if (data[property] === undefined)
-      throw new Error(`Unable to fetch property ${property} of ${this.tableName.toLowerCase()} data.`);
+    const data = parseDataAsJSON(this.data.fetch.get({id}));
 
     return data[property];
   }
 
+  /**
+   * Returns the property if it exists in the database, otherwise returns the default
+   * value provided by `def`.
+   */
   fetchOr(id: string, property: string, def: unknown): Exclude<unknown, undefined> {
-    const data = this.parseData(id);
+    const data = parseDataAsJSON(this.data.fetch.get({id}));
 
     if (data[property] === undefined) {
       return def;
@@ -97,8 +88,12 @@ class TableManager implements BaseTableManager {
     }
   }
 
+  /**
+   * Returns the property if it exists in the database, otherwise returns the default
+   * value provided by the `def` closure.
+   */
   fetchOrElse(id: string, property: string, def: () => unknown): Exclude<unknown, undefined> {
-    const data = this.parseData(id);
+    const data = parseDataAsJSON(this.data.fetch.get({id}));
 
     if (data[property] === undefined) {
       return def();
@@ -107,10 +102,51 @@ class TableManager implements BaseTableManager {
     }
   }
 
+  /**
+   * Returns the property for all rows in the database, 
+   * omitting rows where the property does not exist.
+   */
+  fetchAll(property: string): unknown[] {
+    const dataAll = this.data.fetchUnconstrained.iterate();
+    const propertyArray = [];
+
+    for (const row of dataAll) {
+      const data = parseDataAsJSON(row);
+      if (data[property] !== undefined) {
+        propertyArray.push(data[property]);
+      }
+    }
+
+    return propertyArray;
+  }
+
+  /**
+   * Returns the property for all rows in the database, using the `def` value for
+   * rows that do not exist.
+   */
+  fetchAllOr(property: string, def: unknown): unknown[] {
+    const dataAll = this.data.fetchUnconstrained.iterate();
+    const propertyArray = [];
+
+    for (const row of dataAll) {
+      const data = parseDataAsJSON(row);
+      if (data[property] !== undefined) {
+        propertyArray.push(data[property]);
+      } else {
+        propertyArray.push(def);
+      }
+    }
+
+    return propertyArray;
+  }
+
+  /**
+   * Updates the value of the property to a new value. Creates the row or the property if necessary.
+   */
   update(id: string, property: string, value: unknown): void {
     this.data.createIfNotExists.run({id});
 
-    const data = this.parseData(id);
+    const data = parseDataAsJSON(this.data.fetch.get({id}));
 
     if (data[property] !== undefined && typeof data[property] !== typeof value)
       throw new Error(`Type "${typeof value}" provided to ${this.tableName.toLowerCase()} database property "${property}", when type "${typeof data}" was expected.`);
@@ -125,6 +161,7 @@ class StatementData {
   createIfNotExists: StatementSync;
   update: StatementSync;
   fetch: StatementSync;
+  fetchUnconstrained: StatementSync;
 
   constructor (
     db: DatabaseSync,
@@ -149,10 +186,21 @@ class StatementData {
       LIMIT 1
     `);
 
-    this.fetchAll = db.prepare(`
+    this.fetchUnconstrained = db.prepare(`
       SELECT json 
       FROM ${tableName}
     `);
   }
 }
 
+function parseDataAsJSON(data: DatabaseRecord | undefined): DatabaseRecord {
+  if (data === undefined) return {};
+
+  const json = data.json;
+  if (json === undefined) return {};
+
+  const parsedJSON: unknown = JSON.parse(json as string);
+  // console.log(parsedJSON);
+
+  return parsedJSON as DatabaseRecord;
+}
