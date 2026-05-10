@@ -14,7 +14,7 @@ const Help = new Command({
       name: "command",
       description: "A specific command to view information regarding.",
       type: "string",
-      required: false,
+      optional: true,
     }),
   ],
   execute: async (ctx, opts) => {

@@ -10,7 +10,7 @@ const Diceroll = new Command({
       name: "sides",
       description: "The desired number of sides, providing a random number 1-n (inclusive). Defaults to 6.",
       type: "number",
-      required: false,
+      optional: true,
     }),
   ],
   execute: async (ctx, opts) => {

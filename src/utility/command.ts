@@ -181,13 +181,13 @@ export class CommandOption {
     {
       name: string;
       description: string;
-      required?: boolean;
+      optional?: true;
       type: Exclude<CommandOptionType, "string">;
       autocomplete?: true;
     } | {
       name: string;
       description: string;
-      required?: boolean;
+      optional?: true;
       type: "string";
       autocomplete?: true;
       choices?: NonEmptyArray<string> 
@@ -242,7 +242,7 @@ export class CommandOption {
     this.data
       .setName(args.name)
       .setDescription(args.description)
-      .setRequired(args.required ?? true);
+      .setRequired(!(args.optional ?? false));
   }
 }
 

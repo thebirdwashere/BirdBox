@@ -10,7 +10,7 @@ const flagsStats = new Subcommand({
       name: "user",
       description: "The person to view the stats of. If not set, defaults to yourself.",
       type: "user",
-      required: false,
+      optional: true,
     }),
   ],
   execute: async (ctx, opts) => {

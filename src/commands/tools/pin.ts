@@ -10,7 +10,7 @@ const Pin = new Command({
       name: "link",
       description: "The message link to pin. If not provided, will attempt to pin the message replied to.",
       type: "string",
-      required: false,
+      optional: true,
     }),
   ],
   execute: async (ctx, opts) => {

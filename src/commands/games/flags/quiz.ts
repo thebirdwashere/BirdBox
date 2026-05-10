@@ -15,7 +15,7 @@ const flagsQuiz = new Subcommand({
       name: "difficulty",
       description: "Change how many flags are available to guess.",
       type: "string",
-      required: false,
+      optional: true,
       choices: DIFFICULTIES as NonEmptyArray<string>,
     }),
   ],

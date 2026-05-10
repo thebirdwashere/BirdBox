@@ -52,28 +52,38 @@ const Translate = new Command({
       description: "Uses the Google Translate API to convert text.",
       options: [
         new CommandOption({
-          name: "from",
-          description: "The language to translate from. Must be a language code, as described in the codes subcommand.",
-          type: "string",
-        }),
-        new CommandOption({
-          name: "to",
-          description: "The language to translate to. Must be a language code, as described in the codes subcommand.",
-          type: "string",
-        }),
-        new CommandOption({
           name: "text",
           description: "The message you want translated.",
           type: "string",
+          length: [1, 4999],
+        }),
+        new CommandOption({
+          name: "from",
+          description: "The language to translate from. Must be a language or language code.",
+          type: "string",
+          optional: true,
+          autocomplete: true,
+        }),
+        new CommandOption({
+          name: "to",
+          description: "The language to translate to. Must be a language or language code.",
+          type: "string",
+          optional: true,
+          autocomplete: true,
         }),
       ],
+      autocomplete: async (ctx) => {
+        await ctx.respond(LANGUAGES);
+      },
       execute: async (ctx, opts) => {
-        const langTypeFrom = opts.string.get("from");
-        const langTypeTo = opts.string.get("to");
+        const langTypeFrom = opts.string.get("from") ?? "auto";
+        const langTypeTo = opts.string.get("to") ?? "auto";
         const rawMessage = opts.string.get("text");
 
-        if (langTypeFrom == null || langTypeTo == null || rawMessage == null) throw new Error("One or more required fields not filled.");
-        if (rawMessage.length >= 5000) throw new Error("Provided text is too long. Please shorten your request to below 5000 characters.");
+        if (rawMessage == null) 
+          throw new Error("Message to translate not found.");
+        if (rawMessage.length >= 5000) 
+          throw new Error("Provided text is too long. Please shorten your request to below 5000 characters.");
         
         const validLanguages = LANGUAGES.map(item => item.value).concat(LANGUAGES.map(item => item.name));
         if (!(validLanguages.includes(langTypeFrom))) throw new Error("Language to translate from is invalid. Ensure you have the right language name or code.");

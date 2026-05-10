@@ -261,9 +261,7 @@ export async function detectMessageCommand(
       (sub) => sub.data.name === subcommandName,
     );
     if (subcommand === undefined)
-      throw new Error(
-        `Unknown subcommand: \`/${commandName} ${subcommandName}\``,
-      );
+      throw new Error(`Unknown subcommand: \`/${commandName} ${subcommandName}\``);
 
     // Populate options if they exist.
     if (subcommand.body !== undefined && isOptionArray(subcommand.body)) {

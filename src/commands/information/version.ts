@@ -13,7 +13,7 @@ const Version = new Command({
       name: "version",
       description: "Which version to jump to. If not set, defaults to the latest version.",
       type: "string",
-      required: false,
+      optional: true,
     }),
   ],
   execute: async (ctx, opts) => {

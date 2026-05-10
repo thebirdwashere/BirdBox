@@ -13,7 +13,7 @@ const flagsBoard = new Subcommand({
       name: "statistic",
       description: "Select which statistic you want to view. If not set, defaults to \"points\".",
       type: "string",
-      required: false,
+      optional: true,
       choices: STATISTICS as NonEmptyArray<string>,
     }),
   ],

@@ -14,7 +14,7 @@ const Announce = new Command({
       name: "channel",
       description: "A link to the channel announced to. If not set, defaults to server-configured default channel.",
       type: "string",
-      required: false,
+      optional: true,
     }),
   ],
   // eslint-disable-next-line @typescript-eslint/require-await

@@ -16,14 +16,14 @@ const Image = new Command({
           name: "type",
           description: "Which result format you want. Must be one of \"image\" or \"gif\".",
           type: "string",
-          required: false,
+          optional: true,
           choices: ["image", "gif"]
         }),
         new CommandOption({
           name: "breed",
           description: "Which breed you want images of. If not specified, will choose from all available breeds.",
           type: "string",
-          required: false,
+          optional: true,
           autocomplete: true,
         }),
       ],
@@ -61,14 +61,14 @@ const Image = new Command({
           name: "type",
           description: "Which result format you want. Must be one of `image` or `gif`.",
           type: "string",
-          required: false,
+          optional: true,
           choices: ["image", "gif"]
         }),
         new CommandOption({
           name: "breed",
           description: "Which breed you want images of. If not specified, will choose from all available breeds.",
           type: "string",
-          required: false,
+          optional: true,
           autocomplete: true,
         }),
       ],
@@ -128,7 +128,7 @@ async function getPetImage(type: string, breed: string | null, link: string): Pr
     url?: string;
   };
 
-  const petFetch: JsonList<PetData> = await fetch(fetchString) as unknown as JsonList<PetData>;
+  const petFetch: JsonList<PetData> = await fetch(fetchString) as JsonList<PetData>;
   const petData: PetData[] = await petFetch.json();
 
   if (petData[0]?.url === undefined) throw new Error(`Could not find ${type} of the requested breed. Try broadening your specifications.`);

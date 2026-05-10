@@ -10,13 +10,13 @@ const Coinflip = new Command({
       name: "heads",
       description: "The first option to choose between. Defaults to \"heads\".",
       type: "string",
-      required: false,
+      optional: true,
     }),
     new CommandOption({
       name: "tails",
       description: "The second option to choose between. Defaults to \"tails\" or, if set, the inverse of heads.",
       type: "string",
-      required: false,
+      optional: true,
     }),
   ],
   execute: async (ctx, opts) => {
