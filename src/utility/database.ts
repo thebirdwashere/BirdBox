@@ -48,8 +48,8 @@ interface BaseTableManager {
   tableName: string;
 
   fetchOrUndefined(id: string, property: string): Exclude<unknown, undefined>;
-  fetchOr(id: string, property: string, def: unknown): Exclude<unknown, undefined>;
-  fetchOrElse(id: string, property: string, def: () => unknown): Exclude<unknown, undefined>;
+  fetchOr(id: string, property: string, def: unknown): unknown;
+  fetchOrElse(id: string, property: string, def: () => unknown): unknown;
   update(id: string, property: string, value: unknown): void;
 }
 
@@ -78,11 +78,13 @@ class TableManager implements BaseTableManager {
    * Returns the property if it exists in the database, otherwise returns the default
    * value provided by `def`.
    */
-  fetchOr(id: string, property: string, def: unknown): Exclude<unknown, undefined> {
+  fetchOr(id: string, property: string, def: unknown): unknown {
     const data = parseDataAsJSON(this.data.fetch.get({id}));
 
     if (data[property] === undefined) {
       return def;
+    } else if (typeof data[property] !== typeof def) {
+      throw new Error(`Type ${typeof def} of default value is unrelated to database record type ${typeof data}`);
     } else {
       return data[property];
     }
@@ -92,7 +94,7 @@ class TableManager implements BaseTableManager {
    * Returns the property if it exists in the database, otherwise returns the default
    * value provided by the `def` closure.
    */
-  fetchOrElse(id: string, property: string, def: () => unknown): Exclude<unknown, undefined> {
+  fetchOrElse(id: string, property: string, def: () => unknown): unknown {
     const data = parseDataAsJSON(this.data.fetch.get({id}));
 
     if (data[property] === undefined) {
@@ -193,7 +195,7 @@ class StatementData {
   }
 }
 
-function parseDataAsJSON(data: DatabaseRecord | undefined): DatabaseRecord {
+function parseDataAsJSON(data: DatabaseRecord<unknown> | undefined): DatabaseRecord<unknown> {
   if (data === undefined) return {};
 
   const json = data.json;
@@ -202,5 +204,5 @@ function parseDataAsJSON(data: DatabaseRecord | undefined): DatabaseRecord {
   const parsedJSON: unknown = JSON.parse(json as string);
   // console.log(parsedJSON);
 
-  return parsedJSON as DatabaseRecord;
+  return parsedJSON as DatabaseRecord<unknown>;
 }

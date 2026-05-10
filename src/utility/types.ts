@@ -11,7 +11,7 @@ export interface Data {
   db: Database;
 };
 
-export type DatabaseRecord = Record<string, unknown>
+export type DatabaseRecord<T> = Record<string, T>
 
 export interface Flags {
   emojis: Record<string, {
