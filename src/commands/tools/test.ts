@@ -6,9 +6,17 @@ const Test = new Command({
   options: [
     new CommandOption({
       name: "stringtest",
-      description: "a string",
+      description: "a string with min and max length",
       type: "string",
       required: false,
+      length: [10, 20],
+    }),
+    new CommandOption({
+      name: "choicestest",
+      description: "a string with choice options",
+      type: "string",
+      required: false,
+      choices: ["red", "green", "blue"],
     }),
     new CommandOption({
       name: "numbertest",
@@ -49,6 +57,7 @@ const Test = new Command({
   ],
   execute: async (ctx, opts) => {
     await ctx.send(opts.string.get("stringtest")?.toString() ?? "undefined");
+    await ctx.send(opts.string.get("choicestest")?.toString() ?? "undefined");
     await ctx.send(opts.number.get("numbertest")?.toString() ?? "undefined");
     await ctx.send(opts.boolean.get("booleantest")?.toString() ?? "undefined");
     await ctx.send(opts.user.get("usertest")?.username ?? "undefined");

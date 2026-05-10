@@ -2,6 +2,9 @@ import { Client } from "discord.js";
 import { Registry } from "./registry.js";
 import { Database } from "./database.js";
 
+export type NonEmptyArray<T> = [T, ...T[]];
+export type NonEmptyReadonlyArray<T> = readonly [T, ...T[]];
+
 export interface Data {
   prefix: string;
   id: string;

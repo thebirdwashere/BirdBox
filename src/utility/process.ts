@@ -16,7 +16,7 @@ import {
   AutocompleteContext
 } from "./context.js";
 import { Registry } from "./registry.js";
-import { Data } from "./types.js";
+import { Data, NonEmptyReadonlyArray } from "./types.js";
 import { sleep } from "./utility.js";
 
 export async function detectChatInputInteractionCommand(
@@ -283,7 +283,7 @@ export async function detectMessageCommand(
 
 function populateMessageOptions(
   sources: string[],
-  targets: readonly [CommandOption, ...CommandOption[]],
+  targets: NonEmptyReadonlyArray<CommandOption>,
   message: Message,
 ): Options {
   const options = new Options();
@@ -352,11 +352,26 @@ function populateMessageOptions(
       options.number.set(option.data.name, Number(source));
       break;
     case "boolean":
-      options.boolean.set(option.data.name, source === "true" ? true : false);
+      options.boolean.set(option.data.name, source === "true");
       break;
-    case "string":
+    case "string": {
+      if (option.choices && !option.choices.includes(source)) {
+        console.log(source);
+        console.log(option.choices);
+        const optionsFormatter = new Intl.ListFormat("en", {type: "disjunction"});
+        const choicesList = optionsFormatter.format(option.choices.map(choice => `\`${choice}\``));
+        throw new Error(`Provided "${source}" is invalid for option "${option.data.name}". Option must be one of ${choicesList}.`);
+      }
+      if (option.length && (
+        source.length < option.length[0] ||
+        source.length > option.length[1]
+      )) {
+        throw new Error(`Option ${option.data.name} must be between ${option.length[0].toString()} and ${option.length[1].toString()} characters (${source.length.toString()} characters provided).`);
+      }
+
       options.string.set(option.data.name, source);
       break;
+    }
     case "user": {
       const pingedUser = getMentionableFromID(USER_PING_REGEX, "user");
       options.user.set(option.data.name, pingedUser);

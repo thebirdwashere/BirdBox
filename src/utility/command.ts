@@ -18,15 +18,17 @@ import {
   APIInteractionDataResolvedChannelBase,
   ChannelType,
   Channel,
+  APIApplicationCommandOptionChoice,
 } from "discord.js";
 import { CommandContext, AutocompleteContext } from "./context.js";
 import { panic } from "./utility.js";
+import { NonEmptyArray, NonEmptyReadonlyArray } from "./types.js";
 
 export class Command {
   data: SlashCommandBuilder;
   body?:
-    | readonly [CommandOption, ...CommandOption[]]
-    | readonly [Subcommand, ...Subcommand[]];
+    | NonEmptyReadonlyArray<CommandOption>
+    | NonEmptyReadonlyArray<Subcommand>;
   execute?: (ctx: CommandContext, opts: Options) => Promise<void>;
   autocomplete?: (ctx: AutocompleteContext) => Promise<void>;
 
@@ -40,13 +42,13 @@ export class Command {
       | {
           name: string;
           description: string;
-          options: readonly [CommandOption, ...CommandOption[]];
+          options: NonEmptyReadonlyArray<CommandOption>;
           execute: (ctx: CommandContext, opts: Options) => Promise<void>;
         }
       | {
           name: string;
           description: string;
-          subcommands: readonly [Subcommand, ...Subcommand[]];
+          subcommands: NonEmptyReadonlyArray<Subcommand>;
         },
   ) {
     this.data = new SlashCommandBuilder()
@@ -97,7 +99,7 @@ export class Command {
 
 export class Subcommand {
   data: SlashCommandSubcommandBuilder;
-  body?: readonly [CommandOption, ...CommandOption[]];
+  body?: NonEmptyReadonlyArray<CommandOption>;
   execute: (ctx: CommandContext, opts: Options) => Promise<void>;
   autocomplete?: (ctx: AutocompleteContext) => Promise<void>;
 
@@ -111,7 +113,7 @@ export class Subcommand {
       | {
           name: string;
           description: string;
-          options: readonly [CommandOption, ...CommandOption[]];
+          options: NonEmptyReadonlyArray<CommandOption>;
           execute: (ctx: CommandContext, opts: Options) => Promise<void>;
           autocomplete?: (ctx: AutocompleteContext) => Promise<void>;
         },
@@ -169,24 +171,56 @@ export class CommandOption {
     | SlashCommandChannelOption;
   type: CommandOptionType;
   autocomplete?: true;
+  choices?: NonEmptyReadonlyArray<string>;
+  length?: readonly [number, number];
 
-  constructor(args: {
-    name: string;
-    description: string;
-    required?: boolean;
-    type: CommandOptionType;
-    autocomplete?: true;
-  }) {
+  constructor(args: 
+    {
+      name: string;
+      description: string;
+      required?: boolean;
+      type: Exclude<CommandOptionType, "string">;
+      autocomplete?: true;
+    } | {
+      name: string;
+      description: string;
+      required?: boolean;
+      type: "string";
+      autocomplete?: true;
+      choices?: NonEmptyArray<string> 
+      | NonEmptyArray<APIApplicationCommandOptionChoice>;
+      length?: [number, number];
+    }
+  ) {
     this.type = args.type;
     switch (args.type) {
+    case "string": {
+      this.data = new SlashCommandStringOption();
+      if (args.autocomplete) this.data.setAutocomplete(args.autocomplete);
+
+      if (args.length) {
+        this.length = args.length;
+        this.data.setMinLength(args.length[0]);
+        this.data.setMaxLength(args.length[1]);
+      }
+
+      if (args.choices) {
+        if (typeof args.choices[0] === "string") {
+          const formattedArgs = args.choices.map(item => {return {name: item, value: item};}) as APIApplicationCommandOptionChoice<string>[];
+          this.data.setChoices(formattedArgs);
+          this.choices = args.choices as NonEmptyArray<string>;
+        } else {
+          this.data.setChoices(args.choices as APIApplicationCommandOptionChoice<string>[]);
+          this.choices = (args.choices as APIApplicationCommandOptionChoice<string>[]).map(item => item.value) as NonEmptyArray<string>;
+        }
+      }
+      break;
+    }
     case "number":
       this.data = new SlashCommandIntegerOption();
       break;
     case "boolean":
       this.data = new SlashCommandBooleanOption();
-      break;
-    case "string":
-      this.data = new SlashCommandStringOption();
       break;
     case "user":
       this.data = new SlashCommandUserOption();
@@ -206,10 +240,6 @@ export class CommandOption {
       .setName(args.name)
       .setDescription(args.description)
       .setRequired(args.required ?? true);
-
-    if (this.data instanceof SlashCommandStringOption && args.autocomplete) {
-      this.data.setAutocomplete(args.autocomplete);
-    }
   }
 }
 
@@ -235,16 +265,16 @@ export class Options {
 
 export function isSubcommandArray(
   body:
-    | readonly [CommandOption, ...CommandOption[]]
-    | readonly [Subcommand, ...Subcommand[]],
-): body is readonly [Subcommand, ...Subcommand[]] {
+    | NonEmptyReadonlyArray<CommandOption>
+    | NonEmptyReadonlyArray<Subcommand>,
+): body is NonEmptyReadonlyArray<Subcommand> {
   return body.length > 0 && body[0] instanceof Subcommand;
 }
 
 export function isOptionArray(
   body:
-    | readonly [CommandOption, ...CommandOption[]]
-    | readonly [Subcommand, ...Subcommand[]],
-): body is readonly [CommandOption, ...CommandOption[]] {
+    | NonEmptyReadonlyArray<CommandOption>
+    | NonEmptyReadonlyArray<Subcommand>,
+): body is NonEmptyReadonlyArray<CommandOption> {
   return body.length > 0 && body[0] instanceof CommandOption;
 }
