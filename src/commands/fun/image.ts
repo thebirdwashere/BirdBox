@@ -17,7 +17,7 @@ const Image = new Command({
           description: "Which result format you want. Must be one of \"image\" or \"gif\".",
           type: "string",
           required: false,
-          autocomplete: true,
+          choices: ["image", "gif"]
         }),
         new CommandOption({
           name: "breed",
@@ -28,24 +28,15 @@ const Image = new Command({
         }),
       ],
       autocomplete: async (ctx) => {
-        switch (ctx.option.name) {
-        case "type": {
-          await ctx.respondStrings(["image", "gif"]);
-          break;
-        }
-        case "breed": {
-          const petBreeds = await getPetBreeds(CAT_LINK);
-          const formattedBreeds = petBreeds.map(breed => {
-            return {
-              name: breed.name,
-              value: breed.id,
-            };
-          });
+        const petBreeds = await getPetBreeds(CAT_LINK);
+        const formattedBreeds = petBreeds.map(breed => {
+          return {
+            name: breed.name,
+            value: breed.id,
+          };
+        });
 
-          await ctx.respond(formattedBreeds);
-          break;
-        }
-        }
+        await ctx.respond(formattedBreeds);
       },
       execute: async (ctx, opts) => {
         const imageType = opts.string.get("type") ?? "image";
@@ -81,28 +72,19 @@ const Image = new Command({
         }),
       ],
       autocomplete: async (ctx) => {
-        switch (ctx.option.name) {
-        case "type": {
-          await ctx.respondStrings(["image", "gif"]);
-          break;
-        }
-        case "breed": {
-          const petBreeds = await getPetBreeds(DOG_LINK);
-          const formattedBreeds = petBreeds.map(breed => {
-            return {
-              name: breed.name,
-              value: breed.id,
-            };
-          });
+        const petBreeds = await getPetBreeds(DOG_LINK);
+        const formattedBreeds = petBreeds.map(breed => {
+          return {
+            name: breed.name,
+            value: breed.id,
+          };
+        });
 
-          await ctx.respond(formattedBreeds);
-          break;
-        }
-        }
+        await ctx.respond(formattedBreeds);
       },
       execute: async (ctx, opts) => {
         const imageType = opts.string.get("type") ?? "image";
-        const selectedBreed = opts.string.get("breed") ?? "";
+        const selectedBreed = opts.string.get("breed") ?? null;
 
         const imageURL = await getPetImage(imageType, selectedBreed, DOG_LINK);
 
@@ -118,10 +100,10 @@ const Image = new Command({
   ],
 });
 
-async function getPetImage(type: string, breed: string, link: string): Promise<string> {
+async function getPetImage(type: string, breed: string | null, link: string): Promise<string> {
   let fetchString = `https://${link}/v1/images/search?mime_types=${type}`;
 
-  if (breed !== "") {
+  if (breed !== null) {
     const petBreeds = await getPetBreeds(link);
 
     //console.log(JSON.stringify(petBreeds, null, 2));
