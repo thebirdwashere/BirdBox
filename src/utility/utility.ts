@@ -40,6 +40,20 @@ export function randomChoice<T>(array: T[]): T {
 }
 
 /**
+ * Uses some definitely impractical tricks to call an async callback function
+ * without being async. Necessary for using InteractionCollectors.
+ */
+export function voidFn<T>(callback: (p: T) => Promise<void>, param: T): void {
+  (async (param) => {
+    await callback(param);
+  })(param).catch(
+    (e: unknown) => {
+      throw new Error(String(e));
+    }
+  );
+}
+
+/**
  * Map wrapper with various utility methods to ensure values exist or optionally
  * return defaults.
  */
