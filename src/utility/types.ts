@@ -1,4 +1,4 @@
-import { Client } from "discord.js";
+import { Client, User } from "discord.js";
 import { Registry } from "./registry.js";
 import { Database } from "./database.js";
 
@@ -80,10 +80,18 @@ export interface SnipedMessage {
   imageURL: string | null,
 }
 
-export interface Options {
+export class Options {
   number: Map<string, number | null>;
   boolean: Map<string, boolean | null>;
   string: Map<string, string | null>;
+  user: Map<string, User | null>;
+
+  constructor() {
+    this.number = new Map<string, number | null>();
+    this.boolean = new Map<string, boolean | null>();
+    this.string = new Map<string, string | null>();
+    this.user = new Map<string, User | null>();
+  }
 };
 
 export type EightBallResponses = (string | {text: string; credit?: string; url?: string; image?: string;})[];

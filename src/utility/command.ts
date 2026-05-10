@@ -5,6 +5,7 @@ import {
   SlashCommandBooleanOption,
   SlashCommandStringOption,
   SlashCommandIntegerOption,
+  SlashCommandUserOption,
 } from "discord.js";
 import { CommandContext, AutocompleteContext } from "./context.js";
 import { panic } from "./utility.js";
@@ -52,6 +53,9 @@ export class Command {
           break;
         case ApplicationCommandOptionType.String:
           this.data.addStringOption(option.data);
+          break;
+        case ApplicationCommandOptionType.User:
+          this.data.addUserOption(option.data);
           break;
         default:
           panic("Unimplemented data type.");
@@ -110,6 +114,9 @@ export class Subcommand {
         case ApplicationCommandOptionType.String:
           this.data.addStringOption(option.data);
           break;
+        case ApplicationCommandOptionType.User:
+          this.data.addUserOption(option.data);
+          break;
         default:
           panic("Unimplemented data type.");
         }
@@ -119,20 +126,23 @@ export class Subcommand {
   }
 }
 
+export type CommandOptionType = "number" | "boolean" | "string" | "user";
+
 export class CommandOption {
   data:
     | SlashCommandIntegerOption
     | SlashCommandBooleanOption
-    | SlashCommandStringOption;
-  type: "number" | "boolean" | "string";
-  autocomplete?: boolean;
+    | SlashCommandStringOption
+    | SlashCommandUserOption;
+  type: CommandOptionType;
+  autocomplete?: true;
 
   constructor(args: {
     name: string;
     description: string;
     required?: boolean;
-    type: "number" | "boolean" | "string";
-    autocomplete?: boolean;
+    type: CommandOptionType;
+    autocomplete?: true;
   }) {
     this.type = args.type;
     switch (args.type) {
@@ -144,6 +154,9 @@ export class CommandOption {
       break;
     case "string":
       this.data = new SlashCommandStringOption();
+      break;
+    case "user":
+      this.data = new SlashCommandUserOption();
       break;
     }
 

@@ -5,6 +5,7 @@ import {
   isSubcommandArray,
   Command,
   Subcommand,
+  CommandOptionType,
 } from "./command.js";
 import {
   ChatInputCommandInteractionContext,
@@ -29,11 +30,7 @@ export async function detectChatInputInteractionCommand(
     throw new Error(`Unknown or unregistered command: \`/${commandName}\``);
 
   // Determine passed command options.
-  let options = {
-    number: new Map<string, number | null>(),
-    boolean: new Map<string, boolean | null>(),
-    string: new Map<string, string | null>(),
-  };
+  let options = new Options();
 
   if (command.body !== undefined && isOptionArray(command.body)) {
     options = parseCommandOptions(command, interaction, options);
@@ -128,6 +125,20 @@ function parseCommandOptions(
         options.string.set(option.data.name, opt);
       }
       break;
+    case "user":
+      {
+        const opt = interaction.options.getUser(
+          option.data.name,
+          option.data.required,
+        );
+        if (opt === null && option.data.required)
+          throw new Error(
+            `Required option missing: \`${option.data.name}\``,
+          );
+
+        options.user.set(option.data.name, opt);
+      }
+      break;
     }
   }
 
@@ -171,11 +182,7 @@ export async function detectMessageCommand(
 
   // Handle commands accordingly.
   if (command.execute !== undefined) {
-    let options = {
-      number: new Map<string, number | null>(),
-      boolean: new Map<string, boolean | null>(),
-      string: new Map<string, string | null>(),
-    };
+    let options = new Options();
 
     const context = new MessageContext(message, data);
 
@@ -189,7 +196,7 @@ export async function detectMessageCommand(
             `found ${String(args.length)}.` +
             "\n*Help: Try using ! in place of any optional arguments.*",
         );
-      options = populateMessageOptions(args, command.body);
+      options = populateMessageOptions(args, command.body, message);
     }
 
     // Attempt to execute command.
@@ -199,11 +206,7 @@ export async function detectMessageCommand(
     if (subcommandName === undefined)
       throw new Error(`Subcommand missing in command: \`/${commandName}\``);
 
-    let options = {
-      number: new Map<string, number | null>(),
-      boolean: new Map<string, boolean | null>(),
-      string: new Map<string, string | null>(),
-    };
+    let options = new Options();
 
     const context = new MessageSubcommandContext(message, data, subcommandName, commandName);
 
@@ -226,7 +229,7 @@ export async function detectMessageCommand(
             `found ${String(args.length)}.` +
             "\n*Help: Try using ! in place of any optional arguments.*",
         );
-      options = populateMessageOptions(args, subcommand.body);
+      options = populateMessageOptions(args, subcommand.body, message);
     }
 
     await subcommand.execute(context, options);
@@ -238,18 +241,18 @@ export async function detectMessageCommand(
 function populateMessageOptions(
   sources: string[],
   targets: readonly [CommandOption, ...CommandOption[]],
+  message: Message,
 ): Options {
-  const options = {
-    number: new Map<string, number | null>(),
-    boolean: new Map<string, boolean | null>(),
-    string: new Map<string, string | null>(),
-  };
+  const options = new Options();
 
   for (const [index, option] of targets.entries()) {
-    let sourceType: "optional" | "number" | "boolean" | "string";
+    let sourceType: "optional" | CommandOptionType;
     const targetType = option.type;
 
     const source = sources[index];
+
+    //captures a ping <@ID>, hence the weirdness
+    const USER_PING_REGEX = /<@(\d{18,19})>/;
 
     if (source === "!") {
       sourceType = "optional";
@@ -257,6 +260,8 @@ function populateMessageOptions(
       sourceType = "number";
     } else if (source === "true" || source === "false") {
       sourceType = "boolean";
+    } else if (USER_PING_REGEX.test(source)) {
+      sourceType = "user";
     } else {
       sourceType = "string";
     }
@@ -279,23 +284,35 @@ function populateMessageOptions(
     case "string":
       options.string.set(option.data.name, source);
       break;
+    case "user": {
+      const pingedUserID = (USER_PING_REGEX.exec(source))?.at(1);
+      if (pingedUserID === undefined)
+        throw new Error(`Error parsing pinged user for command option "${option.data.name}".`);
+
+      const pingedUser = message.mentions.parsedUsers.get(pingedUserID);
+      if (pingedUser === undefined)
+        throw new Error(`Error locating pinged user for command option "${option.data.name}".`);
+      
+      options.user.set(option.data.name, pingedUser);
+      break;
+    }
     case "optional":
-      if (!option.data.required) {
-        switch (option.type) {
-        case "number":
-          options.number.set(option.data.name, null);
-          break;
-        case "boolean":
-          options.boolean.set(option.data.name, null);
-          break;
-        case "string":
-          options.string.set(option.data.name, null);
-          break;
-        }
-      } else {
-        throw new Error(
-          `Argument at position ${String(index + 1)} is not optional.`,
-        );
+      if (option.data.required)
+        throw new Error(`Argument at position ${String(index + 1)} is not optional.`);
+
+      switch (option.type) {
+      case "number":
+        options.number.set(option.data.name, null);
+        break;
+      case "boolean":
+        options.boolean.set(option.data.name, null);
+        break;
+      case "string":
+        options.string.set(option.data.name, null);
+        break;
+      case "user":
+        options.user.set(option.data.name, null);
+        break;
       }
       break;
     }
