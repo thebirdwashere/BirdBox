@@ -98,7 +98,7 @@ const flagsQuiz = new Subcommand({
 
     //send embed
     await ctx.reply({embeds: [flagEmbed], components: buttonRowArray});
-    if (ctx.lastReply == null) throw new Error("Could not locate last reply.");
+    if (ctx.lastReply === null) throw new Error("Could not locate last reply.");
 
     //collect button responses
     const buttonCollector = ctx.lastReply.createMessageComponentCollector({
@@ -181,8 +181,6 @@ const flagsQuiz = new Subcommand({
 
       await ctx.lastReply?.reply(responseText);
 
-      //TODO: Add config support 
-
       // //MARK: update stats
 
       const defaultStats = {
@@ -224,8 +222,10 @@ const flagsQuiz = new Subcommand({
       }
     }
 		
-    buttonCollector.on("collect", (i: ButtonInteraction): void => void handleButtonInteraction(i) );
-    buttonCollector.on("end", (_): void => void handleButtonTimeout() );
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+    buttonCollector.on("collect", async (i: ButtonInteraction) => {await handleButtonInteraction(i);});
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+    buttonCollector.on("end", async (_) => {await handleButtonTimeout();});
 
     while (remainingTime) { //MARK: handle timer
       //sleep for less than a second because of slight timer delay
