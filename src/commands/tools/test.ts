@@ -64,7 +64,7 @@ const Test = new Command({
     await ctx.send(opts.role.get("roletest")?.name ?? "undefined");
 
     const mentionable = opts.mentionable.get("mentionabletest");
-    if (mentionable === undefined || mentionable === null) {
+    if (mentionable == null) {
       await ctx.send("undefined");
     } else if ("username" in mentionable) {
       await ctx.send(`<@${mentionable.id.toString()}>`);
@@ -73,7 +73,7 @@ const Test = new Command({
     }
 
     const channel = opts.channel.get("channeltest");
-    if (channel === undefined || channel === null) {
+    if (channel == null) {
       await ctx.send("undefined");
     } else {
       await ctx.send(`<#${channel.id.toString()}>` );
