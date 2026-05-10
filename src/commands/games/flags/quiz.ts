@@ -7,7 +7,7 @@ import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, Colors
 const FLAGS = flags as Flags;
 const DIFFICULTIES = FLAGS.difficulties.map(difficulty => difficulty.name);
 
-const flagsQuiz = new Subcommand({
+const FlagsQuiz = new Subcommand({
   name: "quiz",
   description: "Given a country, guess its flag.",
   options: [
@@ -243,7 +243,7 @@ const flagsQuiz = new Subcommand({
   },
 });
 
-export default flagsQuiz;
+export default FlagsQuiz;
 
 function sampleArray<T>(array: T[], sampleSize: number): T[] {
   const originalArray: T[] = [...array];

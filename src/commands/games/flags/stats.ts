@@ -2,7 +2,7 @@ import { Colors, EmbedBuilder } from "discord.js";
 import { CommandOption, Subcommand } from "src/utility/command.js";
 import { UserFlagStats } from "src/utility/types.js";
 
-const flagsStats = new Subcommand({
+const FlagsStats = new Subcommand({
   name: "stats",
   description: "flags stats",
   options: [
@@ -82,4 +82,4 @@ const flagsStats = new Subcommand({
   },
 });
 
-export default flagsStats;
+export default FlagsStats;

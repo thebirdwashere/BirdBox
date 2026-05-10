@@ -5,7 +5,7 @@ import { NonEmptyArray, UserFlagStats } from "src/utility/types.js";
 const STATISTICS = ["points", "win%", "streak"];
 type StatisticString = "points" | "win%" | "streak";
 
-const flagsBoard = new Subcommand({
+const FlagsBoard = new Subcommand({
   name: "leaderboard",
   description: "View high scores across all BirdBox users.",
   options: [
@@ -198,4 +198,4 @@ const flagsBoard = new Subcommand({
   },
 });
 
-export default flagsBoard;
+export default FlagsBoard;
