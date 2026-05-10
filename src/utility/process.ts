@@ -355,7 +355,7 @@ function populateMessageOptions(
       options.boolean.set(option.data.name, source === "true");
       break;
     case "string": {
-      if (option.choices && !option.choices.includes(source)) {
+      if (option.choices && !option.choices.map(e => e.toLowerCase()).includes(source.toLowerCase())) {
         console.log(source);
         console.log(option.choices);
         const optionsFormatter = new Intl.ListFormat("en", {type: "disjunction"});
