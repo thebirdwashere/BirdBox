@@ -119,7 +119,7 @@ async function getPetImage(type: string, breed: string | null, link: string): Pr
       breedId = petIds[petNames.indexOf(breed)];
       fetchString += `&breed_ids=${breedId}`;
     } else {
-      throw new Error(`Breed ${breed} could not be found.`);
+      throw new Error(`Breed "${breed}" could not be found.`);
     }
   }
 

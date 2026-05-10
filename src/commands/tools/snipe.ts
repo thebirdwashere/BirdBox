@@ -24,7 +24,7 @@ const Snipe = new Command({
 
     const snipedMember = await ctx.guild?.members.fetch(snipedMessage.authorID);
     if (!snipedMember)
-      throw new Error(`Error: Could not find the sniped user with ID ${snipedMessage.authorID}.`);
+      throw new Error(`Could not find the sniped user with ID ${snipedMessage.authorID}.`);
 
     const snipeEmbed = new EmbedBuilder()
       .setTitle(`Deleted from: <#${ctx.channel.id}>`)

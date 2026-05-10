@@ -28,7 +28,7 @@ export async function detectChatInputInteractionCommand(
   // Determine if command exists in registry.
   const command = data.registry.commands.get(commandName);
   if (command === undefined)
-    throw new Error(`Unknown or unregistered command: \`/${commandName}\``);
+    throw new Error(`Unknown or unregistered command \`/${commandName}\``);
 
   // Determine passed command options.
   let options = new Options();
@@ -68,7 +68,7 @@ export async function detectChatInputInteractionCommand(
 
     await command.execute(context, options);
   } else {
-    throw new Error(`Missing execute function in command: \`${commandName}\``);
+    throw new Error(`Missing execute function in command \`${commandName}\``);
   }
 }
 
@@ -220,7 +220,7 @@ export async function detectMessageCommand(
   // Determine if command exists in registry.
   const command = registry.commands.get(commandName);
   if (command === undefined)
-    throw new Error(`Unknown or unregistered command: \`/${commandName}\``);
+    throw new Error(`Unknown or unregistered command \`/${commandName}\``);
   // command: Command
 
   // Handle commands accordingly.
@@ -247,7 +247,7 @@ export async function detectMessageCommand(
   } else if (command.body !== undefined && isSubcommandArray(command.body)) {
     const subcommandName = args.shift();
     if (subcommandName === undefined)
-      throw new Error(`Subcommand missing in command: \`/${commandName}\``);
+      throw new Error(`Subcommand missing in command \`/${commandName}\``);
 
     let options = new Options();
 
@@ -277,7 +277,7 @@ export async function detectMessageCommand(
 
     await subcommand.execute(context, options);
   } else {
-    throw new Error(`Missing execute function in command: ${commandName}`);
+    throw new Error(`Missing execute function in command \`${commandName}\``);
   }
 }
 
@@ -438,13 +438,13 @@ export async function handleAutocomplete(
   const command = data.registry.commands.get(commandName);
 
   if (command === undefined)
-    throw new Error(`Unknown or unregistered command: \`/${commandName}\``);
+    throw new Error(`Unknown or unregistered command \`/${commandName}\``);
   
   if (command.body === undefined) {
-    throw new Error(`Autocomplete call on command without options: \`/${commandName}\``);
+    throw new Error(`Autocomplete call on command \`/${commandName}\` without provided options.`);
   } else if (isOptionArray(command.body)) {
     if (command.autocomplete === undefined)
-      throw new Error(`Missing autocomplete handler: \`/${commandName}\``);
+      throw new Error(`Missing autocomplete handler in command \`/${commandName}\``);
 
     const context = new AutocompleteContext(interaction, data);
     await command.autocomplete(context);
@@ -464,7 +464,7 @@ export async function handleAutocomplete(
     }
   
     if (subcommand.autocomplete === undefined)
-      throw new Error(`Missing autocomplete handler: \`/${commandName} ${subcommandName}\``);
+      throw new Error(`Missing autocomplete handler in command \`/${commandName} ${subcommandName}\``);
 
     const context = new AutocompleteContext(interaction, data);
     await subcommand.autocomplete(context);
