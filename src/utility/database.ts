@@ -43,18 +43,8 @@ export class Database {
   }
 }
 
-interface BaseTableManager {
-  data: StatementData;
-  tableName: string;
-
-  fetchOrUndefined(id: string, property: string): Exclude<unknown, undefined>;
-  fetchOr(id: string, property: string, def: unknown): unknown;
-  fetchOrElse(id: string, property: string, def: () => unknown): unknown;
-  update(id: string, property: string, value: unknown): void;
-}
-
-class TableManager implements BaseTableManager {
-  data: StatementData;
+class TableManager {
+  private data: StatementData;
   tableName: string;
 
   constructor(
@@ -143,6 +133,27 @@ class TableManager implements BaseTableManager {
   }
 
   /**
+   * Returns a map of the database with ID as the keys and the property as the values,  
+   * omitting rows where the property does not exist.
+   */
+  fetchMap(property: string): Map<string, unknown> {
+    const dataAll = this.data.fetchKeyValue.iterate();
+    const propertyMap =  new Map<string, unknown>();
+
+    for (const row of dataAll) {
+      const data = parseDataAsJSON(row);
+      if (!("cast(id as text)" in row) || row["cast(id as text)"] === null)
+        throw new Error("Expected id property in database query.");
+
+      if (data[property] !== undefined) {
+        propertyMap.set(row["cast(id as text)"].toString(), data[property]);
+      }
+    }
+
+    return propertyMap;
+  }
+
+  /**
    * Updates the value of the property to a new value. Creates the row or the property if necessary.
    */
   update(id: string, property: string, value: unknown): void {
@@ -164,6 +175,7 @@ class StatementData {
   update: StatementSync;
   fetch: StatementSync;
   fetchUnconstrained: StatementSync;
+  fetchKeyValue: StatementSync;
 
   constructor (
     db: DatabaseSync,
@@ -190,6 +202,11 @@ class StatementData {
 
     this.fetchUnconstrained = db.prepare(`
       SELECT json 
+      FROM ${tableName}
+    `);
+
+    this.fetchKeyValue = db.prepare(`
+      SELECT cast(id as text), json 
       FROM ${tableName}
     `);
   }
