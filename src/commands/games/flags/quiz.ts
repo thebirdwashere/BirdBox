@@ -1,10 +1,11 @@
 import { Subcommand, CommandOption } from "src/utility/command.js";
 import flags from "src/data/flags.json" with { type: "json" };
-import { Flags, UserFlagStats } from "src/utility/types.js";
+import { Flags, NonEmptyArray, UserFlagStats } from "src/utility/types.js";
 import { randomChoice, sleep } from "src/utility/utility.js";
 import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, Colors, ComponentType, EmbedBuilder } from "discord.js";
 
 const FLAGS = flags as Flags;
+const DIFFICULTIES = FLAGS.difficulties.map(difficulty => difficulty.name);
 
 const flagsQuiz = new Subcommand({
   name: "quiz",
@@ -15,33 +16,18 @@ const flagsQuiz = new Subcommand({
       description: "Change how many flags are available to guess.",
       type: "string",
       required: false,
-      autocomplete: true,
+      choices: DIFFICULTIES as NonEmptyArray<string>,
     }),
   ],
-  autocomplete: async (ctx) => {
-    const difficultyOptions = FLAGS.difficulties.map(difficulty => difficulty.name);
-
-    if (difficultyOptions.length === 0)
-      throw new Error("No difficulties provided for `flags` command.");
-
-    await ctx.respondStrings(difficultyOptions);
-  },
   execute: async (ctx, opts) => { //MARK: game setup
-    const difficultyOptions: Record<string, number> = FLAGS.difficulties.map(difficulty => difficulty.name.toLowerCase()).reduce((acc: Record<string, number>, current, i) => {
-      acc[current] = i;
+    const difficultyOptions: Record<string, number> = DIFFICULTIES.reduce((acc: Record<string, number>, current, i) => {
+      acc[current.toLowerCase()] = i;
       return acc;
     }, {});
 
-    const providedDifficulty = opts.string.get("difficulty");
-    if (providedDifficulty != null && !(providedDifficulty.toLowerCase() in difficultyOptions)) {
-      const optionsFormatter = new Intl.ListFormat("en", {
-        type: "conjunction",
-      });
-      const difficultyOptionsList = optionsFormatter.format(FLAGS.difficulties.map(difficulty => `\`${difficulty.name}\``));
-      throw new Error(`Provided difficulty "${providedDifficulty}" is invalid. The available difficulty options are ${difficultyOptionsList}.`);
-    }
+    const providedDifficulty = opts.string.get("difficulty") ?? DIFFICULTIES[0];
 		
-    const selectedDifficulty = providedDifficulty != null ? FLAGS.difficulties[difficultyOptions[providedDifficulty.toLowerCase()]] : FLAGS.difficulties[0];
+    const selectedDifficulty = FLAGS.difficulties[difficultyOptions[providedDifficulty.toLowerCase()]];
     const flagsNum = selectedDifficulty.flags;
 		
     //get all flag names and emojis
@@ -139,7 +125,7 @@ const flagsQuiz = new Subcommand({
       }
 
       //if user is wrong
-      if (i.customId != rightFlagEmoji && !wrongUsers.includes(userId)) {
+      if (i.customId !== rightFlagEmoji && !wrongUsers.includes(userId)) {
         //if user previously correct, take them out of correct array
         if (correctUsers.includes(userId)) {
           correctUsers.splice(correctUsers.indexOf(userId), 1);

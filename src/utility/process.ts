@@ -356,8 +356,6 @@ function populateMessageOptions(
       break;
     case "string": {
       if (option.choices && !option.choices.map(e => e.toLowerCase()).includes(source.toLowerCase())) {
-        console.log(source);
-        console.log(option.choices);
         const optionsFormatter = new Intl.ListFormat("en", {type: "disjunction"});
         const choicesList = optionsFormatter.format(option.choices.map(choice => `\`${choice}\``));
         throw new Error(`Provided "${source}" is invalid for option "${option.data.name}". Option must be one of ${choicesList}.`);

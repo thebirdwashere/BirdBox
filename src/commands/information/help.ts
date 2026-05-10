@@ -27,7 +27,7 @@ const Help = new Command({
       else return 0;
     });
 
-    if (requestedCommand != null) {
+    if (requestedCommand !== null) {
 
       const requestedCommandData = commandsList.find(cmd => cmd.data.name === requestedCommand)?.data;
       if (requestedCommandData == null) throw new Error("Requested command not found.");
@@ -51,7 +51,7 @@ const Help = new Command({
           const optionDescription = optionJSON.description;
 
           let subOptions = "";
-          if ("options" in optionJSON && optionJSON.options != null && optionJSON.options.length > 0) {
+          if ("options" in optionJSON && optionJSON.options !== undefined && optionJSON.options.length > 0) {
             subOptions = ` \nSub-options: ${optionJSON.options.map(opt => `\`${opt.name}\``).join(", ")}`;
           }
 
