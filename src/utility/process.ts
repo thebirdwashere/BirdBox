@@ -19,6 +19,7 @@ import { Registry } from "./registry.js";
 import { Data, NonEmptyReadonlyArray } from "./types.js";
 import { sleep } from "./utility.js";
 
+//MARK: ChatInput
 export async function detectChatInputInteractionCommand(
   data: Data,
   interaction: ChatInputCommandInteraction,
@@ -72,6 +73,7 @@ export async function detectChatInputInteractionCommand(
   }
 }
 
+//MARK: ChatInput Options
 function parseCommandOptions(
   command: Command | Subcommand,
   interaction: ChatInputCommandInteraction,
@@ -188,6 +190,7 @@ function parseCommandOptions(
   return options;
 }
 
+//MARK: Message
 export async function detectMessageCommand(
   registry: Registry,
   data: Data,
@@ -281,6 +284,7 @@ export async function detectMessageCommand(
   }
 }
 
+//MARK: Message Options
 function populateMessageOptions(
   sources: string[],
   targets: NonEmptyReadonlyArray<CommandOption>,
@@ -430,6 +434,7 @@ function populateMessageOptions(
   return options;
 }
 
+//MARK: Autocomplete
 export async function handleAutocomplete(
   data: Data,
   interaction: AutocompleteInteraction,

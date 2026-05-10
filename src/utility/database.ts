@@ -3,6 +3,7 @@ import { DatabaseRecord } from "./types.js";
 
 //TODO: support bot-global config
 
+//MARK: Database
 export class Database {
   inner: DatabaseSync;
   user: TableManager;
@@ -43,6 +44,7 @@ export class Database {
   }
 }
 
+//MARK: TableManager
 class TableManager {
   private data: StatementData;
   tableName: string;
@@ -170,6 +172,7 @@ class TableManager {
   }
 }
 
+//MARK: StatementData
 class StatementData {
   createIfNotExists: StatementSync;
   update: StatementSync;

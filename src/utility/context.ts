@@ -23,6 +23,7 @@ export interface BaseContext {
   db: Database;
 }
 
+//MARK: CommandContext
 export interface CommandContext extends BaseContext {
   data: Data;
   channel: TextBasedChannel | null;
@@ -64,6 +65,7 @@ export interface CommandContext extends BaseContext {
   sendTyping: () => Promise<void>;
 }
 
+//MARK: MessageContext
 export class MessageContext implements CommandContext {
   message: Message;
 
@@ -122,6 +124,7 @@ export class MessageContext implements CommandContext {
   }
 }
 
+
 export interface SubcommandContext {
   currentSubcommand: string;
   parentCommand: string;
@@ -138,6 +141,7 @@ export class MessageSubcommandContext extends MessageContext implements Subcomma
   }
 }
 
+//MARK: ChatInputCommandInteractionContext
 export class ChatInputCommandInteractionContext implements CommandContext {
   interaction: ChatInputCommandInteraction;
 
@@ -213,6 +217,7 @@ export class ChatInputCommandInteractionSubcommandContext extends ChatInputComma
   }
 }
 
+//MARK: AutocompleteContext
 export class AutocompleteContext implements BaseContext {
   interaction: AutocompleteInteraction;
   option:  AutocompleteFocusedOption;
@@ -223,6 +228,17 @@ export class AutocompleteContext implements BaseContext {
   user: User;
   timestamp: number;
   db: Database;
+
+  constructor(interaction: AutocompleteInteraction, data: Data) {
+    this.interaction = interaction;
+    this.option = interaction.options.getFocused(true);
+    this.data = data;
+    this.user = interaction.user;
+    this.guild = interaction.guild;
+    this.channel = interaction.channel;
+    this.timestamp = interaction.createdTimestamp;
+    this.db = data.db;
+  }
 
   /**
    * Attempts to respond to the autocomplete with a list of choices.
@@ -267,17 +283,6 @@ export class AutocompleteContext implements BaseContext {
     choices: ApplicationCommandOptionChoiceData[]
   ): Promise<void> {
     await this.interaction.respond(choices);
-  }
-
-  constructor(interaction: AutocompleteInteraction, data: Data) {
-    this.interaction = interaction;
-    this.option = interaction.options.getFocused(true);
-    this.data = data;
-    this.user = interaction.user;
-    this.guild = interaction.guild;
-    this.channel = interaction.channel;
-    this.timestamp = interaction.createdTimestamp;
-    this.db = data.db;
   }
 }
 

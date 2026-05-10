@@ -21,6 +21,7 @@ import { Data, Perms, SnipedMessage } from "./utility/types.js";
 
 import { Database } from "./utility/database.js";
 
+//MARK: Data & Registry
 const BOT_TOKEN =
   process.env.BOT_TOKEN ?? panic("Failed to find BOT_TOKEN in environment.");
 const BOT_ID =
@@ -58,6 +59,7 @@ CLIENT.on(Events.ClientReady, (_event) => {
   REGISTRY.registerCommands(BOT_TOKEN, BOT_ID).catch(console.error);
 });
 
+//MARK: Interaction
 CLIENT.on(Events.InteractionCreate, (interaction) => {
   if (interaction.isChatInputCommand()) {
     detectChatInputInteractionCommand(DATA, interaction).catch(
@@ -74,6 +76,7 @@ CLIENT.on(Events.InteractionCreate, (interaction) => {
   }
 });
 
+//MARK: Message
 CLIENT.on(Events.MessageCreate, (message) => {
   if (message.author.bot) return;
 
@@ -92,6 +95,7 @@ CLIENT.on(Events.MessageCreate, (message) => {
   void REGISTRY.testInterjections(context);
 });
 
+//MARK: Delete
 CLIENT.on(Events.MessageDelete, (message) => {
   //TODO: Add config consent here
   const snipeData = {

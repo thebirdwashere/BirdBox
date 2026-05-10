@@ -24,6 +24,7 @@ import { CommandContext, AutocompleteContext } from "./context.js";
 import { panic } from "./utility.js";
 import { NonEmptyArray, NonEmptyReadonlyArray } from "./types.js";
 
+//MARK: Command
 export class Command {
   data: SlashCommandBuilder;
   body?:
@@ -97,6 +98,7 @@ export class Command {
   }
 }
 
+//MARK: Subcommand
 export class Subcommand {
   data: SlashCommandSubcommandBuilder;
   body?: NonEmptyReadonlyArray<CommandOption>;
@@ -157,6 +159,7 @@ export class Subcommand {
   }
 }
 
+//MARK: CommandOption
 export type CommandOptionType = "number" | "boolean" | "string" 
 | "user" | "role" | "mentionable" | "channel";
 
@@ -243,6 +246,7 @@ export class CommandOption {
   }
 }
 
+//MARK: Utils
 export class Options {
   number: Map<string, number | null>;
   boolean: Map<string, boolean | null>;

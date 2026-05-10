@@ -21,6 +21,7 @@ const flagsBoard = new Subcommand({
     await ctx.respondStrings(STATISTICS);
   },
   execute: async (ctx, opts) => {
+    //MARK: common
     const statisticChoice = (opts.string.get("statistic") ?? STATISTICS[0]) as StatisticString;
 
     //get game stats for every player
@@ -93,7 +94,7 @@ const flagsBoard = new Subcommand({
 
         finalizeEmbed();
       },
-      "win%": async () => { //MARK: win % board
+      "win%": async () => { //MARK: win% board
         leaderboardEmbed.setTitle("Flag Quiz - Highest Win Percentage");
 
         leaderboardArray = [];
@@ -148,7 +149,7 @@ const flagsBoard = new Subcommand({
     //execute correct statistic display
     await statisticDisplays[statisticChoice]();
     
-    //MARK: create board selector
+    //MARK: selector
     const boardSelector = new StringSelectMenuBuilder()
       .setCustomId("boardSelector")
       .setPlaceholder("Select leaderboard statistic...")
