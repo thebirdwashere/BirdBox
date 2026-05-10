@@ -7,6 +7,17 @@ import {
   SlashCommandIntegerOption,
   SlashCommandUserOption,
   User,
+  Role,
+  SlashCommandRoleOption,
+  SlashCommandMentionableOption,
+  SlashCommandChannelOption,
+  APIRole,
+  GuildMember,
+  APIInteractionDataResolvedGuildMember,
+  BaseChannel,
+  APIInteractionDataResolvedChannelBase,
+  ChannelType,
+  Channel,
 } from "discord.js";
 import { CommandContext, AutocompleteContext } from "./context.js";
 import { panic } from "./utility.js";
@@ -56,6 +67,15 @@ export class Command {
           break;
         case ApplicationCommandOptionType.User:
           this.data.addUserOption(option.data);
+          break;
+        case ApplicationCommandOptionType.Role:
+          this.data.addRoleOption(option.data);
+          break;
+        case ApplicationCommandOptionType.Mentionable:
+          this.data.addMentionableOption(option.data);
+          break;
+        case ApplicationCommandOptionType.Channel:
+          this.data.addChannelOption(option.data);
           break;
         default:
           panic("Unimplemented data type.");
@@ -117,6 +137,15 @@ export class Subcommand {
         case ApplicationCommandOptionType.User:
           this.data.addUserOption(option.data);
           break;
+        case ApplicationCommandOptionType.Role:
+          this.data.addRoleOption(option.data);
+          break;
+        case ApplicationCommandOptionType.Mentionable:
+          this.data.addMentionableOption(option.data);
+          break;
+        case ApplicationCommandOptionType.Channel:
+          this.data.addChannelOption(option.data);
+          break;
         default:
           panic("Unimplemented data type.");
         }
@@ -126,14 +155,18 @@ export class Subcommand {
   }
 }
 
-export type CommandOptionType = "number" | "boolean" | "string" | "user";
+export type CommandOptionType = "number" | "boolean" | "string" 
+| "user" | "role" | "mentionable" | "channel";
 
 export class CommandOption {
   data:
     | SlashCommandIntegerOption
     | SlashCommandBooleanOption
     | SlashCommandStringOption
-    | SlashCommandUserOption;
+    | SlashCommandUserOption
+    | SlashCommandRoleOption
+    | SlashCommandMentionableOption
+    | SlashCommandChannelOption;
   type: CommandOptionType;
   autocomplete?: true;
 
@@ -158,8 +191,17 @@ export class CommandOption {
     case "user":
       this.data = new SlashCommandUserOption();
       break;
+    case "role":
+      this.data = new SlashCommandRoleOption();
+      break;
+    case "mentionable":
+      this.data = new SlashCommandMentionableOption();
+      break;
+    case "channel":
+      this.data = new SlashCommandChannelOption();
+      break;
     }
-
+    
     this.data
       .setName(args.name)
       .setDescription(args.description)
@@ -176,12 +218,18 @@ export class Options {
   boolean: Map<string, boolean | null>;
   string: Map<string, string | null>;
   user: Map<string, User | null>;
+  role: Map<string, Role | APIRole | null>;
+  mentionable: Map<string, User | Role | APIRole | GuildMember | APIInteractionDataResolvedGuildMember | null>;
+  channel: Map<string, Channel | BaseChannel | APIInteractionDataResolvedChannelBase<ChannelType> | null>;
 
   constructor() {
     this.number = new Map<string, number | null>();
     this.boolean = new Map<string, boolean | null>();
     this.string = new Map<string, string | null>();
     this.user = new Map<string, User | null>();
+    this.role = new Map<string, Role | APIRole | null>();
+    this.mentionable = new Map<string, User | Role | APIRole | GuildMember | APIInteractionDataResolvedGuildMember | null>();
+    this.channel = new Map<string, Channel | BaseChannel | APIInteractionDataResolvedChannelBase<ChannelType> | null>();
   }
 };
 

@@ -1,4 +1,4 @@
-import { AutocompleteInteraction, ChatInputCommandInteraction, Message } from "discord.js";
+import { AutocompleteInteraction, Channel, ChatInputCommandInteraction, Message, Role, User } from "discord.js";
 import {
   CommandOption,
   isOptionArray,
@@ -140,6 +140,48 @@ function parseCommandOptions(
         options.user.set(option.data.name, opt);
       }
       break;
+    case "role":
+      {
+        const opt = interaction.options.getRole(
+          option.data.name,
+          option.data.required,
+        );
+        if (opt === null && option.data.required)
+          throw new Error(
+            `Required option missing: \`${option.data.name}\``,
+          );
+
+        options.role.set(option.data.name, opt);
+      }
+      break;
+    case "mentionable":
+      {
+        const opt = interaction.options.getMentionable(
+          option.data.name,
+          option.data.required,
+        );
+        if (opt === null && option.data.required) 
+          throw new Error(
+            `Required option missing: \`${option.data.name}\``,
+          );
+
+        options.mentionable.set(option.data.name, opt);
+      }
+      break;
+    case "channel":
+      {
+        const opt = interaction.options.getChannel(
+          option.data.name,
+          option.data.required,
+        );
+        if (opt === null && option.data.required) 
+          throw new Error(
+            `Required option missing: \`${option.data.name}\``,
+          );
+
+        options.channel.set(option.data.name, opt);
+      }
+      break;
     }
   }
 
@@ -246,23 +288,38 @@ function populateMessageOptions(
 ): Options {
   const options = new Options();
 
+  //the middle bit captures IDs, 
+  //the outer is just how discord represents these things
+  const USER_PING_REGEX = /<@(\d{18,19})>/;
+  const ROLE_PING_REGEX = /<@&(\d{18,19})>/;
+  const CHANNEL_LINK_REGEX = /<#(\d{18,19})>/;
+
   for (const [index, option] of targets.entries()) {
     let sourceType: "optional" | CommandOptionType;
     const targetType = option.type;
 
     const source = sources[index];
 
-    //captures a ping <@ID>, hence the weirdness
-    const USER_PING_REGEX = /<@(\d{18,19})>/;
+    const isUserPing = USER_PING_REGEX.test(source);
+    const isRolePing = ROLE_PING_REGEX.test(source);
 
     if (source === "!") {
       sourceType = "optional";
+    } else if (targetType === "string") {
+      //anything can be a string if it needs to be
+      sourceType = "string";
     } else if (!isNaN(Number(sources.at(index)))) {
       sourceType = "number";
     } else if (source === "true" || source === "false") {
       sourceType = "boolean";
-    } else if (USER_PING_REGEX.test(source)) {
+    } else if ((isUserPing || isRolePing) && targetType === "mentionable") {
+      sourceType = "mentionable";
+    } else if (isUserPing) {
       sourceType = "user";
+    } else if (isRolePing) {
+      sourceType = "role";
+    } else if (CHANNEL_LINK_REGEX.test(source)) {
+      sourceType = "channel";
     } else {
       sourceType = "string";
     }
@@ -273,6 +330,21 @@ function populateMessageOptions(
           `is of type \`${sourceType}\` ` +
           `when type \`${targetType}\` was expected.`,
       );
+    }
+
+    function getMentionableFromID(regex: RegExp, type: "user"): User;
+    function getMentionableFromID(regex: RegExp, type: "role"): Role;
+    function getMentionableFromID(regex: RegExp, type: "channel"): Channel;
+    function getMentionableFromID(regex: RegExp, type: "user" | "role" | "channel"): User | Role | Channel {
+      const pingedID = (regex.exec(source))?.at(1);
+      if (pingedID === undefined)
+        throw new Error(`Error parsing pinged ${type} for command option "${option.data.name}".`);
+
+      const pingedThing = message.mentions[`${type}s`].get(pingedID);
+      if (pingedThing === undefined)
+        throw new Error(`Error locating pinged ${type} for command option "${option.data.name}".`);
+      
+      return pingedThing;
     }
 
     switch (sourceType) {
@@ -286,15 +358,29 @@ function populateMessageOptions(
       options.string.set(option.data.name, source);
       break;
     case "user": {
-      const pingedUserID = (USER_PING_REGEX.exec(source))?.at(1);
-      if (pingedUserID === undefined)
-        throw new Error(`Error parsing pinged user for command option "${option.data.name}".`);
-
-      const pingedUser = message.mentions.parsedUsers.get(pingedUserID);
-      if (pingedUser === undefined)
-        throw new Error(`Error locating pinged user for command option "${option.data.name}".`);
-      
+      const pingedUser = getMentionableFromID(USER_PING_REGEX, "user");
       options.user.set(option.data.name, pingedUser);
+      break;
+    } case "role": {
+      const pingedRole = getMentionableFromID(ROLE_PING_REGEX, "role");
+      options.role.set(option.data.name, pingedRole);
+      break;
+    } case "mentionable": {
+      if (isUserPing) {
+        const pingedUser = getMentionableFromID(USER_PING_REGEX, "user");
+        options.mentionable.set(option.data.name, pingedUser);
+        break;
+      } else if (isRolePing) {
+        const pingedRole = getMentionableFromID(ROLE_PING_REGEX, "role");
+        options.mentionable.set(option.data.name, pingedRole);
+        break;
+      } else {
+        //this should not happen.
+        throw new Error("Unexpected issue occured parsing mentionable.");
+      }
+    } case "channel": {
+      const linkedChannel = getMentionableFromID(CHANNEL_LINK_REGEX, "channel");
+      options.channel.set(option.data.name, linkedChannel);
       break;
     }
     case "optional":
@@ -313,6 +399,15 @@ function populateMessageOptions(
         break;
       case "user":
         options.user.set(option.data.name, null);
+        break;
+      case "role":
+        options.role.set(option.data.name, null);
+        break;
+      case "mentionable":
+        options.mentionable.set(option.data.name, null);
+        break;
+      case "channel":
+        options.channel.set(option.data.name, null);
         break;
       }
       break;
