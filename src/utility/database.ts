@@ -163,9 +163,14 @@ class TableManager {
 
     const data = parseDataAsJSON(this.data.fetch.get({id}));
 
-    if (data[property] !== undefined && typeof data[property] !== typeof value)
+    if (
+      data[property] !== undefined 
+      && value !== undefined 
+      && typeof data[property] !== typeof value
+    ) {
       throw new Error(`Type "${typeof value}" provided to ${this.tableName.toLowerCase()} database property "${property}", when type "${typeof data}" was expected.`);
-    
+    }
+
     data[property] = value;
     
     this.data.update.run({id, json: JSON.stringify(data)});
