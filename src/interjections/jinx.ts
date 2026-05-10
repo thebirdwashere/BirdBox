@@ -1,11 +1,10 @@
-import { MessageContext } from "src/utility/context.js";
 import { Interjection } from "src/utility/interjection.js";
 
 const JINX_WINDOW = 3000;
 
 const Jinx = new Interjection({
   name: "jinx",
-  test: async (ctx: MessageContext) => {
+  test: async (ctx) => {
     if (!ctx.channel) return;
 
     const previousMessages = await ctx.channel.messages.fetch({limit:2});

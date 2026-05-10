@@ -1,4 +1,3 @@
-import { MessageContext } from "src/utility/context.js";
 import { Interjection } from "src/utility/interjection.js";
 import periodic_table from "src/data/periodic_table.json" with { type: "json" };
 import { PeriodicTable } from "src/utility/types.js";
@@ -10,7 +9,7 @@ const MIN_UNIQUE_ELEMENTS = 6;
 
 const Periodic = new Interjection({
   name: "periodic table",
-  test: async (ctx: MessageContext) => {
+  test: async (ctx) => {
     const content = ctx.message.content.toLowerCase();
 
     //this checks if the message is empty or too long

@@ -1,7 +1,5 @@
 import { Command, CommandOption } from "src/utility/command.js";
 import { Message } from "discord.js";
-import { CommandContext } from "src/utility/context.js";
-import { Options } from "src/utility/types.js";
 import { randomChoice, sleep } from "src/utility/utility.js";
 
 const Diceroll = new Command({
@@ -15,7 +13,7 @@ const Diceroll = new Command({
       required: false,
     }),
   ],
-  execute: async (ctx: CommandContext, opts: Options) => {
+  execute: async (ctx, opts) => {
     let sides = opts.number.get("sides") ?? 6;
     if (isNaN(sides)) sides = 6;
 

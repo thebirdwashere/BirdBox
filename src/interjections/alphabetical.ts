@@ -1,11 +1,10 @@
-import { MessageContext } from "src/utility/context.js";
 import { Interjection } from "src/utility/interjection.js";
 
 const MIN_WORD_LENGTH = 5;
 
 const Alphabetical = new Interjection({
   name: "alphabetical order",
-  test: async (ctx: MessageContext) => {
+  test: async (ctx) => {
     const content = ctx.message.content.toLowerCase();
 
     if (content.length > 1935) return;       //message is too long for embeds

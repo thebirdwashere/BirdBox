@@ -1,4 +1,3 @@
-import { MessageContext } from "src/utility/context.js";
 import { Interjection } from "src/utility/interjection.js";
 import keywords from "src/data/keywords.json" with { type: "json" };
 import { Keywords } from "src/utility/types.js";
@@ -7,7 +6,7 @@ const KEYWORDS = keywords as Keywords;
 
 const Pangram = new Interjection({
   name: "keywords",
-  test: async(ctx: MessageContext) => {
+  test: async(ctx) => {
     //filter and get message content for detection
     const filterRegex = /[^A-Za-z\s!?]/g;
     const content = ctx.message.content.toLowerCase().replace(filterRegex,"").trim();

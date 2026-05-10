@@ -1,9 +1,8 @@
-import { MessageContext } from "src/utility/context.js";
 import { Interjection } from "src/utility/interjection.js";
 
 const Pangram = new Interjection({
   name: "pangrams",
-  test: async (ctx: MessageContext) => {
+  test: async (ctx) => {
     const alphabet = "abcdefghijklmnopqrstuvwxyz".split("");
     const content = ctx.message.content.toLowerCase();
 

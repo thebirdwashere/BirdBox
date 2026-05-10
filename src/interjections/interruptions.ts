@@ -1,4 +1,3 @@
-import { MessageContext } from "src/utility/context.js";
 import { Interjection } from "src/utility/interjection.js";
 import interruptions from "src/data/interruptions.json" with { type: "json" };
 import { ResponsesList } from "src/utility/types.js";
@@ -10,7 +9,7 @@ const CHANCE_OF_INTERRUPTING = 1000;
 
 const Interruptions = new Interjection({
   name: "interruptions",
-  test: async (ctx: MessageContext) => {
+  test: async (ctx) => {
     const randomInt = Math.floor(Math.random() * CHANCE_OF_INTERRUPTING) + 1;
 
     if (randomInt == CHANCE_OF_INTERRUPTING) {
