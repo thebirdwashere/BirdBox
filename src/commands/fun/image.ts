@@ -62,6 +62,7 @@ const Image = new Command({
           description: "Which result format you want. Must be one of `image` or `gif`.",
           type: "string",
           required: false,
+          choices: ["image", "gif"]
         }),
         new CommandOption({
           name: "breed",
