@@ -6,6 +6,7 @@ import {
   Command,
   Subcommand,
   CommandOptionType,
+  Options,
 } from "./command.js";
 import {
   ChatInputCommandInteractionContext,
@@ -15,7 +16,7 @@ import {
   AutocompleteContext
 } from "./context.js";
 import { Registry } from "./registry.js";
-import { Data, Options } from "./types.js";
+import { Data } from "./types.js";
 import { sleep } from "./utility.js";
 
 export async function detectChatInputInteractionCommand(

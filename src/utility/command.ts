@@ -6,10 +6,10 @@ import {
   SlashCommandStringOption,
   SlashCommandIntegerOption,
   SlashCommandUserOption,
+  User,
 } from "discord.js";
 import { CommandContext, AutocompleteContext } from "./context.js";
 import { panic } from "./utility.js";
-import { Options } from "./types.js";
 
 export class Command {
   data: SlashCommandBuilder;
@@ -170,6 +170,20 @@ export class CommandOption {
     }
   }
 }
+
+export class Options {
+  number: Map<string, number | null>;
+  boolean: Map<string, boolean | null>;
+  string: Map<string, string | null>;
+  user: Map<string, User | null>;
+
+  constructor() {
+    this.number = new Map<string, number | null>();
+    this.boolean = new Map<string, boolean | null>();
+    this.string = new Map<string, string | null>();
+    this.user = new Map<string, User | null>();
+  }
+};
 
 export function isSubcommandArray(
   body:
