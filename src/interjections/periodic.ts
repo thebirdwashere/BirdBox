@@ -1,8 +1,12 @@
-import { Interjection } from "src/utility/interjection.js";
+import { Interjection, notifyOfInterjection } from "src/utility/interjection.js";
 import periodic_table from "src/data/periodic_table.json" with { type: "json" };
+import footers from "src/data/footers.json" with { type: "json" };
+import { Footers } from "src/utility/types.js";
 import { PeriodicTable } from "src/utility/types.js";
+import { randomChoice } from "src/utility/utility.js";
 
 const PERIODIC_TABLE = periodic_table as PeriodicTable;
+const FOOTERS = footers as Footers;
 
 const MIN_CHAR_LENGTH = 35;
 const MIN_UNIQUE_ELEMENTS = 6;
@@ -43,13 +47,24 @@ const Periodic = new Interjection({
 
     const tableArray = periodicCheck(cleanContent, [], 0);
 
-    if (tableArray) { //if a value was returned
-      const uniqueItems = [...new Set(tableArray)];
+    if (!tableArray) return; //ensure a value was returned
+    const uniqueItems = [...new Set(tableArray)];
 
-      if (uniqueItems.length >= MIN_UNIQUE_ELEMENTS) {
-        await ctx.message.reply(`:test_tube: Your message is on the periodic table! \n\`${tableArray.join("")}\``);
-      }
-    }
+    if (uniqueItems.length < MIN_UNIQUE_ELEMENTS) return;
+
+    const periodicString = tableArray.join("");
+    await ctx.message.reply(`:test_tube: Your message is on the periodic table! \n\`${periodicString}\``);
+
+    const randomFooter = randomChoice(FOOTERS.periodic)
+      .replace("[[USERNAME]]", ctx.user.displayName.toLowerCase());
+        
+    await notifyOfInterjection(ctx, {
+      "color": 0x21c369,
+      "description": "in on the periodic table",
+      "displayString": periodicString,
+      "emoji": ":test_tube:",
+      "footer": randomFooter,
+    });
   }
 });
 

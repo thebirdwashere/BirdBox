@@ -1,4 +1,9 @@
-import { Interjection } from "src/utility/interjection.js";
+import { Interjection, notifyOfInterjection } from "src/utility/interjection.js";
+import { randomChoice } from "src/utility/utility.js";
+import footers from "src/data/footers.json" with { type: "json" };
+import { Footers } from "src/utility/types.js";
+
+const FOOTERS = footers as Footers;
 
 const MIN_WORD_LENGTH = 5;
 
@@ -21,11 +26,27 @@ const Alphabetical = new Interjection({
 
     //if the sorted content is the same, logically,
     //the original message was in alphabetical order
-    if (splitContent.join(" ") === sortedContent.join(" ")) { 
-      //capitalize each first letter
-      const response = splitContent.map(word => {return word[0].toUpperCase() + word.substring(1);}).join(" ");
-      await ctx.reply(`:abc: Your message is in perfect alphabetical order! \n\`${response}\``);
-    };
+    if (splitContent.join(" ") !== sortedContent.join(" ")) return;
+
+    //capitalize each first letter
+    const responseWords = splitContent.map(word => {return word[0].toUpperCase() + word.substring(1);});
+    const responseText = responseWords.join(" ");
+    await ctx.reply(`:abc: Your message is in perfect alphabetical order! \n\`${responseText}\``);
+
+    //get the random footer for the embed
+    const randomWord = randomChoice(responseWords);
+    const randomLetter = randomWord[0].toUpperCase();
+    const randomFooter = randomChoice(FOOTERS.alphabetical)
+      .replace("[[RANDOMWORD]]", randomWord)
+      .replace("[[RANDOMLETTER]]", randomLetter);
+    
+    await notifyOfInterjection(ctx, {
+      "color": 0x3b88c3,
+      "description": "is in perfect alphabetical order",
+      "displayString": responseText,
+      "emoji": ":abc:",
+      "footer": randomFooter,
+    });
   }
 });
 

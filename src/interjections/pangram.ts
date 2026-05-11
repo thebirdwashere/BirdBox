@@ -1,4 +1,9 @@
-import { Interjection } from "src/utility/interjection.js";
+import { Interjection, notifyOfInterjection } from "src/utility/interjection.js";
+import { randomChoice } from "src/utility/utility.js";
+import footers from "src/data/footers.json" with { type: "json" };
+import { Footers } from "src/utility/types.js";
+
+const FOOTERS = footers as Footers;
 
 const Pangram = new Interjection({
   name: "pangrams",
@@ -16,7 +21,18 @@ const Pangram = new Interjection({
       capitalizedContent[letterIndex] = capitalizedContent[letterIndex].toUpperCase();
     }
 
-    await ctx.reply(`:capital_abcd: Your message contains every letter in the alphabet! \n\`${capitalizedContent.join("")}\``);
+    const pangramString = capitalizedContent.join("");
+    await ctx.reply(`:capital_abcd: Your message contains every letter in the alphabet! \n\`${pangramString}\``);
+
+    const randomFooter = randomChoice(FOOTERS.pangrams);
+        
+    await notifyOfInterjection(ctx, {
+      "color": 0x3b88c3,
+      "description": "contains every letter in the alphabet",
+      "displayString": pangramString,
+      "emoji": ":capital_abcd:",
+      "footer": randomFooter,
+    });
   }
 });
 

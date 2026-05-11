@@ -1,8 +1,6 @@
 import { DatabaseSync, StatementSync } from "node:sqlite";
 import { DatabaseRecord } from "./types.js";
 
-//TODO: support bot-global config
-
 //MARK: Database
 export class Database {
   inner: DatabaseSync;

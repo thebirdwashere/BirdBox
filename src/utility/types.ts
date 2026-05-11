@@ -84,6 +84,9 @@ export interface Footers {
   magic8ball: string[];
   help: string[];
   snipe: string[];
+  alphabetical: string[];
+  periodic: string[];
+  pangrams: string[];
 };
 
 export type Keywords = Record<string, string>;

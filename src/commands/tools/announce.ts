@@ -27,14 +27,14 @@ const Announce = new Command({
     //autocomplete suggested this why. this looks awful. what is this. ig its compact tho
     announceChannelId ??= ctx.channel.id;
 
-    if (typeof announceChannelId !== "string") 
+    if (typeof announceChannelId !== "string")
       throw new Error("No announcement channel provided, or provided data was not a channel ID.");
 
     const announceChannel = ctx.guild.channels.cache.get(announceChannelId);
 
     if (announceChannel === undefined) 
       throw new Error("Provided ID could not be located. Ensure the requested channel exists in this server.");
-    
+
     if (!("send" in announceChannel)) 
       throw new Error("Provided channel does not support sent messages.");
 
