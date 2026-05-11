@@ -1,5 +1,11 @@
 import path from "path";
 import { CommandContext } from "./context.js";
+import perms from "src/data/perms.json" with { type: "json" };
+import { Perms } from "./types.js";
+
+const PERMS = perms as Perms;
+
+//MARK: General
 
 /**
  * Brings the program to a complete halt with the provided error message. Avoid
@@ -40,10 +46,19 @@ export function randomChoice<T>(array: T[]): T {
 }
 
 /**
+ * Returns an array of every ID in perms.json.
+ */
+export function getAdminIds(): string[] {
+  return (Object.values(PERMS) as Record<string, string[]>[])
+    .map(item => Object.values(item))
+    .flat(2);
+}
+
+/**
  * Map wrapper with various utility methods to ensure values exist or optionally
  * return defaults.
  */
-export class EnsureMap<T> {
+export class EnsureMap<T> { //MARK: EnsureMap
   inner: Map<string, T | null>;
 
   /**
