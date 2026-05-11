@@ -473,7 +473,6 @@ export async function handleAutocomplete(
     await subcommand.autocomplete(context);
 
   }
-
-  //console.log(command);
+  
   await sleep(1);
 }

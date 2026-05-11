@@ -5,6 +5,48 @@ import { Database } from "./database.js";
 export type NonEmptyArray<T> = [T, ...T[]];
 export type NonEmptyReadonlyArray<T> = readonly [T, ...T[]];
 
+export interface NameValueObject {
+  name: string, 
+  value: string
+};
+
+export type ConfigScope = "user" | "server" | "bot";
+
+export type Config = Record<ConfigScope, Record<string, ConfigOptions>>;
+
+export type ConfigOptions = {
+  name: string;
+  desc: string;
+  value: string;
+  displayOptionsAs: "toggle";
+  default: "enable" | "disable";
+} | {
+  name: string;
+  desc: string;
+  value: string;
+  displayOptionsAs: "channel" | "user" | "role" | "mentionable";
+  default?: string;
+} | {
+  name: string;
+  desc: string;
+  value: string;
+  displayOptionsAs: "buttons" | "select";
+  options: NameValueObject[];
+  default?: string;
+} | {
+  name: string;
+  desc: string;
+  value: string;
+  displayOptionsAs: "modal";
+  default?: string;
+  options: {
+    name: string;
+    type: string;
+    placeholder: string;
+    value: string;
+  };
+}
+
 export interface Data {
   prefix: string;
   id: string;
