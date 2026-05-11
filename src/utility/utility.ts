@@ -1,8 +1,11 @@
 import path from "path";
 import { CommandContext } from "./context.js";
+import config from "src/data/config.json" with { type: "json" };
 import perms from "src/data/perms.json" with { type: "json" };
-import { Perms } from "./types.js";
+import { Config, ConfigScope, Perms } from "./types.js";
+import { Database } from "./database.js";
 
+const CONFIG = config as Config;
 const PERMS = perms as Perms;
 
 //MARK: General
@@ -52,6 +55,46 @@ export function getAdminIds(): string[] {
   return (Object.values(PERMS) as Record<string, string[]>[])
     .map(item => Object.values(item))
     .flat(2);
+}
+
+/**
+ * Returns a config option from the database, or the default from config.json if not present.
+ */
+export function fetchConfigOption<ConfigScopeType extends ConfigScope>(
+  db: Database, 
+  scope: ConfigScopeType, 
+  option: keyof Config[ConfigScopeType], 
+  id: string | undefined
+): Exclude<unknown, undefined> {
+  const setting = CONFIG[scope][option];
+
+  switch (scope) {
+  case "user": {
+    if (id === undefined)
+      throw new Error(`Attempted to get server config option ${setting.name} without a valid ID.`);
+    
+    const fetchedData = db.user.fetchOr(id, setting.value, setting.default);
+    if (fetchedData === "enable" || fetchedData === "disable") {
+      return fetchedData === "enable";
+    } else {
+      return fetchedData;
+    }
+
+  } case "server": {
+    if (id === undefined)
+      throw new Error(`Attempted to get user config option ${setting.name} without a valid ID.`);
+
+    const fetchedData = db.server.fetchOr(id, setting.value, setting.default);
+    if (fetchedData === "enable" || fetchedData === "disable") {
+      return fetchedData === "enable";
+    } else {
+      return fetchedData;
+    }
+
+  } case "bot": {
+    return db.global.fetchOr("global", setting.value, setting.default);
+  }
+  }
 }
 
 /**

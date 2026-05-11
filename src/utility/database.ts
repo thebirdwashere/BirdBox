@@ -6,10 +6,10 @@ import { DatabaseRecord } from "./types.js";
 //MARK: Database
 export class Database {
   inner: DatabaseSync;
-  user: TableManager;
-  channel: TableManager;
-  server: TableManager;
-  global: TableManager;
+  user: DatabaseTableManager;
+  channel: DatabaseTableManager;
+  server: DatabaseTableManager;
+  global: DatabaseTableManager;
 
   constructor (path: string) {
     const db = new DatabaseSync(path);
@@ -34,10 +34,10 @@ export class Database {
       ) STRICT;
     `);
 
-    this.user = new TableManager(db, "User");
-    this.channel = new TableManager(db, "Channel");
-    this.server = new TableManager(db, "Server");
-    this.global = new TableManager(db, "Global");
+    this.user = new DatabaseTableManager(db, "User");
+    this.channel = new DatabaseTableManager(db, "Channel");
+    this.server = new DatabaseTableManager(db, "Server");
+    this.global = new DatabaseTableManager(db, "Global");
   }
 
   close(): void {
@@ -49,7 +49,7 @@ export class Database {
 export type DatabaseTableName = "User" | "Channel" | "Server" | "Global";
 
 //MARK: TableManager
-class TableManager {
+export class DatabaseTableManager {
   private data: StatementData;
   tableName: DatabaseTableName;
 

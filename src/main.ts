@@ -5,7 +5,7 @@ import "dotenv/config";
 
 import perms from "./data/perms.json" with { type: "json" };
 
-import { panic } from "./utility/utility.js";
+import { fetchConfigOption, panic } from "./utility/utility.js";
 import { handleAutocompleteError, handleCommandError } from "./utility/error.js";
 import { Registry } from "./utility/registry.js";
 import {
@@ -106,9 +106,18 @@ CLIENT.on(Events.MessageCreate, (message) => {
 
 //MARK: Delete
 CLIENT.on(Events.MessageDelete, (message) => {
-  //TODO: Add config consent here
+  if (!message.author) return;
+
+  const userSnipesEnabled = fetchConfigOption(DB, "user", "snipes", message.author.id);
+  if (!userSnipesEnabled) return;
+
+  if (message.guild) {
+    const serverSnipesEnabled = fetchConfigOption(DB, "server", "snipes", message.guild.id);
+    if (!serverSnipesEnabled) return;
+  }
+
   const snipeData = {
-    authorID: message.author?.id,
+    authorID: message.author.id,
     timestamp: message.createdTimestamp,
     content: message.content,
     imageURL: null,
@@ -120,8 +129,6 @@ CLIENT.on(Events.MessageDelete, (message) => {
   }
 
   DB.channel.update(message.channel.id, "snipe", snipeData);
-  
-  console.log(DB.channel.fetchOrUndefined(message.channel.id, "snipe"));
 });
 
 process.on("exit", (code) => {

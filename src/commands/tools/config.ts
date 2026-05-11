@@ -4,7 +4,7 @@ import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, Channe
 import config from "src/data/config.json" with { type: "json" };
 import { Config, ConfigOptions, ConfigScope } from "src/utility/types.js";
 import { Database } from "src/utility/database.js";
-import { getAdminIds } from "src/utility/utility.js";
+import { fetchConfigOption, getAdminIds } from "src/utility/utility.js";
 
 const CONFIG = config as Config;
 
@@ -292,7 +292,7 @@ async function optionsBuilder<ScopeType extends ConfigScope>(
   name: keyof Config[ScopeType],
 ): Promise<MessageActionRowComponentBuilder[]> {
   const currentSetting = CONFIG[scope][name];
-  const currentSelection = await getSetting(scope, id, db, currentSetting);
+  const currentSelection = await fetchConfigOption(db, scope, name, id);
   
   // Switch by preset option  
   //TODO: IN FUTURE ADD OPTION FOR ADDING CUSTOM MULTI-ROW OPTIONS
@@ -302,12 +302,12 @@ async function optionsBuilder<ScopeType extends ConfigScope>(
       .setCustomId("disable")
       .setLabel("Disable")
       .setStyle(ButtonStyle.Danger)
-      .setDisabled(currentSelection == "disable");
+      .setDisabled(currentSelection === false);
     const enableButton = new ButtonBuilder()
       .setCustomId("enable")
       .setLabel("Enable")
       .setStyle(ButtonStyle.Success)
-      .setDisabled(currentSelection == "enable");
+      .setDisabled(currentSelection === true);
     return [disableButton, enableButton]; 
   } case "buttons": {
     const buttonArray: ButtonBuilder[] = [];
@@ -400,35 +400,17 @@ function setSetting(scope: ConfigScope, id: string | undefined, db: Database, se
     if (id === undefined)
       throw new Error("Attempted to get setting without a valid ID.");
 
-    db.user.update(id, setting.name, value);
+    db.user.update(id, setting.value, value);
     break;
   } case "server": {
     if (id === undefined)
       throw new Error("Attempted to get setting without a valid ID.");
 
-    db.server.update(id, setting.name, value);
+    db.server.update(id, setting.value, value);
     break;
   } case "bot": {
     db.global.update("global", setting.value, value);
     break;
-  }
-  }
-}
-
-function getSetting(scope: ConfigScope, id: string | undefined, db: Database, setting: ConfigOptions): unknown {
-  switch (scope) {
-  case "user": {
-    if (id === undefined)
-      throw new Error("Attempted to get setting without a valid ID.");
-
-    return db.user.fetchOr(id, setting.name, setting.default);
-  } case "server": {
-    if (id === undefined)
-      throw new Error("Attempted to get setting without a valid ID.");
-
-    return db.server.fetchOr(id, setting.name, setting.default);
-  } case "bot": {
-    return db.global.fetchOr("global", setting.name, setting.default);
   }
   }
 }

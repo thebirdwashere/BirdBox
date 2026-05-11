@@ -21,11 +21,11 @@
     }
   },
   "server": {
-    "announceChannel": {
+    "announcements": {
       "name": "Announcements Channel",
       "desc": "Change the default channel the announce command sends to. \nIf not set, defaults to the channel announce is run in.",
       "displayOptionsAs": "channel",
-      "value": "announceChannel"
+      "value": "announcements"
     },
     "jinxes": {
       "name": "Jinx Responses",
@@ -41,18 +41,18 @@
       "default": "enable",
       "value": "responses"
     },
-    "notifChannel": {
+    "notifications": {
       "name": "Notifications Channel",
       "desc": "Change the channel notification logs are sent to. \nIf not set, logs will be disabled.",
       "displayOptionsAs": "channel",
-      "value": "notifChannel"
+      "value": "notifications"
     },
-    "serverSnipes": {
+    "snipes": {
       "name": "Snipe Logging",
       "desc": "Change whether this server's deleted messages are logged for the snipe command. Both the member and server must consent for the message to be logged. \nDefaults to `enable` if not set.",
       "displayOptionsAs": "toggle",
       "default": "enable",
-      "value": "serverSnipes"
+      "value": "snipes"
     }
   },
   "bot": {
