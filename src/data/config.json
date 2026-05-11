@@ -25,6 +25,7 @@
       "name": "Announcements Channel",
       "desc": "Change the default channel the announce command sends to. \nIf not set, defaults to the channel announce is run in.",
       "displayOptionsAs": "channel",
+      "default": null,
       "value": "announcements"
     },
     "jinxes": {
@@ -45,6 +46,7 @@
       "name": "Notifications Channel",
       "desc": "Change the channel notification logs are sent to. \nIf not set, logs will be disabled.",
       "displayOptionsAs": "channel",
+      "default": null,
       "value": "notifications"
     },
     "snipes": {

@@ -25,20 +25,20 @@ export type ConfigOptions = {
   desc: string;
   value: string;
   displayOptionsAs: "channel" | "user" | "role" | "mentionable";
-  default?: string;
+  default: string | null;
 } | {
   name: string;
   desc: string;
   value: string;
   displayOptionsAs: "buttons" | "select";
   options: NameValueObject[];
-  default?: string;
+  default: string | null;
 } | {
   name: string;
   desc: string;
   value: string;
   displayOptionsAs: "modal";
-  default?: string;
+  default: string | null;
   options: {
     name: string;
     type: string;

@@ -79,7 +79,7 @@ export class DatabaseTableManager {
 
     if (data[property] === undefined) {
       return def;
-    } else if (typeof data[property] !== typeof def && def !== undefined) {
+    } else if (typeof data[property] !== typeof def && def != null) {
       throw new Error(`Type ${typeof def} of default value is unrelated to database record type ${typeof data}`);
     } else {
       return data[property];
