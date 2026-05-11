@@ -6,9 +6,10 @@ import "dotenv/config";
 import perms from "./data/perms.json" with { type: "json" };
 
 import { panic } from "./utility/utility.js";
-import { handleCommandError } from "./utility/error.js";
+import { handleAutocompleteError, handleCommandError } from "./utility/error.js";
 import { Registry } from "./utility/registry.js";
 import {
+  AutocompleteContext,
   ChatInputCommandInteractionContext,
   MessageContext,
 } from "./utility/context.js";
@@ -72,7 +73,15 @@ CLIENT.on(Events.InteractionCreate, (interaction) => {
       },
     );
   } else if (interaction.isAutocomplete()) {
-    void handleAutocomplete(DATA, interaction);
+    handleAutocomplete(DATA, interaction).catch(
+      (error: unknown) => {
+        const context = new AutocompleteContext(
+          interaction,
+          DATA,
+        );
+        handleAutocompleteError(context, interaction.commandName, error);
+      },
+    );
   }
 });
 

@@ -1,5 +1,5 @@
 import { Colors, EmbedBuilder } from "discord.js";
-import { CommandContext, MessageContext } from "./context.js";
+import { AutocompleteContext, CommandContext, MessageContext } from "./context.js";
 
 async function handleError(
   ctx: CommandContext,
@@ -42,4 +42,12 @@ export async function handleInterjectionError(
   error: unknown,
 ): Promise<void> {
   await handleError(ctx, originCommand, error, "Interjection");
+}
+
+export function handleAutocompleteError(
+  _ctx: AutocompleteContext,
+  _originCommand: string,
+  error: unknown,
+): void {
+  console.error(error);
 }
