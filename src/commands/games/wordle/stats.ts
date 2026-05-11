@@ -29,7 +29,7 @@ const WordleStats = new Subcommand({
     const statsEmbed = new EmbedBuilder()
       .setTitle(`Stats for ${userChoice.username}`)
       .setColor(Colors.Purple)
-      .setThumbnail(userChoice.avatarURL())
+      .setThumbnail(userChoice.avatarURL());
 
     //end execution if no stats found
     if (userStats === undefined) {
