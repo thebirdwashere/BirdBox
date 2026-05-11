@@ -45,6 +45,7 @@ export class Command {
           description: string;
           options: NonEmptyReadonlyArray<CommandOption>;
           execute: (ctx: CommandContext, opts: Options) => Promise<void>;
+          autocomplete?: (ctx: AutocompleteContext) => Promise<void>;
         }
       | {
           name: string;
@@ -95,6 +96,7 @@ export class Command {
     }
 
     if ("execute" in args) this.execute = args.execute;
+    if ("autocomplete" in args) this.autocomplete = args.autocomplete;
   }
 }
 
