@@ -2,12 +2,13 @@
   "user": {
     "notifs": {
       "name": "Notifications",
-      "desc": "Change notifications for when BirdBox notices something about your message. \nDefaults to `reply` if not set.",
+      "desc": "Change notifications for interjections that support it. \nDefaults to `reply` if not set.",
       "displayOptionsAs": "buttons",
       "options": [
         { "name": "Reply", "value": "reply" },
         { "name": "Ping", "value": "ping" },
-        { "name": "Neither", "value": "neither" }
+        { "name": "Log", "value": "log" },
+        { "name": "None", "value": "none" }
       ],
       "default": "reply",
       "value": "notifs"
