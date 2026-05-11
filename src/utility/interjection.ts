@@ -2,8 +2,6 @@ import { EmbedBuilder } from "discord.js";
 import { MessageContext } from "./context.js";
 import { fetchConfigOption } from "./utility.js";
 
-//TODO: add notification support
-
 export class Interjection {
   name: string;
   test: (ctx: MessageContext) => Promise<void> | void;
