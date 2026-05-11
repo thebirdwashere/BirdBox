@@ -245,7 +245,8 @@ export class AutocompleteContext implements BaseContext {
    * Automatically filters responses based on the user's current input.
    */
   async respond(
-    choices: ApplicationCommandOptionChoiceData[]
+    choices: ApplicationCommandOptionChoiceData[],
+    blank?: string,
   ): Promise<void> {
     const current = this.option.value.toLowerCase();
 
@@ -260,7 +261,13 @@ export class AutocompleteContext implements BaseContext {
       responseElements = choicesStartsWith.concat(choicesContains);
     };
 
-    await this.interaction.respond(responseElements.slice(0, 25));
+    if (responseElements.length > 1) {
+      await this.interaction.respond(responseElements.slice(0, 25));
+    } else if (blank) {
+      await this.interaction.respond([{ name: blank, value: blank }]);
+    } else {
+      await this.interaction.respond([]);
+    }
   }
 
   /**
@@ -270,9 +277,26 @@ export class AutocompleteContext implements BaseContext {
    */
   async respondStrings(
     choices: string[],
+    blank?: string,
   ): Promise<void> {
     const convertedContent = choices.map((choice) => ({ name: choice, value: choice }));
-    await this.respond(convertedContent);
+
+    if (convertedContent.length > 0) {
+      await this.interaction.respond(convertedContent.slice(0, 25));
+    } else if (blank) {
+      await this.interaction.respond([{ name: blank, value: blank }]);
+    } else {
+      await this.interaction.respond([]);
+    }
+  }
+
+  /**
+   * Attempts to respond to the autocomplete with a single string.
+   */
+  async respondMessage(
+    message: string,
+  ): Promise<void> {
+    await this.interaction.respond([{ name: message, value: message }]);
   }
 
   /**
