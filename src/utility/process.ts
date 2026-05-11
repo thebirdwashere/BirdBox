@@ -390,7 +390,7 @@ function populateMessageOptions(
     }
     case "optional":
       if (option.data.required)
-        throw new Error(`Argument at position ${String(index + 1)} is not optional.`);
+        throw new Error(`Argument "${option.data.name}" (position ${String(index + 1)}) is required.`);
 
       switch (option.type) {
       case "number":
