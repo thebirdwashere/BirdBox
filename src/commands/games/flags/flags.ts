@@ -7,9 +7,9 @@ const FlagsCommand = new Command({
   name: "flags",
   description: "Compete to guess a country's flag quickly.",
   subcommands: [
-    FlagsQuiz, // "quiz"
-    FlagsLeaderboard, // "board"
-    FlagsStats, // "stats"
+    FlagsQuiz,        // "quiz"
+    FlagsLeaderboard, // "leaderboard"
+    FlagsStats,       // "stats"
   ],
 });
 
