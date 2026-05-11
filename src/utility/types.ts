@@ -89,3 +89,26 @@ export type EightBallResponses = (string | {
   url?: string; 
   image?: string;
 })[];
+
+export interface Wordle {
+  "extras": string[],
+  "guesses": string[],
+  "solutions": string[],
+}
+
+export type WordleGameFields = { boxes: string[]; word: string; }[];
+
+export interface WordleGameData {
+  solution: string, 
+  guesses: number,
+  fields: WordleGameFields,
+  usedCode: boolean,
+}
+
+export type WordleGuessNum = | "1" | "2" | "3" | "4" | "5" | "6" | "loss";
+
+export interface UserWordleStats {
+  guessStats: Record<WordleGuessNum, number>, 
+  currentStreak: number,
+  bestStreak: number,
+}
