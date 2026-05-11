@@ -234,14 +234,9 @@ export async function detectMessageCommand(
 
     // Populate options if they exist.
     if (command.body !== undefined && isOptionArray(command.body)) {
-      if (args.length !== command.body.length)
-        throw new Error(
-          "Incorrect number of arguments in command: " +
-            `\`/${commandName}\`; ` +
-            `expected ${String(command.body.length)}, ` +
-            `found ${String(args.length)}.` +
-            "\n*Help: Try using ! in place of any optional arguments.*",
-        );
+      while (args.length !== command.body.length) {
+        args.push("!");
+      }
       options = populateMessageOptions(args, command.body, message);
     }
 
@@ -265,14 +260,9 @@ export async function detectMessageCommand(
 
     // Populate options if they exist.
     if (subcommand.body !== undefined && isOptionArray(subcommand.body)) {
-      if (args.length !== subcommand.body.length)
-        throw new Error(
-          "Incorrect number of arguments in command: " +
-            `\`/${commandName} ${subcommandName}\`; ` +
-            `expected ${String(subcommand.body.length)}, ` +
-            `found ${String(args.length)}.` +
-            "\n*Help: Try using ! in place of any optional arguments.*",
-        );
+      while (args.length !== command.body.length) {
+        args.push("!");
+      }
       options = populateMessageOptions(args, subcommand.body, message);
     }
 
