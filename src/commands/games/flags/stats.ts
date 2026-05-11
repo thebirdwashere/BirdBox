@@ -27,20 +27,18 @@ const FlagsStats = new Subcommand({
 
     //initialize embed
     const statsEmbed = new EmbedBuilder()
+      .setTitle(`Stats for ${userChoice.username}`)
       .setColor(Colors.Purple)
-      .setThumbnail(userChoice.avatarURL())
-      .setFooter({ text: "look at this sweaty nerd" });
+      .setThumbnail(userChoice.avatarURL());
 
     //end execution if no stats found
     if (userStats === undefined) {
-      statsEmbed.setTitle("Flag Quiz");
       statsEmbed.setDescription("huh, looks like there's nothing here");
       await ctx.reply({ embeds: [statsEmbed] });
       return;
     }
 
-    //title with user name
-    statsEmbed.setTitle(`Stats for ${userChoice.username}`);
+    statsEmbed.setFooter({ text: "look at this sweaty nerd" });
 
     //add stats
     statsEmbed.addFields(
