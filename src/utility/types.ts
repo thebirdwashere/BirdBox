@@ -33,8 +33,8 @@ export interface Flags {
 export interface UserFlagStats {
   wins: number,
   losses: number,
-  current_streak: number,
-  best_streak: number,
+  currentStreak: number,
+  bestStreak: number,
   points: number,
 }
 

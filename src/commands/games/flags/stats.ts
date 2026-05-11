@@ -46,12 +46,12 @@ const FlagsStats = new Subcommand({
     statsEmbed.addFields(
       {
         name: "Wins",
-        value: `${userStats.wins.toString()} ${userStats.current_streak === 1 ? "win" : "wins"}\n`,
+        value: `${userStats.wins.toString()} ${userStats.currentStreak === 1 ? "win" : "wins"}\n`,
         inline: true,
       },
       {
         name: "Losses",
-        value: `${userStats.losses.toString()} ${userStats.current_streak === 1 ? "loss" : "losses"}\n`,
+        value: `${userStats.losses.toString()} ${userStats.currentStreak === 1 ? "loss" : "losses"}\n`,
         inline: true,
       },
       {
@@ -68,12 +68,12 @@ const FlagsStats = new Subcommand({
       },
       {
         name: "Current Streak",
-        value: `${userStats.current_streak.toString()} ${userStats.current_streak === 1 ? "game" : "games"}\n`,
+        value: `${userStats.currentStreak.toString()} ${userStats.currentStreak === 1 ? "game" : "games"}\n`,
         inline: true,
       },
       {
         name: "Best Streak",
-        value: `${userStats.best_streak.toString()} ${userStats.best_streak === 1 ? "game" : "games"}\n`,
+        value: `${userStats.bestStreak.toString()} ${userStats.bestStreak === 1 ? "game" : "games"}\n`,
         inline: true,
       }
     );

@@ -137,8 +137,8 @@ const FlagsBoard = new Subcommand({
           //push to centralized array
           leaderboardArray.push({
             name: userName,
-            value: userStats.best_streak,
-            display: `${userStats.best_streak.toString()} game${userStats.best_streak > 1 ? "s" : ""}`
+            value: userStats.bestStreak,
+            display: `${userStats.bestStreak.toString()} game${userStats.bestStreak > 1 ? "s" : ""}`
           });
         }
 

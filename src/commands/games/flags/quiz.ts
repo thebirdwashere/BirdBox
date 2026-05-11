@@ -186,8 +186,8 @@ const FlagsQuiz = new Subcommand({
       const defaultStats = {
         wins: 0,
         losses: 0,
-        current_streak: 0,
-        best_streak: 0,
+        currentStreak: 0,
+        bestStreak: 0,
         points: 0,
       };
 
@@ -197,12 +197,12 @@ const FlagsQuiz = new Subcommand({
 
       	//simple stat manipulation
       	userStats.wins++;
-      	userStats.current_streak++;
+      	userStats.currentStreak++;
       	userStats.points += pointsEarned;
 
       	//set new best streak if needed
-      	if (userStats.current_streak > userStats.best_streak) {
-      	userStats.best_streak = userStats.current_streak;
+      	if (userStats.currentStreak > userStats.bestStreak) {
+      	userStats.bestStreak = userStats.currentStreak;
       	}
 
       	//enter into db
@@ -215,7 +215,7 @@ const FlagsQuiz = new Subcommand({
 
       	//simple stat manipulation
       	userStats.losses++;
-      	userStats.current_streak = 0;
+      	userStats.currentStreak = 0;
       	userStats.points -= pointsLost;
 
       	ctx.db.user.update(userId, "flagStats", userStats);
