@@ -9,6 +9,7 @@ export class Database {
   user: TableManager;
   channel: TableManager;
   server: TableManager;
+  global: TableManager;
 
   constructor (path: string) {
     const db = new DatabaseSync(path);
@@ -16,26 +17,27 @@ export class Database {
 
     db.exec(`
       CREATE TABLE IF NOT EXISTS User(
-        id INTEGER PRIMARY KEY NOT NULL,
+        id TEXT PRIMARY KEY NOT NULL,
         json TEXT DEFAULT '{}'
       ) STRICT;
       CREATE TABLE IF NOT EXISTS Channel(
-        id INTEGER PRIMARY KEY NOT NULL,
+        id TEXT PRIMARY KEY NOT NULL,
         json TEXT DEFAULT '{}'
       ) STRICT;
       CREATE TABLE IF NOT EXISTS Server(
-        id INTEGER PRIMARY KEY NOT NULL,
+        id TEXT PRIMARY KEY NOT NULL,
         json TEXT DEFAULT '{}'
       ) STRICT;
       CREATE TABLE IF NOT EXISTS Global(
-        key TEXT PRIMARY KEY NOT NULL,
-        value TEXT
+        id TEXT PRIMARY KEY NOT NULL,
+        json TEXT DEFAULT '{}'
       ) STRICT;
     `);
 
     this.user = new TableManager(db, "User");
     this.channel = new TableManager(db, "Channel");
     this.server = new TableManager(db, "Server");
+    this.global = new TableManager(db, "Global");
   }
 
   close(): void {
@@ -44,14 +46,16 @@ export class Database {
   }
 }
 
+export type DatabaseTableName = "User" | "Channel" | "Server" | "Global";
+
 //MARK: TableManager
 class TableManager {
   private data: StatementData;
-  tableName: string;
+  tableName: DatabaseTableName;
 
   constructor(
     db: DatabaseSync,
-    name: string,
+    name: DatabaseTableName,
   ) {
     this.tableName = name;
     this.data = new StatementData(db, name);
@@ -75,7 +79,7 @@ class TableManager {
 
     if (data[property] === undefined) {
       return def;
-    } else if (typeof data[property] !== typeof def) {
+    } else if (typeof data[property] !== typeof def && def !== undefined) {
       throw new Error(`Type ${typeof def} of default value is unrelated to database record type ${typeof data}`);
     } else {
       return data[property];
