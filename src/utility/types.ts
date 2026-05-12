@@ -112,11 +112,13 @@ export interface PeriodicTable {
   impossibleEndings: string[];
 }
 
+export type PermsRank = "host" | "developer" | "contributor" | "tester";
+
 export interface Perms {
   host: Record<string, string>;
   developer: Record<string, string>;
   contributor: Record<string, string>;
-  botTester: Record<string, string>;
+  tester: Record<string, string>;
 };
 
 export type ResponsesList = string[];

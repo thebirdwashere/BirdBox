@@ -4,6 +4,7 @@ import { DatabaseTableManager } from "src/utility/database.js";
 const Debug = new Command({
   name: "debug",
   description: "Debug various features of the bot.",
+  permissions: ["host", "developer"],
   subcommands: [
     new Subcommand({
       name: "arguments",

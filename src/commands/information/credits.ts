@@ -15,7 +15,7 @@ const Credits = new Command({
         { name: "Host", value: Object.keys(perms.host)[0] },
         { name: "Developers", value: Object.keys(perms.developer).join(", ") },
         { name: "Contributors", value: Object.keys(perms.contributor).join(", ") },
-        { name: "Bot Testers", value: Object.keys(perms.botTester).join(", ") }
+        { name: "Bot Testers", value: Object.keys(perms.tester).join(", ") }
       )
       .setFooter({ text: "And an extra-special thanks to users like you!" });
 

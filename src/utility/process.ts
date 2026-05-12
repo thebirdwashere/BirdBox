@@ -7,6 +7,7 @@ import {
   Subcommand,
   CommandOptionType,
   Options,
+  testUserPermissions,
 } from "./command.js";
 import {
   ChatInputCommandInteractionContext,
@@ -18,6 +19,10 @@ import {
 import { Registry } from "./registry.js";
 import { Data, NonEmptyReadonlyArray } from "./types.js";
 import { sleep } from "./utility.js";
+import perms from "../data/perms.json" with { type: "json" };
+import { Perms } from "./types.js";
+
+const PERMS = perms as Perms;
 
 //MARK: ChatInput
 export async function detectChatInputInteractionCommand(
@@ -30,6 +35,9 @@ export async function detectChatInputInteractionCommand(
   const command = data.registry.commands.get(commandName);
   if (command === undefined)
     throw new Error(`Unknown or unregistered command \`/${commandName}\``);
+
+  if (command.permissions) 
+    testUserPermissions(command.permissions, PERMS, interaction.user.id);
 
   // Determine passed command options.
   let options = new Options();
@@ -51,11 +59,11 @@ export async function detectChatInputInteractionCommand(
     const subcommand = command.body.find(
       (sub) => sub.data.name === subcommandName,
     );
-    if (subcommand === undefined) {
-      throw new Error(
-        `Unknown subcommand: \`/${commandName} ${subcommandName}\``,
-      );
-    }
+    if (subcommand === undefined)
+      throw new Error(`Unknown subcommand: \`/${commandName} ${subcommandName}\``);
+
+    if (subcommand.permissions)
+      testUserPermissions(subcommand.permissions, PERMS, interaction.user.id);
 
     if (subcommand.body !== undefined && isOptionArray(subcommand.body)) {
       options = parseCommandOptions(subcommand, interaction, options);
@@ -226,6 +234,9 @@ export async function detectMessageCommand(
     throw new Error(`Unknown or unregistered command \`/${commandName}\``);
   // command: Command
 
+  if (command.permissions) 
+    testUserPermissions(command.permissions, PERMS, message.author.id);
+
   // Handle commands accordingly.
   if (command.execute !== undefined) {
     let options = new Options();
@@ -265,6 +276,10 @@ export async function detectMessageCommand(
     );
     if (subcommand === undefined)
       throw new Error(`Unknown subcommand: \`/${commandName} ${subcommandName}\``);
+
+    if (subcommand.permissions) {
+      testUserPermissions(subcommand.permissions, PERMS, message.author.id);
+    }
 
     // Populate options if they exist.
     if (subcommand.body !== undefined && isOptionArray(subcommand.body)) {

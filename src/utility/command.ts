@@ -22,7 +22,7 @@ import {
 } from "discord.js";
 import { CommandContext, AutocompleteContext } from "./context.js";
 import { panic } from "./utility.js";
-import { NonEmptyArray, NonEmptyReadonlyArray } from "./types.js";
+import { NonEmptyArray, NonEmptyReadonlyArray, Perms, PermsRank } from "./types.js";
 
 //MARK: Command
 export class Command {
@@ -32,18 +32,21 @@ export class Command {
     | NonEmptyReadonlyArray<Subcommand>;
   execute?: (ctx: CommandContext, opts: Options) => Promise<void>;
   autocomplete?: (ctx: AutocompleteContext) => Promise<void>;
+  permissions?: PermsRank[];
 
   constructor(
     args:
       | {
           name: string;
           description: string;
+          permissions?: PermsRank[];
           execute: (ctx: CommandContext, opts: Options) => Promise<void>;
         }
       | {
           name: string;
           description: string;
           options: NonEmptyReadonlyArray<CommandOption>;
+          permissions?: PermsRank[];
           execute: (ctx: CommandContext, opts: Options) => Promise<void>;
           autocomplete?: (ctx: AutocompleteContext) => Promise<void>;
         }
@@ -97,6 +100,7 @@ export class Command {
 
     if ("execute" in args) this.execute = args.execute;
     if ("autocomplete" in args) this.autocomplete = args.autocomplete;
+    if ("permissions" in args) this.permissions = args.permissions;
   }
 }
 
@@ -104,6 +108,7 @@ export class Command {
 export class Subcommand {
   data: SlashCommandSubcommandBuilder;
   body?: NonEmptyReadonlyArray<CommandOption>;
+  permissions?: PermsRank[];
   execute: (ctx: CommandContext, opts: Options) => Promise<void>;
   autocomplete?: (ctx: AutocompleteContext) => Promise<void>;
 
@@ -112,6 +117,7 @@ export class Subcommand {
       | {
           name: string;
           description: string;
+          permissions?: PermsRank[];
           execute: (ctx: CommandContext, opts: Options) => Promise<void>;
         }
       | {
@@ -127,6 +133,7 @@ export class Subcommand {
       .setDescription(args.description);
     this.execute = args.execute;
     if ("autocomplete" in args) this.autocomplete = args.autocomplete;
+    if ("permissions" in args) this.permissions = args.permissions;
 
     if ("options" in args) {
       for (const option of args.options) {
@@ -283,4 +290,18 @@ export function isOptionArray(
     | NonEmptyReadonlyArray<Subcommand>,
 ): body is NonEmptyReadonlyArray<CommandOption> {
   return body.length > 0 && body[0] instanceof CommandOption;
+}
+
+export function testUserPermissions(ranks: PermsRank[], perms: Perms, id: string): void {
+  const permittedIds = Object.entries(perms)
+    .filter(([rank]) => ranks.includes(rank as PermsRank))
+    .map(([_, ids]) => Object.values(ids as Record<string, string>))
+    .flat(2);
+
+  if (!(permittedIds.includes(id))) {
+    const optionsFormatter = new Intl.ListFormat("en", {type: "disjunction"});
+    const choicesList = optionsFormatter.format(ranks.map(choice => `\`${choice}\``));
+
+    throw new Error(`Sorry, you lack the permissions to use this command. Your rank must be ${choicesList}.`);
+  }
 }
