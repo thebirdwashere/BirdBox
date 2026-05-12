@@ -66,9 +66,15 @@ export class Registry {
   }
 
   async testInterjections(ctx: MessageContext): Promise<void> {
+    // const timesArray = new Collection();
     for (const interjection of this.interjections.values()) {
       try {
+        // const startTime = performance.now();
+
         await interjection.test(ctx);
+
+        // const endTime = performance.now();
+        // timesArray.set(interjection.name, endTime - startTime);
       } catch (error: unknown) {
         await handleInterjectionError(
           ctx,
@@ -77,5 +83,12 @@ export class Registry {
         );
       };
     };
+
+    // timesArray.sort().reverse();
+    // for (const [key, val] of timesArray.entries()) {
+    //   console.log(`${String(key)} time: ${String(val)}`);
+    // }
+
+    // console.log("---");
   }
 }
