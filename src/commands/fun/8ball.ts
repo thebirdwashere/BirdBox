@@ -19,8 +19,19 @@ const Magic8Ball = new Command({
       type: "string",
     }),
   ],
+  contextmenu: {
+    label: "ask 8ball",
+    type: "message",
+    contextOption: "message",
+  },
   execute: async (ctx, opts) => {
     const message = opts.string.get("message");
+    if (!message)
+      throw new Error("Could not locate message.");
+    
+    if (message.length && message.length > 1000)
+      await ctx.reply("bro that message is WAY too long, i aint reading allat");
+    
     const randomResponse =
       RESPONSES[
         Math.floor(Math.random() * RESPONSES.length)
@@ -34,7 +45,7 @@ const Magic8Ball = new Command({
           "https://cdn.discordapp.com/avatars/803811104953466880/5bce4f0ba438015ec65f5b9cac11c8e3.png?size=256",
       })
       .setColor(Colors.Blue)
-      .addFields({ name: "You asked:", value: `"${message ?? "nothing"}"` });
+      .addFields({ name: "You asked:", value: `"${message}"` });
 
     if (typeof randomResponse == "string") {
       responseEmbed.setTitle(randomResponse);
