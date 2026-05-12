@@ -62,7 +62,7 @@ export class DatabaseTableManager {
   /**
    * Returns the property if it exists in the database, otherwise returns `undefined`.
    */
-  fetchOrUndefined(id: string, property: string): Exclude<unknown, undefined> {
+  fetchOrUndefined(id: string, property: string): unknown {
     const data = parseDataAsJSON(this.data.fetch.get({id}));
 
     return data[property];
@@ -99,10 +99,19 @@ export class DatabaseTableManager {
   }
 
   /**
+   * Returns all JSON for the provided ID.
+   */
+  fetchFull(id: string): unknown {
+    const data = parseDataAsJSON(this.data.fetch.get({id}));
+    return data;
+  }
+
+
+  /**
    * Returns the property for all rows in the database, 
    * omitting rows where the property does not exist.
    */
-  fetchAll(property: string): unknown[] {
+  fetchEvery(property: string): unknown[] {
     const dataAll = this.data.fetchUnconstrained.iterate();
     const propertyArray = [];
 
@@ -120,7 +129,7 @@ export class DatabaseTableManager {
    * Returns the property for all rows in the database, using the `def` value for
    * rows that do not exist.
    */
-  fetchAllOr(property: string, def: unknown): unknown[] {
+  fetchEveryOr(property: string, def: unknown): unknown[] {
     const dataAll = this.data.fetchUnconstrained.iterate();
     const propertyArray = [];
 
