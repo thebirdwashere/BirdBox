@@ -34,7 +34,7 @@ const Snipe = new Command({
       })
       .setColor(Colors.Blue)
       .setDescription(snipedMessage.content)
-      .setImage(snipedMessage.imageURL)
+      .setImage(snipedMessage.imageURL ?? null)
       .setFooter({ text: randomChoice(FOOTERS.snipe) })
       .setTimestamp(snipedMessage.timestamp);
 

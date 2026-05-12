@@ -120,7 +120,7 @@ CLIENT.on(Events.MessageDelete, (message) => {
     authorID: message.author.id,
     timestamp: message.createdTimestamp,
     content: message.content,
-    imageURL: null,
+    imageURL: undefined,
   } as SnipedMessage;
 
   const attachment = message.attachments.at(0);

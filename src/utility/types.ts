@@ -125,7 +125,7 @@ export interface SnipedMessage {
   authorID: string,
   timestamp: number,
   content: string,
-  imageURL: string | null,
+  imageURL: string | undefined,
 }
 
 export type EightBallResponses = (string | {
