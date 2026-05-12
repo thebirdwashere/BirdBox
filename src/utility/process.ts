@@ -234,7 +234,15 @@ export async function detectMessageCommand(
 
     // Populate options if they exist.
     if (command.body !== undefined && isOptionArray(command.body)) {
-      while (args.length !== command.body.length) {
+      if (args.length > command.body.length) {
+        throw new Error(
+          `Too many arguments provided to command \`/${commandName}\`; ` +
+          `expected at most ${String(command.body.length)}, ` +
+          `found ${String(args.length)}.`
+        );
+      }
+
+      while (args.length < command.body.length) {
         args.push("!");
       }
       options = populateMessageOptions(args, command.body, message);
@@ -260,6 +268,14 @@ export async function detectMessageCommand(
 
     // Populate options if they exist.
     if (subcommand.body !== undefined && isOptionArray(subcommand.body)) {
+      if (args.length > subcommand.body.length) {
+        throw new Error(
+          `Too many arguments provided to command: \`/${commandName} ${subcommandName}\`; ` +
+          `expected at most ${String(subcommand.body.length)}, ` +
+          `found ${String(args.length)}.`
+        );
+      }
+
       while (args.length !== command.body.length) {
         args.push("!");
       }
