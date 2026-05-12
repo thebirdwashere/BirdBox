@@ -19,20 +19,23 @@ import {
   ChannelType,
   Channel,
   APIApplicationCommandOptionChoice,
+  ContextMenuCommandBuilder,
+  ApplicationCommandType,
 } from "discord.js";
 import { CommandContext, AutocompleteContext } from "./context.js";
 import { panic } from "./utility.js";
-import { NonEmptyArray, NonEmptyReadonlyArray, Perms, PermsRank } from "./types.js";
+import { NonEmptyArray, Perms, PermsRank } from "./types.js";
 
 //MARK: Command
 export class Command {
   data: SlashCommandBuilder;
   body?:
-    | NonEmptyReadonlyArray<CommandOption>
-    | NonEmptyReadonlyArray<Subcommand>;
+    | Readonly<NonEmptyArray<CommandOption>>
+    | Readonly<NonEmptyArray<Subcommand>>;
   execute?: (ctx: CommandContext, opts: Options) => Promise<void>;
   autocomplete?: (ctx: AutocompleteContext) => Promise<void>;
   permissions?: PermsRank[];
+  contextmenu?: ContextMenuData;
 
   constructor(
     args:
@@ -40,25 +43,31 @@ export class Command {
           name: string;
           description: string;
           permissions?: PermsRank[];
+          contextmenu?: Omit<ContextMenuData, "data">
           execute: (ctx: CommandContext, opts: Options) => Promise<void>;
         }
       | {
           name: string;
           description: string;
-          options: NonEmptyReadonlyArray<CommandOption>;
+          options: Readonly<NonEmptyArray<CommandOption>>;
           permissions?: PermsRank[];
+          contextmenu?: Omit<ContextMenuData, "data">
           execute: (ctx: CommandContext, opts: Options) => Promise<void>;
           autocomplete?: (ctx: AutocompleteContext) => Promise<void>;
         }
       | {
           name: string;
           description: string;
-          subcommands: NonEmptyReadonlyArray<Subcommand>;
+          subcommands: Readonly<NonEmptyArray<Subcommand>>;
         },
   ) {
     this.data = new SlashCommandBuilder()
       .setName(args.name)
       .setDescription(args.description);
+
+    if ("execute" in args) this.execute = args.execute;
+    if ("autocomplete" in args) this.autocomplete = args.autocomplete;
+    if ("permissions" in args) this.permissions = args.permissions;
 
     if ("options" in args) {
       for (const option of args.options) {
@@ -98,17 +107,36 @@ export class Command {
       this.body = args.subcommands;
     }
 
-    if ("execute" in args) this.execute = args.execute;
-    if ("autocomplete" in args) this.autocomplete = args.autocomplete;
-    if ("permissions" in args) this.permissions = args.permissions;
+    if ("contextmenu" in args && args.contextmenu) {
+      const menuData = new ContextMenuCommandBuilder()
+        .setName(args.contextmenu.label);
+
+      switch (args.contextmenu.type) {
+      case "message": {
+        menuData.setType(ApplicationCommandType.Message);
+        break;
+      } case "user": {
+        menuData.setType(ApplicationCommandType.User);
+        break;
+      }
+      }
+
+      this.contextmenu = {
+        data: menuData,
+        label: args.contextmenu.label,
+        type: args.contextmenu.type,
+        contextOption: args.contextmenu.contextOption,
+      };
+    }
   }
 }
 
 //MARK: Subcommand
 export class Subcommand {
   data: SlashCommandSubcommandBuilder;
-  body?: NonEmptyReadonlyArray<CommandOption>;
+  body?: Readonly<NonEmptyArray<CommandOption>>;
   permissions?: PermsRank[];
+  contextmenu?: ContextMenuData;
   execute: (ctx: CommandContext, opts: Options) => Promise<void>;
   autocomplete?: (ctx: AutocompleteContext) => Promise<void>;
 
@@ -118,12 +146,14 @@ export class Subcommand {
           name: string;
           description: string;
           permissions?: PermsRank[];
+          contextmenu?: Omit<ContextMenuData, "data">;
           execute: (ctx: CommandContext, opts: Options) => Promise<void>;
         }
       | {
           name: string;
           description: string;
-          options: NonEmptyReadonlyArray<CommandOption>;
+          options: Readonly<NonEmptyArray<CommandOption>>;
+          contextmenu?: Omit<ContextMenuData, "data">;
           execute: (ctx: CommandContext, opts: Options) => Promise<void>;
           autocomplete?: (ctx: AutocompleteContext) => Promise<void>;
         },
@@ -165,6 +195,28 @@ export class Subcommand {
       }
       this.body = args.options;
     }
+
+    if ("contextmenu" in args && args.contextmenu) {
+      const menuData = new ContextMenuCommandBuilder()
+        .setName(args.contextmenu.label);
+
+      switch (args.contextmenu.type) {
+      case "message": {
+        menuData.setType(ApplicationCommandType.Message);
+        break;
+      } case "user": {
+        menuData.setType(ApplicationCommandType.User);
+        break;
+      }
+      }
+
+      this.contextmenu = {
+        data: menuData,
+        label: args.contextmenu.label,
+        type: args.contextmenu.type,
+        contextOption: args.contextmenu.contextOption,
+      };
+    }
   }
 }
 
@@ -183,7 +235,7 @@ export class CommandOption {
     | SlashCommandChannelOption;
   type: CommandOptionType;
   autocomplete?: true;
-  choices?: NonEmptyReadonlyArray<string>;
+  choices?: Readonly<NonEmptyArray<string>>;
   length?: readonly [number, number];
 
   constructor(args: 
@@ -256,6 +308,13 @@ export class CommandOption {
 }
 
 //MARK: Utils
+export interface ContextMenuData {
+  data: ContextMenuCommandBuilder;
+  label: string;
+  type: "message" | "user";
+  contextOption?: string;
+}
+
 export class Options {
   number: Map<string, number | null>;
   boolean: Map<string, boolean | null>;
@@ -278,17 +337,17 @@ export class Options {
 
 export function isSubcommandArray(
   body:
-    | NonEmptyReadonlyArray<CommandOption>
-    | NonEmptyReadonlyArray<Subcommand>,
-): body is NonEmptyReadonlyArray<Subcommand> {
+    | Readonly<NonEmptyArray<CommandOption>>
+    | Readonly<NonEmptyArray<Subcommand>>,
+): body is Readonly<NonEmptyArray<Subcommand>> {
   return body.length > 0 && body[0] instanceof Subcommand;
 }
 
 export function isOptionArray(
   body:
-    | NonEmptyReadonlyArray<CommandOption>
-    | NonEmptyReadonlyArray<Subcommand>,
-): body is NonEmptyReadonlyArray<CommandOption> {
+    | Readonly<NonEmptyArray<CommandOption>>
+    | Readonly<NonEmptyArray<Subcommand>>,
+): body is Readonly<NonEmptyArray<CommandOption>> {
   return body.length > 0 && body[0] instanceof CommandOption;
 }
 

@@ -1,5 +1,5 @@
 import { Collection, REST, Routes } from "discord.js";
-import { Command } from "./command.js";
+import { Command, ContextMenuData, isSubcommandArray, Subcommand } from "./command.js";
 import { toPosixPath } from "./utility.js";
 import path from "path";
 import fg from "fast-glob";
@@ -39,8 +39,27 @@ export class Registry {
   async registerCommands(token: string, id: string): Promise<void> {
     const rest = new REST().setToken(token);
 
+    //reigster ordinary commands
     await rest.put(Routes.applicationCommands(id), {
       body: this.commands.map((command) => command.data),
+    });
+
+    //reigster context menu commands
+    const contextMenuCommands = this.commands
+      .map(command => command.contextmenu)
+      .filter(command => command !== undefined);
+    
+    const contextMenuSubcommands = Array.from(this.commands.values())
+      .flatMap((command): (ContextMenuData | undefined)[] => {
+        if (!command.body || !isSubcommandArray(command.body)) return [undefined];
+        return command.body.map(subcommand => subcommand.contextmenu);
+      })
+      .filter(command => command !== undefined);
+    
+    const allContextMenuCommands = contextMenuCommands.concat(contextMenuSubcommands);
+
+    await rest.put(Routes.applicationCommands(id), {
+      body: allContextMenuCommands.map((command) => command.data),
     });
   }
 

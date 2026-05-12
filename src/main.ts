@@ -11,10 +11,12 @@ import { Registry } from "./utility/registry.js";
 import {
   AutocompleteContext,
   ChatInputCommandInteractionContext,
+  ContextMenuCommandContext,
   MessageContext,
 } from "./utility/context.js";
 import {
   detectChatInputInteractionCommand,
+  detectContextMenuCommand,
   detectMessageCommand,
   handleAutocomplete,
 } from "./utility/process.js";
@@ -80,6 +82,16 @@ CLIENT.on(Events.InteractionCreate, (interaction) => {
           DATA,
         );
         handleAutocompleteError(context, interaction.commandName, error);
+      },
+    );
+  } else if (interaction.isContextMenuCommand()) {
+    detectContextMenuCommand(DATA, interaction).catch(
+      async (error: unknown) => {
+        const context = new ContextMenuCommandContext(
+          interaction,
+          DATA,
+        );
+        await handleCommandError(context, interaction.commandName, error);
       },
     );
   }

@@ -1,4 +1,4 @@
-import { AutocompleteInteraction, Channel, ChatInputCommandInteraction, Message, Role, User } from "discord.js";
+import { AutocompleteInteraction, Channel, ChatInputCommandInteraction, ContextMenuCommandInteraction, Message, Role, User } from "discord.js";
 import {
   CommandOption,
   isOptionArray,
@@ -14,10 +14,11 @@ import {
   ChatInputCommandInteractionSubcommandContext,
   MessageContext,
   MessageSubcommandContext,
-  AutocompleteContext
+  AutocompleteContext,
+  ContextMenuCommandContext
 } from "./context.js";
 import { Registry } from "./registry.js";
-import { Data, NonEmptyReadonlyArray } from "./types.js";
+import { Data, NonEmptyArray } from "./types.js";
 import { sleep } from "./utility.js";
 import perms from "../data/perms.json" with { type: "json" };
 import { Perms } from "./types.js";
@@ -306,7 +307,7 @@ export async function detectMessageCommand(
 //MARK: Message Options
 function populateMessageOptions(
   sources: string[],
-  targets: NonEmptyReadonlyArray<CommandOption>,
+  targets: Readonly<NonEmptyArray<CommandOption>>,
   message: Message,
 ): Options {
   const options = new Options();
@@ -496,4 +497,93 @@ export async function handleAutocomplete(
   }
   
   await sleep(1);
+}
+
+//MARK: Context Menu
+export async function detectContextMenuCommand(
+  data: Data,
+  interaction: ContextMenuCommandInteraction,
+): Promise<void> {
+  const commandName = interaction.commandName;
+  //go through regular commands
+  let command = data.registry.commands
+    .find(cmd => cmd.contextmenu?.label === interaction.commandName);
+
+  if (command !== undefined) {
+    const contextMenuData = command.contextmenu;
+  
+    if (contextMenuData === undefined)
+      throw new Error(`Could not locate context menu command with name: ${commandName}`);
+
+    if (command.execute === undefined) 
+      throw new Error("Malformed context menu command is missing an execute function.");
+
+    const context = new ContextMenuCommandContext(interaction, data);
+
+    const options = new Options();
+    if (contextMenuData.contextOption) {
+      switch (contextMenuData.type) {
+      case "message": {
+        if (!interaction.isMessageContextMenuCommand())
+          throw new Error("Invalid data for user-type context menu option.");
+
+        options.string.set(contextMenuData.contextOption, interaction.targetMessage.content);
+        break;
+      } case "user": {
+        if (!interaction.isUserContextMenuCommand())
+          throw new Error("Invalid data for message-type context menu option.");
+      
+        options.user.set(contextMenuData.contextOption, interaction.targetUser);
+        break;
+      }
+      }
+    }
+
+    await command.execute(context, options);
+  } else {
+    //try looking for a subcommand
+    let subcommand: Subcommand | undefined = undefined;
+    for (const cmd of data.registry.commands.values()) {
+      if (!cmd.body || !isSubcommandArray(cmd.body)) continue;
+      const foundSubcommand = cmd.body
+        .find(subcmd => subcmd.contextmenu?.label === interaction.commandName);
+
+      if (foundSubcommand) {
+        command = cmd;
+        subcommand = foundSubcommand;
+        break;
+      }
+    }
+    
+    if (command === undefined || subcommand === undefined)
+      throw new Error("Could not locate context menu command.");
+    
+    const contextMenuData = subcommand.contextmenu;
+  
+    if (contextMenuData === undefined)
+      throw new Error(`Could not locate context menu command with name: ${commandName}`);
+    
+    const context = new ContextMenuCommandContext(interaction, data);
+
+    const options = new Options();
+    if (contextMenuData.contextOption) {
+      switch (contextMenuData.type) {
+      case "message": {
+        if (!interaction.isMessageContextMenuCommand())
+          throw new Error("Invalid data for user-type context menu option.");
+
+        options.string.set(contextMenuData.contextOption, interaction.targetMessage.content);
+        break;
+      } case "user": {
+        if (!interaction.isUserContextMenuCommand())
+          throw new Error("Invalid data for message-type context menu option.");
+      
+        options.user.set(contextMenuData.contextOption, interaction.targetUser);
+        break;
+      }
+      }
+    }
+
+    await subcommand.execute(context, options);
+  }
 }

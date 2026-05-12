@@ -10,6 +10,7 @@ import {
   AutocompleteInteraction,
   ApplicationCommandOptionChoiceData,
   AutocompleteFocusedOption,
+  ContextMenuCommandInteraction,
 } from "discord.js";
 import { Data } from "./types.js";
 import { Database } from "./database.js";
@@ -68,7 +69,7 @@ export interface CommandContext extends BaseContext {
 //MARK: MessageContext
 export class MessageContext implements CommandContext {
   message: Message;
-
+  
   data: Data;
   channel: TextBasedChannel | null;
   lastReply: Message | null;
@@ -76,14 +77,25 @@ export class MessageContext implements CommandContext {
   user: User;
   timestamp: number;
   db: Database;
-
+  
+  constructor(message: Message, data: Data) {
+    this.message = message;
+    this.data = data;
+    this.channel = message.channel;
+    this.lastReply = null;
+    this.guild = message.guild;
+    this.user = message.author;
+    this.timestamp = message.createdTimestamp;
+    this.db = data.db;
+  }
+  
   async reply(
     content:
-      | string
-      | {
-          content?: string;
-          embeds?: EmbedBuilder[];
-          components?: ActionRowBuilder<MessageActionRowComponentBuilder>[];
+    | string
+    | {
+      content?: string;
+      embeds?: EmbedBuilder[];
+      components?: ActionRowBuilder<MessageActionRowComponentBuilder>[];
         },
   ): Promise<Message> {
     this.lastReply = await this.message.reply(content);
@@ -110,17 +122,6 @@ export class MessageContext implements CommandContext {
       throw new Error(
         "Tried to send typing indicator in a unsendable channel.",
       );
-  }
-
-  constructor(message: Message, data: Data) {
-    this.message = message;
-    this.data = data;
-    this.channel = message.channel;
-    this.lastReply = null;
-    this.guild = message.guild;
-    this.user = message.author;
-    this.timestamp = message.createdTimestamp;
-    this.db = data.db;
   }
 }
 
@@ -152,6 +153,17 @@ export class ChatInputCommandInteractionContext implements CommandContext {
   user: User;
   timestamp: number;
   db: Database;
+
+  constructor(interaction: ChatInputCommandInteraction, data: Data) {
+    this.interaction = interaction;
+    this.data = data;
+    this.lastReply = null;
+    this.user = interaction.user;
+    this.guild = interaction.guild;
+    this.channel = interaction.channel;
+    this.timestamp = interaction.createdTimestamp;
+    this.db = data.db;
+  }
 
   async reply(
     content:
@@ -192,17 +204,6 @@ export class ChatInputCommandInteractionContext implements CommandContext {
       throw new Error(
         "Tried to send typing indicator in a unsendable channel.",
       );
-  }
-
-  constructor(interaction: ChatInputCommandInteraction, data: Data) {
-    this.interaction = interaction;
-    this.data = data;
-    this.lastReply = null;
-    this.user = interaction.user;
-    this.guild = interaction.guild;
-    this.channel = interaction.channel;
-    this.timestamp = interaction.createdTimestamp;
-    this.db = data.db;
   }
 }
 
@@ -310,3 +311,77 @@ export class AutocompleteContext implements BaseContext {
   }
 }
 
+export class ContextMenuCommandContext implements CommandContext {
+  interaction: ContextMenuCommandInteraction;
+
+  data: Data;
+  channel: TextBasedChannel | null;
+  lastReply: Message | null;
+  guild: Guild | null;
+  user: User;
+  timestamp: number;
+  db: Database;
+
+  constructor(interaction: ContextMenuCommandInteraction, data: Data) {
+    this.interaction = interaction;
+    this.data = data;
+    this.lastReply = null;
+    this.user = interaction.user;
+    this.guild = interaction.guild;
+    this.channel = interaction.channel;
+    this.timestamp = interaction.createdTimestamp;
+    this.db = data.db;
+  }
+
+  async reply(
+    content:
+    | string
+    | {
+      content?: string;
+      embeds?: EmbedBuilder[];
+      components?: ActionRowBuilder<MessageActionRowComponentBuilder>[];
+        },
+  ): Promise<Message> {
+    let callbackResponse;
+
+    if (typeof content === "object") {
+      callbackResponse = await this.interaction.reply({ 
+        content: content.content, 
+        embeds: content.embeds,
+        components: content.components,
+        withResponse: true 
+      });
+      this.lastReply = callbackResponse.resource?.message ?? null;
+    } else {
+      callbackResponse = await this.interaction.reply({ content, withResponse: true });
+      this.lastReply = callbackResponse.resource?.message ?? null;
+    }
+    if (this.lastReply === null)
+      throw new Error(`Interaction reply failed to create message in command ${this.interaction.commandName}.`);
+
+    return this.lastReply;
+  }
+
+  async send(
+    content:
+      | string
+      | {
+          content?: string;
+          embeds?: EmbedBuilder[];
+        },
+  ): Promise<Message> {
+    if (this.channel?.isSendable()) {
+      return await this.channel.send(content);
+    } else throw new Error("Tried to send message in a unsendable channel.");
+  }
+
+  async sendTyping(): Promise<void> {
+    if (this.channel?.isSendable()) {
+      await this.channel.sendTyping();
+    } else
+      throw new Error(
+        "Tried to send typing indicator in a unsendable channel.",
+      );
+  }
+
+}
