@@ -13,6 +13,11 @@ const FlagsStats = new Subcommand({
       optional: true,
     }),
   ],
+  contextmenu: {
+    type: "user",
+    label: "check flags stats",
+    contextOption: "user",
+  },
   execute: async (ctx, opts) => {
     const userChoice = opts.user.get("user") ?? ctx.user;
 
