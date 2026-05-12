@@ -1,4 +1,4 @@
-import { Collection, REST, Routes } from "discord.js";
+import { Collection, ContextMenuCommandBuilder, REST, Routes, SlashCommandBuilder } from "discord.js";
 import { Command, ContextMenuData, isSubcommandArray } from "./command.js";
 import { toPosixPath } from "./utility.js";
 import path from "path";
@@ -17,7 +17,7 @@ export class Registry {
     this.interjections = new Collection();
   }
 
-  async detectCommands(source: string): Promise<void> {
+  async detectCommands(source: string, devMode: boolean): Promise<void> {
     const globPattern = toPosixPath(path.join(source, "**/*.{js,ts}"));
     const fileGlob = await fg(globPattern);
 
@@ -29,6 +29,7 @@ export class Registry {
       .map(({ default: command }) => {
         if (!(command instanceof Command)) return null;
         // command: Command
+        if (devMode) console.log(`- Detected command "${command.data.name}" with ${(command.body?.length ?? 0).toString()} arguments.`);
         return [command.data.name, command] as [string, Command];
       })
       .filter((item) => item !== null);
@@ -39,31 +40,45 @@ export class Registry {
   async registerCommands(token: string, id: string): Promise<void> {
     const rest = new REST().setToken(token);
 
-    //reigster ordinary commands
-    await rest.put(Routes.applicationCommands(id), {
-      body: this.commands.map((command) => command.data),
-    });
+    //get ordinary commands
+    const chatInputCommands = this.commands;
 
-    //reigster context menu commands
+    //get regular context menu commands
     const contextMenuCommands = this.commands
-      .map(command => command.contextmenu)
+      .mapValues(command => command.contextmenu)
       .filter(command => command !== undefined);
     
-    const contextMenuSubcommands = Array.from(this.commands.values())
-      .flatMap((command): (ContextMenuData | undefined)[] => {
-        if (!command.body || !isSubcommandArray(command.body)) return [undefined];
-        return command.body.map(subcommand => subcommand.contextmenu);
-      })
-      .filter(command => command !== undefined);
-    
-    const allContextMenuCommands = contextMenuCommands.concat(contextMenuSubcommands);
+    //this is awful i'm so sorry to whoever has to edit this next, 
+    //i'll try to comment well but there's no saving this gibberish
 
+    //get context menu subcommands
+    const contextMenuSubcommands: Collection<string, ContextMenuData> = new Collection<string, ContextMenuData>();
+
+    //for each regular command...
+    for (const command of this.commands.values()) {
+      //if the command doesn't have subcommands, move on
+      if (!command.body || !isSubcommandArray(command.body)) continue;
+
+      //for each subcommand, if it has a context menu, add it to the list
+      for (const subcommand of command.body) {
+        if (subcommand.contextmenu) 
+          contextMenuSubcommands.set(subcommand.contextmenu.label, subcommand.contextmenu);
+      }
+    }
+
+    //merge everything together
+    const allContextMenuCommands = contextMenuCommands.concat(contextMenuSubcommands);
+    const allCommands: (SlashCommandBuilder | ContextMenuCommandBuilder)[] = new Array<SlashCommandBuilder | ContextMenuCommandBuilder>()
+      .concat(chatInputCommands.map((command) => command.data))
+      .concat(allContextMenuCommands.map((command) => command.data));
+
+    //send it off
     await rest.put(Routes.applicationCommands(id), {
-      body: allContextMenuCommands.map((command) => command.data),
+      body: allCommands,
     });
   }
 
-  async detectInterjections(source: string): Promise<void> {
+  async detectInterjections(source: string, devMode: boolean): Promise<void> {
     const globPattern = toPosixPath(path.join(source, "*.{js,ts}"));
     const fileGlob = await fg(globPattern);
 
@@ -75,6 +90,7 @@ export class Registry {
       .map(({ default: interjection }) => {
         if (!(interjection instanceof Interjection)) return null;
         // interjection: Interjection
+        if (devMode) console.log(`- Detected interjection "${interjection.name}".`);
         return [interjection.name, interjection] as [string, Interjection];
       })
       .filter((item) => item !== null);
