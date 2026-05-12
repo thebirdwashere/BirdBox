@@ -37,21 +37,16 @@ const Jinx = new Interjection({
   test: async (ctx) => {
     console.log("tset running");
     if (!ctx.channel) return;
-    const channelId = ctx.channel.id;
-
-    const lastData = dbRequest.get({ id: channelId });
+    const lastData = dbRequest.get({ id: ctx.channel.id });
 
     const contentHash = createHash("SHA256").update(ctx.message.content).digest("base64");
 
-    const authorId = ctx.user.id;
-    const timestamp = ctx.message.createdTimestamp;
-
     dbUpdate.run({ 
-      id: channelId, 
+      id: ctx.channel.id, 
       data: JSON.stringify({
         contentHash,
-        timestamp,
-        authorId,
+        timestamp: ctx.message.createdTimestamp,
+        authorId: ctx.user.id,
       })
     });
 
@@ -59,13 +54,12 @@ const Jinx = new Interjection({
 
     const lastMessage = JSON.parse(lastData.data?.toString() ?? "{}") as jinxMessage;
 
-    //the required tests
-    const jinxCreatedCloseTogether = Math.abs(lastMessage.timestamp - ctx.message.createdTimestamp) <= JINX_WINDOW;
-    const contentIsIdentical = lastMessage.contentHash === contentHash;
-    const jinxFromDifferentPeople = lastMessage.authorId !== authorId;
-
     //only pass if all true
-    if (jinxCreatedCloseTogether && contentIsIdentical && jinxFromDifferentPeople) {
+    if (
+      Math.abs(lastMessage.timestamp - ctx.message.createdTimestamp) <= JINX_WINDOW
+      && lastMessage.contentHash === contentHash 
+      && lastMessage.authorId !== ctx.user.id
+    ) {
       await ctx.send(ctx.message.content);
     }
   }
