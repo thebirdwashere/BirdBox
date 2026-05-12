@@ -53,6 +53,7 @@ export interface Data {
   registry: Registry;
   client: Client;
   db: Database;
+  devMode: boolean;
 };
 
 export type DatabaseRecord<T> = Record<string, T>

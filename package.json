@@ -1,11 +1,12 @@
 {
   "name": "birdbox",
-  "version": "1.0.0",
-  "description": "discord bot",
+  "version": "7.0.0",
+  "description": "A little fun bot project turned actually somewhat useful.",
   "main": "src/main.ts",
   "scripts": {
     "start": "tsx src/main.ts",
     "watch": "tsx --watch src/main.ts",
+    "dev": "tsx --watch src/main.ts --DEV-MODE",
     "lint": "eslint ./src/ --ext .ts --no-warn-ignored",
     "build": "tsc"
   },

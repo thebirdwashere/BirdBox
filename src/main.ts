@@ -24,6 +24,10 @@ import { Data, Perms, SnipedMessage } from "./utility/types.js";
 
 import { Database } from "./utility/database.js";
 
+const COMMAND_LINE_ARGUMENTS = process.argv.slice(2);
+const DEVMODE = COMMAND_LINE_ARGUMENTS[0] === "--DEV-MODE";
+if (DEVMODE) console.log("--- Developer Mode Enabled ---");
+
 //MARK: Data & Registry
 const BOT_TOKEN =
   process.env.BOT_TOKEN ?? panic("Failed to find BOT_TOKEN in environment.");
@@ -49,15 +53,21 @@ const DATA: Data = {
   registry: REGISTRY,
   client: CLIENT,
   db: DB,
+  devMode: DEVMODE,
 };
 
-await REGISTRY.detectCommands(path.join(import.meta.dirname, "commands"));
-await REGISTRY.detectInterjections(path.join(import.meta.dirname, "interjections"));
+if (DEVMODE) console.log("Beginning to detect commands.");
+await REGISTRY.detectCommands(path.join(import.meta.dirname, "commands"), DEVMODE);
+
+if (DEVMODE) console.log("\nBeginning to detect interjections.");
+await REGISTRY.detectInterjections(path.join(import.meta.dirname, "interjections"), DEVMODE);
+
+if (DEVMODE) console.log("\nDetection complete. Logging in...\n");
 
 CLIENT.on(Events.ClientReady, (_event) => {
   console.log("Birdbox Rewrite is now online.");
   console.log(`Logged in as ${CLIENT.user?.tag ?? "(undefined)"}.`);
-  console.log("Logs will be shown in this terminal.");
+  console.log("Logs will be shown in this terminal.\n");
 
   REGISTRY.registerCommands(BOT_TOKEN, BOT_ID).catch(console.error);
 });
@@ -65,6 +75,8 @@ CLIENT.on(Events.ClientReady, (_event) => {
 //MARK: Interaction
 CLIENT.on(Events.InteractionCreate, (interaction) => {
   if (interaction.isChatInputCommand()) {
+    if (DEVMODE) console.log(`Interaction originates from chat input command: "${interaction.commandName}"`);
+
     detectChatInputInteractionCommand(DATA, interaction).catch(
       async (error: unknown) => {
         const context = new ChatInputCommandInteractionContext(
@@ -75,6 +87,8 @@ CLIENT.on(Events.InteractionCreate, (interaction) => {
       },
     );
   } else if (interaction.isAutocomplete()) {
+    if (DEVMODE) console.log(`Interaction originates from chat input command: "${interaction.commandName}"`);
+
     handleAutocomplete(DATA, interaction).catch(
       (error: unknown) => {
         const context = new AutocompleteContext(
@@ -85,6 +99,8 @@ CLIENT.on(Events.InteractionCreate, (interaction) => {
       },
     );
   } else if (interaction.isContextMenuCommand()) {
+    if (DEVMODE) console.log(`Interaction originates from chat input command: "${interaction.commandName}"`);
+
     detectContextMenuCommand(DATA, interaction).catch(
       async (error: unknown) => {
         const context = new ContextMenuCommandContext(
@@ -94,12 +110,17 @@ CLIENT.on(Events.InteractionCreate, (interaction) => {
         await handleCommandError(context, interaction.commandName, error);
       },
     );
+  } else {
+    if (DEVMODE) {
+      console.log(`Received interaction event of type ${interaction.type.toString()}, initiated by ${interaction.user.username}. (possibly an ActionRow event)`);
+    }
   }
 });
 
 //MARK: Message
 CLIENT.on(Events.MessageCreate, (message) => {
   if (message.author.bot) return;
+  if (DEVMODE) console.log(`Received message from ${message.author.username}.`);
 
   const context = new MessageContext(message, DATA);
   
@@ -119,6 +140,7 @@ CLIENT.on(Events.MessageCreate, (message) => {
 //MARK: Delete
 CLIENT.on(Events.MessageDelete, (message) => {
   if (!message.author) return;
+  if (DEVMODE) console.log(`Detected message deletion from ${message.author.username}.`);
 
   const userSnipesEnabled = fetchConfigOption(DB, "user", "snipes", message.author.id);
   if (!userSnipesEnabled) return;
