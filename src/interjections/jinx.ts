@@ -35,7 +35,6 @@ const dbUpdate = db.prepare(`
 const Jinx = new Interjection({
   name: "jinx",
   test: async (ctx) => {
-    console.log("tset running");
     if (!ctx.channel) return;
     const lastData = dbRequest.get({ id: ctx.channel.id });
 
