@@ -1,5 +1,5 @@
 import { Collection, REST, Routes } from "discord.js";
-import { Command, ContextMenuData, isSubcommandArray, Subcommand } from "./command.js";
+import { Command, ContextMenuData, isSubcommandArray } from "./command.js";
 import { toPosixPath } from "./utility.js";
 import path from "path";
 import fg from "fast-glob";
