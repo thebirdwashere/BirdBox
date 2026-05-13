@@ -9,7 +9,7 @@
     "lint": "eslint ./src/ --ext .ts --no-warn-ignored",
     "build": "tsc"
   },
-  "author": "bislij",
+  "author": "TheBirdWasHere and friends",
   "license": "ISC",
   "type": "module",
   "devDependencies": {

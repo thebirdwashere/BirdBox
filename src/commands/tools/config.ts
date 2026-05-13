@@ -1,10 +1,11 @@
 import { Command, CommandOption } from "src/utility/command.js";
-import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, ChannelSelectMenuBuilder, ChannelType, ComponentType, EmbedBuilder, MentionableSelectMenuBuilder, MessageActionRowComponentBuilder, MessageComponentInteraction, ModalBuilder, ModalSubmitInteraction, RoleSelectMenuBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, TextInputBuilder, TextInputStyle, UserSelectMenuBuilder 
+import { ActionRowBuilder, ActivityType, ButtonBuilder, ButtonInteraction, ButtonStyle, ChannelSelectMenuBuilder, ChannelType, ComponentType, EmbedBuilder, MentionableSelectMenuBuilder, MessageActionRowComponentBuilder, MessageComponentInteraction, ModalBuilder, ModalSubmitInteraction, RoleSelectMenuBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, TextInputBuilder, TextInputStyle, UserSelectMenuBuilder 
 } from "discord.js";
 import config from "src/data/config.json" with { type: "json" };
 import { Config, ConfigOptions, ConfigScope } from "src/utility/types.js";
 import { Database } from "src/utility/database.js";
 import { fetchConfigOption, getAdminIds } from "src/utility/utility.js";
+import { CommandContext } from "src/utility/context.js";
 
 const CONFIG = config as Config;
 
@@ -104,7 +105,7 @@ const Config = new Command({
             const shortenedSubmit = submittedValue.length > MAX_DISPLAY_LENGTH ? submittedValue.substring(0, 25) + "..." : submittedValue;
             await i2.reply(`Config option set to "${shortenedSubmit}"!`);
 
-            setSetting(scope, i.user.id, ctx.db, CONFIG[scope][name], submittedValue);
+            setSetting(ctx, scope, CONFIG[scope][name], submittedValue);
           })
           .catch(async () => {await i.followUp("Modal submit timed out.");});
         
@@ -114,7 +115,7 @@ const Config = new Command({
       await i.deferUpdate();
 
       const settingId = scope == "user" ? i.user.id : i.guild?.id;
-      setSetting(scope, settingId, ctx.db, CONFIG[scope][name], i.customId);
+      setSetting(ctx, scope, CONFIG[scope][name], i.customId);
       await response.edit({components: await updateRow(settingId, ctx.db, scope, name)});
     });
 
@@ -142,8 +143,7 @@ const Config = new Command({
       } else if (i.customId == "settingOptionsSelect") {
         await i.deferUpdate();
 
-        const settingId = scope == "user" ? i.user.id : i.guild?.id;
-        setSetting(scope, settingId, ctx.db, CONFIG[scope][name], collectedValue);
+        setSetting(ctx, scope, CONFIG[scope][name], i.customId);
       }
     });
     
@@ -164,8 +164,7 @@ const Config = new Command({
       const collectedValue = i.values[0];
       await i.deferUpdate();
 
-      const settingId = scope == "user" ? i.user.id : i.guild?.id;
-      setSetting(scope, settingId, ctx.db, CONFIG[scope][name], collectedValue);
+      setSetting(ctx, scope, CONFIG[scope][name], collectedValue);
     });
 
     //MARK: mention responses
@@ -180,8 +179,7 @@ const Config = new Command({
       const collectedValue = i.values[0];
       await i.deferUpdate();
 
-      const settingId = scope == "user" ? i.user.id : i.guild?.id;
-      setSetting(scope, settingId, ctx.db, CONFIG[scope][name], collectedValue);
+      setSetting(ctx, scope, CONFIG[scope][name], collectedValue);
     });
 
     //MARK: role responses
@@ -196,8 +194,7 @@ const Config = new Command({
       const collectedValue = i.values[0];
       await i.deferUpdate();
 
-      const settingId = scope == "user" ? i.user.id : i.guild?.id;
-      setSetting(scope, settingId, ctx.db, CONFIG[scope][name], collectedValue);
+      setSetting(ctx, scope, CONFIG[scope][name], collectedValue);
     });
 
     //MARK: user responses
@@ -212,8 +209,7 @@ const Config = new Command({
       const collectedValue = i.values[0];
       await i.deferUpdate();
 
-      const settingId = scope == "user" ? i.user.id : i.guild?.id;
-      setSetting(scope, settingId, ctx.db, CONFIG[scope][name], collectedValue);
+      setSetting(ctx, scope, CONFIG[scope][name], collectedValue);
     });
   },
 });
@@ -393,23 +389,32 @@ async function customModal(i: ButtonInteraction, setting: ConfigOptions): Promis
   await i.showModal(modal);
 }
 
-//MARK: set/get setting
-function setSetting(scope: ConfigScope, id: string | undefined, db: Database, setting: ConfigOptions, value: unknown): void {
+//MARK: set config
+function setSetting(ctx: CommandContext, scope: ConfigScope, setting: ConfigOptions, value: unknown): void {
   switch (scope) {
   case "user": {
-    if (id === undefined)
-      throw new Error("Attempted to get setting without a valid ID.");
-
-    db.user.update(id, setting.value, value);
+    ctx.db.user.update(ctx.user.id, setting.value, value);
     break;
   } case "server": {
-    if (id === undefined)
-      throw new Error("Attempted to get setting without a valid ID.");
+    if (ctx.guild == null)
+      throw new Error("Attempted to set server config outside a server.");
 
-    db.server.update(id, setting.value, value);
+    ctx.db.server.update(ctx.guild.id, setting.value, value);
     break;
   } case "bot": {
-    db.global.update("global", setting.value, value);
+    ctx.db.global.update("global", setting.value, value);
+    
+    //manual extra code for specific configs
+    switch (setting.value) {
+    case "status": {
+      if (typeof value !== "string") break;
+      if (ctx.data.client.user == null) break;
+
+      ctx.data.client.user.setPresence({ activities: [{ name: value, type: ActivityType.Custom }] });
+      break;
+    }
+    }
+
     break;
   }
   }

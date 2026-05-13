@@ -1,4 +1,4 @@
-import { Client, Events, GatewayIntentBits } from "discord.js";
+import { ActivityType, Client, Events, GatewayIntentBits } from "discord.js";
 import path from "path";
 
 import "dotenv/config";
@@ -69,8 +69,19 @@ CLIENT.on(Events.ClientReady, (_event) => {
   console.log(`Logged in as ${CLIENT.user?.tag ?? "(undefined)"}.`);
   console.log("Logs will be shown in this terminal.\n");
 
-  if (DEVMODE) console.log("Registering commands has been skipped due to dev mode. Prefixed commands will work as expected. \nIf you have made changes to slash or context menu commands, use `npm run start` to update them.");
+  if (DEVMODE) console.log("Registering commands has been skipped due to dev mode. Prefixed commands will work as expected. \nIf you have made changes to slash or context menu commands, use `npm run start` to update them.\n");
   else REGISTRY.registerCommands(BOT_TOKEN, BOT_ID).catch(console.error);
+
+  const status = fetchConfigOption(DB, "bot", "status", undefined);
+
+  if (typeof status !== "string") {
+    console.error("Provided status is invalid. Proceeding without configuring status...");
+  } else if (CLIENT.user == null) {
+    console.error("Cannot locate CLIENT.user. Proceeding without configuring status...");
+  } else {
+    CLIENT.user.setPresence({ activities: [{ name: status, type: ActivityType.Custom }] });
+    if (DEVMODE) console.log(`Status configured successfully as "${status}"!\n`);
+  }
 });
 
 //MARK: Interaction
