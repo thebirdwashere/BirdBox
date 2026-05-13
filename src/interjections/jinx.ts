@@ -36,10 +36,10 @@ const dbUpdate = db.prepare(`
 const Jinx = new Interjection({
   name: "jinx",
   test: async (ctx) => {
-    if (!ctx.channel) return;
+    if (!ctx.channel) return false;
     if (ctx.guild) {
       const jinxSetting = fetchConfigOption(ctx.db, "server", "jinxes", ctx.guild.id);
-      if (!jinxSetting) return;
+      if (!jinxSetting) return false;
     }
 
     const lastData = dbRequest.get({ id: ctx.channel.id });
@@ -55,7 +55,7 @@ const Jinx = new Interjection({
       })
     });
 
-    if (lastData === undefined) return;
+    if (lastData === undefined) return false;
 
     const lastMessage = JSON.parse(lastData.data?.toString() ?? "{}") as jinxMessage;
 
@@ -66,7 +66,10 @@ const Jinx = new Interjection({
       && lastMessage.authorId !== ctx.user.id
     ) {
       await ctx.send(ctx.message.content);
+      return true;
     }
+
+    return false;
   }
 });
 

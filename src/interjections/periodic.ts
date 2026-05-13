@@ -17,40 +17,40 @@ const Periodic = new Interjection({
     const content = ctx.message.content.toLowerCase();
 
     //this checks if the message is empty or too long
-    if (content.length > 950) return;
+    if (content.length > 950) return false;
     //this tests for non-alphabetical characters
-    if (Array.isArray(/[^a-zA-Z\s]/.exec(content))) return;
+    if (Array.isArray(/[^a-zA-Z\s]/.exec(content))) return false;
     //no j or q on the periodic table, fun fact
-    if (content.includes("j") || content.includes("q")) return;
+    if (content.includes("j") || content.includes("q")) return false;
 
     //only test strings with a certain number of characters, for coolness factor
-    if (content.length < MIN_CHAR_LENGTH) return;
+    if (content.length < MIN_CHAR_LENGTH) return false;
 
     //another fun fact: x only starts a two-letter combo, so cannot end it
-    if (content.endsWith("x")) return;
+    if (content.endsWith("x")) return false;
 
     //list of clusters that can't happen ever
     for (const item of PERIODIC_TABLE.impossibleStrings) {
-      if (content.includes(item)) return;
+      if (content.includes(item)) return false;
     };
 
     //btw i'm bothering to check this super well because it's going to take a while
-    // to get to the end with this algorithm, and figuring out which endings are impossible is 
-    // relatively straightforward with another algoritm i made elsewhere. it's already 
-    // super fast so i really don't have to do this, but i am bored on winter break and 
-    // terrified to push this complicated update
+    // to get to the end with this algorithm, and figuring out which endings are impossible 
+    // is relatively straightforward with another algoritm i made elsewhere.  
+    // it's already super fast so i really don't have to do this, but i am bored   
+    // on winter break and terrified to push this complicated update
 
-    if (PERIODIC_TABLE.impossibleEndings.includes(content.slice(-2))) return;    
+    if (PERIODIC_TABLE.impossibleEndings.includes(content.slice(-2))) return false;    
 
     //https://stackoverflow.com/questions/6163169/replace-multiple-whitespaces-with-single-whitespace-in-javascript-string
     const cleanContent = content.replace(/\s+/g, " ").trim(); 
 
     const tableArray = periodicCheck(cleanContent, [], 0);
 
-    if (!tableArray) return; //ensure a value was returned
+    if (!tableArray) return false; //ensure a value was returned
     const uniqueItems = [...new Set(tableArray)];
 
-    if (uniqueItems.length < MIN_UNIQUE_ELEMENTS) return;
+    if (uniqueItems.length < MIN_UNIQUE_ELEMENTS) return false;
 
     const periodicString = tableArray.join("");
     await ctx.message.reply(`:test_tube: Your message is on the periodic table! \n\`${periodicString}\``);
@@ -65,6 +65,8 @@ const Periodic = new Interjection({
       "emoji": ":test_tube:",
       "footer": randomFooter,
     });
+
+    return true;
   }
 });
 

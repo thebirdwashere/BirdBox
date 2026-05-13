@@ -11,7 +11,10 @@ const Mentions = new Interjection({
     if (ctx.message.content.toLowerCase().includes("birdbox")) {
       const response = randomChoice(RESPONSES);
       await ctx.message.react(response);
+      return true;
     }
+
+    return false;
   }
 });
 

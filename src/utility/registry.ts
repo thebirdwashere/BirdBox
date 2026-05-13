@@ -119,17 +119,17 @@ export class Registry {
       throw new Error("Benchmarking expects dev mode.");
     console.log("\nBeginning to benchmark interjections...");
 
-    const timesArray = new Collection<string, number>();
+    const timesArray = new Collection<string, [number, boolean]>();
     const overallStart = performance.now();
   
     for (const interjection of this.interjections.values()) {
       try {
         const startTime = performance.now();
 
-        await interjection.test(ctx);
+        const success = await interjection.test(ctx);
 
         const endTime = performance.now();
-        timesArray.set(interjection.name, endTime - startTime);
+        timesArray.set(interjection.name, [endTime - startTime, success]);
       } catch (error: unknown) {
         await handleInterjectionError(
           ctx,
@@ -144,7 +144,7 @@ export class Registry {
 
     timesArray.sort().reverse();
     for (const [key, val] of timesArray.entries()) {
-      console.log(`- ${String(key)} time: \x1b[33m${val.toPrecision(4)}ms\x1b[0m`);
+      console.log(`- ${String(key)} time: \x1b[33m${val[0].toPrecision(2)}ms\x1b[0m ${val[1] ? "[SUCCESSFUL]" : ""}`);
     }
     console.log(`Overall: \x1b[33m${overallTime.toPrecision(4)}ms\x1b[0m`);
   }

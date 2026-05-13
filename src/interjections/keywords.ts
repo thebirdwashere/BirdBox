@@ -10,7 +10,7 @@ const Pangram = new Interjection({
   test: async (ctx) => {
     if (ctx.guild) {
       const settingValue = await fetchConfigOption(ctx.db, "server", "responses", ctx.guild.id);
-      if (!settingValue) return;
+      if (!settingValue) return false;
     }
     
     //filter and get message content for detection
@@ -24,9 +24,11 @@ const Pangram = new Interjection({
     for (const [key, val] of keywordsMap) {
       if (content.includes(key)) {
         await ctx.reply(val);
-        return;
+        return true;
       }
     }
+    
+    return false;
   }
 });
 

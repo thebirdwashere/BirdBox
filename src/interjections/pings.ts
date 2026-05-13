@@ -11,7 +11,10 @@ const Pings = new Interjection({
     if (ctx.message.content.includes(`<@${ctx.data.id}>`)) {
       const randomReply = randomChoice(RESPONSES);
       await ctx.reply(randomReply);
+      return true;
     }
+
+    return false;
   }
 });
 

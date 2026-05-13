@@ -16,7 +16,10 @@ const Interruptions = new Interjection({
       const randomInterruption = randomChoice(RESPONSES);
       const response = randomInterruption.replace("(userPing)", `<@${ctx.user.id}>`);
       await ctx.send(response);
+      return true;
     }
+
+    return false;
   }
 });
 

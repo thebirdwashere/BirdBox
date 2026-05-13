@@ -13,7 +13,7 @@ const Lyrics = new Interjection({
   test: async (ctx) => {
     if (ctx.guild) {
       const settingValue = await fetchConfigOption(ctx.db, "server", "responses", ctx.guild.id);
-      if (!settingValue) return;
+      if (!settingValue) return false;
     }
 
     //filter and get message content for detection
@@ -56,11 +56,10 @@ const Lyrics = new Interjection({
 
       if (responseLyric == false) {
         //end the function completely, if the song was meant to be over
-        return;
+        return false;
       } else if (responseLyric !== undefined) {
         await ctx.reply(responseLyric);
-
-        return;
+        return true;
       }
     }
 
@@ -85,15 +84,18 @@ const Lyrics = new Interjection({
       }
     }
 
-    //send chosen lyric
-    if (decidedLyric) {
-      await ctx.reply(decidedLyric);
-    }
-
     //update database with indices, or undefined if no indices exist
     if (ctx.channel) {
       ctx.db.channel.update(ctx.channel.id, "lyricIndices", newLyricIndices);
     };
+
+    //send chosen lyric
+    if (decidedLyric) {
+      await ctx.reply(decidedLyric);
+      return true;
+    }
+
+    return false;
   }
 });
 

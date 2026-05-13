@@ -11,12 +11,12 @@ const Pangram = new Interjection({
     const alphabet = "abcdefghijklmnopqrstuvwxyz".split("");
     const content = ctx.message.content.toLowerCase();
 
-    if (content.length > 950) return; //this checks if the message is empty or too long
-    if (content.includes("https://")) return; //this checks for contained links (which trivialize detection)
+    if (content.length > 950) return false; //this checks if the message is empty or too long
+    if (content.includes("https://")) return false; //this checks for contained links (which trivialize detection)
     
     const capitalizedContent = content.split("");
     for (const letter of alphabet) {
-      if (!content.includes(letter)) return;
+      if (!content.includes(letter)) return false;
       const letterIndex = content.indexOf(letter);
       capitalizedContent[letterIndex] = capitalizedContent[letterIndex].toUpperCase();
     }
@@ -33,6 +33,8 @@ const Pangram = new Interjection({
       "emoji": ":capital_abcd:",
       "footer": randomFooter,
     });
+
+    return true;
   }
 });
 
