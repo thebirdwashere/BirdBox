@@ -69,14 +69,14 @@ CLIENT.on(Events.ClientReady, (_event) => {
   console.log(`Logged in as ${CLIENT.user?.tag ?? "(undefined)"}.`);
   console.log("Logs will be shown in this terminal.\n");
 
-  if (DEVMODE) console.log("Command registry is being skipped due to dev mode. \nIf you have made changes to commands, use `npm run start` to update them.");
+  if (DEVMODE) console.log("Registering commands has been skipped due to dev mode. Prefixed commands will work as expected. \nIf you have made changes to slash or context menu commands, use `npm run start` to update them.");
   else REGISTRY.registerCommands(BOT_TOKEN, BOT_ID).catch(console.error);
 });
 
 //MARK: Interaction
 CLIENT.on(Events.InteractionCreate, (interaction) => {
   if (interaction.isChatInputCommand()) {
-    if (DEVMODE) console.log(`Interaction originates from chat input command: "${interaction.commandName}"`);
+    if (DEVMODE) console.log(`\nReceived interaction from chat input command: \x1b[33m"${interaction.commandName}"\x1b[0m`);
 
     detectChatInputInteractionCommand(DATA, interaction).catch(
       async (error: unknown) => {
@@ -88,7 +88,7 @@ CLIENT.on(Events.InteractionCreate, (interaction) => {
       },
     );
   } else if (interaction.isAutocomplete()) {
-    if (DEVMODE) console.log(`Interaction originates from chat input command: "${interaction.commandName}"`);
+    if (DEVMODE) console.log(`\nReceived interaction from chat input command: \x1b[33m"${interaction.commandName}"\x1b[0m`);
 
     handleAutocomplete(DATA, interaction).catch(
       (error: unknown) => {
@@ -100,7 +100,7 @@ CLIENT.on(Events.InteractionCreate, (interaction) => {
       },
     );
   } else if (interaction.isContextMenuCommand()) {
-    if (DEVMODE) console.log(`Interaction originates from chat input command: "${interaction.commandName}"`);
+    if (DEVMODE) console.log(`\nReceived interaction from chat input command: \x1b[33m"${interaction.commandName}"\x1b[0m`);
 
     detectContextMenuCommand(DATA, interaction).catch(
       async (error: unknown) => {
@@ -113,7 +113,7 @@ CLIENT.on(Events.InteractionCreate, (interaction) => {
     );
   } else {
     if (DEVMODE) {
-      console.log(`Received interaction event of type ${interaction.type.toString()}, initiated by ${interaction.user.username}. (possibly an ActionRow event)`);
+      console.log(`Received unknown interaction event of type ${interaction.type.toString()}, initiated by ${interaction.user.username}. (possibly an ActionRow event)`);
     }
   }
 });
@@ -121,7 +121,9 @@ CLIENT.on(Events.InteractionCreate, (interaction) => {
 //MARK: Message
 CLIENT.on(Events.MessageCreate, (message) => {
   if (message.author.bot) return;
-  if (DEVMODE) console.log(`Received message from ${message.author.username}.`);
+  if (DEVMODE) {
+    console.log(`\nReceived message from ${message.author.username} with content: \n"\x1b[33m${message.content.substring(0, 50)}${message.content.length > 50 ? "..." : ""}\x1b[0m"`);
+  }
 
   const context = new MessageContext(message, DATA);
   
@@ -135,13 +137,14 @@ CLIENT.on(Events.MessageCreate, (message) => {
     },
   );
 
-  void REGISTRY.testInterjections(context);
+  if (!DEVMODE) void REGISTRY.testInterjections(context);
+  else void REGISTRY.testAndBenchmarknterjections(context);
 });
 
 //MARK: Delete
 CLIENT.on(Events.MessageDelete, (message) => {
   if (!message.author) return;
-  if (DEVMODE) console.log(`Detected message deletion from ${message.author.username}.`);
+  if (DEVMODE) console.log(`Detected message deletion from ${message.author.username} with content: \n"\x1b[33m${message.content?.substring(0, 50) ?? ""}${message.content && message.content.length > 50 ? "..." : ""}\x1b[0m"`);
 
   const userSnipesEnabled = fetchConfigOption(DB, "user", "snipes", message.author.id);
   if (!userSnipesEnabled) return;

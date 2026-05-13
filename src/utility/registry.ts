@@ -101,15 +101,35 @@ export class Registry {
   }
 
   async testInterjections(ctx: MessageContext): Promise<void> {
-    // const timesArray = new Collection();
     for (const interjection of this.interjections.values()) {
       try {
-        // const startTime = performance.now();
+        await interjection.test(ctx);
+      } catch (error: unknown) {
+        await handleInterjectionError(
+          ctx,
+          interjection.name,
+          error
+        );
+      };
+    };
+  }
+
+  async testAndBenchmarknterjections(ctx: MessageContext): Promise<void> {
+    if (!ctx.data.devMode) 
+      throw new Error("Benchmarking expects dev mode.");
+    console.log("\nBeginning to benchmark interjections...");
+
+    const timesArray = new Collection<string, number>();
+    const overallStart = performance.now();
+  
+    for (const interjection of this.interjections.values()) {
+      try {
+        const startTime = performance.now();
 
         await interjection.test(ctx);
 
-        // const endTime = performance.now();
-        // timesArray.set(interjection.name, endTime - startTime);
+        const endTime = performance.now();
+        timesArray.set(interjection.name, endTime - startTime);
       } catch (error: unknown) {
         await handleInterjectionError(
           ctx,
@@ -119,11 +139,13 @@ export class Registry {
       };
     };
 
-    // timesArray.sort().reverse();
-    // for (const [key, val] of timesArray.entries()) {
-    //   console.log(`${String(key)} time: ${String(val)}`);
-    // }
+    const overallEnd = performance.now();
+    const overallTime = overallEnd - overallStart;
 
-    // console.log("---");
+    timesArray.sort().reverse();
+    for (const [key, val] of timesArray.entries()) {
+      console.log(`- ${String(key)} time: \x1b[33m${val.toPrecision(4)}ms\x1b[0m`);
+    }
+    console.log(`Overall: \x1b[33m${overallTime.toPrecision(4)}ms\x1b[0m`);
   }
 }

@@ -5,7 +5,6 @@
   "main": "src/main.ts",
   "scripts": {
     "start": "tsx src/main.ts",
-    "watch": "tsx --watch src/main.ts",
     "dev": "tsx --watch src/main.ts --DEV-MODE",
     "lint": "eslint ./src/ --ext .ts --no-warn-ignored",
     "build": "tsc"

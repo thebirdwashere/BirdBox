@@ -1,6 +1,7 @@
 import { Interjection } from "src/utility/interjection.js";
 import { createHash } from "crypto";
 import { DatabaseSync } from "node:sqlite";
+import { fetchConfigOption } from "src/utility/utility.js";
 
 const JINX_WINDOW = 3000;
 
@@ -36,6 +37,11 @@ const Jinx = new Interjection({
   name: "jinx",
   test: async (ctx) => {
     if (!ctx.channel) return;
+    if (ctx.guild) {
+      const jinxSetting = fetchConfigOption(ctx.db, "server", "jinxes", ctx.guild.id);
+      if (!jinxSetting) return;
+    }
+
     const lastData = dbRequest.get({ id: ctx.channel.id });
 
     const contentHash = createHash("SHA256").update(ctx.message.content).digest("base64");
