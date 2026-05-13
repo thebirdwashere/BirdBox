@@ -150,6 +150,8 @@ export type Languages = {
   name: string;
 }[];
 
+export type Lyrics = string[][];
+
 export type PatchNotes = {
   version: string;
   type: string;

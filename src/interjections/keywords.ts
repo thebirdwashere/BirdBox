@@ -7,7 +7,7 @@ const KEYWORDS = keywords as Keywords;
 
 const Pangram = new Interjection({
   name: "keywords",
-  test: async(ctx) => {
+  test: async (ctx) => {
     if (ctx.guild) {
       const settingValue = await fetchConfigOption(ctx.db, "server", "responses", ctx.guild.id);
       if (!settingValue) return;
