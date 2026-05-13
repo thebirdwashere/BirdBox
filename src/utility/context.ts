@@ -262,7 +262,7 @@ export class AutocompleteContext implements BaseContext {
       responseElements = choicesStartsWith.concat(choicesContains);
     };
 
-    if (responseElements.length > 1) {
+    if (responseElements.length !== 0) {
       await this.interaction.respond(responseElements.slice(0, 25));
     } else if (blank) {
       await this.interaction.respond([{ name: blank, value: blank }]);
