@@ -5,6 +5,8 @@ import { fetchConfigOption } from "src/utility/utility.js";
 
 const KEYWORDS = keywords as Keywords;
 
+const FILTER_REGEX = /[^A-Za-z\s!?]/g;
+
 const Pangram = new Interjection({
   name: "keywords",
   test: async (ctx) => {
@@ -14,8 +16,7 @@ const Pangram = new Interjection({
     }
     
     //filter and get message content for detection
-    const filterRegex = /[^A-Za-z\s!?]/g;
-    const content = ctx.message.content.toLowerCase().replace(filterRegex,"").trim();
+    const content = ctx.message.content.toLowerCase().replace(FILTER_REGEX,"").trim();
 
     //get keyword-type responses and sort by length
     const keywordsMap = new Map([...new Map(Object.entries(KEYWORDS))].sort((a, b) => a[1].length - b[1].length));

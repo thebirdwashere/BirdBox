@@ -5,15 +5,17 @@ import { Footers } from "src/utility/types.js";
 
 const FOOTERS = footers as Footers;
 
+const FILTER_REGEX = /[^a-z\s]/;
 const MIN_WORD_LENGTH = 5;
 
 const Alphabetical = new Interjection({
   name: "alphabetical order",
   test: async (ctx) => {
-    const content = ctx.message.content.toLowerCase();
+    const content = ctx.message.content
+      .toLowerCase()
+      .replace(FILTER_REGEX, "");
 
-    if (content.length > 1935) return false;       //message is too long for embeds
-    if (/[^a-zA-Z\s]/.test(content)) return false; //check for non-alphabetic characters
+    if (content.length && content.length > 1935) return false;    //message is too long for embeds
 
     const splitContent = content.split(" ").filter(word => word !== "");
     
