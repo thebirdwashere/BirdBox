@@ -69,7 +69,8 @@ CLIENT.on(Events.ClientReady, (_event) => {
   console.log(`Logged in as ${CLIENT.user?.tag ?? "(undefined)"}.`);
   console.log("Logs will be shown in this terminal.\n");
 
-  REGISTRY.registerCommands(BOT_TOKEN, BOT_ID).catch(console.error);
+  if (DEVMODE) console.log("Command registry is being skipped due to dev mode. \nIf you have made changes to commands, use `npm run start` to update them.");
+  else REGISTRY.registerCommands(BOT_TOKEN, BOT_ID).catch(console.error);
 });
 
 //MARK: Interaction
