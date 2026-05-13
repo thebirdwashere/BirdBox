@@ -1,12 +1,18 @@
 import { Interjection } from "src/utility/interjection.js";
 import keywords from "src/data/keywords.json" with { type: "json" };
 import { Keywords } from "src/utility/types.js";
+import { fetchConfigOption } from "src/utility/utility.js";
 
 const KEYWORDS = keywords as Keywords;
 
 const Pangram = new Interjection({
   name: "keywords",
   test: async(ctx) => {
+    if (ctx.guild) {
+      const settingValue = await fetchConfigOption(ctx.db, "server", "responses", ctx.guild.id);
+      if (!settingValue) return;
+    }
+    
     //filter and get message content for detection
     const filterRegex = /[^A-Za-z\s!?]/g;
     const content = ctx.message.content.toLowerCase().replace(filterRegex,"").trim();
