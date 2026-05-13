@@ -8,18 +8,19 @@ import { randomChoice } from "src/utility/utility.js";
 const PERIODIC_TABLE = periodic_table as PeriodicTable;
 const FOOTERS = footers as Footers;
 
+const FILTER_REGEX = /[^a-z\s]/;
 const MIN_CHAR_LENGTH = 35;
 const MIN_UNIQUE_ELEMENTS = 6;
 
 const Periodic = new Interjection({
   name: "periodic table",
   test: async (ctx) => {
-    const content = ctx.message.content.toLowerCase();
+    const content = ctx.message.content
+      .toLowerCase()
+      .replace(FILTER_REGEX, "");
 
     //this checks if the message is empty or too long
-    if (content.length > 950) return false;
-    //this tests for non-alphabetical characters
-    if (Array.isArray(/[^a-zA-Z\s]/.exec(content))) return false;
+    if (content.length && content.length > 950) return false;
     //no j or q on the periodic table, fun fact
     if (content.includes("j") || content.includes("q")) return false;
 

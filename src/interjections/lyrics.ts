@@ -6,7 +6,7 @@ import { Database } from "src/utility/database.js";
 
 const LYRICS = lyrics as Lyrics;
 
-const FILTER_REGEX = /[^A-Za-z\s!?]/g;
+const FILTER_REGEX = /[^a-z\s!?]/g;
 
 const Lyrics = new Interjection({
   name: "lyrics",
@@ -17,7 +17,12 @@ const Lyrics = new Interjection({
     }
 
     //filter and get message content for detection
-    const content = ctx.message.content.toLowerCase().replace(FILTER_REGEX,"").trim();
+    const content = ctx.message.content
+      .toLowerCase()
+      .replace(FILTER_REGEX,"")
+      .trim();
+
+    if (!content) return false;
 
     /*/
       * first, previous lyric detection
@@ -103,10 +108,7 @@ function checklyricIndex(db: Database, id: string, content: string): string | un
   const lastLyricIndices = db.channel.fetchOrUndefined(id, "lyricIndices");
 
   //type guard for typescript's sake
-  if (!Array.isArray(lastLyricIndices) || lastLyricIndices.length !== 2 || lastLyricIndices[0] == null) {
-    console.error("Bad format for lyric indices, skipping checks");
-    return;
-  }
+  if (!Array.isArray(lastLyricIndices) || lastLyricIndices.length !== 2 || lastLyricIndices[0] == null) return;
 
   const songIndex = lastLyricIndices[0] as number;
   const lyricIndex = lastLyricIndices[1] as number;
