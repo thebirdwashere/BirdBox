@@ -99,7 +99,7 @@ CLIENT.on(Events.InteractionCreate, (interaction) => {
       },
     );
   } else if (interaction.isAutocomplete()) {
-    if (DEVMODE) console.log(`\nReceived interaction from chat input command: \x1b[33m"${interaction.commandName}"\x1b[0m`);
+    if (DEVMODE) console.log(`\nReceived interaction from command autocomplete: \x1b[33m"${interaction.commandName}"\x1b[0m`);
 
     handleAutocomplete(DATA, interaction).catch(
       (error: unknown) => {
@@ -111,7 +111,7 @@ CLIENT.on(Events.InteractionCreate, (interaction) => {
       },
     );
   } else if (interaction.isContextMenuCommand()) {
-    if (DEVMODE) console.log(`\nReceived interaction from chat input command: \x1b[33m"${interaction.commandName}"\x1b[0m`);
+    if (DEVMODE) console.log(`\nReceived interaction from context menu command: \x1b[33m"${interaction.commandName}"\x1b[0m`);
 
     detectContextMenuCommand(DATA, interaction).catch(
       async (error: unknown) => {
