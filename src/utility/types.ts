@@ -2,6 +2,8 @@ import { Client } from "discord.js";
 import { Registry } from "./registry.js";
 import { Database } from "./database.js";
 
+
+//MARK: Basic
 export type NonEmptyArray<T> = [T, ...T[]];
 
 export interface NameValueObject {
@@ -9,6 +11,7 @@ export interface NameValueObject {
   value: string
 };
 
+//MARK: Config
 export type ConfigScope = "user" | "server" | "bot";
 
 export type Config = Record<ConfigScope, Record<string, ConfigOptions>>;
@@ -46,6 +49,7 @@ export type ConfigOptions = {
   };
 }
 
+//MARK: Data
 export interface Data {
   prefix: string;
   id: string;
@@ -56,8 +60,7 @@ export interface Data {
   devMode: boolean;
 };
 
-export type DatabaseRecord<T> = Record<string, T>
-
+//MARK: Flags
 export interface Flags {
   emojis: Record<string, {
     emoji: string;
@@ -79,6 +82,57 @@ export interface UserFlagStats {
   bestStreak: number,
   points: number,
 }
+
+//MARK: Perms
+export type PermsRank = "host" | "developer" | "contributor" | "tester";
+
+export interface Perms {
+  host: Record<string, string>;
+  developer: Record<string, string>;
+  contributor: Record<string, string>;
+  tester: Record<string, string>;
+};
+
+//MARK: Snipes
+export interface SnipedMessage {
+  authorID: string,
+  timestamp: number,
+  content: string,
+  imageURL: string | undefined,
+}
+
+//MARK: Wordle
+export interface Wordle {
+  "extras": string[],
+  "guesses": string[],
+  "solutions": string[],
+}
+
+export type WordleGameFields = { boxes: string[]; word: string; }[];
+
+export interface WordleGameData {
+  solution: string, 
+  guesses: number,
+  fields: WordleGameFields,
+  usedCode: boolean,
+}
+
+export type WordleGuessNum = | "1" | "2" | "3" | "4" | "5" | "6" | "loss";
+
+export interface UserWordleStats {
+  guessStats: Record<WordleGuessNum, number>, 
+  currentStreak: number,
+  bestStreak: number,
+}
+
+
+//MARK: Misc JSON
+export type EightBallResponses = (string | {
+  text: string; 
+  credit?: string; 
+  url?: string; 
+  image?: string;
+})[];
 
 export interface Footers {
   magic8ball: string[];
@@ -112,50 +166,4 @@ export interface PeriodicTable {
   impossibleEndings: string[];
 }
 
-export type PermsRank = "host" | "developer" | "contributor" | "tester";
-
-export interface Perms {
-  host: Record<string, string>;
-  developer: Record<string, string>;
-  contributor: Record<string, string>;
-  tester: Record<string, string>;
-};
-
 export type ResponsesList = string[];
-
-export interface SnipedMessage {
-  authorID: string,
-  timestamp: number,
-  content: string,
-  imageURL: string | undefined,
-}
-
-export type EightBallResponses = (string | {
-  text: string; 
-  credit?: string; 
-  url?: string; 
-  image?: string;
-})[];
-
-export interface Wordle {
-  "extras": string[],
-  "guesses": string[],
-  "solutions": string[],
-}
-
-export type WordleGameFields = { boxes: string[]; word: string; }[];
-
-export interface WordleGameData {
-  solution: string, 
-  guesses: number,
-  fields: WordleGameFields,
-  usedCode: boolean,
-}
-
-export type WordleGuessNum = | "1" | "2" | "3" | "4" | "5" | "6" | "loss";
-
-export interface UserWordleStats {
-  guessStats: Record<WordleGuessNum, number>, 
-  currentStreak: number,
-  bestStreak: number,
-}

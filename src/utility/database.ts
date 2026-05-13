@@ -1,5 +1,4 @@
 import { DatabaseSync, StatementSync } from "node:sqlite";
-import { DatabaseRecord } from "./types.js";
 
 //MARK: Database
 export class Database {
@@ -45,6 +44,7 @@ export class Database {
 }
 
 export type DatabaseTableName = "User" | "Channel" | "Server" | "Global";
+export type DatabaseRecord<T> = Record<string, T>;
 
 //MARK: TableManager
 export class DatabaseTableManager {
