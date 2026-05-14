@@ -114,7 +114,6 @@ function checklyricIndex(db: Database, id: string, content: string): string | un
   const lyricIndex = lastLyricIndices[1] as number;
   const lastLyric = LYRICS[songIndex]?.[lyricIndex] as string | undefined;
   const nextLyric = LYRICS[songIndex]?.[lyricIndex+1] as string | undefined;
-  console.log(songIndex, lyricIndex, lastLyric, nextLyric);
 
   if (lastLyric == null || nextLyric == null) return undefined;
 
