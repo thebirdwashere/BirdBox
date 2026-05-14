@@ -225,7 +225,7 @@ const FlagsQuiz = new Subcommand({
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     buttonCollector.on("collect", async (i: ButtonInteraction) => {await handleButtonInteraction(i);});
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    buttonCollector.on("end", async (_) => {await handleButtonTimeout();});
+    buttonCollector.on("end", async () => {await handleButtonTimeout();});
 
     while (remainingTime) { //MARK: handle timer
       //sleep for less than a second because of slight timer delay
