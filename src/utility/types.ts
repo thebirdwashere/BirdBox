@@ -138,6 +138,13 @@ export interface Footers {
   magic8ball: string[];
   help: string[];
   snipe: string[];
+  tictactoe: {
+    start: string[];
+    early: string[];
+    late: string[];
+    win: string[];
+    nowin: string[];
+  },
   alphabetical: string[];
   periodic: string[];
   pangrams: string[];

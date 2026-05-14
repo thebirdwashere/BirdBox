@@ -4,12 +4,12 @@ import { fetchConfigOption } from "./utility.js";
 
 export class Interjection {
   name: string;
-  test: (ctx: MessageContext) => Promise<void> | void;
+  test: (ctx: MessageContext) => Promise<boolean> | boolean;
 
   constructor(
     args: {
       name: string;
-      test: (ctx: MessageContext) => Promise<void> | void;
+      test: (ctx: MessageContext) => Promise<boolean> | boolean;
     },
   ) {
     this.name = args.name;
