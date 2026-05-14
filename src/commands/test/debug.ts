@@ -168,7 +168,23 @@ const Debug = new Command({
           }
         }
       },
-    })
+    }),
+    new Subcommand({
+      name: "permissions",
+      description: "Only the bot host (TheBirdWasHere) should be able to run this command!",
+      permissions: ["host"],
+      execute: async (ctx) => {
+        await ctx.reply("Hello Bird!");
+      }
+    }),
+    new Subcommand({
+      name: "cooldown",
+      description: "Ensure a cooldown of 5 minutes works as expected.",
+      cooldown: 300_000,
+      execute: async (ctx) => {
+        await ctx.reply("Cooldown is not active!");
+      }
+    }),
   ],
 });
 

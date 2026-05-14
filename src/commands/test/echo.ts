@@ -10,6 +10,7 @@ const Echo = new Command({
       type: "string",
     }),
   ],
+  cooldown: 60_000,
   execute: async (ctx, opts) => {
     const message = opts.string.get("message");
     if (message == null) throw new Error("Could not retrieve message.");

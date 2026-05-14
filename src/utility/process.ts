@@ -40,6 +40,18 @@ export async function detectChatInputInteractionCommand(
   if (command.permissions) 
     testUserPermissions(command.permissions, PERMS, interaction.user.id);
 
+  if (command.cooldown) {
+    const lastUsed = command.cooldown.data.get(interaction.user.id);
+    const currentTime = interaction.createdTimestamp;
+
+    if (lastUsed && currentTime - lastUsed < command.cooldown.time) {
+      const waitTime = Math.floor((command.cooldown.time - (currentTime - lastUsed)) / 1000);
+      throw new Error(`Sorry, this command is on cooldown. Please wait ${String(waitTime)} more seconds before using \`/${command.data.name}\`.`);
+    } else {
+      command.cooldown.data.set(interaction.user.id, currentTime);
+    }
+  }
+
   // Determine passed command options.
   let options = new Options();
 
@@ -65,6 +77,18 @@ export async function detectChatInputInteractionCommand(
 
     if (subcommand.permissions)
       testUserPermissions(subcommand.permissions, PERMS, interaction.user.id);
+
+    if (subcommand.cooldown) {
+      const lastUsed = subcommand.cooldown.data.get(interaction.user.id);
+      const currentTime = interaction.createdTimestamp;
+
+      if (lastUsed && currentTime - lastUsed < subcommand.cooldown.time) {
+        const waitTime = Math.floor((subcommand.cooldown.time - (currentTime - lastUsed)) / 1000);
+        throw new Error(`Sorry, this subcommand is on cooldown. Please wait ${String(waitTime)} more seconds before using \`/${command.data.name} ${subcommand.data.name}\`.`);
+      } else {
+        subcommand.cooldown.data.set(interaction.user.id, currentTime);
+      }
+    }
 
     if (subcommand.body !== undefined && isOptionArray(subcommand.body)) {
       options = parseCommandOptions(subcommand, interaction, options);

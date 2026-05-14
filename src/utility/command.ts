@@ -21,6 +21,7 @@ import {
   APIApplicationCommandOptionChoice,
   ContextMenuCommandBuilder,
   ApplicationCommandType,
+  Collection,
 } from "discord.js";
 import { CommandContext, AutocompleteContext } from "./context.js";
 import { panic } from "./utility.js";
@@ -32,10 +33,15 @@ export class Command {
   body?:
     | Readonly<NonEmptyArray<CommandOption>>
     | Readonly<NonEmptyArray<Subcommand>>;
+  permissions?: PermsRank[];
+  cooldown?: {
+    time: number;
+    data: Collection<string, number>;
+  };
+  contextmenu?: ContextMenuData;
   execute?: (ctx: CommandContext, opts: Options) => Promise<void>;
   autocomplete?: (ctx: AutocompleteContext) => Promise<void>;
-  permissions?: PermsRank[];
-  contextmenu?: ContextMenuData;
+
 
   constructor(
     args:
@@ -43,6 +49,7 @@ export class Command {
           name: string;
           description: string;
           permissions?: PermsRank[];
+          cooldown?: number;
           contextmenu?: Omit<ContextMenuData, "data">
           execute: (ctx: CommandContext, opts: Options) => Promise<void>;
         }
@@ -51,6 +58,7 @@ export class Command {
           description: string;
           options: Readonly<NonEmptyArray<CommandOption>>;
           permissions?: PermsRank[];
+          cooldown?: number;
           contextmenu?: Omit<ContextMenuData, "data">
           execute: (ctx: CommandContext, opts: Options) => Promise<void>;
           autocomplete?: (ctx: AutocompleteContext) => Promise<void>;
@@ -68,6 +76,10 @@ export class Command {
     if ("execute" in args) this.execute = args.execute;
     if ("autocomplete" in args) this.autocomplete = args.autocomplete;
     if ("permissions" in args) this.permissions = args.permissions;
+    if ("cooldown" in args && args.cooldown !== undefined) this.cooldown = {
+      time: args.cooldown,
+      data: new Collection(),
+    };
 
     if ("options" in args) {
       for (const option of args.options) {
@@ -136,6 +148,10 @@ export class Subcommand {
   data: SlashCommandSubcommandBuilder;
   body?: Readonly<NonEmptyArray<CommandOption>>;
   permissions?: PermsRank[];
+  cooldown?: {
+    time: number;
+    data: Collection<string, number>;
+  };
   contextmenu?: ContextMenuData;
   execute: (ctx: CommandContext, opts: Options) => Promise<void>;
   autocomplete?: (ctx: AutocompleteContext) => Promise<void>;
@@ -146,6 +162,7 @@ export class Subcommand {
           name: string;
           description: string;
           permissions?: PermsRank[];
+          cooldown?: number;
           contextmenu?: Omit<ContextMenuData, "data">;
           execute: (ctx: CommandContext, opts: Options) => Promise<void>;
         }
@@ -153,6 +170,8 @@ export class Subcommand {
           name: string;
           description: string;
           options: Readonly<NonEmptyArray<CommandOption>>;
+          permissions?: PermsRank[];
+          cooldown?: number;
           contextmenu?: Omit<ContextMenuData, "data">;
           execute: (ctx: CommandContext, opts: Options) => Promise<void>;
           autocomplete?: (ctx: AutocompleteContext) => Promise<void>;
@@ -164,6 +183,10 @@ export class Subcommand {
     this.execute = args.execute;
     if ("autocomplete" in args) this.autocomplete = args.autocomplete;
     if ("permissions" in args) this.permissions = args.permissions;
+    if ("cooldown" in args && args.cooldown !== undefined) this.cooldown = {
+      time: args.cooldown,
+      data: new Collection(),
+    };
 
     if ("options" in args) {
       for (const option of args.options) {
