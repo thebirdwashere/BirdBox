@@ -42,7 +42,6 @@ export class Command {
   execute?: (ctx: CommandContext, opts: Options) => Promise<void>;
   autocomplete?: (ctx: AutocompleteContext) => Promise<void>;
 
-
   constructor(
     args:
       | {
@@ -331,12 +330,14 @@ export class CommandOption {
 }
 
 //MARK: Utils
-export interface ContextMenuData {
+export type ContextMenuData = {
   data: ContextMenuCommandBuilder;
   label: string;
-  type: "message" | "user";
   contextOption?: string;
-}
+} & (
+  | { type: "message"; userContextOption?: string; } 
+  | { type: "user"; userContextOption?: undefined; }
+);
 
 export class Options {
   number: Map<string, number | null>;

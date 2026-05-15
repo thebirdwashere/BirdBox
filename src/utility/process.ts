@@ -552,6 +552,9 @@ export async function detectContextMenuCommand(
           throw new Error("Invalid data for user-type context menu option.");
 
         options.string.set(contextMenuData.contextOption, interaction.targetMessage.content);
+        if (contextMenuData.userContextOption !== undefined)
+          options.user.set(contextMenuData.userContextOption, interaction.targetMessage.author);
+
         break;
       } case "user": {
         if (!interaction.isUserContextMenuCommand())
