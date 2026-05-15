@@ -56,7 +56,7 @@ const Periodic = new Interjection({
     const periodicString = tableArray.join("");
     await ctx.message.reply(`:test_tube: Your message is on the periodic table! \n\`${periodicString}\``);
 
-    const randomFooter = randomChoice(FOOTERS.periodic)
+    const randomFooter = randomChoice(FOOTERS.interjections.periodic.concat(FOOTERS.interjections.generic))
       .replaceAll("[[USERNAME]]", ctx.user.displayName.toLowerCase());
         
     await notifyOfInterjection(ctx, {

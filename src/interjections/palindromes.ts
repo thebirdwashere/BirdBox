@@ -37,7 +37,7 @@ const Palindrome = new Interjection({
     await ctx.reply(`:left_right_arrow: Your message is a palindrome! \n\`${reversedContent}\``);
 
     //get the random footer for the embed
-    const randomFooter = randomChoice(FOOTERS.palindromes);
+    const randomFooter = randomChoice(FOOTERS.interjections.palindromes.concat(FOOTERS.interjections.generic));
     
     await notifyOfInterjection(ctx, {
       "color": 0x3b88c3,

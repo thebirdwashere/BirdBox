@@ -24,7 +24,7 @@ const Pangram = new Interjection({
     const pangramString = capitalizedContent.join("");
     await ctx.reply(`:capital_abcd: Your message contains every letter in the alphabet! \n\`${pangramString}\``);
 
-    const randomFooter = randomChoice(FOOTERS.pangrams);
+    const randomFooter = randomChoice(FOOTERS.interjections.pangrams.concat(FOOTERS.interjections.generic));
         
     await notifyOfInterjection(ctx, {
       "color": 0x3b88c3,

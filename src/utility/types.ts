@@ -154,10 +154,13 @@ export interface Footers {
     win: string[];
     nowin: string[];
   },
-  alphabetical: string[];
-  periodic: string[];
-  pangrams: string[];
-  palindromes: string[];
+  interjections: {
+    generic: string[];
+    alphabetical: string[];
+    periodic: string[];
+    pangrams: string[];
+    palindromes: string[];
+  }
 };
 
 export type Keywords = Record<string, string>;

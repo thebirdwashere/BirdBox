@@ -38,7 +38,7 @@ const Alphabetical = new Interjection({
     //get the random footer for the embed
     const randomWord = randomChoice(responseWords);
     const randomLetter = randomWord[0].toUpperCase();
-    const randomFooter = randomChoice(FOOTERS.alphabetical)
+    const randomFooter = randomChoice(FOOTERS.interjections.alphabetical.concat(FOOTERS.interjections.generic))
       .replaceAll("[[RANDOMWORD]]", randomWord)
       .replaceAll("[[RANDOMLETTER]]", randomLetter);
     
