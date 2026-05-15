@@ -93,6 +93,14 @@ export interface Perms {
   tester: Record<string, string>;
 };
 
+//MARK: Quotes
+export interface QuoteData {
+  text: string;
+  username: string;
+  userid: string;
+  date: string;
+}
+
 //MARK: Snipes
 export interface SnipedMessage {
   authorID: string,
@@ -138,6 +146,7 @@ export interface Footers {
   magic8ball: string[];
   help: string[];
   snipe: string[];
+  quotes: string[];
   tictactoe: {
     start: string[];
     early: string[];
@@ -148,6 +157,7 @@ export interface Footers {
   alphabetical: string[];
   periodic: string[];
   pangrams: string[];
+
 };
 
 export type Keywords = Record<string, string>;
