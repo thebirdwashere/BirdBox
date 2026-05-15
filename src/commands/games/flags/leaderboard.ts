@@ -78,7 +78,12 @@ const FlagsBoard = new Subcommand({
 
         //add username to each user's stats
         for (const userId of gameStats.keys()) {
-          const userInfo = await ctx.data.client.users.fetch(userId);
+          let userInfo;
+          try {
+            userInfo = await ctx.data.client.users.fetch(userId);
+          } catch {
+            userInfo = {username: "unknown"};
+          }
           const userName = userInfo.username;
 
           const userStats = gameStats.get(userId);
@@ -101,7 +106,12 @@ const FlagsBoard = new Subcommand({
 
         //add username to each user's stats
         for (const userId of gameStats.keys()) {
-          const userInfo = await ctx.data.client.users.fetch(userId);
+          let userInfo;
+          try {
+            userInfo = await ctx.data.client.users.fetch(userId);
+          } catch {
+            userInfo = {username: "unknown"};
+          }
           const userName = userInfo.username;
 
           const userStats = gameStats.get(userId);
@@ -128,7 +138,12 @@ const FlagsBoard = new Subcommand({
 
         //add username to each user's stats
         for (const userId of gameStats.keys()) {
-          const userInfo = await ctx.data.client.users.fetch(userId);
+          let userInfo;
+          try {
+            userInfo = await ctx.data.client.users.fetch(userId);
+          } catch {
+            userInfo = {username: "unknown"};
+          }
           const userName = userInfo.username;
 
           const userStats = gameStats.get(userId);
