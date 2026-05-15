@@ -81,7 +81,7 @@ const Help = new Command({
 
       const commandsArray = chunkArray<commandEmbedDisplay>(
         commandsList.map(cmd => ({
-          name: `${ctx.data.prefix}${cmd.data.name}  ${cmd.data.options.map(opt => {
+          name: `${ctx.prefix}${cmd.data.name}  ${cmd.data.options.map(opt => {
             return `\`${opt.toJSON().name}\``;
           }).join(" ")}`,
           value: cmd.data.description,

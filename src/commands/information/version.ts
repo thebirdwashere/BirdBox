@@ -27,7 +27,7 @@ const Version = new Command({
     function updateEmbed(p: number) : EmbedBuilder[] {
       const developers = `Update by ${PATCH_NOTES[p].devs.join(", ")}`;
       const contributors = "contribs" in PATCH_NOTES[p] ? `With contribution from ${PATCH_NOTES[p].contribs?.join(", ") ?? ""}` : "";
-      const notes = `● ${PATCH_NOTES[p].notes.join("\n● ").replaceAll("e;", ctx.data.prefix)}`;
+      const notes = `● ${PATCH_NOTES[p].notes.join("\n● ").replaceAll("e;", ctx.prefix)}`;
 
       const infoEmbed = new EmbedBuilder()
         .setTitle(`${PATCH_NOTES[p].type} ${PATCH_NOTES[p].version}`)
