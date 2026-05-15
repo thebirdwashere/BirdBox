@@ -159,6 +159,27 @@ export type Languages = {
 
 export type Lyrics = string[][];
 
+export interface MaybepileEntry {
+  title: string;
+  description: string;
+  suggester: string;
+  claim: {
+    status: "claimed";
+    user: string;
+    id: string;
+  } | {
+    status: "in development";
+    user: string;
+    id: string;
+  } | {
+    status: "deprioritized";
+  } | {
+    status: "unclaimed";
+  }
+}
+
+export type MaybepileArray = ["Table of Contents", ...MaybepileEntry[]]
+
 export type PatchNotes = {
   version: string;
   type: string;
