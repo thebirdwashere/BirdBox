@@ -1,5 +1,23 @@
 [
   {
+    "version": "7.0.0",
+    "type": "Release",
+    "date": "TBD",
+    "devs": ["AgentNebulator", "Bislij"],
+    "notes": [
+        "Rewrote all bot systems in TypeScript",
+        "Slash, classic, and context menu commands are now handled by the same internal system",
+        "Certain error types are now displayed rather than crashing the bot",
+        "Rewrote `e;debug` to debug specific features of the new system",
+        "Renamed \"responses\" to \"interjections\" and added an expandable system for them",
+        "Improved efficiency of jinx interjections",
+        "Rewrote and revised `e;tictactoe`, including a new BirdBox AI",
+        "Added `e;wordle leaderboard` subcommand",
+        "Removed `e;pin` and `e;quote` due to Discord introducing equivalent features",
+        "Plus many more small fixes and tweaks"
+    ]
+  },
+  {
     "version": "6.0.4",
     "type": "Release",
     "date": "6/8/2025",
