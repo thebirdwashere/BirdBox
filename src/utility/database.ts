@@ -75,7 +75,7 @@ export class DatabaseTableManager {
   fetchOr(id: string, property: string, def: unknown): unknown {
     const data = parseDataAsJSON(this.data.fetch.get({id}));
 
-    if (data[property] === undefined) {
+    if (data[property] == null) {
       return def;
     } else if (typeof data[property] !== typeof def && def != null) {
       throw new Error(`Type ${typeof def} of default value is unrelated to database record type ${typeof data}`);
@@ -91,7 +91,7 @@ export class DatabaseTableManager {
   fetchOrElse(id: string, property: string, def: () => unknown): unknown {
     const data = parseDataAsJSON(this.data.fetch.get({id}));
 
-    if (data[property] === undefined) {
+    if (data[property] == null) {
       return def();
     } else {
       return data[property];
@@ -155,7 +155,7 @@ export class DatabaseTableManager {
 
     for (const row of dataAll) {
       const data = parseDataAsJSON(row);
-      if (!("cast(id as text)" in row) || row["cast(id as text)"] === null)
+      if (!("cast(id as text)" in row) || row["cast(id as text)"] == null)
         throw new Error("Expected id property in database query.");
 
       if (data[property] !== undefined) {
@@ -232,10 +232,10 @@ class StatementData {
 }
 
 function parseDataAsJSON(data: DatabaseRecord<unknown> | undefined): DatabaseRecord<unknown> {
-  if (data === undefined) return {};
+  if (data == null) return {};
 
   const json = data.json;
-  if (json === undefined) return {};
+  if (json == null) return {};
 
   const parsedJSON: unknown = JSON.parse(json as string);
   // console.log(parsedJSON);
