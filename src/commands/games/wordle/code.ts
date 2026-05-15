@@ -28,7 +28,7 @@ const WordleCode = new Subcommand({
     const encryptedCode = encryptWordCode(word.toLowerCase());
 
     //tell em what the code is
-    const responseText = `The Wordle code for your provided word is \`${encryptedCode}\`. \nUse \`/wordle start\` to play your custom game!`;
+    const responseText = `The Wordle code for your provided word is \`${encryptedCode}\`. \nUse \`${ctx.data.prefix}wordle start\` to play your custom game!`;
     await ctx.reply(responseText);
   },
 });
