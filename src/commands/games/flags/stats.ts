@@ -4,7 +4,7 @@ import { UserFlagStats } from "src/utility/types.js";
 
 const FlagsStats = new Subcommand({
   name: "stats",
-  description: "flags stats",
+  description: "View stats of the selected person.",
   options: [
     new CommandOption({
       name: "user",
