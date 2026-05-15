@@ -157,7 +157,7 @@ export interface Footers {
   alphabetical: string[];
   periodic: string[];
   pangrams: string[];
-
+  palindromes: string[];
 };
 
 export type Keywords = Record<string, string>;
