@@ -5,7 +5,7 @@ import { Footers } from "src/utility/types.js";
 
 const FOOTERS = footers as Footers;
 
-const FILTER_REGEX = /[^a-z\s]/;
+const FILTER_REGEX = /[^a-z\s]/g;
 const MIN_WORD_LENGTH = 5;
 
 const Alphabetical = new Interjection({
@@ -13,7 +13,7 @@ const Alphabetical = new Interjection({
   test: async (ctx) => {
     const content = ctx.message.content
       .toLowerCase()
-      .replace(FILTER_REGEX, "");
+      .replaceAll(FILTER_REGEX, "");
 
     if (content.length && content.length > 1935) return false;    //message is too long for embeds
 
@@ -39,8 +39,8 @@ const Alphabetical = new Interjection({
     const randomWord = randomChoice(responseWords);
     const randomLetter = randomWord[0].toUpperCase();
     const randomFooter = randomChoice(FOOTERS.alphabetical)
-      .replace("[[RANDOMWORD]]", randomWord)
-      .replace("[[RANDOMLETTER]]", randomLetter);
+      .replaceAll("[[RANDOMWORD]]", randomWord)
+      .replaceAll("[[RANDOMLETTER]]", randomLetter);
     
     await notifyOfInterjection(ctx, {
       "color": 0x3b88c3,

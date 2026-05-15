@@ -8,7 +8,7 @@ import { randomChoice } from "src/utility/utility.js";
 const PERIODIC_TABLE = periodic_table as PeriodicTable;
 const FOOTERS = footers as Footers;
 
-const FILTER_REGEX = /[^a-z\s]/;
+const FILTER_REGEX = /[^a-z\s]/g;
 const MIN_CHAR_LENGTH = 35;
 const MIN_UNIQUE_ELEMENTS = 6;
 
@@ -17,7 +17,7 @@ const Periodic = new Interjection({
   test: async (ctx) => {
     const content = ctx.message.content
       .toLowerCase()
-      .replace(FILTER_REGEX, "");
+      .replaceAll(FILTER_REGEX, "");
 
     //this checks if the message is empty or too long
     if (content.length && content.length > 950) return false;
@@ -44,7 +44,7 @@ const Periodic = new Interjection({
     if (PERIODIC_TABLE.impossibleEndings.includes(content.slice(-2))) return false;    
 
     //https://stackoverflow.com/questions/6163169/replace-multiple-whitespaces-with-single-whitespace-in-javascript-string
-    const cleanContent = content.replace(/\s+/g, " ").trim(); 
+    const cleanContent = content.replaceAll(/\s+/g, " ").trim(); 
 
     const tableArray = periodicCheck(cleanContent, [], 0);
 
@@ -57,7 +57,7 @@ const Periodic = new Interjection({
     await ctx.message.reply(`:test_tube: Your message is on the periodic table! \n\`${periodicString}\``);
 
     const randomFooter = randomChoice(FOOTERS.periodic)
-      .replace("[[USERNAME]]", ctx.user.displayName.toLowerCase());
+      .replaceAll("[[USERNAME]]", ctx.user.displayName.toLowerCase());
         
     await notifyOfInterjection(ctx, {
       "color": 0x21c369,

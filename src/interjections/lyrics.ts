@@ -19,7 +19,7 @@ const Lyrics = new Interjection({
     //filter and get message content for detection
     const content = ctx.message.content
       .toLowerCase()
-      .replace(FILTER_REGEX,"")
+      .replaceAll(FILTER_REGEX,"")
       .trim();
 
     if (!content) return false;
@@ -77,7 +77,7 @@ const Lyrics = new Interjection({
     //iterate and check
     for (const [i, song] of lyrics.entries()) { 
       for (const [j, lyric] of song.entries()) {
-        if (content.endsWith(lyric.replace(FILTER_REGEX,"").trim())) {
+        if (content.endsWith(lyric.replaceAll(FILTER_REGEX,"").trim())) {
           //ensure the chosen lyric is the longest one that fits
           if (lyric.length > compareLyric.length) {
             //set values for future iterations
@@ -118,7 +118,7 @@ function checklyricIndex(db: Database, id: string, content: string): string | un
   if (lastLyric == null || nextLyric == null) return undefined;
 
   //if this message matches what should come next...
-  if (nextLyric.replace(FILTER_REGEX,"").trim() === content) {
+  if (nextLyric.replaceAll(FILTER_REGEX,"").trim() === content) {
     //return the lyric after, if it exists
     const responseLyric = LYRICS[songIndex]?.[lyricIndex+2] as string | undefined;
 
