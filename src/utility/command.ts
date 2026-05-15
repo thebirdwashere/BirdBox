@@ -132,12 +132,18 @@ export class Command {
       }
       }
 
-      this.contextmenu = {
+      const contextMenuInfo: ContextMenuData = {
         data: menuData,
         label: args.contextmenu.label,
         type: args.contextmenu.type,
-        contextOption: args.contextmenu.contextOption,
+        contextOption: args.contextmenu.contextOption
       };
+
+      if (contextMenuInfo.type === "message") {
+        contextMenuInfo.userContextOption = args.contextmenu.userContextOption;
+      }
+
+      this.contextmenu = contextMenuInfo;
     }
   }
 }
@@ -232,12 +238,18 @@ export class Subcommand {
       }
       }
 
-      this.contextmenu = {
+      const contextMenuInfo: ContextMenuData = {
         data: menuData,
         label: args.contextmenu.label,
         type: args.contextmenu.type,
-        contextOption: args.contextmenu.contextOption,
+        contextOption: args.contextmenu.contextOption
       };
+
+      if (contextMenuInfo.type === "message") {
+        contextMenuInfo.userContextOption = args.contextmenu.userContextOption;
+      }
+
+      this.contextmenu = contextMenuInfo;
     }
   }
 }

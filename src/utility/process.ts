@@ -552,8 +552,6 @@ export async function detectContextMenuCommand(
           throw new Error("Invalid data for user-type context menu option.");
 
         options.string.set(contextMenuData.contextOption, interaction.targetMessage.content);
-        if (contextMenuData.userContextOption !== undefined)
-          options.user.set(contextMenuData.userContextOption, interaction.targetMessage.author);
 
         break;
       } case "user": {
@@ -564,6 +562,13 @@ export async function detectContextMenuCommand(
         break;
       }
       }
+    }
+
+    if (contextMenuData.userContextOption) {
+      if (!interaction.isMessageContextMenuCommand())
+        throw new Error("Invalid data for user-type context menu option.");
+
+      options.user.set(contextMenuData.userContextOption, interaction.targetMessage.author);
     }
 
     await command.execute(context, options);
@@ -609,6 +614,13 @@ export async function detectContextMenuCommand(
         break;
       }
       }
+    }
+
+    if (contextMenuData.userContextOption) {
+      if (!interaction.isMessageContextMenuCommand())
+        throw new Error("Invalid data for user-type context menu option.");
+
+      options.user.set(contextMenuData.userContextOption, interaction.targetMessage.author);
     }
 
     await subcommand.execute(context, options);
