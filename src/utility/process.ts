@@ -316,7 +316,7 @@ export async function detectMessageCommand(
         );
       }
 
-      while (args.length !== command.body.length) {
+      while (args.length < subcommand.body.length) {
         args.push("!");
       }
       options = populateMessageOptions(args, subcommand.body, message);
@@ -356,7 +356,7 @@ function populateMessageOptions(
     } else if (targetType === "string") {
       //anything can be a string if it needs to be
       sourceType = "string";
-    } else if (!isNaN(Number(sources.at(index)))) {
+    } else if (!isNaN(Number(source))) {
       sourceType = "number";
     } else if (source === "true" || source === "false") {
       sourceType = "boolean";
