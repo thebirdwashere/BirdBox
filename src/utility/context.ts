@@ -33,6 +33,7 @@ export interface CommandContext extends BaseContext {
   user: User;
   timestamp: number;
   db: Database;
+  prefix: string;
 
   /**
    * Attempts to respond to the command. Returns the message after completion.
@@ -77,6 +78,7 @@ export class MessageContext implements CommandContext {
   user: User;
   timestamp: number;
   db: Database;
+  prefix: string;
   
   constructor(message: Message, data: Data) {
     this.message = message;
@@ -87,6 +89,7 @@ export class MessageContext implements CommandContext {
     this.user = message.author;
     this.timestamp = message.createdTimestamp;
     this.db = data.db;
+    this.prefix = data.prefix;
   }
   
   async reply(
@@ -153,6 +156,7 @@ export class ChatInputCommandInteractionContext implements CommandContext {
   user: User;
   timestamp: number;
   db: Database;
+  prefix: string;
 
   constructor(interaction: ChatInputCommandInteraction, data: Data) {
     this.interaction = interaction;
@@ -163,6 +167,7 @@ export class ChatInputCommandInteractionContext implements CommandContext {
     this.channel = interaction.channel;
     this.timestamp = interaction.createdTimestamp;
     this.db = data.db;
+    this.prefix = "/";
   }
 
   async reply(
@@ -311,6 +316,7 @@ export class AutocompleteContext implements BaseContext {
   }
 }
 
+//MARK: ContextMenuCommandContext
 export class ContextMenuCommandContext implements CommandContext {
   interaction: ContextMenuCommandInteraction;
 
@@ -321,6 +327,7 @@ export class ContextMenuCommandContext implements CommandContext {
   user: User;
   timestamp: number;
   db: Database;
+  prefix: string;
 
   constructor(interaction: ContextMenuCommandInteraction, data: Data) {
     this.interaction = interaction;
@@ -331,6 +338,7 @@ export class ContextMenuCommandContext implements CommandContext {
     this.channel = interaction.channel;
     this.timestamp = interaction.createdTimestamp;
     this.db = data.db;
+    this.prefix = "/";
   }
 
   async reply(
