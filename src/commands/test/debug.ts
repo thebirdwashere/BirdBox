@@ -1,3 +1,4 @@
+import { ActionRowBuilder, TextInputBuilder, TextInputStyle, ModalBuilder, ModalSubmitInteraction, Message } from "discord.js";
 import { Command, CommandOption, Subcommand } from "src/utility/command.js";
 import { DatabaseTableManager } from "src/utility/database.js";
 
@@ -183,6 +184,33 @@ const Debug = new Command({
       cooldown: 300_000,
       execute: async (ctx) => {
         await ctx.reply("Cooldown is not active!");
+      }
+    }),
+    new Subcommand({
+      name: "modal",
+      description: "Test the modal system.",
+      execute: async (ctx) => {
+        const editModal = new ModalBuilder()
+          .setCustomId("debug-testing")
+          .setTitle("Testing Modal")
+          .addComponents([
+            new ActionRowBuilder<TextInputBuilder>()
+              .addComponents(
+                new TextInputBuilder()
+                  .setCustomId("debug-text")
+                  .setLabel("Response")
+                  .setStyle(TextInputStyle.Short)
+                  .setPlaceholder("It's love. But only if it's eternal love...")
+                  .setRequired(true)
+              ),
+          ]);
+
+        await ctx.replyModal(editModal, onModalSubmit);
+
+        async function onModalSubmit(i: ModalSubmitInteraction, _: Message): Promise<void> {
+          const submission = i.fields.getTextInputValue("debug-text");
+          await i.reply(`You submitted: \n\`\`\`\n${submission}\n\`\`\``);
+        }
       }
     }),
   ],
