@@ -1,5 +1,5 @@
 import { Command, CommandOption, Subcommand } from "src/utility/command.js";
-import { Colors, EmbedBuilder } from "discord.js";
+import { ActionRowBuilder, Colors, EmbedBuilder, Message, ModalBuilder, ModalSubmitInteraction, TextInputBuilder, TextInputStyle } from "discord.js";
 import footers from "src/data/footers.json" with { type: "json" };
 import { Footers, QuoteData } from "src/utility/types.js";
 import { randomChoice } from "src/utility/utility.js";
@@ -156,9 +156,124 @@ const Quotes = new Command({
           throw new Error("Couldn't find a quote at the requested index.");
 
         //support negative numbers indexing from the end instead of the start
-        const actualQuoteIndex = requestedQuoteIndex >= 1 ? requestedQuoteIndex : serverQuotes.length + requestedQuoteIndex;
+        const displayQuoteIndex = requestedQuoteIndex >= 1 ? requestedQuoteIndex : serverQuotes.length + requestedQuoteIndex;
 
-        await ctx.reply({ embeds: [await formatQuoteEmbed(ctx, requestedQuote, actualQuoteIndex, "specific")] });
+        await ctx.reply({ embeds: [await formatQuoteEmbed(ctx, requestedQuote, displayQuoteIndex, "specific")] });
+      }
+    }),
+    new Subcommand({ //MARK: quotes edit
+      name: "edit",
+      description: "Edit a specific quote.",
+      options: [
+        new CommandOption({
+          name: "quote",
+          description: "The index of the quote to be edited.",
+          type: "string",
+          autocomplete: true,
+        })
+      ],
+      autocomplete: quotesAutocomplete,
+      execute: async (ctx, opts) => {
+        if (!ctx.guild) {
+          await ctx.reply("Sorry, you can only delete quotes inside a server.");
+          return;
+        }
+
+        const serverQuotes = ctx.db.server.fetchOr(ctx.guild.id, "quotes", []) as QuoteData[];
+
+        if (serverQuotes.length === 0) {
+          await ctx.reply(`No quotes were found in this server. Try adding some with \`${ctx.prefix}quotes add\`!`);
+          return;
+        }
+
+        const requestedQuoteIndex = Number(opts.string.get("quote"));
+
+        if (isNaN(requestedQuoteIndex))
+          throw new Error("Index is not a number.");
+
+        const requestedQuote = serverQuotes.at(requestedQuoteIndex-1);
+
+        if (requestedQuoteIndex === 0 || requestedQuote === undefined)
+          throw new Error("Couldn't find a quote at the requested index.");
+
+        //support negative numbers indexing from the end instead of the start
+        const displayQuoteIndex = requestedQuoteIndex >= 1 ? requestedQuoteIndex : serverQuotes.length + requestedQuoteIndex;
+
+        const modalFields = [
+          new ActionRowBuilder<TextInputBuilder>()
+            .setComponents(
+              new TextInputBuilder()
+                .setCustomId("quotes-edit-date")
+                .setLabel("Quote Date")
+                .setStyle(TextInputStyle.Short)
+                .setPlaceholder("The quote's date, ideally formatted as \"Month Day, Year\"")
+                .setValue(requestedQuote.date)
+                .setRequired(true)
+                .setMinLength(1)
+            ),
+          new ActionRowBuilder<TextInputBuilder>()
+            .setComponents(
+              new TextInputBuilder()
+                .setCustomId("quotes-edit-text")
+                .setLabel("Quote Text")
+                .setStyle(TextInputStyle.Paragraph)
+                .setPlaceholder("The text of your quote.")
+                .setValue(requestedQuote.text)
+                .setRequired(true)
+                .setMinLength(1)
+            ),
+          new ActionRowBuilder<TextInputBuilder>()
+            .setComponents(
+              new TextInputBuilder()
+                .setCustomId("quotes-edit-username")
+                .setLabel("Quotee Username")
+                .setStyle(TextInputStyle.Short)
+                .setPlaceholder("The default username for the quotee.")
+                .setValue(requestedQuote.username)
+                .setRequired(true)
+                .setMinLength(1)
+            ),
+          new ActionRowBuilder<TextInputBuilder>()
+            .setComponents(
+              new TextInputBuilder()
+                .setCustomId("quotes-edit-userid")
+                .setLabel("Quotee User ID")
+                .setStyle(TextInputStyle.Short)
+                .setPlaceholder("Do NOT touch this if you don't know what you're doing!")
+                .setValue(requestedQuote.userid)
+                .setRequired(true)
+                .setMinLength(18)
+                .setMaxLength(19)
+            )
+        ];
+
+        const editModal = new ModalBuilder()
+          .setCustomId("quotes-edit")
+          .setTitle("Edit Quote")
+          .setComponents(modalFields);
+
+        const guildId = ctx.guild.id;
+
+        async function onModalSubmit(i: ModalSubmitInteraction, _: Message): Promise<void> {
+          const newDate = i.fields.getTextInputValue("quotes-edit-date");
+          const newText = i.fields.getTextInputValue("quotes-edit-text");
+          const newUsername = i.fields.getTextInputValue("quotes-edit-username");
+          const newId = i.fields.getTextInputValue("quotes-edit-userid");
+          
+          const newQuote = {
+            date: newDate,
+            text: newText,
+            username: newUsername,
+            userid: newId,
+          };
+
+          serverQuotes[requestedQuoteIndex-1] = newQuote;
+          ctx.db.server.update(guildId, "quotes", serverQuotes);
+
+          await i.reply({ content: "The following quote was successfully edited!", embeds: [await formatQuoteEmbed(ctx, newQuote, displayQuoteIndex, "specific")] });
+        }
+
+        await ctx.replyModal(editModal, onModalSubmit);
       }
     }),
     new Subcommand({ //MARK: quotes delete
@@ -191,18 +306,18 @@ const Quotes = new Command({
         if (isNaN(requestedQuoteIndex))
           throw new Error("Index is not a number.");
 
-        //support negative numbers indexing from the end instead of the start
-        const actualQuoteIndex = requestedQuoteIndex >= 0 ? requestedQuoteIndex-1 : serverQuotes.length + requestedQuoteIndex;
-
-        const requestedQuote = serverQuotes.at(actualQuoteIndex);
+        const requestedQuote = serverQuotes.at(requestedQuoteIndex-1);
 
         if (requestedQuoteIndex === 0 || requestedQuote === undefined)
           throw new Error("Couldn't find a quote at the requested index.");
 
-        serverQuotes.splice(actualQuoteIndex);
+        //support negative numbers indexing from the end instead of the start
+        const displayQuoteIndex = requestedQuoteIndex >= 1 ? requestedQuoteIndex : serverQuotes.length + requestedQuoteIndex;
+
+        serverQuotes.splice(requestedQuoteIndex-1);
         ctx.db.server.update(ctx.guild.id, "quotes", serverQuotes);
 
-        await ctx.reply({ content: "The following quote was successfully deleted!", embeds: [await formatQuoteEmbed(ctx, requestedQuote, actualQuoteIndex, "specific")] });
+        await ctx.reply({ content: "The following quote was successfully deleted!", embeds: [await formatQuoteEmbed(ctx, requestedQuote, displayQuoteIndex, "specific")] });
       }
     }),
   ],
@@ -217,7 +332,7 @@ async function quotesAutocomplete(ctx: AutocompleteContext): Promise<void> {
 
   const serverQuotes = ctx.db.server.fetchOr(ctx.guild.id, "quotes", []) as QuoteData[];
 
-  await ctx.respond(serverQuotes.map((quote, i) => ({ name: `${(i+1).toString()}: ${quote.text}`, value: i.toString()})));
+  await ctx.respond(serverQuotes.map((quote, i) => ({ name: `${(i+1).toString()}: ${quote.text}`, value: (i+1).toString()})));
 }
 
 async function formatQuoteEmbed(ctx: CommandContext, quote: QuoteData, index: number, type: "new" | "random" | "specific"): Promise<EmbedBuilder> {
@@ -266,7 +381,7 @@ async function formatQuoteEmbed(ctx: CommandContext, quote: QuoteData, index: nu
     } catch {
       quoteEmbed
         .setFields({ name: `-${quote.username} (${quote.date})`, value: ""})
-        .setThumbnail("https://cdn.discordapp.com/embed/avatars/1.png");
+        .setThumbnail("https://cdn.discordapp.com/embed/avatars/2.png");
     }
   }
 
