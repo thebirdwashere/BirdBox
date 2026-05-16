@@ -7,6 +7,7 @@ import { Database } from "src/utility/database.js";
 const LYRICS = lyrics as Lyrics;
 
 const FILTER_REGEX = /[^a-z\s!?]/g;
+const lastWords = LYRICS.flat().map(lyric => lyric.split(" ").at(-1)).filter(lyric => lyric !== undefined);
 
 const Lyrics = new Interjection({
   name: "lyrics",
@@ -23,6 +24,9 @@ const Lyrics = new Interjection({
       .trim();
 
     if (!content) return false;
+
+    const contentLastWord = content.split(" ").at(-1);
+    if (contentLastWord === undefined || !lastWords.includes(contentLastWord)) return false;
 
     /*/
       * first, previous lyric detection
