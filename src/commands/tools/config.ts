@@ -366,7 +366,7 @@ async function customModal(i: ButtonInteraction, setting: ConfigOptions): Promis
     throw new Error();
 
   const modal = new ModalBuilder()
-    .setCustomId("settingsModal")
+    .setCustomId("settings-modal")
     .setTitle(setting.name);
   
   const optionInput = new TextInputBuilder()
