@@ -1,4 +1,4 @@
-import { ActionRowBuilder, TextInputBuilder, TextInputStyle, ModalBuilder, ModalSubmitInteraction, Message } from "discord.js";
+import { ActionRowBuilder, TextInputBuilder, TextInputStyle, ModalBuilder, ModalSubmitInteraction } from "discord.js";
 import { Command, CommandOption, Subcommand } from "src/utility/command.js";
 import { DatabaseTableManager } from "src/utility/database.js";
 
@@ -207,7 +207,7 @@ const Debug = new Command({
 
         await ctx.replyModal(editModal, onModalSubmit);
 
-        async function onModalSubmit(i: ModalSubmitInteraction, _: Message): Promise<void> {
+        async function onModalSubmit(i: ModalSubmitInteraction): Promise<void> {
           const submission = i.fields.getTextInputValue("debug-text");
           await i.reply(`You submitted: \n\`\`\`\n${submission}\n\`\`\``);
         }

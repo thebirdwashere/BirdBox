@@ -1,4 +1,4 @@
-import { ActionRowBuilder, Message, ModalBuilder, ModalSubmitInteraction, TextInputBuilder, TextInputStyle } from "discord.js";
+import { ActionRowBuilder, ModalBuilder, ModalSubmitInteraction, TextInputBuilder, TextInputStyle } from "discord.js";
 import { Subcommand, CommandOption } from "src/utility/command.js";
 import { MaybepileEntry } from "src/utility/types.js";
 import { getMaybepile, getPageNumber, maybepileAutocomplete, updateMaybepile } from "./utils.js";
@@ -74,7 +74,7 @@ const MaybepileEdit = new Subcommand({
       .setTitle("Edit Maybepile Item")
       .addComponents(modalFields);
 
-    async function onModalSubmit(i: ModalSubmitInteraction, _: Message): Promise<void> {
+    async function onModalSubmit(i: ModalSubmitInteraction): Promise<void> {
       const newItem: MaybepileEntry = {
         title: i.fields.getTextInputValue("maybepile-title"),
         description: i.fields.getTextInputValue("maybepile-description"),

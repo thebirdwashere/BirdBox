@@ -76,7 +76,11 @@ export interface CommandContext extends BaseContext {
    * Attempts to reply with a button that opens the provided modal. 
    * Runs the provided callback function on modal submit.
    */
-  replyModal: (modal: ModalBuilder, callback: (i: ModalSubmitInteraction, msg: Message) => Promise<void>) => Promise<void>;
+  replyModal: (
+    modal: ModalBuilder, 
+    callback: ((i: ModalSubmitInteraction) => Promise<void>)
+    | ((i: ModalSubmitInteraction, msg: Message) => Promise<void>)
+  ) => Promise<void>;
 }
 
 //MARK: MessageContext
@@ -139,7 +143,11 @@ export class MessageContext implements CommandContext {
       );
   }
 
-  async replyModal(modal: ModalBuilder, callback: (i: ModalSubmitInteraction, msg: Message) => Promise<void>): Promise<void> {
+  async replyModal(
+    modal: ModalBuilder, 
+    callback: ((i: ModalSubmitInteraction) => Promise<void>)
+    | ((i: ModalSubmitInteraction, msg: Message) => Promise<void>)
+  ): Promise<void> {
     if (!this.channel?.isSendable())
       throw new Error("Tried to send a modal in a unsendable channel.");
 
@@ -281,7 +289,11 @@ export class ChatInputCommandInteractionContext implements CommandContext {
       );
   }
 
-  async replyModal(modal: ModalBuilder, callback: (i: ModalSubmitInteraction, msg: Message) => Promise<void>): Promise<void> {
+  async replyModal(
+    modal: ModalBuilder, 
+    callback: ((i: ModalSubmitInteraction) => Promise<void>)
+    | ((i: ModalSubmitInteraction, msg: Message) => Promise<void>)
+  ): Promise<void> {
     if (!this.channel?.isSendable())
       throw new Error("Tried to send a modal in a unsendable channel.");
 
@@ -520,7 +532,11 @@ export class ContextMenuCommandContext implements CommandContext {
       );
   }
 
-  async replyModal(modal: ModalBuilder, callback: (i: ModalSubmitInteraction, msg: Message) => Promise<void>): Promise<void> {
+  async replyModal(
+    modal: ModalBuilder, 
+    callback: ((i: ModalSubmitInteraction) => Promise<void>)
+    | ((i: ModalSubmitInteraction, msg: Message) => Promise<void>)
+  ): Promise<void> {
     if (!this.channel?.isSendable())
       throw new Error("Tried to send a modal in a unsendable channel.");
 
