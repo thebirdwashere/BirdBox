@@ -188,7 +188,7 @@ export class MessageContext implements CommandContext {
 
       await i.awaitModalSubmit({ filter: modalFilter, time: 300_000 })
         .then(async i => { await callback(i, response); })
-        .catch(async () => { await response.edit("Modal interaction has timed out."); });
+        .catch(async (e: unknown) => { console.error(e); await response.edit("Modal interaction has timed out."); });
     }
     
      
@@ -334,7 +334,7 @@ export class ChatInputCommandInteractionContext implements CommandContext {
 
       await i.awaitModalSubmit({ filter: modalFilter, time: 300_000 })
         .then(async i => { await callback(i, response); })
-        .catch(async () => { await response.edit("Modal interaction has timed out."); });
+        .catch(async (e: unknown) => { console.error(e); await response.edit("Modal interaction has timed out."); });
     }
     
      
@@ -577,7 +577,7 @@ export class ContextMenuCommandContext implements CommandContext {
 
       await i.awaitModalSubmit({ filter: modalFilter, time: 300_000 })
         .then(async i => { await callback(i, response); })
-        .catch(async () => { await response.edit("Modal interaction has timed out."); });
+        .catch(async (e: unknown) => { console.error(e); await response.edit("Modal interaction has timed out."); });
     }
     
      
