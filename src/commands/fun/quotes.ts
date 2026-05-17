@@ -1,5 +1,5 @@
 import { Command, CommandOption, Subcommand } from "src/utility/command.js";
-import { ActionRowBuilder, Colors, EmbedBuilder, Message, ModalBuilder, ModalSubmitInteraction, TextInputBuilder, TextInputStyle } from "discord.js";
+import { ActionRowBuilder, Colors, EmbedBuilder, Message, ModalBuilder, ModalSubmitInteraction, PermissionFlagsBits, TextInputBuilder, TextInputStyle } from "discord.js";
 import footers from "src/data/footers.json" with { type: "json" };
 import { Footers, QuoteData } from "src/utility/types.js";
 import { randomChoice } from "src/utility/utility.js";
@@ -179,6 +179,12 @@ const Quotes = new Command({
           return;
         }
 
+        const hasPermission = await checkPermissions(ctx);
+        if (!hasPermission) {
+          await ctx.reply("Sorry, editing quotes requires the Manage Messages permission.");
+          return;
+        }
+
         const serverQuotes = ctx.db.server.fetchOr(ctx.guild.id, "quotes", []) as QuoteData[];
 
         if (serverQuotes.length === 0) {
@@ -294,6 +300,12 @@ const Quotes = new Command({
           return;
         }
 
+        const hasPermission = await checkPermissions(ctx);
+        if (!hasPermission) {
+          await ctx.reply("Sorry, editing quotes requires the Manage Messages permission.");
+          return;
+        }
+        
         const serverQuotes = ctx.db.server.fetchOr(ctx.guild.id, "quotes", []) as QuoteData[];
 
         if (serverQuotes.length === 0) {
@@ -333,6 +345,15 @@ async function quotesAutocomplete(ctx: AutocompleteContext): Promise<void> {
   const serverQuotes = ctx.db.server.fetchOr(ctx.guild.id, "quotes", []) as QuoteData[];
 
   await ctx.respond(serverQuotes.map((quote, i) => ({ name: `${(i+1).toString()}: ${quote.text}`, value: (i+1).toString()})));
+}
+
+async function checkPermissions(ctx: CommandContext): Promise<boolean> {
+  if (!ctx.guild)
+    throw new Error("Checked permissions outside guild.");
+  
+  const serverMember = await ctx.guild.members.fetch(ctx.user.id);
+
+  return serverMember.permissions.has(PermissionFlagsBits.ManageMessages);
 }
 
 async function formatQuoteEmbed(ctx: CommandContext, quote: QuoteData, index: number, type: "new" | "random" | "specific"): Promise<EmbedBuilder> {
