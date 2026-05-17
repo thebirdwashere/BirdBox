@@ -1,5 +1,5 @@
 import { Command, CommandOption } from "@src/utility/command.js";
-import { EmbedBuilder } from "discord.js";
+import { Colors, EmbedBuilder } from "discord.js";
 import { fetchConfigOption } from "@src/utility/utility.js";
 
 const Announce = new Command({
@@ -42,7 +42,7 @@ const Announce = new Command({
       .setTitle(`${ctx.channel.name ?? "undefined"}'s Announcement`)
       .setDescription(opts.string.get("message") ?? "undefined")
       .setAuthor({ name: ctx.user.username, iconURL: ctx.user.displayAvatarURL() })
-      .setColor(0xAA00FF)
+      .setColor(Colors.Purple)
       .setTimestamp(ctx.timestamp);
 
     announceChannel.send({ embeds: [announceEmbed] })

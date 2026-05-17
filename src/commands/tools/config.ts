@@ -1,5 +1,5 @@
 import { Command, CommandOption } from "@src/utility/command.js";
-import { ActionRowBuilder, ActivityType, ButtonBuilder, ButtonInteraction, ButtonStyle, ChannelSelectMenuBuilder, ChannelType, ComponentType, EmbedBuilder, MentionableSelectMenuBuilder, MessageActionRowComponentBuilder, MessageComponentInteraction, ModalBuilder, ModalSubmitInteraction, RoleSelectMenuBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, TextInputBuilder, TextInputStyle, UserSelectMenuBuilder 
+import { ActionRowBuilder, ActivityType, ButtonBuilder, ButtonInteraction, ButtonStyle, ChannelSelectMenuBuilder, ChannelType, Colors, ComponentType, EmbedBuilder, MentionableSelectMenuBuilder, MessageActionRowComponentBuilder, MessageComponentInteraction, ModalBuilder, ModalSubmitInteraction, RoleSelectMenuBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, TextInputBuilder, TextInputStyle, UserSelectMenuBuilder 
 } from "discord.js";
 import config from "@src/data/config.json" with { type: "json" };
 import { Config, ConfigOptions, ConfigScope } from "@src/utility/types.js";
@@ -220,7 +220,7 @@ export default Config;
 function updateEmbed(scope: ConfigScope, name: string): EmbedBuilder { //MARK: update embed
   // Returns an updated embed on request.
   const configEmbed = new EmbedBuilder()
-    .setColor(0xffffff)
+    .setColor(Colors.White)
     .setTitle(`${scope.charAt(0).toUpperCase() + scope.slice(1)} Config`)
     .setFooter({ text: "Made by TheBirdWasHere, with help from friends." });
   
