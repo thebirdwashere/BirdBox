@@ -35,7 +35,7 @@ export async function detectChatInputInteractionCommand(
   // Determine if command exists in registry.
   const command = data.registry.commands.get(commandName);
   if (command === undefined)
-    throw new Error(`Unknown or unregistered command \`/${commandName}\``);
+    throw new Error(`Command \`/${commandName}\` does not exist.`);
 
   if (command.permissions) 
     testUserPermissions(command.permissions, PERMS, interaction.user.id);
@@ -73,7 +73,7 @@ export async function detectChatInputInteractionCommand(
       (sub) => sub.data.name === subcommandName,
     );
     if (subcommand === undefined)
-      throw new Error(`Unknown subcommand: \`/${commandName} ${subcommandName}\``);
+      throw new Error(`Subcommand \`/${commandName} ${subcommandName}\` does not exist.`);
 
     if (subcommand.permissions)
       testUserPermissions(subcommand.permissions, PERMS, interaction.user.id);
@@ -256,7 +256,7 @@ export async function detectMessageCommand(
   // Determine if command exists in registry.
   const command = registry.commands.get(commandName);
   if (command === undefined)
-    throw new Error(`Unknown or unregistered command \`/${commandName}\``);
+    throw new Error(`Command \`${data.prefix}${commandName}\` does not exist.`);
   // command: Command
 
   if (command.permissions) 
@@ -272,7 +272,7 @@ export async function detectMessageCommand(
     if (command.body !== undefined && isOptionArray(command.body)) {
       if (args.length > command.body.length) {
         throw new Error(
-          `Too many arguments provided to command \`/${commandName}\`; ` +
+          `Too many arguments provided to command \`${data.prefix}${commandName}\`; ` +
           `expected at most ${String(command.body.length)}, ` +
           `found ${String(args.length)}.`
         );
@@ -288,8 +288,12 @@ export async function detectMessageCommand(
     await command.execute(context, options);
   } else if (command.body !== undefined && isSubcommandArray(command.body)) {
     const subcommandName = args.shift();
-    if (subcommandName === undefined)
-      throw new Error(`Subcommand missing in command \`/${commandName}\``);
+    if (subcommandName === undefined) {
+      const subcommandsFormatter = new Intl.ListFormat("en", {type: "conjunction",});
+      const subcommandsList = subcommandsFormatter.format(command.body.map(sub => `\`${sub.data.name}\``));
+      throw new Error(`Subcommand missing in command \`${data.prefix}${commandName}\`. Available subcommands are ${subcommandsList}.`);
+    }
+
 
     let options = new Options();
 
@@ -300,7 +304,7 @@ export async function detectMessageCommand(
       (sub) => sub.data.name === subcommandName,
     );
     if (subcommand === undefined)
-      throw new Error(`Unknown subcommand: \`/${commandName} ${subcommandName}\``);
+      throw new Error(`Subcommand \`${data.prefix}${commandName} ${subcommandName}\` does not exist.`);
 
     if (subcommand.permissions) {
       testUserPermissions(subcommand.permissions, PERMS, message.author.id);
@@ -310,7 +314,7 @@ export async function detectMessageCommand(
     if (subcommand.body !== undefined && isOptionArray(subcommand.body)) {
       if (args.length > subcommand.body.length) {
         throw new Error(
-          `Too many arguments provided to command: \`/${commandName} ${subcommandName}\`; ` +
+          `Too many arguments provided to command \`${data.prefix}${commandName} ${subcommandName}\`; ` +
           `expected at most ${String(subcommand.body.length)}, ` +
           `found ${String(args.length)}.`
         );
@@ -324,7 +328,7 @@ export async function detectMessageCommand(
 
     await subcommand.execute(context, options);
   } else {
-    throw new Error(`Missing execute function in command \`${commandName}\``);
+    throw new Error(`Missing execute function in command \`${commandName}\`.`);
   }
 }
 
@@ -487,7 +491,7 @@ export async function handleAutocomplete(
   const command = data.registry.commands.get(commandName);
 
   if (command === undefined)
-    throw new Error(`Unknown or unregistered command \`/${commandName}\``);
+    throw new Error(`Command \`/${commandName}\` does not exist.`);
   
   if (command.body === undefined) {
     throw new Error(`Autocomplete call on command \`/${commandName}\` without provided options.`);
@@ -508,7 +512,7 @@ export async function handleAutocomplete(
 
     if (subcommand === undefined) {
       throw new Error(
-        `Unknown subcommand: \`/${commandName} ${subcommandName}\``,
+        `Subcommand \`/${commandName} ${subcommandName}\` does not exist.`,
       );
     }
   
