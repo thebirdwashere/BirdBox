@@ -22,6 +22,7 @@ const MaybepileSuggest = new Subcommand({
       optional: true,
     }),
   ],
+  cooldown: 300_000,
   execute: async (ctx, opts) => {
     const title = opts.string.get("title");
     if (title == null)
