@@ -101,6 +101,13 @@ export interface QuoteData {
   date: string;
 }
 
+//MARK: Scratchpad
+export interface ScratchpadNoteData {
+  label: string;
+  text: string;
+  timestamp: number;
+}
+
 //MARK: Snipes
 export interface SnipedMessage {
   authorID: string,
