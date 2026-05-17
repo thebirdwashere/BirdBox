@@ -396,6 +396,8 @@ export class AutocompleteContext implements BaseContext {
   ): Promise<void> {
     const current = this.option.value.toLowerCase();
 
+    console.log(current);
+
     let responseElements = choices;
     if (current !== "") {
       const choicesStartsWith = choices.filter(choice => choice.name.toLowerCase().startsWith(current));
@@ -426,14 +428,7 @@ export class AutocompleteContext implements BaseContext {
     blank?: string,
   ): Promise<void> {
     const convertedContent = choices.map((choice) => ({ name: choice, value: choice }));
-
-    if (convertedContent.length > 0) {
-      await this.interaction.respond(convertedContent.slice(0, 25));
-    } else if (blank) {
-      await this.interaction.respond([{ name: blank, value: blank }]);
-    } else {
-      await this.interaction.respond([]);
-    }
+    await this.respond(convertedContent, blank);
   }
 
   /**
