@@ -98,8 +98,16 @@ const MaybepileView = new Subcommand({
       const buttonRow = new ActionRowBuilder<ButtonBuilder>()
         .addComponents(leftButton, rightButton);
                     
-      if (pageNum == 1) {
+      if (pageNum === 1) {
         buttonRow.components[0].setDisabled(true);
+      } else {
+        buttonRow.components[0].setDisabled(false);
+      }
+
+      if (pageNum === pileArray.length - 1) {
+        buttonRow.components[1].setDisabled(true);
+      } else {
+        buttonRow.components[1].setDisabled(false);
       }
                     
       const response = await ctx.reply({embeds: [generateItemEmbed(chosenItem)], components: [buttonRow]});
