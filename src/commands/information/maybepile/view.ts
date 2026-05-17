@@ -37,7 +37,7 @@ const MaybepileView = new Subcommand({
           throw new Error("Found Table of Contents while indexing maybepile.");
         
         tableOfContentsEmbed.addFields({
-          name: `${index.toString()}: ${item.title}`, 
+          name: `${String(index+1)}: ${item.title}`, 
           value: `Suggested by ${item.suggester} (*${item.claim.status}*)`, 
           inline: true
         });
