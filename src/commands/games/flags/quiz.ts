@@ -1,7 +1,7 @@
-import { Subcommand, CommandOption } from "src/utility/command.js";
-import flags from "src/data/flags.json" with { type: "json" };
-import { Flags, NonEmptyArray, UserFlagStats } from "src/utility/types.js";
-import { randomChoice, sleep } from "src/utility/utility.js";
+import { Subcommand, CommandOption } from "@src/utility/command.js";
+import flags from "@src/data/flags.json" with { type: "json" };
+import { Flags, NonEmptyArray, UserFlagStats } from "@src/utility/types.js";
+import { randomChoice, sleep } from "@src/utility/utility.js";
 import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, Colors, ComponentType, EmbedBuilder } from "discord.js";
 
 const FLAGS = flags as Flags;

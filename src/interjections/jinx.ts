@@ -1,5 +1,5 @@
-import { Interjection } from "src/utility/interjection.js";
-import { fetchConfigOption } from "src/utility/utility.js";
+import { Interjection } from "@src/utility/interjection.js";
+import { fetchConfigOption } from "@src/utility/utility.js";
 
 const JINX_WINDOW = 3000;
 

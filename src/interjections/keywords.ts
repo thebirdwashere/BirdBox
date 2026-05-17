@@ -1,7 +1,7 @@
-import { Interjection } from "src/utility/interjection.js";
-import keywords from "src/data/keywords.json" with { type: "json" };
-import { Keywords } from "src/utility/types.js";
-import { fetchConfigOption } from "src/utility/utility.js";
+import { Interjection } from "@src/utility/interjection.js";
+import keywords from "@src/data/keywords.json" with { type: "json" };
+import { Keywords } from "@src/utility/types.js";
+import { fetchConfigOption } from "@src/utility/utility.js";
 
 const KEYWORDS = keywords as Keywords;
 

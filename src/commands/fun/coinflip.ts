@@ -1,6 +1,6 @@
 import { Message } from "discord.js";
-import { Command, CommandOption } from "src/utility/command.js";
-import { sleep } from "src/utility/utility.js";
+import { Command, CommandOption } from "@src/utility/command.js";
+import { sleep } from "@src/utility/utility.js";
 
 const Coinflip = new Command({
   name: "coinflip",

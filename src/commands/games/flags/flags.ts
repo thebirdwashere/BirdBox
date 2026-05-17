@@ -1,4 +1,4 @@
-import { Command } from "src/utility/command.js";
+import { Command } from "@src/utility/command.js";
 import FlagsQuiz from "./quiz.js";
 import FlagsLeaderboard from "./leaderboard.js";
 import FlagsStats from "./stats.js";

@@ -1,9 +1,9 @@
-import { Interjection, notifyOfInterjection } from "src/utility/interjection.js";
-import periodic_table from "src/data/periodic_table.json" with { type: "json" };
-import footers from "src/data/footers.json" with { type: "json" };
-import { Footers } from "src/utility/types.js";
-import { PeriodicTable } from "src/utility/types.js";
-import { randomChoice } from "src/utility/utility.js";
+import { Interjection, notifyOfInterjection } from "@src/utility/interjection.js";
+import periodic_table from "@src/data/periodic_table.json" with { type: "json" };
+import footers from "@src/data/footers.json" with { type: "json" };
+import { Footers } from "@src/utility/types.js";
+import { PeriodicTable } from "@src/utility/types.js";
+import { randomChoice } from "@src/utility/utility.js";
 
 const PERIODIC_TABLE = periodic_table as PeriodicTable;
 const FOOTERS = footers as Footers;

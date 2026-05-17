@@ -1,8 +1,8 @@
-import { Command, CommandOption, Subcommand } from "src/utility/command.js";
+import { Command, CommandOption, Subcommand } from "@src/utility/command.js";
 import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, Colors, ComponentType, EmbedBuilder, Message, ModalBuilder, ModalSubmitInteraction, TextInputBuilder, TextInputStyle } from "discord.js";
-import { ScratchpadNoteData } from "src/utility/types.js";
-import { AutocompleteContext, CommandContext } from "src/utility/context.js";
-import { handleCommandError } from "src/utility/error.js";
+import { ScratchpadNoteData } from "@src/utility/types.js";
+import { AutocompleteContext, CommandContext } from "@src/utility/context.js";
+import { handleCommandError } from "@src/utility/error.js";
 
 const Scratchpad = new Command({
   name: "scratchpad",

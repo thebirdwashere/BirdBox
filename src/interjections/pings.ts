@@ -1,7 +1,7 @@
-import { Interjection } from "src/utility/interjection.js";
-import ping_responses from "src/data/ping_responses.json" with { type: "json" };
-import { ResponsesList } from "src/utility/types.js";
-import { randomChoice } from "src/utility/utility.js";
+import { Interjection } from "@src/utility/interjection.js";
+import ping_responses from "@src/data/ping_responses.json" with { type: "json" };
+import { ResponsesList } from "@src/utility/types.js";
+import { randomChoice } from "@src/utility/utility.js";
 
 const RESPONSES = ping_responses as ResponsesList;
 

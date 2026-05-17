@@ -1,4 +1,4 @@
-import { Subcommand, CommandOption } from "src/utility/command.js";
+import { Subcommand, CommandOption } from "@src/utility/command.js";
 import { encryptWordCode } from "./utils.js";
 
 const WordleCode = new Subcommand({

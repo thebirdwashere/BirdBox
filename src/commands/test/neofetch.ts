@@ -1,6 +1,6 @@
-import { Command } from "src/utility/command.js";
+import { Command } from "@src/utility/command.js";
 import { exec } from "node:child_process";
-import { sleep } from "src/utility/utility.js";
+import { sleep } from "@src/utility/utility.js";
 
 const Neofetch = new Command({
   name: "neofetch",

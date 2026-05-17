@@ -1,6 +1,6 @@
 import { ActionRowBuilder, Colors, ComponentType, EmbedBuilder, StringSelectMenuBuilder, StringSelectMenuInteraction, StringSelectMenuOptionBuilder } from "discord.js";
-import { CommandOption, Subcommand } from "src/utility/command.js";
-import { NonEmptyArray, UserFlagStats } from "src/utility/types.js";
+import { CommandOption, Subcommand } from "@src/utility/command.js";
+import { NonEmptyArray, UserFlagStats } from "@src/utility/types.js";
 
 const STATISTICS = ["points", "win%", "streak"];
 type StatisticString = "points" | "win%" | "streak";

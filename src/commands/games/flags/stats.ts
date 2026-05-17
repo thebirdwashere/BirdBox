@@ -1,6 +1,6 @@
 import { Colors, EmbedBuilder } from "discord.js";
-import { CommandOption, Subcommand } from "src/utility/command.js";
-import { UserFlagStats } from "src/utility/types.js";
+import { CommandOption, Subcommand } from "@src/utility/command.js";
+import { UserFlagStats } from "@src/utility/types.js";
 
 const FlagsStats = new Subcommand({
   name: "stats",

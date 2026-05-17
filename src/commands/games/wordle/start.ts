@@ -1,7 +1,7 @@
-import { Subcommand, CommandOption } from "src/utility/command.js";
-import wordle from "src/data/wordle.json" with { type: "json" };
-import { Wordle, WordleGameFields } from "src/utility/types.js";
-import { randomChoice } from "src/utility/utility.js";
+import { Subcommand, CommandOption } from "@src/utility/command.js";
+import wordle from "@src/data/wordle.json" with { type: "json" };
+import { Wordle, WordleGameFields } from "@src/utility/types.js";
+import { randomChoice } from "@src/utility/utility.js";
 import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, ComponentType } from "discord.js";
 import { decryptWordCode, encryptWordCode, createWordleEmbed, handleUsedLettersDisplay } from "./utils.js";
 

@@ -1,6 +1,6 @@
-import { AutocompleteContext } from "src/utility/context.js";
-import { Database } from "src/utility/database.js";
-import { MaybepileArray } from "src/utility/types.js";
+import { AutocompleteContext } from "@src/utility/context.js";
+import { Database } from "@src/utility/database.js";
+import { MaybepileArray } from "@src/utility/types.js";
 
 export async function maybepileAutocomplete(ctx: AutocompleteContext): Promise<void> {
   const pileArray = ctx.db.global.fetchOr("global", "maybepile", ["Table of Contents"]) as MaybepileArray;

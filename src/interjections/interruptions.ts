@@ -1,7 +1,7 @@
-import { Interjection } from "src/utility/interjection.js";
-import interruptions from "src/data/interruptions.json" with { type: "json" };
-import { ResponsesList } from "src/utility/types.js";
-import { randomChoice } from "src/utility/utility.js";
+import { Interjection } from "@src/utility/interjection.js";
+import interruptions from "@src/data/interruptions.json" with { type: "json" };
+import { ResponsesList } from "@src/utility/types.js";
+import { randomChoice } from "@src/utility/utility.js";
 
 const RESPONSES = interruptions as ResponsesList;
 

@@ -1,11 +1,11 @@
-import { Command, CommandOption } from "src/utility/command.js";
+import { Command, CommandOption } from "@src/utility/command.js";
 import { ActionRowBuilder, ActivityType, ButtonBuilder, ButtonInteraction, ButtonStyle, ChannelSelectMenuBuilder, ChannelType, ComponentType, EmbedBuilder, MentionableSelectMenuBuilder, MessageActionRowComponentBuilder, MessageComponentInteraction, ModalBuilder, ModalSubmitInteraction, RoleSelectMenuBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, TextInputBuilder, TextInputStyle, UserSelectMenuBuilder 
 } from "discord.js";
-import config from "src/data/config.json" with { type: "json" };
-import { Config, ConfigOptions, ConfigScope } from "src/utility/types.js";
-import { Database } from "src/utility/database.js";
-import { fetchConfigOption, getAdminIds } from "src/utility/utility.js";
-import { CommandContext } from "src/utility/context.js";
+import config from "@src/data/config.json" with { type: "json" };
+import { Config, ConfigOptions, ConfigScope } from "@src/utility/types.js";
+import { Database } from "@src/utility/database.js";
+import { fetchConfigOption, getAdminIds } from "@src/utility/utility.js";
+import { CommandContext } from "@src/utility/context.js";
 
 const CONFIG = config as Config;
 

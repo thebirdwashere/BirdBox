@@ -1,4 +1,4 @@
-import { Command, Subcommand, CommandOption } from "src/utility/command.js";
+import { Command, Subcommand, CommandOption } from "@src/utility/command.js";
 import { EmbedBuilder, Colors } from "discord.js";
 
 const CAT_LINK = "api.thecatapi.com";

@@ -1,8 +1,8 @@
-import { Interjection } from "src/utility/interjection.js";
-import lyrics from "src/data/lyrics.json" with { type: "json" };
-import { Lyrics } from "src/utility/types.js";
-import { fetchConfigOption } from "src/utility/utility.js";
-import { Database } from "src/utility/database.js";
+import { Interjection } from "@src/utility/interjection.js";
+import lyrics from "@src/data/lyrics.json" with { type: "json" };
+import { Lyrics } from "@src/utility/types.js";
+import { fetchConfigOption } from "@src/utility/utility.js";
+import { Database } from "@src/utility/database.js";
 
 const LYRICS = lyrics as Lyrics;
 

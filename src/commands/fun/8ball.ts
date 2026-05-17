@@ -1,9 +1,9 @@
-import { Command, CommandOption } from "src/utility/command.js";
+import { Command, CommandOption } from "@src/utility/command.js";
 import { Colors, EmbedBuilder } from "discord.js";
-import footers from "src/data/footers.json" with { type: "json" };
-import responses from "src/data/8ball.json" with { type: "json" };
-import { Footers, EightBallResponses } from "src/utility/types.js";
-import { randomChoice } from "src/utility/utility.js";
+import footers from "@src/data/footers.json" with { type: "json" };
+import responses from "@src/data/8ball.json" with { type: "json" };
+import { Footers, EightBallResponses } from "@src/utility/types.js";
+import { randomChoice } from "@src/utility/utility.js";
 
 const FOOTERS = footers as Footers;
 const RESPONSES = responses as EightBallResponses;

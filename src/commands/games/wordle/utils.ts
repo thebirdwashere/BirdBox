@@ -1,5 +1,5 @@
 import { Colors, EmbedBuilder } from "discord.js";
-import { WordleGameFields } from "src/utility/types.js";
+import { WordleGameFields } from "@src/utility/types.js";
 
 //for code encryption and decryption (shuffled for the tiniest bit of protection)
 const shuffledAlphabet = "rlzwvefuognicapqmytbjksxdh".split("");

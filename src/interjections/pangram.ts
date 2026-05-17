@@ -1,7 +1,7 @@
-import { Interjection, notifyOfInterjection } from "src/utility/interjection.js";
-import { randomChoice } from "src/utility/utility.js";
-import footers from "src/data/footers.json" with { type: "json" };
-import { Footers } from "src/utility/types.js";
+import { Interjection, notifyOfInterjection } from "@src/utility/interjection.js";
+import { randomChoice } from "@src/utility/utility.js";
+import footers from "@src/data/footers.json" with { type: "json" };
+import { Footers } from "@src/utility/types.js";
 
 const FOOTERS = footers as Footers;
 

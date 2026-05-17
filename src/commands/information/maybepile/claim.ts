@@ -1,6 +1,6 @@
-import { Subcommand, CommandOption } from "src/utility/command.js";
+import { Subcommand, CommandOption } from "@src/utility/command.js";
 import { getMaybepile, getPageNumber, maybepileAutocomplete, updateMaybepile } from "./utils.js";
-import { getAdminIds } from "src/utility/utility.js";
+import { getAdminIds } from "@src/utility/utility.js";
 
 const MaybepileClaim = new Subcommand({
   name: "claim",

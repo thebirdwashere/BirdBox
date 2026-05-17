@@ -1,9 +1,9 @@
-import { Command, CommandOption, Subcommand } from "src/utility/command.js";
+import { Command, CommandOption, Subcommand } from "@src/utility/command.js";
 import { ActionRowBuilder, Colors, EmbedBuilder, Message, ModalBuilder, ModalSubmitInteraction, PermissionFlagsBits, TextInputBuilder, TextInputStyle } from "discord.js";
-import footers from "src/data/footers.json" with { type: "json" };
-import { Footers, QuoteData } from "src/utility/types.js";
-import { randomChoice } from "src/utility/utility.js";
-import { AutocompleteContext, CommandContext } from "src/utility/context.js";
+import footers from "@src/data/footers.json" with { type: "json" };
+import { Footers, QuoteData } from "@src/utility/types.js";
+import { randomChoice } from "@src/utility/utility.js";
+import { AutocompleteContext, CommandContext } from "@src/utility/context.js";
 
 const FOOTERS = footers as Footers;
 

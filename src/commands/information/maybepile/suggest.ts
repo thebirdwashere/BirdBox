@@ -1,4 +1,4 @@
-import { Subcommand, CommandOption } from "src/utility/command.js";
+import { Subcommand, CommandOption } from "@src/utility/command.js";
 import { getMaybepile, updateMaybepile } from "./utils.js";
 
 const MaybepileSuggest = new Subcommand({

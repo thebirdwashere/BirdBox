@@ -1,7 +1,7 @@
 import path from "path";
 import { CommandContext } from "./context.js";
-import config from "src/data/config.json" with { type: "json" };
-import perms from "src/data/perms.json" with { type: "json" };
+import config from "@src/data/config.json" with { type: "json" };
+import perms from "@src/data/perms.json" with { type: "json" };
 import { Config, ConfigScope, Perms } from "./types.js";
 import { Database } from "./database.js";
 

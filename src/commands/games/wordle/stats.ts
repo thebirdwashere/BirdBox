@@ -1,6 +1,6 @@
 import { Colors, EmbedBuilder } from "discord.js";
-import { CommandOption, Subcommand } from "src/utility/command.js";
-import { UserWordleStats } from "src/utility/types.js";
+import { CommandOption, Subcommand } from "@src/utility/command.js";
+import { UserWordleStats } from "@src/utility/types.js";
 
 const WordleStats = new Subcommand({
   name: "stats",

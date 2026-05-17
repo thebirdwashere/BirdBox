@@ -1,4 +1,4 @@
-import { Command, CommandOption } from "src/utility/command.js";
+import { Command, CommandOption } from "@src/utility/command.js";
 
 const Echo = new Command({
   name: "echo",

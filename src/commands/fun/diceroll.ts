@@ -1,6 +1,6 @@
-import { Command, CommandOption } from "src/utility/command.js";
+import { Command, CommandOption } from "@src/utility/command.js";
 import { Message } from "discord.js";
-import { randomChoice, sleep } from "src/utility/utility.js";
+import { randomChoice, sleep } from "@src/utility/utility.js";
 
 const Diceroll = new Command({
   name: "diceroll",

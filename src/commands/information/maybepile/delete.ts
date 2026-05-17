@@ -1,4 +1,4 @@
-import { Subcommand, CommandOption } from "src/utility/command.js";
+import { Subcommand, CommandOption } from "@src/utility/command.js";
 import { getMaybepile, getPageNumber, maybepileAutocomplete, updateMaybepile } from "./utils.js";
 
 const MaybepileDelete = new Subcommand({

@@ -1,6 +1,6 @@
-import { Command, CommandOption } from "src/utility/command.js";
+import { Command, CommandOption } from "@src/utility/command.js";
 import { EmbedBuilder } from "discord.js";
-import { fetchConfigOption } from "src/utility/utility.js";
+import { fetchConfigOption } from "@src/utility/utility.js";
 
 const Announce = new Command({
   name: "announce",

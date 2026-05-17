@@ -1,4 +1,4 @@
-import { Command } from "src/utility/command.js";
+import { Command } from "@src/utility/command.js";
 import WordleStart from "./start.js";
 import WordleGuess from "./guess.js";
 import WordleStats from "./stats.js";

@@ -1,4 +1,4 @@
-import { Command } from "src/utility/command.js";
+import { Command } from "@src/utility/command.js";
 import MaybepileView from "./view.js";
 import MaybepileSuggest from "./suggest.js";
 import MaybepileEdit from "./edit.js";

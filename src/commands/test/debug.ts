@@ -1,6 +1,6 @@
 import { ActionRowBuilder, TextInputBuilder, TextInputStyle, ModalBuilder, ModalSubmitInteraction } from "discord.js";
-import { Command, CommandOption, Subcommand } from "src/utility/command.js";
-import { DatabaseTableManager } from "src/utility/database.js";
+import { Command, CommandOption, Subcommand } from "@src/utility/command.js";
+import { DatabaseTableManager } from "@src/utility/database.js";
 
 const Debug = new Command({
   name: "debug",

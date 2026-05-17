@@ -1,4 +1,4 @@
-import { Command } from "src/utility/command.js";
+import { Command } from "@src/utility/command.js";
 import { EmbedBuilder, Colors } from "discord.js";
 
 const Credits = new Command({

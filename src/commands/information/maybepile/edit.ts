@@ -1,6 +1,6 @@
 import { ActionRowBuilder, ModalBuilder, ModalSubmitInteraction, TextInputBuilder, TextInputStyle } from "discord.js";
-import { Subcommand, CommandOption } from "src/utility/command.js";
-import { MaybepileEntry } from "src/utility/types.js";
+import { Subcommand, CommandOption } from "@src/utility/command.js";
+import { MaybepileEntry } from "@src/utility/types.js";
 import { getMaybepile, getPageNumber, maybepileAutocomplete, updateMaybepile } from "./utils.js";
 
 const MaybepileEdit = new Subcommand({

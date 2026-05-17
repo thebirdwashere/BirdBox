@@ -1,8 +1,8 @@
-import { Command } from "src/utility/command.js";
+import { Command } from "@src/utility/command.js";
 import { Colors, EmbedBuilder } from "discord.js";
-import footers from "src/data/footers.json" with { type: "json" };
-import { Footers, SnipedMessage } from "src/utility/types.js";
-import { randomChoice } from "src/utility/utility.js";
+import footers from "@src/data/footers.json" with { type: "json" };
+import { Footers, SnipedMessage } from "@src/utility/types.js";
+import { randomChoice } from "@src/utility/utility.js";
 
 const FOOTERS = footers as Footers;
 

@@ -1,7 +1,7 @@
 import { EmbedBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder, ComponentType, Colors, ButtonInteraction } from "discord.js";
-import { Subcommand, CommandOption } from "src/utility/command.js";
-import { handleCommandError } from "src/utility/error.js";
-import { MaybepileEntry } from "src/utility/types.js";
+import { Subcommand, CommandOption } from "@src/utility/command.js";
+import { handleCommandError } from "@src/utility/error.js";
+import { MaybepileEntry } from "@src/utility/types.js";
 import { getMaybepile, getPageNumber, maybepileAutocomplete } from "./utils.js";
 
 const MaybepileView = new Subcommand({
