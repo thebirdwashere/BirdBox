@@ -6,6 +6,8 @@ import { randomChoice } from "@src/utility/utility.js";
 
 const FOOTERS = footers as Footers;
 
+const OPTION_TYPES = [null, "subcommand", "subcommand group", "string option", "integer option", "boolean option", "user selector", "channel selector", "role selector", "user/role selector", "number option", "attachment upload"];
+
 const Help = new Command({
   name: "help",
   description: "Browse and learn about BirdBox's many commands.",
@@ -15,8 +17,19 @@ const Help = new Command({
       description: "A specific command to view information regarding.",
       type: "string",
       optional: true,
+      autocomplete: true,
     }),
   ],
+  autocomplete: async (ctx) => {
+    const commandsTextList = Array.from(ctx.data.registry.commands.values()).map(cmd => cmd.data.name);
+    commandsTextList.sort((a, b) => { // Put commands in alphabetical order.
+      if (a < b) return -1;
+      else if (a > b) return 1;
+      else return 0;
+    });
+
+    await ctx.respondStrings(commandsTextList);
+  },
   execute: async (ctx, opts) => {
     const requestedCommand = opts.string.get("command");
 
@@ -27,7 +40,7 @@ const Help = new Command({
       else return 0;
     });
 
-    if (requestedCommand !== null) {
+    if (requestedCommand != null) {
 
       const requestedCommandData = commandsList.find(cmd => cmd.data.name === requestedCommand)?.data;
       if (requestedCommandData == null) throw new Error("Requested command not found.");
@@ -46,17 +59,22 @@ const Help = new Command({
         for (const option of requestedCommandData.options) {
           const optionJSON = option.toJSON();
           
-          const optionTitle = optionJSON.name.charAt(0).toUpperCase() + optionJSON.name.slice(1);
-          const optionType = [null, "subcommand", "subcommand group", "string option", "integer option", "boolean option", "user selector", "channel selector", "role selector", "user/role selector", "number option", "attachment upload"][optionJSON.type] ?? "subcommand";
+          const optionTitle = optionJSON.name; //optionJSON.name.charAt(0).toUpperCase() + optionJSON.name.slice(1);
+          const optionType = OPTION_TYPES[optionJSON.type] ?? "subcommand";
           const optionDescription = optionJSON.description;
 
           let subOptions = "";
           if ("options" in optionJSON && optionJSON.options !== undefined && optionJSON.options.length > 0) {
-            subOptions = ` \nSub-options: ${optionJSON.options.map(opt => `\`${opt.name}\``).join(", ")}`;
+            for (const subopt of optionJSON.options) {
+              const subOptionTitle = subopt.name; //subopt.name.charAt(0).toUpperCase() + subopt.name.slice(1);
+              const subOptionType = OPTION_TYPES[subopt.type] ?? "subcommand";
+              const subOptionDescription = subopt.description;
+              subOptions += `\n- **${subOptionTitle} (${subOptionType}):** ${subOptionDescription}`;
+            }
           }
 
           commandEmbed.addFields({
-            name: `${optionTitle} (${optionType})`, value: `${optionDescription}${subOptions}`
+            name: `**${optionTitle} (${optionType})**`, value: `${optionDescription}${subOptions}`
           });
         }
       } else {
