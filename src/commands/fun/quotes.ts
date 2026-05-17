@@ -54,7 +54,7 @@ const Quotes = new Command({
           year: "numeric"
         });
 
-        const newQuote = {
+        const newQuote: QuoteData = {
           text,
           userid: quotedUser.id,
           username: quotedUser.displayName,
@@ -259,7 +259,7 @@ const Quotes = new Command({
           const newUsername = i.fields.getTextInputValue("quotes-edit-username");
           const newId = i.fields.getTextInputValue("quotes-edit-userid");
           
-          const newQuote = {
+          const newQuote: QuoteData = {
             date: newDate,
             text: newText,
             username: newUsername,
