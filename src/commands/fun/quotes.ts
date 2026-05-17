@@ -54,13 +54,6 @@ const Quotes = new Command({
           year: "numeric"
         });
 
-        const newQuoteEmbed = new EmbedBuilder()
-          .setTitle(`Quote from ${ctx.guild.name}`)
-          .setDescription(`> ${text}`)
-          .setFields({ name: `-${quotedUser.displayName} (${dateString})`, value: ""})
-          .setColor(Colors.Blue)
-          .setThumbnail(quotedUser.displayAvatarURL());
-
         const newQuote = {
           text,
           userid: quotedUser.id,
@@ -72,7 +65,7 @@ const Quotes = new Command({
         currentQuotes.push(newQuote);
         ctx.db.server.update(ctx.guild.id, "quotes", currentQuotes);
         
-        await ctx.reply({ content: `New quote added from <@${quotedUser.id}>!`, embeds: [newQuoteEmbed] });
+        await ctx.reply({ content: `New quote added from <@${quotedUser.id}>!`, embeds: [await formatQuoteEmbed(ctx, newQuote, currentQuotes.length, "new")] });
       },
     }),
     new Subcommand({//MARK: quotes random
