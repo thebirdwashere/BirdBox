@@ -13,7 +13,7 @@ async function handleError(
     new EmbedBuilder()
       .setTitle(`${type} Error`)
       .addFields( 
-        { name: "Message:", value: String(error), inline: true },
+        { name: "Message", value: String(error), inline: true },
         { name: `In ${type.toLowerCase()}:`, value: originCommand, inline: true },
       )
       .setColor(Colors.Red),
