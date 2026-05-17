@@ -45,24 +45,20 @@ const Magic8Ball = new Command({
           "https://cdn.discordapp.com/avatars/803811104953466880/5bce4f0ba438015ec65f5b9cac11c8e3.png?size=256",
       })
       .setColor(Colors.Blue)
-      .addFields({ name: "You asked:", value: `"${message}"` });
+      .addFields({ name: "You asked:", value: `"${message}"` })
+      .setFooter({ text: randomFooter });
 
     if (typeof randomResponse == "string") {
       responseEmbed.setTitle(randomResponse);
-      responseEmbed.setFooter({ text: randomFooter });
     } else {
       responseEmbed
         .setTitle(randomResponse.text)
-        .setURL(randomResponse.url ?? null);
-
-      if (randomResponse.image !== undefined)
-        responseEmbed
-          .setTitle(randomResponse.text)
-          .setImage(randomResponse.image ?? null);
-
+        .setURL(randomResponse.url ?? null)
+        .setImage(randomResponse.image ?? null);
+      
       if (randomResponse.credit !== undefined)
         responseEmbed.setFooter({
-          text: `${randomResponse.credit} - ${randomFooter}`,
+          text: `${randomResponse.credit} ● ${randomFooter}`,
         });
     }
 
