@@ -6,7 +6,7 @@
 
 **BirdBox** is a Discord Bot made using discord.js, mainly designed for personal use. However, it is fairly easy to self-host, and contains some features that may be useful to other servers.
 
-The original project was created in late January 2021, originally using Zapier and BotGhost, and was rewritten in November 2021 using discord.js (and then again in 2026 using Typescript). We've decided to open source the bot, mainly to make it easier to collaborate. Hopefully you'll find it useful for inspiration or even functionality!
+The original project was created in late January 2021, originally using Zapier and BotGhost, was rewritten in November 2021 using discord.js, and then again in 2026 to use Typescript. We've decided to open source the bot, mainly to make it easier to collaborate. Hopefully you'll find it useful for inspiration or even functionality!
 
 ## Features
 
@@ -55,9 +55,9 @@ Note: If you are creating a version of BirdBox for development/contribution purp
 
 **Initial Use**
 
-If you followed all the other steps correctly, your bot should now be online and perational! We hope you enjoy your BirdBox experience.
+If you followed all the other steps correctly, your bot should now be online and operational! We hope you enjoy your BirdBox experience.
 
-Some commands require additions to the sqlite database. These should support an empty one without breaking, but commands like `e;quotes`, `e;maybepile`, and `e;scratchpad` will require some setup for maximum enjoyment. For the neofetch command to work, you will need to have neofetch installed on your system. Other commands, interjections, and other features should work out of the box.
+Some commands require additions to the sqlite database. These should support an empty one without breaking, but commands like `e;quotes`, `e;maybepile`, and `e;scratchpad` will require some setup for maximum enjoyment. For the neofetch command to work, you will need to have neofetch installed on your system. Other commands, interjections, and features should work out of the box.
 
 ## Contribution
 
