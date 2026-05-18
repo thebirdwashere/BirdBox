@@ -393,16 +393,16 @@ async function customModal(i: ButtonInteraction, setting: ConfigOptions): Promis
 function setSetting(ctx: CommandContext, scope: ConfigScope, setting: ConfigOptions, value: unknown): void {
   switch (scope) {
   case "user": {
-    ctx.db.user.update(ctx.user.id, setting.value, value);
+    ctx.db.user.update(ctx.user.id, `config_${setting.value}`, value);
     break;
   } case "server": {
     if (ctx.guild == null)
       throw new Error("Attempted to set server config outside a server.");
 
-    ctx.db.server.update(ctx.guild.id, setting.value, value);
+    ctx.db.server.update(ctx.guild.id, `config_${setting.value}`, value);
     break;
   } case "bot": {
-    ctx.db.global.update("global", setting.value, value);
+    ctx.db.global.update("global", `config_${setting.value}`, value);
     
     //manual extra code for specific configs
     switch (setting.value) {

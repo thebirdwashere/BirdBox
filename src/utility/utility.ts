@@ -73,7 +73,7 @@ export function fetchConfigOption<ConfigScopeType extends ConfigScope>(
     if (id === undefined)
       throw new Error(`Attempted to get server config option ${setting.name} without a valid ID.`);
     
-    const fetchedData = db.user.fetchOr(id, setting.value, setting.default);
+    const fetchedData = db.user.fetchOr(id, `config_${setting.value}`, setting.default);
     if (fetchedData === "enable" || fetchedData === "disable") {
       return fetchedData === "enable";
     } else {
@@ -84,7 +84,7 @@ export function fetchConfigOption<ConfigScopeType extends ConfigScope>(
     if (id === undefined)
       throw new Error(`Attempted to get user config option ${setting.name} without a valid ID.`);
 
-    const fetchedData = db.server.fetchOr(id, setting.value, setting.default);
+    const fetchedData = db.server.fetchOr(id, `config_${setting.value}`, setting.default);
     if (fetchedData === "enable" || fetchedData === "disable") {
       return fetchedData === "enable";
     } else {
@@ -92,7 +92,7 @@ export function fetchConfigOption<ConfigScopeType extends ConfigScope>(
     }
 
   } case "bot": {
-    return db.global.fetchOr("global", setting.value, setting.default);
+    return db.global.fetchOr("global", `config_${setting.value}`, setting.default);
   }
   }
 }
