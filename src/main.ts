@@ -65,7 +65,7 @@ await REGISTRY.detectInterjections(path.join(import.meta.dirname, "interjections
 if (DEVMODE) console.log("\nDetection complete. Logging in...\n");
 
 CLIENT.on(Events.ClientReady, (_event) => {
-  console.log("Birdbox Rewrite is now online.");
+  console.log("\nBirdbox Rewrite is now online.");
   console.log(`Logged in as ${CLIENT.user?.tag ?? "(undefined)"}.`);
   console.log("Logs will be shown in this terminal.\n");
 

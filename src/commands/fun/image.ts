@@ -1,8 +1,17 @@
+import "dotenv/config";
 import { Command, Subcommand, CommandOption } from "@src/utility/command.js";
 import { EmbedBuilder, Colors } from "discord.js";
 
 const CAT_LINK = "api.thecatapi.com";
 const DOG_LINK = "api.thedogapi.com";
+
+const CAT_API_KEY = process.env.CAT_API_KEY;
+const DOG_API_KEY = process.env.DOG_API_KEY;
+
+if (CAT_API_KEY === undefined)
+  console.log("Warning: API key to thecatapi.com is not present. The image command will not work without this key, but other commands should function as normal.");
+if (DOG_API_KEY === undefined)
+  console.log("Warning: API key to thedogapi.com is not present. The image command will not work without this key, but other commands should function as normal.");
 
 const Image = new Command({
   name: "image",
@@ -12,7 +21,7 @@ const Image = new Command({
       name: "cat",
       description: "Picks a random cat from TheCatAPI.",
       options: [
-        new CommandOption({
+        new CommandOption({ //MARK: image cat
           name: "type",
           description: "Which result format you want. Must be one of \"image\" or \"gif\".",
           type: "string",
@@ -28,7 +37,12 @@ const Image = new Command({
         }),
       ],
       autocomplete: async (ctx) => {
-        const petBreeds = await getPetBreeds(CAT_LINK);
+        if (CAT_API_KEY === undefined) {
+          await ctx.respond([]);
+          return;
+        }
+
+        const petBreeds = await getPetBreeds(CAT_LINK, CAT_API_KEY);
         const formattedBreeds = petBreeds.map(breed => {
           return {
             name: breed.name,
@@ -39,10 +53,13 @@ const Image = new Command({
         await ctx.respond(formattedBreeds);
       },
       execute: async (ctx, opts) => {
+        if (CAT_API_KEY === undefined)
+          throw new Error("API key is not present in `.env`.");
+
         const imageType = opts.string.get("type") ?? "image";
         const selectedBreed = opts.string.get("breed") ?? "";
 
-        const imageURL = await getPetImage(imageType, selectedBreed, CAT_LINK);
+        const imageURL = await getPetImage(imageType, selectedBreed, CAT_LINK, CAT_API_KEY);
 
         const catEmbed = new EmbedBuilder()
           .setTitle("Random Cat")
@@ -53,7 +70,7 @@ const Image = new Command({
         await ctx.reply({ embeds: [catEmbed] });
       }
     }),
-    new Subcommand({
+    new Subcommand({ //MARK: image dog
       name: "dog",
       description: "Picks a random dog from TheDogAPI.",
       options: [
@@ -73,7 +90,12 @@ const Image = new Command({
         }),
       ],
       autocomplete: async (ctx) => {
-        const petBreeds = await getPetBreeds(DOG_LINK);
+        if (DOG_API_KEY === undefined) {
+          await ctx.respond([]);
+          return;
+        }
+
+        const petBreeds = await getPetBreeds(DOG_LINK, DOG_API_KEY);
         const formattedBreeds = petBreeds.map(breed => {
           return {
             name: breed.name,
@@ -84,10 +106,13 @@ const Image = new Command({
         await ctx.respond(formattedBreeds);
       },
       execute: async (ctx, opts) => {
+        if (DOG_API_KEY === undefined)
+          throw new Error("API key is not present in `.env`.");
+
         const imageType = opts.string.get("type") ?? "image";
         const selectedBreed = opts.string.get("breed") ?? null;
 
-        const imageURL = await getPetImage(imageType, selectedBreed, DOG_LINK);
+        const imageURL = await getPetImage(imageType, selectedBreed, DOG_LINK, DOG_API_KEY);
 
         const dogEmbed = new EmbedBuilder()
           .setTitle("Random Dog")
@@ -101,11 +126,12 @@ const Image = new Command({
   ],
 });
 
-async function getPetImage(type: string, breed: string | null, link: string): Promise<string> {
+//MARK: utils
+async function getPetImage(type: string, breed: string | null, link: string, key: string): Promise<string> {
   let fetchString = `https://${link}/v1/images/search?mime_types=${type}`;
 
   if (breed !== null) {
-    const petBreeds = await getPetBreeds(link);
+    const petBreeds = await getPetBreeds(link, key);
 
     //console.log(JSON.stringify(petBreeds, null, 2));
 
@@ -128,7 +154,11 @@ async function getPetImage(type: string, breed: string | null, link: string): Pr
     url?: string;
   };
 
-  const petFetch: JsonList<PetData> = await fetch(fetchString) as JsonList<PetData>;
+  const petFetch: JsonList<PetData> = await fetch(fetchString, {
+    headers: {
+      "x-api-key": key,
+    }
+  }) as JsonList<PetData>;
   const petData: PetData[] = await petFetch.json();
 
   if (petData[0]?.url === undefined) throw new Error(`Could not find ${type} of the requested breed. Try broadening your specifications.`);
@@ -136,9 +166,20 @@ async function getPetImage(type: string, breed: string | null, link: string): Pr
   return petData[0].url;
 }
 
-async function getPetBreeds(link: string): Promise<PetBreed[]> {
-  const list: JsonList<PetBreed> = await fetch(`https://${link}/v1/breeds`) as JsonList<PetBreed>;
+async function getPetBreeds(link: string, key: string): Promise<PetBreed[]> {
+  const list: JsonList<PetBreed> = await fetch(`https://${link}/v1/breeds`, {
+    headers: {
+      "x-api-key": key,
+    }
+  });
+
+  if (!instanceOfJsonList(list))
+    throw new Error("Unexpected return from breeds call.");
+
   const breeds: PetBreed[] = await list.json();
+
+  if ("error" in breeds && "message" in breeds)
+    throw new Error(String(breeds.message));
 
   return breeds;
 };
@@ -146,6 +187,15 @@ async function getPetBreeds(link: string): Promise<PetBreed[]> {
 interface JsonList<T> {
   json(): Promise<T[]>;
 };
+
+function instanceOfJsonList<T>(object: unknown): object is JsonList<T> {
+  return (
+    typeof object === "object" 
+      && object != null 
+      && "json" in object 
+      && typeof object.json === "function"
+  );
+}
 
 interface PetBreed {
   id: string;
