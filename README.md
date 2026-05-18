@@ -41,7 +41,7 @@ Install instructions might be coming at a later date, but you pretty much just n
 
 **Configuration**
 
-To set up your bot, create a ".env" file in the root directory and format it like this:
+To set up your bot, create a `.env` file in the root directory and format it like this:
 ```env
 BOT_TOKEN=yourtokenhere
 BOT_ID=youridhere
@@ -57,7 +57,7 @@ Note: If you are creating a version of BirdBox for development/contribution purp
 
 If you followed all the other steps correctly, your bot should now be online and operational! We hope you enjoy your BirdBox experience.
 
-Some commands require additions to the sqlite database. These should support an empty one without breaking, but commands like `e;quotes`, `e;maybepile`, and `e;scratchpad` will require some setup for maximum enjoyment. For the neofetch command to work, you will need to have neofetch installed on your system. Other commands, interjections, and features should work out of the box.
+Some commands require additions to the sqlite database. These should support an empty one without breaking, but commands like `e;quotes`, `e;maybepile`, and `e;scratchpad` will require some setup. The image command requires an API key from [thecatapi.com](https://www.thecatapi.com) and [thedogapi.com](https://www.thedogapi.com/en/students), added to the `.env` file as "CAT_API_KEY" and "DOG_API_KEY" respectively. For the neofetch command to work, you will need to have neofetch installed on your system. Other commands, interjections, and features should work out of the box.
 
 ## Contribution
 
@@ -79,7 +79,7 @@ ctx.db.user.fetchOrUndefined(ctx.user.id, "favoriteColor") //"red"
 
 **Interjections**
 
-These are how we refer to BirdBox jumping into a conversation every so often to provide random commentary or special responses. These are made by adding a file to `src/interjections` containing an Interjection object, which should have a name and a `test` function. If a message is detected that isn't from a bot, each interjection test is run and appropriate responses are carried out. Several of our current interjections can also be modified by changing the selection of messages they pull from, such as `interruptions.json`, `mention_emojis.json`, and `ping_responses.json`.
+These are how we refer to BirdBox jumping into a conversation every so often to provide random commentary or special responses. These are made by adding a file to `src/interjections` containing an Interjection object, which should have a name and a `test` function. If a message is detected that isn't from a bot, each interjection test is run and appropriate responses are carried out. Several of our current interjections can also be modified by changing the selection of messages they pull from, such as `keywords.json`, `lyrics.json`, and `interruptions.json`.
 
 **General Advice**
 
