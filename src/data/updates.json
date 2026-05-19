@@ -14,6 +14,7 @@
         "Removed `e;pin` and `e;quote` due to Discord introducing equivalents",
         "Added `e;wordle leaderboard`, `e;quotes`, and `e;scratchpad` commands",
         "Renamed \"responses\" to \"interjections\" and added a modular handler",
+        "Added a new interjection which detects palindromes",
         "Added 18 new ping responses, for a total of 40",
         "Added 9 new interruptions, for a total of 181",
         "Plus many more small fixes and tweaks"
