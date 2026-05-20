@@ -20,6 +20,15 @@ export function panic(errorMessage = "A fatal error has occured."): never {
 }
 
 /**
+ * Returns the type inferred from context, but errors if actually called.
+ * Useful to prevent warnings in partially-finished code.
+ */
+// eslint-disable-next-line @typescript-eslint/no-unnecessary-type-parameters
+export function TODO<T>(): T {
+  throw new Error("Called function TODO with.");
+}
+
+/**
  * Converts a Windows-style path to a POSIX-style path.
  */
 export function toPosixPath(pathString: string): string {
