@@ -159,7 +159,8 @@ const Debug = new Command({
         if (returnValue.length <= 1500) {
           await ctx.reply(`Database fetch for ID ${id} returned the following value(s): \`\`\`json\n${returnValue}\n\`\`\``);
         } else {
-          const returnValueSplit = returnValue.match(/(.{1,1500})/g);
+          //https://stackoverflow.com/questions/7033639/split-large-string-in-n-size-chunks-in-javascript
+          const returnValueSplit = returnValue.match(/(.|[\r\n]){1,1500}/g);
           if (returnValueSplit == null || returnValueSplit.length === 0)
             throw new Error("Error splitting value for character limits.");
 

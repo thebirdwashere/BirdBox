@@ -39,7 +39,7 @@ export async function notifyOfInterjection(ctx: MessageContext, embedProperties:
     throw new Error("Messages cannot be sent in the current notification channel.");
   
   //make sure we don't go over embed char limits
-  const displaySplit = embedProperties.displayString.match(/(.{1,1000})/g); 
+  const displaySplit = embedProperties.displayString.match(/(.|[\r\n]){1,1000}/g); 
 
   if (displaySplit === null)
     throw new Error("Could not locate display text for embed formatting.");
