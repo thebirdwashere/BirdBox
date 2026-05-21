@@ -57,7 +57,7 @@ const Image = new Command({
           throw new Error("API key is not present in `.env`.");
 
         const imageType = opts.string.get("type") ?? "image";
-        const selectedBreed = opts.string.get("breed") ?? "";
+        const selectedBreed = opts.string.get("breed") ?? null;
 
         const imageURL = await getPetImage(imageType, selectedBreed, CAT_LINK, CAT_API_KEY);
 
