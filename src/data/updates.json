@@ -2,7 +2,7 @@
   {
     "version": "7.0.0",
     "type": "Release",
-    "date": "TBD",
+    "date": "5/20/2026",
     "devs": ["AgentNebulator", "Bislij"],
     "notes": [
         "Rewrote all bot systems in TypeScript",
