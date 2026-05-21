@@ -1,5 +1,5 @@
 .env
-node_modules/**
-json.sqlite
-birdbox-discord-bot.code-workspace
+dist/
+node_modules/
+src/database.sqlite
 .vscode
