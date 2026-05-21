@@ -56,7 +56,7 @@ const QuotesAdd = new Subcommand({
     currentQuotes.push(newQuote);
     ctx.db.server.update(ctx.guild.id, "quotes", currentQuotes);
         
-    await ctx.reply({ content: `New quote added from <@${quotedUser.id}>!`, embeds: [await formatQuoteEmbed(ctx, newQuote, currentQuotes.length, "new")] });
+    await ctx.reply({ content: `New quote added from **${quotedUser.displayName}**!`, embeds: [await formatQuoteEmbed(ctx, newQuote, currentQuotes.length, "new")] });
   },
 });
 
