@@ -17,6 +17,7 @@ const QuotesAdd = new Subcommand({
       type: "user",
     }),
   ],
+  cooldown: 300_000,
   contextmenu: {
     type: "message",
     label: "add to quotes",
