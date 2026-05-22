@@ -16,6 +16,12 @@ const QuotesAdd = new Subcommand({
       description: "The user being quoted.",
       type: "user",
     }),
+    new CommandOption({
+      name: "date",
+      description: "The date of the quote, ideally formatted as \"Month Day, Year\". If not set, defaults to today.",
+      type: "string",
+      optional: true,
+    }),
   ],
   cooldown: 300_000,
   contextmenu: {
@@ -37,20 +43,24 @@ const QuotesAdd = new Subcommand({
     const quotedUser = opts.user.get("quotee");
     if (!quotedUser)
       throw new Error("Unable to locate quotee.");
-        
-    const quoteDate = new Date(new Date(ctx.timestamp).toDateString());
 
-    const dateString = quoteDate.toLocaleDateString(undefined, { 
-      month: "long", 
-      day: "numeric", 
-      year: "numeric"
-    });
+    let quoteDate = opts.string.get("date");
+
+    if (!quoteDate) {
+      const currentDate = new Date(new Date(ctx.timestamp).toDateString());
+
+      quoteDate = currentDate.toLocaleDateString(undefined, { 
+        month: "long", 
+        day: "numeric", 
+        year: "numeric"
+      });
+    }
 
     const newQuote: QuoteData = {
       text,
       userid: quotedUser.id,
       username: quotedUser.displayName,
-      date: dateString,
+      date: quoteDate,
     };
 
     const currentQuotes = ctx.db.server.fetchOr(ctx.guild.id, "quotes", []) as QuoteData[];
