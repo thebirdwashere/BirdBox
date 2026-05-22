@@ -2,12 +2,14 @@ import { Interjection } from "@src/utility/interjection.js";
 import lyrics from "@src/data/lyrics.json" with { type: "json" };
 import { Lyrics } from "@src/utility/types.js";
 import { fetchConfigOption } from "@src/utility/utility.js";
-import { Database } from "@src/utility/database.js";
 
 const LYRICS = lyrics as Lyrics;
 
 const FILTER_REGEX = /[^a-z\s!?]/g;
 const lastWords = LYRICS.flat().map(lyric => lyric.split(" ").at(-1)).filter(lyric => lyric !== undefined);
+
+//only stored during program runtime for privacy concerns
+const lyricIndexData: Record<string, [number, number] | [null, null]> = {};
 
 const Lyrics = new Interjection({
   name: "lyrics",
@@ -61,7 +63,7 @@ const Lyrics = new Interjection({
     /*/
 
     if (ctx.channel) {
-      const responseLyric = checklyricIndex(ctx.db, ctx.channel.id, content);
+      const responseLyric = checklyricIndex(ctx.channel.id, content);
 
       if (responseLyric == false) {
         //end the function completely, if the song was meant to be over
@@ -75,8 +77,7 @@ const Lyrics = new Interjection({
     //variables to store while iterating
     let compareLyric = "";
     let decidedLyric = "";
-    let newLyricIndices: [number | null, number | null] 
-      = [null, null];
+    let newLyricIndices: [number, number] | [null, null] = [null, null];
     
     //iterate and check
     for (const [i, song] of lyrics.entries()) { 
@@ -95,7 +96,7 @@ const Lyrics = new Interjection({
 
     //update database with indices, or undefined if no indices exist
     if (ctx.channel) {
-      ctx.db.channel.update(ctx.channel.id, "lyricIndices", newLyricIndices);
+      lyricIndexData[ctx.channel.id] = newLyricIndices;
     };
 
     //send chosen lyric
@@ -108,14 +109,14 @@ const Lyrics = new Interjection({
   }
 });
 
-function checklyricIndex(db: Database, id: string, content: string): string | undefined | false {
-  const lastLyricIndices = db.channel.fetchOrUndefined(id, "lyricIndices");
+function checklyricIndex(id: string, content: string): string | undefined | false {
+  const lastLyricIndices = lyricIndexData[id];
 
   //type guard for typescript's sake
-  if (!Array.isArray(lastLyricIndices) || lastLyricIndices.length !== 2 || lastLyricIndices[0] == null) return;
+  if (!Array.isArray(lastLyricIndices) || lastLyricIndices[0] == null) return;
 
-  const songIndex = lastLyricIndices[0] as number;
-  const lyricIndex = lastLyricIndices[1] as number;
+  const songIndex = lastLyricIndices[0];
+  const lyricIndex = lastLyricIndices[1];
   const lastLyric = LYRICS[songIndex]?.[lyricIndex] as string | undefined;
   const nextLyric = LYRICS[songIndex]?.[lyricIndex+1] as string | undefined;
 
@@ -127,10 +128,10 @@ function checklyricIndex(db: Database, id: string, content: string): string | un
     const responseLyric = LYRICS[songIndex]?.[lyricIndex+2] as string | undefined;
 
     if (responseLyric == null) {
-      db.channel.update(id, "lyricIndices", [null, null]);
+      lyricIndexData[id] = [null, null];
       return false;
     } else {
-      db.channel.update(id, "lyricIndices", [songIndex, lyricIndex+2]);
+      lyricIndexData[id] = [songIndex, lyricIndex+2];
       return responseLyric;
     }
   }

@@ -9,6 +9,7 @@ interface JinxMessage {
   authorId: string,
 }
 
+//only stored during program runtime for privacy concerns
 const jinxData: Record<string, JinxMessage> = {};
 
 const Jinx = new Interjection({

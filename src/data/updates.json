@@ -10,6 +10,7 @@
       "Added 5-minute cooldown to `e;quotes add`",
       "Line breaks are now formatted correctly in displayed quotes",
       "Developers can now successfully override command cooldowns",
+      "Lyric responses no longer reference the database for functionality",
       "Fixed issue splitting multiple messages for character limits",
       "Fixed error when using `e;image cat` without specifying breed",
       "Several internal changes for consistency"
