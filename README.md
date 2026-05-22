@@ -21,17 +21,17 @@ The original project was created in late January 2021, originally using Zapier a
 
 ## Setup
 
-To set up BirdBox you will need
+To set up BirdBox you will need:
 
-- Discord.js (currently using v14)
-- TypeScript (v5.8.3 should work fine)
 - Node.js (v22 or higher for database support)
+- TypeScript (v5.8.3 should work fine)
+- Discord.js (currently using v14)
 - fast-glob (for extensible command system)
 - dotenv (for .env file used for token)
 - child_process (for neofetch command)
 - google-translate-api (for translate command)
 
-All packages in the above are available using NPM.
+All packages in the above are available using NPM, and `npm install` should handle them automatically.
 
 BirdBox will run on pretty much any Linux system (I have used both Arch Linux and Ubuntu Server). Other operating systems may work with some testing (Windows has been confirmed to work by fellow developers with some tweaking)
 
@@ -47,7 +47,7 @@ BOT_TOKEN=yourtokenhere
 BOT_ID=youridhere
 BOT_PREFIX="e;"
 ```
-Replace "yourtokenhere" with the token you got from the Discord Developer Portal for your bot account, "youridhere" with your bot's ID, and e; with your preferred command prefix. Details for how to set up a bot account and how to acquire user IDs can be found online.
+Replace "yourtokenhere" with the token you got from the Discord Developer Portal for your bot account, "youridhere" with your bot's ID, and "e;" with your preferred command prefix. Details for how to set up a bot account and how to acquire user IDs can be found online.
 
 Several features of BirdBox are configurable in the `config` command, including your user and server preferences on interjections, as well as bot-global settings including the bot's status. If you want to be considered a developer to access bot-global settings and gain elevated permissions across commands, add your User ID and name to the json under `src/data/perms.json`.
 
@@ -65,7 +65,7 @@ We could always use an extra set of hands, so if you want to become a BirdBox co
 
 **Commands**
 
-BirdBox uses a custom system (originally developed by Bislij) to unify Discord's modern slash commands system (e.g. `/ping`) with the prefixed command system of old (`e;ping`). Adding a command is as easy as adding a file to `src/commands` which exports a Command object. The code in the `execute` function is run when the command is detected, and responses can be made using the `ctx` parameter of that function. Other properties like options, subcommands, permission requirements, or cooldowns can be added via optional parameters in the Command object.
+BirdBox uses a custom system (originally developed by Bislij) to unify Discord's modern slash commands (e.g. `/ping`) with the prefixed commands of old (`e;ping`). Adding a command is as easy as adding a file to `src/commands` which exports a Command object. The code in the `execute` function is run when the command is detected, and responses can be made using the `ctx` parameter of that function. Other properties like options, subcommands, permission requirements, or cooldowns can be added via optional parameters in the Command object.
 
 **Database**
 
@@ -79,7 +79,7 @@ ctx.db.user.fetchOrUndefined(ctx.user.id, "favoriteColor") //"red"
 
 **Interjections**
 
-These are how we refer to BirdBox jumping into a conversation every so often to provide random commentary or special responses. These are made by adding a file to `src/interjections` containing an Interjection object, which should have a name and a `test` function. If a message is detected that isn't from a bot, each interjection test is run and appropriate responses are carried out. Several of our current interjections can also be modified by changing the selection of messages they pull from, such as `keywords.json`, `lyrics.json`, and `interruptions.json`.
+These are how we refer to BirdBox jumping into a conversation every so often to provide random commentary or special responses. These are made by adding a file to `src/interjections` containing an Interjection object, which should have a name and a `test` function. If a message is detected that isn't from a bot, each interjection test is run and appropriate responses are carried out. Several of our current interjections can also be modified by changing the selection of responses they pull from, found in files such as `keywords.json`, `lyrics.json`, and `interruptions.json`.
 
 **General Advice**
 
