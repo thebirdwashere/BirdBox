@@ -15,7 +15,14 @@ export async function quotesAutocomplete(ctx: AutocompleteContext): Promise<void
 
   const serverQuotes = ctx.db.server.fetchOr(ctx.guild.id, "quotes", []) as QuoteData[];
 
-  await ctx.respond(serverQuotes.map((quote, i) => ({ name: `${(i+1).toString()}: ${quote.text}`, value: (i+1).toString()})));
+  await ctx.respond(
+    serverQuotes.map((quote, i) => (
+      { 
+        name: `${(i+1).toString()}: ${quote.text.replaceAll("\n", " ")}`, 
+        value: (i+1).toString()
+      }
+    ))
+  );
 }
 
 //MARK: permissions
@@ -34,7 +41,7 @@ export async function formatQuoteEmbed(ctx: CommandContext, quote: QuoteData, in
     throw new Error("Formatted quote outside guild.");
 
   const quoteEmbed = new EmbedBuilder()
-    .setDescription(`> ${quote.text}`)
+    .setDescription(`> ${quote.text.replaceAll("\n", "\n> ")}`)
     .setColor(Colors.Blue);
 
   switch (type) {

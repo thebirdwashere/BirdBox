@@ -1,12 +1,10 @@
 import path from "path";
 import { CommandContext } from "./context.js";
 import config from "@src/data/config.json" with { type: "json" };
-import perms from "@src/data/perms.json" with { type: "json" };
-import { Config, ConfigScope, Perms } from "./types.js";
+import { Config, ConfigScope } from "./types.js";
 import { Database } from "./database.js";
 
 const CONFIG = config as Config;
-const PERMS = perms as Perms;
 
 //MARK: General
 
@@ -55,15 +53,6 @@ export function isSubcommand(ctx: CommandContext): boolean {
  */
 export function randomChoice<T>(array: T[]): T {
   return array[Math.floor(Math.random() * array.length)];
-}
-
-/**
- * Returns an array of every ID in perms.json.
- */
-export function getAdminIds(): string[] {
-  return (Object.values(PERMS) as Record<string, string[]>[])
-    .map(item => Object.values(item))
-    .flat(2);
 }
 
 /**

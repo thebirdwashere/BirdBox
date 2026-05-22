@@ -36,6 +36,9 @@ const BOT_ID =
 const BOT_PREFIX =
   process.env.BOT_PREFIX ?? panic("Failed to find BOT_PREFIX in environment.");
 const PERMS = perms as Perms;
+const ADMINS = (Object.values(PERMS) as Record<string, string[]>[])
+  .map(item => Object.values(item))
+  .flat(2);
 const DB = new Database("src/database.sqlite");
 const CLIENT = new Client({
   intents: [
@@ -49,7 +52,7 @@ const REGISTRY = new Registry();
 const DATA: Data = {
   prefix: BOT_PREFIX,
   id: BOT_ID,
-  perms: PERMS,
+  admins: ADMINS,
   registry: REGISTRY,
   client: CLIENT,
   db: DB,

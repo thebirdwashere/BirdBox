@@ -1,6 +1,5 @@
 import { Subcommand, CommandOption } from "@src/utility/command.js";
 import { getMaybepile, getPageNumber, maybepileAutocomplete, updateMaybepile } from "./utils.js";
-import { getAdminIds } from "@src/utility/utility.js";
 
 const MaybepileClaim = new Subcommand({
   name: "claim",
@@ -41,7 +40,7 @@ const MaybepileClaim = new Subcommand({
       return;
     }
 
-    const claimerNotDev = !getAdminIds().includes(ctx.user.id);
+    const claimerNotDev = !ctx.data.admins.includes(ctx.user.id);
 
     if (claimedItem.claim.status === "claimed" && ctx.user.id !== claimedItem.claim.id && claimerNotDev) {
       await ctx.reply({content: "sorry, that's already been claimed"});

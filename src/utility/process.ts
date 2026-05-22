@@ -40,7 +40,7 @@ export async function detectChatInputInteractionCommand(
   if (command.permissions) 
     testUserPermissions(command.permissions, PERMS, interaction.user.id);
 
-  if (command.cooldown) {
+  if (command.cooldown && !data.admins.includes(interaction.user.id)) {
     const lastUsed = command.cooldown.data.get(interaction.user.id);
     const currentTime = interaction.createdTimestamp;
 
@@ -78,7 +78,7 @@ export async function detectChatInputInteractionCommand(
     if (subcommand.permissions)
       testUserPermissions(subcommand.permissions, PERMS, interaction.user.id);
 
-    if (subcommand.cooldown) {
+    if (subcommand.cooldown && !data.admins.includes(interaction.user.id)) {
       const lastUsed = subcommand.cooldown.data.get(interaction.user.id);
       const currentTime = interaction.createdTimestamp;
 
@@ -262,7 +262,9 @@ export async function detectMessageCommand(
   if (command.permissions) 
     testUserPermissions(command.permissions, PERMS, message.author.id);
 
-  if (command.cooldown) {
+  if (command.cooldown && !data.admins.includes(message.author.id)) {
+    console.log(data.admins);
+    console.log(message.author.id);
     const lastUsed = command.cooldown.data.get(message.author.id);
     const currentTime = message.createdTimestamp;
 
@@ -322,7 +324,7 @@ export async function detectMessageCommand(
       testUserPermissions(subcommand.permissions, PERMS, message.author.id);
     }
 
-    if (subcommand.cooldown) {
+    if (subcommand.cooldown && !data.admins.includes(message.author.id)) {
       const lastUsed = subcommand.cooldown.data.get(message.author.id);
       const currentTime = message.createdTimestamp;
 

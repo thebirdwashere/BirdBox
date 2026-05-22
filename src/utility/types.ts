@@ -53,7 +53,7 @@ export type ConfigOptions = {
 export interface Data {
   prefix: string;
   id: string;
-  perms: Perms;
+  admins: string[];
   registry: Registry;
   client: Client;
   db: Database;

@@ -14,7 +14,7 @@ const Interruptions = new Interjection({
 
     if (randomInt == CHANCE_OF_INTERRUPTING) {
       const randomInterruption = randomChoice(RESPONSES);
-      const response = randomInterruption.replace("(userPing)", `<@${ctx.user.id}>`);
+      const response = randomInterruption.replace("[[USERPING]]", `<@${ctx.user.id}>`);
       await ctx.send(response);
       return true;
     }

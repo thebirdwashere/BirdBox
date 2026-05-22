@@ -1,5 +1,21 @@
 [
   {
+    "version": "7.0.1",
+    "type": "Beta",
+    "date": "TBD",
+    "devs": ["AgentNebulator"],
+    "notes": [
+      "Added non-required date option to `e;quotes add`",
+      "Changed `e;quotes add` to not ping the quotee",
+      "Added 5-minute cooldown to `e;quotes add`",
+      "Line breaks are now formatted correctly in displayed quotes",
+      "Developers can now successfully override command cooldowns",
+      "Fixed issue splitting multiple messages for character limits",
+      "Fixed error when using `e;image cat` without specifying breed",
+      "Several internal changes for consistency"
+    ]
+  },
+  {
     "version": "7.0.0",
     "type": "Release",
     "date": "5/20/2026",

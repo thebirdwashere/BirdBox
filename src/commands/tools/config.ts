@@ -4,7 +4,7 @@ import { ActionRowBuilder, ActivityType, ButtonBuilder, ButtonInteraction, Butto
 import config from "@src/data/config.json" with { type: "json" };
 import { Config, ConfigOptions, ConfigScope } from "@src/utility/types.js";
 import { Database } from "@src/utility/database.js";
-import { fetchConfigOption, getAdminIds } from "@src/utility/utility.js";
+import { fetchConfigOption } from "@src/utility/utility.js";
 import { CommandContext } from "@src/utility/context.js";
 
 const CONFIG = config as Config;
@@ -48,10 +48,8 @@ const Config = new Command({
       return;
     }
 
-    const adminIds = getAdminIds();
-
     // Reject the user if they are illegitimately modifying bot config.
-    if (scope === "bot" && !adminIds.includes(ctx.user.id)) {
+    if (scope === "bot" && !ctx.data.admins.includes(ctx.user.id)) {
       await ctx.reply("sorry, you must be a BirdBox admin to modify those settings");
       return;
     }
@@ -66,7 +64,7 @@ const Config = new Command({
       const guildMember = await ctx.guild.members.fetch(ctx.user.id);
       const hasManageRoles = guildMember.permissions.has("ManageRoles");
       
-      if (!hasManageRoles && !adminIds.includes(ctx.user.id)
+      if (!hasManageRoles && !!ctx.data.admins.includes(ctx.user.id)
       ) {
         await ctx.reply("sorry, you need the Manage Roles permission to modify server config");
         return;
