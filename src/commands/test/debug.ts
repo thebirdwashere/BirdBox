@@ -7,7 +7,7 @@ const Debug = new Command({
   description: "Debug various features of the bot.",
   permissions: ["host", "developer"],
   subcommands: [
-    new Subcommand({
+    new Subcommand({ //MARK: debug arguments
       name: "arguments",
       description: "Debug command arguments.",
       options: [
@@ -87,7 +87,7 @@ const Debug = new Command({
         }
       },
     }),
-    new Subcommand({
+    new Subcommand({ //MARK: debug database
       name: "database",
       description: "Grab values from the database at request.",
       options: [
@@ -171,7 +171,7 @@ const Debug = new Command({
         }
       },
     }),
-    new Subcommand({
+    new Subcommand({ //MARK: debug permissions
       name: "permissions",
       description: "Only the bot host (TheBirdWasHere) should be able to run this command!",
       permissions: ["host"],
@@ -179,7 +179,7 @@ const Debug = new Command({
         await ctx.reply("Hello Bird!");
       }
     }),
-    new Subcommand({
+    new Subcommand({ //MARK: debug cooldown
       name: "cooldown",
       description: "Ensure a cooldown of 5 minutes works as expected.",
       cooldown: 300_000,
@@ -187,7 +187,7 @@ const Debug = new Command({
         await ctx.reply("Cooldown is not active!");
       }
     }),
-    new Subcommand({
+    new Subcommand({ //MARK: debug modal
       name: "modal",
       description: "Test the modal system.",
       execute: async (ctx) => {
@@ -211,6 +211,40 @@ const Debug = new Command({
         async function onModalSubmit(i: ModalSubmitInteraction): Promise<void> {
           const submission = i.fields.getTextInputValue("debug-text");
           await i.reply(`You submitted: \n\`\`\`\n${submission}\n\`\`\``);
+        }
+      }
+    }),
+    new Subcommand({ //MARK: debug modal
+      name: "react",
+      description: "React to someone's message.",
+      options: [
+        new CommandOption({
+          name: "to",
+          description: "Message ID to react to.",
+          type: "string",
+        }),
+        new CommandOption({
+          name: "emoji",
+          description: "Emoji to react with.",
+          type: "string",
+        }),
+      ],
+      execute: async (ctx, opts) => {
+        const reactMessageId = opts.string.get("to");
+        if (reactMessageId == null)
+          throw new Error("Could not locate react message ID.");
+        const emoji = opts.string.get("emoji");
+        if (emoji == null)
+          throw new Error("Could not locate emoji.");
+
+        const reactMessage = await ctx.channel?.messages.fetch(reactMessageId);
+        if (reactMessage == undefined)
+          throw new Error("Unable to locate channel or message to react to.");
+
+        try {
+          await reactMessage.react(emoji);
+        } catch {
+          throw new Error("Error while attempting to react.");
         }
       }
     }),
