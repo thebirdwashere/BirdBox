@@ -212,36 +212,6 @@ const Debug = new Command({
         }
       }
     }),
-    new Subcommand({ //MARK: debug modal
-      name: "react",
-      description: "React to someone's message.",
-      options: [
-        new CommandOption({
-          name: "to",
-          description: "Message ID to react to.",
-          type: "string",
-        }),
-        new CommandOption({
-          name: "emoji",
-          description: "Emoji to react with.",
-          type: "string",
-        }),
-      ],
-      execute: async (ctx, opts) => {
-        const reactMessageId = opts.string.getRequired("to");
-        const emoji = opts.string.getRequired("emoji");
-
-        const reactMessage = await ctx.channel?.messages.fetch(reactMessageId);
-        if (reactMessage == undefined)
-          throw new Error("Unable to locate channel or message to react to.");
-
-        try {
-          await reactMessage.react(emoji);
-        } catch {
-          throw new Error("Error while attempting to react.");
-        }
-      }
-    }),
   ],
 });
 
