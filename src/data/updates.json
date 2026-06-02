@@ -1,5 +1,15 @@
 [
   {
+    "version": "7.0.2",
+    "type": "Beta",
+    "date": "TBD",
+    "devs": ["AgentNebulator"],
+    "notes": [
+      "Fixed credits command breaking due to moved information",
+      "Updated internal options system to remove unecesssary checks"
+    ]
+  },
+  {
     "version": "7.0.1",
     "type": "Release",
     "date": "5/23/2026",
