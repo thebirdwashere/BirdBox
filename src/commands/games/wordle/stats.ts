@@ -14,7 +14,7 @@ const WordleStats = new Subcommand({
     }),
   ],
   execute: async (ctx, opts) => {
-    const userChoice = opts.user.get("user") ?? ctx.user;
+    const userChoice = opts.user.getOptional("user") ?? ctx.user;
 
     //easter egg?
     if (userChoice.id === ctx.data.id) {

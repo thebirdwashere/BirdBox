@@ -23,7 +23,7 @@ const Announce = new Command({
     if (ctx.guild === null) throw new Error("Command must be run in a server.");
     if (ctx.channel === null || !("name" in ctx.channel)) throw new Error("Command must be run in a valid channel.");
 
-    let announceChannelId = opts.channel.get("channel")?.id ?? fetchConfigOption(ctx.db, "server", "announcements", ctx.guild.id);
+    let announceChannelId = opts.channel.getOptional("channel")?.id ?? fetchConfigOption(ctx.db, "server", "announcements", ctx.guild.id);
     //autocomplete suggested this why. this looks awful. what is this. ig its compact tho
     announceChannelId ??= ctx.channel.id;
 
@@ -40,7 +40,7 @@ const Announce = new Command({
 
     const announceEmbed = new EmbedBuilder()
       .setTitle(`${ctx.channel.name ?? "undefined"}'s Announcement`)
-      .setDescription(opts.string.get("message") ?? "undefined")
+      .setDescription(opts.string.getOptional("message") ?? "undefined")
       .setAuthor({ name: ctx.user.username, iconURL: ctx.user.displayAvatarURL() })
       .setColor(Colors.Purple)
       .setTimestamp(ctx.timestamp);

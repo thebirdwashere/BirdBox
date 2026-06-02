@@ -29,7 +29,7 @@ const QuotesGet = new Subcommand({
       return;
     }
 
-    const requestedQuoteIndex = Number(opts.string.get("quote"));
+    const requestedQuoteIndex = Number(opts.string.getRequired("quote"));
     let pageNum = requestedQuoteIndex - 1;
 
     if (isNaN(requestedQuoteIndex))

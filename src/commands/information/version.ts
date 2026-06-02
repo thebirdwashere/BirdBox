@@ -17,7 +17,7 @@ const Version = new Command({
     }),
   ],
   execute: async (ctx, opts) => {
-    const version = opts.string.get("version") ?? PATCH_NOTES[0].version;
+    const version = opts.string.getOptional("version") ?? PATCH_NOTES[0].version;
 
     if (!PATCH_NOTES.map(item => item.version).includes(version)) throw new Error("Version provided does not exist.");
     let page: number = PATCH_NOTES.map(item => item.version).indexOf(version);

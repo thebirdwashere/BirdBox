@@ -32,8 +32,8 @@ const WordleStart = new Subcommand({
       return;
     }
 
-    const code = opts.string.get("code");
-    const moreSolutions = opts.string.get("solutions") ?? "curated";
+    const code = opts.string.getOptional("code");
+    const moreSolutions = opts.string.getOptional("solutions") ?? "curated";
 
     //do some checking that the code is valid
     const codeRegex = /^[0-9A-F]{10}$/i;

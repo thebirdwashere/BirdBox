@@ -17,10 +17,8 @@ const MaybepileEdit = new Subcommand({
   permissions: ["host", "developer"],
   autocomplete: maybepileAutocomplete,
   execute: async (ctx, opts) => {
-    const itemSelection = opts.string.get("item");
-    if (itemSelection == null)
-      throw new Error("Unable to locate item number.");
-
+    const itemSelection = opts.string.getRequired("item");
+    
     const pileArray = getMaybepile(ctx.db);
 
     const itemNum = getPageNumber(pileArray, itemSelection);

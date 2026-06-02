@@ -23,8 +23,7 @@ const Translate = new Command({
       execute: async (ctx, opts) => {
         const lettersList = "abcdefghijklmnopqrstuvwxyz".split("");
         const charList = "abdefghijklmnprstuvwxyz".split("");
-        const requestedPage = opts.string.get("page");
-        if (requestedPage === null || requestedPage === undefined) throw new Error("Must provide a page.");
+        const requestedPage = opts.string.getRequired("page");
 
         if (!lettersList.includes(requestedPage)) {
           throw new Error("Provided page is not a letter A-Z.");
@@ -76,12 +75,10 @@ const Translate = new Command({
         await ctx.respond(LANGUAGES);
       },
       execute: async (ctx, opts) => {
-        const langTypeFrom = opts.string.get("from") ?? "auto";
-        const langTypeTo = opts.string.get("to") ?? "auto";
-        const rawMessage = opts.string.get("text");
+        const rawMessage = opts.string.getRequired("text");
+        const langTypeFrom = opts.string.getOptional("from") ?? "auto";
+        const langTypeTo = opts.string.getOptional("to") ?? "auto";
 
-        if (rawMessage == null) 
-          throw new Error("Message to translate not found.");
         if (rawMessage.length >= 5000) 
           throw new Error("Provided text is too long. Please shorten your request to below 5000 characters.");
         

@@ -26,11 +26,11 @@ const QuotesRandom = new Subcommand({
       return;
     }
 
-    const filterMember = opts.user.get("member");
+    const filterMember = opts.user.getOptional("member");
 
     let randomIndex: number;
     let randomQuote: QuoteData;
-    if (filterMember) {
+    if (filterMember !== null) {
       const filteredQuotes = serverQuotes.filter(quote => quote.userid === filterMember.id);
       if (filteredQuotes.length === 0) {
         await ctx.reply(`No quotes were found from ${filterMember.displayName}. Try adding some with \`${ctx.prefix}quotes add\`!`);

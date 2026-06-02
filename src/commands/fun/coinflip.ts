@@ -20,9 +20,9 @@ const Coinflip = new Command({
     }),
   ],
   execute: async (ctx, opts) => {
-    const heads = opts.string.get("heads");
-    const tails = opts.string.get("tails");
-    const onlyHeadsProvided = (heads != null) && (tails == null);
+    const heads = opts.string.getOptional("heads");
+    const tails = opts.string.getOptional("tails");
+    const onlyHeadsProvided = (heads !== null) && (tails === null);
 
     const validOptions: string[] = [];
     validOptions[0] = heads ?? "heads";

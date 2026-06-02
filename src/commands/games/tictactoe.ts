@@ -26,7 +26,7 @@ const TicTacToe = new Command({
   },
   execute: async (ctx, opts) => {
     //MARK: opponent setup
-    let opponentId = opts.user.get("opponent")?.id;
+    let opponentId = opts.user.getOptional("opponent")?.id;
     
     let previousReply = undefined;
     if (opponentId == null) {

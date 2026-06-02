@@ -25,7 +25,7 @@ const FlagsQuiz = new Subcommand({
       return acc;
     }, {});
 
-    const providedDifficulty = opts.string.get("difficulty") ?? DIFFICULTIES[0];
+    const providedDifficulty = opts.string.getOptional("difficulty") ?? DIFFICULTIES[0];
 		
     const selectedDifficulty = FLAGS.difficulties[difficultyOptions[providedDifficulty.toLowerCase()]];
     const flagsNum = selectedDifficulty.flags;

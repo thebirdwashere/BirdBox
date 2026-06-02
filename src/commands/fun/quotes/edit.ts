@@ -34,7 +34,7 @@ const QuotesEdit = new Subcommand({
       return;
     }
 
-    const requestedQuoteIndex = Number(opts.string.get("quote"));
+    const requestedQuoteIndex = Number(opts.string.getRequired("quote"));
 
     if (isNaN(requestedQuoteIndex))
       throw new Error("Index is not a number.");

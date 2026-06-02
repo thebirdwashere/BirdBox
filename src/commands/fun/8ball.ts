@@ -25,9 +25,7 @@ const Magic8Ball = new Command({
     contextOption: "message",
   },
   execute: async (ctx, opts) => {
-    const message = opts.string.get("message");
-    if (!message)
-      throw new Error("Could not locate message.");
+    const message = opts.string.getRequired("message");
     
     if (message.length && message.length > 1000)
       await ctx.reply("bro that message is WAY too long, i aint reading allat");

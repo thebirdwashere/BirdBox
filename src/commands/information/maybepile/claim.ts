@@ -21,15 +21,13 @@ const MaybepileClaim = new Subcommand({
   ],
   autocomplete: maybepileAutocomplete,
   execute: async (ctx, opts) => {
-    const itemSelection = opts.string.get("item");
-    if (itemSelection == null)
-      throw new Error("Unable to locate item number.");
+    const itemSelection = opts.string.getRequired("item");
 
     const pileArray = getMaybepile(ctx.db);
 
     const itemNum = getPageNumber(pileArray, itemSelection);
 
-    const claimStatus = opts.string.get("status") ?? "claimed";
+    const claimStatus = opts.string.getOptional("status") ?? "claimed";
 
     const claimedItem = pileArray.at(itemNum);
     if (claimedItem == undefined) {

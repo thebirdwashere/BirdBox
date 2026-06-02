@@ -18,13 +18,13 @@ const RPS = new Command({
     const validMoves = moveNames.concat(moveAbbreviations);
     const emojis = [":rock:", ":roll_of_paper:", ":scissors:"];
 
-    const playerMove = opts.string.get("move");
+    const playerMove = opts.string.getRequired("move");
     const computerMove = randomChoice(moveNames);
     let result, footer, color;
 
-    if(!validMoves.includes(playerMove ?? "undefined")) throw new Error("Move provided is not `rock`, `paper`, `scissors`, `r`, `p`, or `s`.");
+    if(!validMoves.includes(playerMove)) throw new Error("Move provided is not `rock`, `paper`, `scissors`, `r`, `p`, or `s`.");
         
-    const playerMoveNum = validMoves.indexOf(playerMove ?? "undefined") % moveNames.length;
+    const playerMoveNum = validMoves.indexOf(playerMove) % moveNames.length;
 
     const computerMoveNum = moveNames.indexOf(computerMove);
 

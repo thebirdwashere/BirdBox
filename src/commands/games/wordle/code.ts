@@ -12,11 +12,7 @@ const WordleCode = new Subcommand({
     }),
   ],
   execute: async (ctx, opts) => { //MARK: game setup
-    const word = opts.string.get("word")?.replaceAll(/[^a-zA-Z]+/g, "");
-
-    if (word == null) {
-      throw new Error("Error locating provided word.");
-    }
+    const word = opts.string.getRequired("word").replaceAll(/[^a-zA-Z]+/g, "");
 
     //any 5 letter string works, even ones not in the json
     if (word.length !== 5) {

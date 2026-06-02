@@ -56,8 +56,8 @@ const Image = new Command({
         if (CAT_API_KEY === undefined)
           throw new Error("API key is not present in `.env`.");
 
-        const imageType = opts.string.get("type") ?? "image";
-        const selectedBreed = opts.string.get("breed") ?? null;
+        const imageType = opts.string.getOptional("type") ?? "image";
+        const selectedBreed = opts.string.getOptional("breed");
 
         const imageURL = await getPetImage(imageType, selectedBreed, CAT_LINK, CAT_API_KEY);
 
@@ -109,8 +109,8 @@ const Image = new Command({
         if (DOG_API_KEY === undefined)
           throw new Error("API key is not present in `.env`.");
 
-        const imageType = opts.string.get("type") ?? "image";
-        const selectedBreed = opts.string.get("breed") ?? null;
+        const imageType = opts.string.getOptional("type") ?? "image";
+        const selectedBreed = opts.string.getOptional("breed");
 
         const imageURL = await getPetImage(imageType, selectedBreed, DOG_LINK, DOG_API_KEY);
 

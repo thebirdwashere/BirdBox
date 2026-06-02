@@ -22,7 +22,7 @@ const flagsBoard = new Subcommand({
   },
   execute: async (ctx, opts) => {
     //MARK: common
-    const statisticChoice = (opts.string.get("statistic") ?? STATISTICS[0]) as StatisticString;
+    const statisticChoice = (opts.string.getOptional("statistic") ?? STATISTICS[0]) as StatisticString;
 
     //get game stats for every player
     const gameStats = ctx.db.user.fetchMap("wordleStats") as Map<string, UserWordleStats>;

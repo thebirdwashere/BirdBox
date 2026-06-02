@@ -36,17 +36,12 @@ const QuotesAdd = new Subcommand({
       return;
     }
 
-    const text = opts.string.get("text");
-    if (!text)
-      throw new Error("Unable to locate quote text.");
+    const text = opts.string.getRequired("text");
+    const quotedUser = opts.user.getRequired("quotee");
 
-    const quotedUser = opts.user.get("quotee");
-    if (!quotedUser)
-      throw new Error("Unable to locate quotee.");
+    let quoteDate = opts.string.getOptional("date");
 
-    let quoteDate = opts.string.get("date");
-
-    if (!quoteDate) {
+    if (quoteDate === null) {
       const currentDate = new Date(new Date(ctx.timestamp).toDateString());
 
       quoteDate = currentDate.toLocaleDateString(undefined, { 

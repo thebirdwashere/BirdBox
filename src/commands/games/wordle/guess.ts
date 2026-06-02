@@ -52,10 +52,7 @@ const WordleGuess = new Subcommand({
     }
                 
     //get guess and set to lower case
-    const guess = opts.string.get("word")?.toLowerCase();
-
-    if (guess === undefined)
-      throw new Error("Could not locate provided guess.");
+    const guess = opts.string.getRequired("word").toLowerCase();
 
     //get useful variables from current session
     const solutionWord = currentSession.solution;

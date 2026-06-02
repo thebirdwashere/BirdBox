@@ -31,7 +31,7 @@ const Help = new Command({
     await ctx.respondStrings(commandsTextList);
   },
   execute: async (ctx, opts) => {
-    const requestedCommand = opts.string.get("command");
+    const requestedCommand = opts.string.getOptional("command");
 
     const commandsList = Array.from(ctx.data.registry.commands.values());
     commandsList.sort((a, b) => { // Put commands in alphabetical order.
@@ -40,7 +40,7 @@ const Help = new Command({
       else return 0;
     });
 
-    if (requestedCommand != null) {
+    if (requestedCommand !== null) {
 
       const requestedCommandData = commandsList.find(cmd => cmd.data.name === requestedCommand)?.data;
       if (requestedCommandData == null) throw new Error("Requested command not found.");

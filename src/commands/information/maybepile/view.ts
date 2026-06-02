@@ -18,7 +18,7 @@ const MaybepileView = new Subcommand({
   ],
   autocomplete: maybepileAutocomplete,
   execute: async (ctx, opts) => {
-    const pageSelection = opts.string.get("page") ?? "0";
+    const pageSelection = opts.string.getOptional("page") ?? "0";
     const pileArray = getMaybepile(ctx.db);
 
     let pageNum = getPageNumber(pileArray, pageSelection);

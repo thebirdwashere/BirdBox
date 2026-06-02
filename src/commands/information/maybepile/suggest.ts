@@ -24,13 +24,9 @@ const MaybepileSuggest = new Subcommand({
   ],
   cooldown: 300_000,
   execute: async (ctx, opts) => {
-    const title = opts.string.get("title");
-    if (title == null)
-      throw new Error("Could not locate title.");
-    const description = opts.string.get("description");
-    if (description == null)
-      throw new Error("Could not locate description.");
-    const suggester = opts.user.get("suggester")?.username ?? ctx.user.username;
+    const title = opts.string.getRequired("title");
+    const description = opts.string.getRequired("description");
+    const suggester = opts.user.getOptional("suggester")?.username ?? ctx.user.username;
   
     const pileArray = getMaybepile(ctx.db);
 

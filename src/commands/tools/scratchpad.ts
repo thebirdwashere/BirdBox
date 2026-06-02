@@ -24,11 +24,11 @@ const Scratchpad = new Command({
         }),
       ],
       execute: async (ctx, opts) => {
-        const label = opts.string.get("label");
+        const label = opts.string.getRequired("label");
         if (!label)
           throw new Error("Unable to locate note label.");
 
-        const text = opts.string.get("text");
+        const text = opts.string.getRequired("text");
         if (!text)
           throw new Error("Unable to locate note text.");
 
@@ -68,7 +68,7 @@ const Scratchpad = new Command({
           return;
         }
 
-        const requestedNoteIndex = Number(opts.string.get("note"));
+        const requestedNoteIndex = Number(opts.string.getRequired("note"));
         let pageNum = requestedNoteIndex - 1;
 
         if (isNaN(requestedNoteIndex))
@@ -188,7 +188,7 @@ const Scratchpad = new Command({
           return;
         }
 
-        const requestedNoteIndex = Number(opts.string.get("note"));
+        const requestedNoteIndex = Number(opts.string.getRequired("note"));
 
         if (isNaN(requestedNoteIndex))
           throw new Error("Index is not a number.");
@@ -275,7 +275,7 @@ const Scratchpad = new Command({
           return;
         }
 
-        const requestedNoteIndex = Number(opts.string.get("note"));
+        const requestedNoteIndex = Number(opts.string.getRequired("note"));
 
         if (isNaN(requestedNoteIndex))
           throw new Error("Index is not a number.");

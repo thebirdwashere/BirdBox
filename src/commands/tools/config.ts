@@ -38,8 +38,8 @@ const Config = new Command({
   execute: async (ctx, opts) => {
     //MARK: setup
 
-    const scope = (opts.string.get("scope") ?? "user") as ConfigScope;
-    let name = opts.string.get("name") ?? NO_DEFAULT_SELECTION;
+    const scope = (opts.string.getOptional("scope") ?? "user") as ConfigScope;
+    let name = opts.string.getOptional("name") ?? NO_DEFAULT_SELECTION;
 
     // Reject the user if the configuration option does not exist.
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition

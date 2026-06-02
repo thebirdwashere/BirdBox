@@ -26,6 +26,7 @@ import {
 import { CommandContext, AutocompleteContext } from "./context.js";
 import { panic } from "./utility.js";
 import { NonEmptyArray, Perms, PermsRank } from "./types.js";
+import assert from "node:assert";
 
 //MARK: Command
 export class Command {
@@ -351,23 +352,55 @@ export type ContextMenuData = {
   | { type: "user"; userContextOption?: undefined; }
 );
 
-export class Options {
-  number: Map<string, number | null>;
-  boolean: Map<string, boolean | null>;
-  string: Map<string, string | null>;
-  user: Map<string, User | null>;
-  role: Map<string, Role | APIRole | null>;
-  mentionable: Map<string, User | Role | APIRole | GuildMember | APIInteractionDataResolvedGuildMember | null>;
-  channel: Map<string, Channel | BaseChannel | APIInteractionDataResolvedChannelBase<ChannelType> | null>;
+class OptionManager<T> {
+  inner: Map<string, T | null>;
 
   constructor() {
-    this.number = new Map<string, number | null>();
-    this.boolean = new Map<string, boolean | null>();
-    this.string = new Map<string, string | null>();
-    this.user = new Map<string, User | null>();
-    this.role = new Map<string, Role | APIRole | null>();
-    this.mentionable = new Map<string, User | Role | APIRole | GuildMember | APIInteractionDataResolvedGuildMember | null>();
-    this.channel = new Map<string, Channel | BaseChannel | APIInteractionDataResolvedChannelBase<ChannelType> | null>();
+    this.inner = new Map();
+  }
+
+  /**
+   * Sets the provided value.
+   */
+  set(key: string, value: T | null): void {
+    this.inner.set(key, value);
+  }
+
+  /**
+   * Returns the value, throwing an error if it is `null`.
+   */
+  getRequired(key: string): T {
+    const value = this.inner.get(key);
+    assert(value != null, `Required option was not provided: ${key}`);
+    return value;
+  }
+
+  /**
+   * Returns the value if it exists, otherwise returns `null`.
+   */
+  getOptional(key: string): T | null {
+    const value = this.inner.get(key);
+    return value ?? null;
+  }
+}
+
+export class Options {
+  number: OptionManager<number>;
+  boolean: OptionManager<boolean>;
+  string: OptionManager<string>;
+  user: OptionManager<User>;
+  role: OptionManager<Role | APIRole>;
+  mentionable: OptionManager<User | Role | APIRole | GuildMember | APIInteractionDataResolvedGuildMember>;
+  channel:  OptionManager<Channel | BaseChannel | APIInteractionDataResolvedChannelBase<ChannelType>>;
+
+  constructor() {
+    this.number = new OptionManager<number>();
+    this.boolean = new OptionManager<boolean>();
+    this.string = new OptionManager<string>();
+    this.user = new OptionManager<User>();
+    this.role = new OptionManager<Role | APIRole>();
+    this.mentionable = new OptionManager<User | Role | APIRole | GuildMember | APIInteractionDataResolvedGuildMember>();
+    this.channel = new OptionManager<Channel | BaseChannel | APIInteractionDataResolvedChannelBase<ChannelType>>();
   }
 };
 

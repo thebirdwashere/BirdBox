@@ -1,12 +1,14 @@
 import { Command } from "@src/utility/command.js";
+import PERMS from "../../data/perms.json" with { type: "json" };
+import { Perms } from "@src/utility/types.js";
 import { EmbedBuilder, Colors } from "discord.js";
+
+const perms = PERMS as Perms;
 
 const Credits = new Command({
   	name: "credits",
   	description: "Give some due credit to the people who worked on this bot.",
   	execute: async (ctx) => {
-    const perms = ctx.data.perms;
-
     const creditsEmbed = new EmbedBuilder()
       .setColor(Colors.White)
       .setTitle("Credits")

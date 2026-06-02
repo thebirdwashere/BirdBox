@@ -63,14 +63,14 @@ const Debug = new Command({
         }),
       ],
       execute: async (ctx, opts) => {
-        await ctx.send(opts.string.get("stringtest")?.toString() ?? "undefined");
-        await ctx.send(opts.string.get("choicestest")?.toString() ?? "undefined");
-        await ctx.send(opts.number.get("numbertest")?.toString() ?? "undefined");
-        await ctx.send(opts.boolean.get("booleantest")?.toString() ?? "undefined");
-        await ctx.send(opts.user.get("usertest")?.username ?? "undefined");
-        await ctx.send(opts.role.get("roletest")?.name ?? "undefined");
+        await ctx.send(opts.string.getOptional("stringtest")?.toString() ?? "undefined");
+        await ctx.send(opts.string.getOptional("choicestest")?.toString() ?? "undefined");
+        await ctx.send(opts.number.getOptional("numbertest")?.toString() ?? "undefined");
+        await ctx.send(opts.boolean.getOptional("booleantest")?.toString() ?? "undefined");
+        await ctx.send(opts.user.getOptional("usertest")?.username ?? "undefined");
+        await ctx.send(opts.role.getOptional("roletest")?.name ?? "undefined");
 
-        const mentionable = opts.mentionable.get("mentionabletest");
+        const mentionable = opts.mentionable.getOptional("mentionabletest");
         if (mentionable == null) {
           await ctx.send("undefined");
         } else if ("username" in mentionable) {
@@ -79,7 +79,7 @@ const Debug = new Command({
           await ctx.send(`<@&${mentionable.id.toString()}>`);
         }
 
-        const channel = opts.channel.get("channeltest");
+        const channel = opts.channel.getOptional("channeltest");
         if (channel == null) {
           await ctx.send("undefined");
         } else {
@@ -110,11 +110,9 @@ const Debug = new Command({
         }),
       ],
       execute: async (ctx, opts) => {
-        const scope = opts.string.get("scope");
-        if (!scope) throw new Error("Could not locate scope argument.");
-        const id = opts.string.get("id");
-        if (!id) throw new Error("Could not locate ID argument.");
-        const property = opts.string.get("property");
+        const scope = opts.string.getRequired("scope");
+        const id = opts.string.getRequired("id");
+        const property = opts.string.getOptional("property");
 
         let databaseTable: DatabaseTableManager;
 
@@ -137,7 +135,7 @@ const Debug = new Command({
         }
         
         let returnValue: string;
-        if (property != null) {
+        if (property !== null) {
           const databaseReturn = databaseTable.fetchOrUndefined(id, property);
 
           if (databaseReturn == null) {
@@ -230,12 +228,8 @@ const Debug = new Command({
         }),
       ],
       execute: async (ctx, opts) => {
-        const reactMessageId = opts.string.get("to");
-        if (reactMessageId == null)
-          throw new Error("Could not locate react message ID.");
-        const emoji = opts.string.get("emoji");
-        if (emoji == null)
-          throw new Error("Could not locate emoji.");
+        const reactMessageId = opts.string.getRequired("to");
+        const emoji = opts.string.getRequired("emoji");
 
         const reactMessage = await ctx.channel?.messages.fetch(reactMessageId);
         if (reactMessage == undefined)

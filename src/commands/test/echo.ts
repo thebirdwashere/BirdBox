@@ -12,9 +12,7 @@ const Echo = new Command({
   ],
   cooldown: 60_000,
   execute: async (ctx, opts) => {
-    const message = opts.string.get("message");
-    if (message == null) throw new Error("Could not retrieve message.");
-
+    const message = opts.string.getRequired("message");
     await ctx.reply(message);
   },
 });
