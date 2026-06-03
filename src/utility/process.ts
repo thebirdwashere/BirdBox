@@ -25,6 +25,8 @@ import { Perms } from "./types.js";
 
 const PERMS = perms as Perms;
 
+const DEFAULT_COOLDOWN_MS = 500;
+
 //MARK: ChatInput
 export async function detectChatInputInteractionCommand(
   data: Data,
@@ -40,16 +42,28 @@ export async function detectChatInputInteractionCommand(
   if (command.permissions) 
     testUserPermissions(command.permissions, PERMS, interaction.user.id);
 
-  if (command.cooldown && !data.admins.includes(interaction.user.id)) {
+  if (!data.admins.includes(interaction.user.id)) {
     const lastUsed = command.cooldown.data.get(interaction.user.id);
     const currentTime = interaction.createdTimestamp;
+    if (lastUsed) {
+      const timeSinceLastUsed = currentTime - lastUsed;
 
-    if (lastUsed && currentTime - lastUsed < command.cooldown.time) {
-      const waitTime = Math.floor((command.cooldown.time - (currentTime - lastUsed)) / 1000);
-      throw new Error(`Sorry, this command is on cooldown. Please wait ${String(waitTime)} more seconds before using \`/${command.data.name}\`.`);
-    } else {
-      command.cooldown.data.set(interaction.user.id, currentTime);
+      if (
+        "time" in command.cooldown && command.cooldown.time !== undefined 
+        && timeSinceLastUsed < command.cooldown.time
+      ) {
+        const waitTime = Math.ceil((command.cooldown.time - timeSinceLastUsed) / 1000);
+        throw new Error(`Sorry, this command is on cooldown. Please wait ${String(waitTime)} more seconds before using \`/${command.data.name}\`.`);
+      } else if (
+        //verify there is no set time before checking against the default (for overrides)
+        !("time" in command.cooldown) 
+        && timeSinceLastUsed < DEFAULT_COOLDOWN_MS
+      ) {
+        const waitTime = Math.ceil((DEFAULT_COOLDOWN_MS - timeSinceLastUsed) / 1000);
+        throw new Error(`Sorry, this command is on cooldown. Please wait ${String(waitTime)} more seconds before using \`/${command.data.name}\`.`);
+      }
     }
+    command.cooldown.data.set(interaction.user.id, currentTime);
   }
 
   // Determine passed command options.
@@ -78,16 +92,28 @@ export async function detectChatInputInteractionCommand(
     if (subcommand.permissions)
       testUserPermissions(subcommand.permissions, PERMS, interaction.user.id);
 
-    if (subcommand.cooldown && !data.admins.includes(interaction.user.id)) {
+    if (!data.admins.includes(interaction.user.id)) {
       const lastUsed = subcommand.cooldown.data.get(interaction.user.id);
       const currentTime = interaction.createdTimestamp;
+      if (lastUsed) {
+        const timeSinceLastUsed = currentTime - lastUsed;
 
-      if (lastUsed && currentTime - lastUsed < subcommand.cooldown.time) {
-        const waitTime = Math.floor((subcommand.cooldown.time - (currentTime - lastUsed)) / 1000);
-        throw new Error(`Sorry, this subcommand is on cooldown. Please wait ${String(waitTime)} more seconds before using \`/${command.data.name} ${subcommand.data.name}\`.`);
-      } else {
-        subcommand.cooldown.data.set(interaction.user.id, currentTime);
+        if (
+          "time" in subcommand.cooldown && subcommand.cooldown.time !== undefined 
+        && timeSinceLastUsed < subcommand.cooldown.time
+        ) {
+          const waitTime = Math.ceil((subcommand.cooldown.time - timeSinceLastUsed) / 1000);
+          throw new Error(`Sorry, this command is on cooldown. Please wait ${String(waitTime)} more seconds before using \`/${command.data.name}\`.`);
+        } else if (
+        //verify there is no set time before checking against the default (for overrides)
+          !("time" in subcommand.cooldown) 
+        && timeSinceLastUsed < DEFAULT_COOLDOWN_MS
+        ) {
+          const waitTime = Math.ceil((DEFAULT_COOLDOWN_MS - timeSinceLastUsed) / 1000);
+          throw new Error(`Sorry, this command is on cooldown. Please wait ${String(waitTime)} more seconds before using \`/${command.data.name}\`.`);
+        }
       }
+      subcommand.cooldown.data.set(interaction.user.id, currentTime);
     }
 
     if (subcommand.body !== undefined && isOptionArray(subcommand.body)) {
@@ -262,18 +288,27 @@ export async function detectMessageCommand(
   if (command.permissions) 
     testUserPermissions(command.permissions, PERMS, message.author.id);
 
-  if (command.cooldown && !data.admins.includes(message.author.id)) {
-    console.log(data.admins);
-    console.log(message.author.id);
+  if (!data.admins.includes(message.author.id)) {
     const lastUsed = command.cooldown.data.get(message.author.id);
-    const currentTime = message.createdTimestamp;
+    if (lastUsed) {
+      const timeSinceLastUsed = message.createdTimestamp - lastUsed;
 
-    if (lastUsed && currentTime - lastUsed < command.cooldown.time) {
-      const waitTime = Math.floor((command.cooldown.time - (currentTime - lastUsed)) / 1000);
-      throw new Error(`Sorry, this command is on cooldown. Please wait ${String(waitTime)} more seconds before using \`/${command.data.name}\`.`);
-    } else {
-      command.cooldown.data.set(message.author.id, currentTime);
+      if (
+        "time" in command.cooldown && command.cooldown.time !== undefined 
+        && timeSinceLastUsed < command.cooldown.time
+      ) {
+        const waitTime = Math.ceil((command.cooldown.time - timeSinceLastUsed) / 1000);
+        throw new Error(`Sorry, this command is on cooldown. Please wait ${String(waitTime)} more seconds before using \`/${command.data.name}\`.`);
+      } else if (
+        //verify there is no set time before checking against the default (for overrides)
+        !("time" in command.cooldown) 
+        && timeSinceLastUsed < DEFAULT_COOLDOWN_MS
+      ) {
+        const waitTime = Math.ceil((DEFAULT_COOLDOWN_MS - timeSinceLastUsed) / 1000);
+        throw new Error(`Sorry, this command is on cooldown. Please wait ${String(waitTime)} more seconds before using \`/${command.data.name}\`.`);
+      }
     }
+    command.cooldown.data.set(message.author.id, message.createdTimestamp);
   }
 
   // Handle commands accordingly.
@@ -324,16 +359,28 @@ export async function detectMessageCommand(
       testUserPermissions(subcommand.permissions, PERMS, message.author.id);
     }
 
-    if (subcommand.cooldown && !data.admins.includes(message.author.id)) {
+    if (!data.admins.includes(message.author.id)) {
       const lastUsed = subcommand.cooldown.data.get(message.author.id);
       const currentTime = message.createdTimestamp;
+      if (lastUsed) {
+        const timeSinceLastUsed = currentTime - lastUsed;
 
-      if (lastUsed && currentTime - lastUsed < subcommand.cooldown.time) {
-        const waitTime = Math.floor((subcommand.cooldown.time - (currentTime - lastUsed)) / 1000);
-        throw new Error(`Sorry, this subcommand is on cooldown. Please wait ${String(waitTime)} more seconds before using \`/${command.data.name} ${subcommand.data.name}\`.`);
-      } else {
-        subcommand.cooldown.data.set(message.author.id, currentTime);
+        if (
+          "time" in subcommand.cooldown && subcommand.cooldown.time !== undefined 
+        && timeSinceLastUsed < subcommand.cooldown.time
+        ) {
+          const waitTime = Math.ceil((subcommand.cooldown.time - timeSinceLastUsed) / 1000);
+          throw new Error(`Sorry, this command is on cooldown. Please wait ${String(waitTime)} more seconds before using \`/${command.data.name}\`.`);
+        } else if (
+        //verify there is no set time before checking against the default (for overrides)
+          !("time" in subcommand.cooldown) 
+        && timeSinceLastUsed < DEFAULT_COOLDOWN_MS
+        ) {
+          const waitTime = Math.ceil((DEFAULT_COOLDOWN_MS - timeSinceLastUsed) / 1000);
+          throw new Error(`Sorry, this command is on cooldown. Please wait ${String(waitTime)} more seconds before using \`/${command.data.name}\`.`);
+        }
       }
+      subcommand.cooldown.data.set(message.author.id, currentTime);
     }
 
     // Populate options if they exist.

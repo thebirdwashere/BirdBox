@@ -35,8 +35,8 @@ export class Command {
     | Readonly<NonEmptyArray<CommandOption>>
     | Readonly<NonEmptyArray<Subcommand>>;
   permissions?: PermsRank[];
-  cooldown?: {
-    time: number;
+  cooldown: {
+    time?: number;
     data: Collection<string, number>;
   };
   contextmenu?: ContextMenuData;
@@ -76,10 +76,12 @@ export class Command {
     if ("execute" in args) this.execute = args.execute;
     if ("autocomplete" in args) this.autocomplete = args.autocomplete;
     if ("permissions" in args) this.permissions = args.permissions;
-    if ("cooldown" in args && args.cooldown !== undefined) this.cooldown = {
-      time: args.cooldown,
-      data: new Collection(),
+
+    this.cooldown = {
+      data: new Collection()
     };
+
+    if ("cooldown" in args && args.cooldown !== undefined) this.cooldown.time = args.cooldown;
 
     if ("options" in args) {
       for (const option of args.options) {
@@ -154,8 +156,8 @@ export class Subcommand {
   data: SlashCommandSubcommandBuilder;
   body?: Readonly<NonEmptyArray<CommandOption>>;
   permissions?: PermsRank[];
-  cooldown?: {
-    time: number;
+  cooldown: {
+    time?: number;
     data: Collection<string, number>;
   };
   contextmenu?: ContextMenuData;
@@ -189,10 +191,11 @@ export class Subcommand {
     this.execute = args.execute;
     if ("autocomplete" in args) this.autocomplete = args.autocomplete;
     if ("permissions" in args) this.permissions = args.permissions;
-    if ("cooldown" in args && args.cooldown !== undefined) this.cooldown = {
-      time: args.cooldown,
-      data: new Collection(),
+    this.cooldown = {
+      data: new Collection()
     };
+
+    if ("cooldown" in args && args.cooldown !== undefined) this.cooldown.time = args.cooldown;
 
     if ("options" in args) {
       for (const option of args.options) {

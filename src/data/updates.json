@@ -5,6 +5,8 @@
     "date": "TBD",
     "devs": ["AgentNebulator"],
     "notes": [
+      "Removed cooldown from `e;echo`",
+      "Added base cooldown of half a second to every command",
       "Fixed credits command breaking due to moved information",
       "Updated internal options system to remove unecesssary checks"
     ]
