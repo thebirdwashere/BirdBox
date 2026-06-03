@@ -20,7 +20,7 @@ import {
 } from "./context.js";
 import { Registry } from "./registry.js";
 import { Data, NonEmptyArray } from "./types.js";
-import { sleep } from "./utility.js";
+import { InputError, sleep } from "./utility.js";
 import perms from "../data/perms.json" with { type: "json" };
 import { Perms } from "./types.js";
 
@@ -106,9 +106,7 @@ function parseCommandOptions(
         );
 
         if (opt === null && option.data.required)
-          throw new Error(
-            `Required option missing: \`${option.data.name}\``,
-          );
+          throw new Error(`Required option missing: \`${option.data.name}\``);
 
         options.number.set(option.data.name, opt);
       }
@@ -121,9 +119,7 @@ function parseCommandOptions(
         );
 
         if (opt === null && option.data.required)
-          throw new Error(
-            `Required option missing: \`${option.data.name}\``,
-          );
+          throw new Error(`Required option missing: \`${option.data.name}\``);
 
         options.boolean.set(option.data.name, opt);
       }
@@ -135,9 +131,7 @@ function parseCommandOptions(
           option.data.required,
         );
         if (opt === null && option.data.required)
-          throw new Error(
-            `Required option missing: \`${option.data.name}\``,
-          );
+          throw new Error(`Required option missing: \`${option.data.name}\``);
 
         options.string.set(option.data.name, opt);
       }
@@ -149,9 +143,7 @@ function parseCommandOptions(
           option.data.required,
         );
         if (opt === null && option.data.required)
-          throw new Error(
-            `Required option missing: \`${option.data.name}\``,
-          );
+          throw new Error(`Required option missing: \`${option.data.name}\``);
 
         options.user.set(option.data.name, opt);
       }
@@ -163,9 +155,7 @@ function parseCommandOptions(
           option.data.required,
         );
         if (opt === null && option.data.required)
-          throw new Error(
-            `Required option missing: \`${option.data.name}\``,
-          );
+          throw new Error(`Required option missing: \`${option.data.name}\``);
 
         options.role.set(option.data.name, opt);
       }
@@ -177,9 +167,7 @@ function parseCommandOptions(
           option.data.required,
         );
         if (opt === null && option.data.required) 
-          throw new Error(
-            `Required option missing: \`${option.data.name}\``,
-          );
+          throw new Error(`Required option missing: \`${option.data.name}\``);
 
         options.mentionable.set(option.data.name, opt);
       }
@@ -191,9 +179,7 @@ function parseCommandOptions(
           option.data.required,
         );
         if (opt === null && option.data.required) 
-          throw new Error(
-            `Required option missing: \`${option.data.name}\``,
-          );
+          throw new Error(`Required option missing: \`${option.data.name}\``);
 
         options.channel.set(option.data.name, opt);
       }
@@ -254,7 +240,7 @@ export async function detectMessageCommand(
     // Populate options if they exist.
     if (command.body !== undefined && isOptionArray(command.body)) {
       if (args.length > command.body.length) {
-        throw new Error(
+        throw new InputError(
           `Too many arguments provided to command \`${data.prefix}${commandName}\`; ` +
           `expected at most ${String(command.body.length)}, ` +
           `found ${String(args.length)}.`
@@ -274,9 +260,8 @@ export async function detectMessageCommand(
     if (subcommandName === undefined) {
       const subcommandsFormatter = new Intl.ListFormat("en", {type: "conjunction",});
       const subcommandsList = subcommandsFormatter.format(command.body.map(sub => `\`${sub.data.name}\``));
-      throw new Error(`Subcommand missing in command \`${data.prefix}${commandName}\`. Available subcommands are ${subcommandsList}.`);
+      throw new InputError(`Subcommand missing in command \`${data.prefix}${commandName}\`. Available subcommands are ${subcommandsList}.`);
     }
-
 
     let options = new Options();
 
@@ -298,7 +283,7 @@ export async function detectMessageCommand(
     // Populate options if they exist.
     if (subcommand.body !== undefined && isOptionArray(subcommand.body)) {
       if (args.length > subcommand.body.length) {
-        throw new Error(
+        throw new InputError(
           `Too many arguments provided to command \`${data.prefix}${commandName} ${subcommandName}\`; ` +
           `expected at most ${String(subcommand.body.length)}, ` +
           `found ${String(args.length)}.`
@@ -362,7 +347,7 @@ function populateMessageOptions(
     }
 
     if (sourceType !== targetType && sourceType !== "optional") {
-      throw new Error(
+      throw new InputError(
         `Argument at position ${String(index + 1)} ` +
           `is of type \`${sourceType}\` ` +
           `when type \`${targetType}\` was expected.`,
@@ -395,13 +380,13 @@ function populateMessageOptions(
       if (option.choices && !option.choices.map(e => e.toLowerCase()).includes(source.toLowerCase())) {
         const optionsFormatter = new Intl.ListFormat("en", {type: "disjunction"});
         const choicesList = optionsFormatter.format(option.choices.map(choice => `\`${choice}\``));
-        throw new Error(`Provided "${source}" is invalid for option "${option.data.name}". Option must be one of ${choicesList}.`);
+        throw new InputError(`Provided "${source}" is invalid for option "${option.data.name}". Option must be one of ${choicesList}.`);
       }
       if (option.length && (
         source.length < option.length[0] ||
         source.length > option.length[1]
       )) {
-        throw new Error(`Option ${option.data.name} must be between ${option.length[0].toString()} and ${option.length[1].toString()} characters (${source.length.toString()} characters provided).`);
+        throw new InputError(`Option ${option.data.name} must be between ${option.length[0].toString()} and ${option.length[1].toString()} characters (${source.length.toString()} characters provided).`);
       }
 
       options.string.set(option.data.name, source);
@@ -435,7 +420,7 @@ function populateMessageOptions(
     }
     case "optional":
       if (option.data.required)
-        throw new Error(`Argument "${option.data.name}" (position ${String(index + 1)}) is required.`);
+        throw new InputError(`Argument "${option.data.name}" (position ${String(index + 1)}) is required.`);
 
       switch (option.type) {
       case "number":

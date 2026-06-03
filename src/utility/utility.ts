@@ -96,6 +96,18 @@ export function fetchConfigOption<ConfigScopeType extends ConfigScope>(
 }
 
 /**
+ * Utility type used for errors which are the user's fault, not the bot's. Does not
+ * log to the console when thrown.
+ */
+export class InputError extends Error {
+  constructor(msg: string) {
+    super(msg);
+
+    Object.setPrototypeOf(this, InputError.prototype);
+  }
+}
+
+/**
  * Map wrapper with various utility methods to ensure values exist or optionally
  * return defaults.
  */

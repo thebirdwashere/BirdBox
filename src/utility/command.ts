@@ -24,9 +24,8 @@ import {
   Collection,
 } from "discord.js";
 import { CommandContext, AutocompleteContext } from "./context.js";
-import { panic } from "./utility.js";
+import { InputError, panic } from "./utility.js";
 import { NonEmptyArray, Perms, PermsRank } from "./types.js";
-import assert from "node:assert";
 
 const DEFAULT_COOLDOWN_MS = 500;
 
@@ -376,7 +375,9 @@ class OptionManager<T> {
    */
   getRequired(key: string): T {
     const value = this.inner.get(key);
-    assert(value != null, `Required option was not provided: ${key}`);
+    if(value == null) {
+      throw new Error(`Required option was not provided: ${key}`);
+    }
     return value;
   }
 
@@ -435,7 +436,7 @@ export function testUserPermissions(ranks: PermsRank[], perms: Perms, id: string
     const optionsFormatter = new Intl.ListFormat("en", {type: "disjunction"});
     const choicesList = optionsFormatter.format(ranks.map(choice => `\`${choice}\``));
 
-    throw new Error(`Sorry, you lack the permissions to use this command. Your rank must be ${choicesList}.`);
+    throw new InputError(`Sorry, you lack the permissions to use this command. Your rank must be ${choicesList}.`);
   }
 }
 
@@ -466,7 +467,7 @@ export function handleCooldown(
     }
 
     if (waitTime > 0) {
-      throw new Error(`Sorry, this command is on cooldown. Please wait ${String(waitTime)} more seconds before using \`/${command.data.name}\`.`);
+      throw new InputError(`Sorry, this command is on cooldown. Please wait ${String(waitTime)} more seconds before using \`/${command.data.name}\`.`);
     }
 
     command.cooldown.data.set(userId, timestamp);
