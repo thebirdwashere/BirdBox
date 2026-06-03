@@ -28,6 +28,8 @@ import { panic } from "./utility.js";
 import { NonEmptyArray, Perms, PermsRank } from "./types.js";
 import assert from "node:assert";
 
+const DEFAULT_COOLDOWN_MS = 500;
+
 //MARK: Command
 export class Command {
   data: SlashCommandBuilder;
@@ -434,5 +436,39 @@ export function testUserPermissions(ranks: PermsRank[], perms: Perms, id: string
     const choicesList = optionsFormatter.format(ranks.map(choice => `\`${choice}\``));
 
     throw new Error(`Sorry, you lack the permissions to use this command. Your rank must be ${choicesList}.`);
+  }
+}
+
+export function handleCooldown(
+  command: Command | Subcommand, 
+  admins: string[], 
+  userId: string,
+  timestamp: number,
+): void {
+  if (!admins.includes(userId)) {
+    const lastUsed = command.cooldown.data.get(userId);
+    let waitTime = 0;
+    if (lastUsed) {
+      const timeSinceLastUsed = timestamp - lastUsed;
+      
+      if (
+        "time" in command.cooldown && command.cooldown.time !== undefined 
+        && timeSinceLastUsed < command.cooldown.time
+      ) {
+        waitTime = Math.ceil((command.cooldown.time - timeSinceLastUsed) / 1000);
+      } else if (
+        //verify there is no set time before checking against the default (for overrides)
+        !("time" in command.cooldown) 
+        && timeSinceLastUsed < DEFAULT_COOLDOWN_MS
+      ) {
+        waitTime = Math.ceil((DEFAULT_COOLDOWN_MS - timeSinceLastUsed) / 1000);
+      }
+    }
+
+    if (waitTime > 0) {
+      throw new Error(`Sorry, this command is on cooldown. Please wait ${String(waitTime)} more seconds before using \`/${command.data.name}\`.`);
+    }
+
+    command.cooldown.data.set(userId, timestamp);
   }
 }
