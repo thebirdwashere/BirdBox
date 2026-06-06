@@ -1,0 +1,122 @@
+{
+  "magic8ball": [
+    "i be like that wise tree fr fr",
+    "1 million billion iq move",
+    "big brain",
+    "panzer of ze lake",
+    "erm it's yr'oue* actually",
+    "vague responses will continue until morale improves",
+    "hope this helped! (not)",
+    "truth nuke",
+    "domain expansion: infinite answers",
+    "they call me nostradamus",
+    "still unclear? have you tried asking again"
+  ],
+  "help": [
+    "don't just stand around, go and try it!",
+    "but remember, the best way to learn is through practice",
+    "for more information, contact a developer i guess",
+    "really? i thought this one would be obvious"
+  ],
+  "snipe": [
+    "can't hide from me",
+    "lol get sniped",
+    "this won't be forgotten, i'll make sure of it",
+    "too iconic of a quote to be lost to time",
+    "this is why you always remember to make backups",
+    "ripbozo"
+  ],
+  "quotes": [
+    "a wise man once said",
+    "truly an inspirational message",
+    "top 10 best motivational quotes",
+    "Sun Tzu, The Art of War",
+    "i forgot about that one, it feels like ages ago now",
+    "no way someone actually said that lol",
+    "this ^^^",
+    "honestly so real for saying that",
+    "we were all thinking it, someone had to say it",
+    "you gotta respect it",
+    "who could forget about this one",
+    "oh i remember this, good times"
+  ],
+  "tictactoe": {
+    "start": [
+      "exciting prospects for this one",
+      "better give 110% here",
+      "this is a make or break game",
+      "gotta bring your A game here",
+      "we are SEATED for this matchup 🍿🍿"
+    ],
+    "early": [
+      "off to a great start",
+      "can't wait to see how this ends",
+      "interesting strategy...",
+      "ah yes, the classic Kravchenko Gambit",
+      "hard to say who has the advantage",
+      "yikes, huge blunder there",
+      "excellent defensive play",
+      "not so sure about that move",
+      "looking good, but anything can happen"
+    ],
+    "late": [
+      "really closing down the grid here",
+      "not too many spots left",
+      "nice blocks so far",
+      "the suspense is killing me",
+      "it's looking like a draw, maybe?",
+      "just trading blows now",
+      "it's not over until it's over",
+      "the momentum is shifting, or is it?",
+      "running out of time..."
+    ],
+    "win": [
+      "WHATTTT A GAME",
+      "i did NOT see that coming",
+      "bro that strategy needs to be nerfed",
+      "nice work chump",
+      "too ez bro",
+      "gg no re",
+      "well, you win some you lose some",
+      "one for the record books",
+      "a game for the ages"
+    ],
+    "nowin": [
+      "BORINGGGG",
+      "aw man, i was on the edge of my seat",
+      "good effort, good effort",
+      "i don't know what i expected tbh",
+      "rematch?",
+      "a respectable outcome",
+      "everyone played hard there",
+      "really dropped the ball",
+      "cat game? more like bunny game"
+    ]
+  },
+  "interjections": {
+    "generic": [
+      "did you do that on purpose? no way this one was accidental.",
+      "it's beautiful, i could stare at this for hours"
+    ],
+    "alphabetical": [
+      "now i know my abc's, next time won't you sing with me",
+      "perfectly sorted, as all things should be",
+      "remember kids, [[RANDOMLETTER]] is for \"[[RANDOMWORD]]\""
+    ],
+    "periodic": [
+      "[[USERNAME]] nye the science guy fr",
+      "i wonder if this is a real compound, probably not but still",
+      "one could say, this only happens... periodically"
+    ],
+    "pangrams": [
+      "no quick brown fox can jump over this masterpiece",
+      "the sphinx of black quartz judges this as excellent",
+      "great job! next up, the whole of unicode"
+    ],
+    "palindromes": [
+      "able was I, ere I saw an incredible palindrome",
+      "a man, a plan, a channel- palindrome!",
+      "aibohphobes, look away now"
+    ]
+  }
+}
