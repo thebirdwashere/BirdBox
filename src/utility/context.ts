@@ -64,6 +64,7 @@ export interface CommandContext extends BaseContext {
       | {
           content?: string;
           embeds?: EmbedBuilder[];
+          components?: ActionRowBuilder<MessageActionRowComponentBuilder>[];
         },
   ) => Promise<Message>;
 
@@ -273,6 +274,7 @@ export class ChatInputCommandInteractionContext implements CommandContext {
       | {
           content?: string;
           embeds?: EmbedBuilder[];
+          components?: ActionRowBuilder<MessageActionRowComponentBuilder>[];
         },
   ): Promise<Message> {
     if (this.channel?.isSendable()) {
@@ -511,6 +513,7 @@ export class ContextMenuCommandContext implements CommandContext {
       | {
           content?: string;
           embeds?: EmbedBuilder[];
+          components?: ActionRowBuilder<MessageActionRowComponentBuilder>[];
         },
   ): Promise<Message> {
     if (this.channel?.isSendable()) {
