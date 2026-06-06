@@ -50,6 +50,13 @@
       "default": null,
       "value": "notifications"
     },
+    "guesswho_channel": {
+      "name": "Guess Who Channel",
+      "desc": "Change the channel the Guess Who game searches. \nIf not set, defaults to the channel Guess Who is run in.",
+      "displayOptionsAs": "channel",
+      "default": null,
+      "value": "guesswho"
+    },
     "snipes": {
       "name": "Snipe Logging",
       "desc": "Change whether this server's deleted messages are logged for the snipe command. Both the user and server must consent for the message to be logged. \nDefaults to `enable` if not set.",
