@@ -47,6 +47,9 @@ const Magic8Ball = new Command({
       .setFooter({ text: randomFooter });
 
     if (typeof randomResponse == "string") {
+      if (randomResponse == "[[ERROR]]") {
+        throw new Error("Answer not found");
+      }
       responseEmbed.setTitle(randomResponse);
     } else {
       responseEmbed
