@@ -1,6 +1,6 @@
 import { Colors, EmbedBuilder } from "discord.js";
 import { AutocompleteContext, CommandContext, MessageContext } from "./context.js";
-import { InputError } from "./utility.js";
+import { InputError, NonLoggedError } from "./utility.js";
 
 async function handleError(
   ctx: CommandContext,
@@ -9,7 +9,7 @@ async function handleError(
   type: string,
 ): Promise<void> {
   //don't log errors that were the user's fault
-  if (!(error instanceof InputError))
+  if (!(error instanceof InputError || error instanceof NonLoggedError))
     console.error(error);
   
   const embeds = [

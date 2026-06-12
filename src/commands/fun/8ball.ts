@@ -3,7 +3,7 @@ import { Colors, EmbedBuilder } from "discord.js";
 import footers from "@src/data/footers.json" with { type: "json" };
 import responses from "@src/data/8ball.json" with { type: "json" };
 import { Footers, EightBallResponses } from "@src/utility/types.js";
-import { randomChoice } from "@src/utility/utility.js";
+import { NonLoggedError, randomChoice } from "@src/utility/utility.js";
 
 const FOOTERS = footers as Footers;
 const RESPONSES = responses as EightBallResponses;
@@ -47,8 +47,9 @@ const Magic8Ball = new Command({
       .setFooter({ text: randomFooter });
 
     if (typeof randomResponse == "string") {
+      //joke inclusion, nothing is wrong with the bot here
       if (randomResponse == "[[ERROR]]") {
-        throw new Error("Query could not be answered.");
+        throw new NonLoggedError("Query could not be answered.");
       }
 
       responseEmbed.setTitle(randomResponse);
@@ -69,3 +70,4 @@ const Magic8Ball = new Command({
 });
 
 export default Magic8Ball;
+

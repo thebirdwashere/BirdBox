@@ -108,6 +108,23 @@ export class InputError extends Error {
 }
 
 /**
+ * Utility type for generic errors which shouldn't log to the console.
+ */
+export class NonLoggedError extends Error {
+  constructor(msg: string) {
+    super(msg);
+
+    Object.setPrototypeOf(this, NonLoggedError.prototype);
+
+    this.toString = (): string => {
+      return `Error: ${this.message}`;
+    };
+  }
+}
+
+
+
+/**
  * Map wrapper with various utility methods to ensure values exist or optionally
  * return defaults.
  */
