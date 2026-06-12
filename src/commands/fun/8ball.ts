@@ -48,8 +48,9 @@ const Magic8Ball = new Command({
 
     if (typeof randomResponse == "string") {
       if (randomResponse == "[[ERROR]]") {
-        throw new Error("Answer not found");
+        throw new Error("Query could not be answered.");
       }
+
       responseEmbed.setTitle(randomResponse);
     } else {
       responseEmbed
