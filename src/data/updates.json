@@ -5,7 +5,7 @@
     "date": "TBD",
     "devs": ["AgentNebulator"],
     "notes": [
-      "Added 11 new `e;8ball` responses inspired by \"goedel\" fortunes",
+      "Added 11 new `e;8ball` responses, for a total of 126",
       "Removed cooldown from `e;echo`",
       "Added base cooldown of half a second to every command",
       "Reduced frequency of error logging due to malformed input",
