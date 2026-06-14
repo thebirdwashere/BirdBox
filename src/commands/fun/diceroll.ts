@@ -14,9 +14,11 @@ const Diceroll = new Command({
     }),
   ],
   execute: async (ctx, opts) => {
-    const sides = opts.number.getOptional("sides") ?? 6;
+    let sides = opts.number.getOptional("sides");
 
-    if (sides > 2147483647) {
+    if (sides == null) {
+      sides = 6;
+    } else if (sides > 2147483647) {
       throw new Error("Too many sides provided.");
     } else if (sides < 1) {
       throw new Error("Provided number of sides is not positive.");
