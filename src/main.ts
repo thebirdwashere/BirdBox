@@ -141,18 +141,22 @@ CLIENT.on(Events.MessageCreate, (message) => {
 
   const context = new MessageContext(message, DATA);
   
-  detectMessageCommand(REGISTRY, DATA, message).catch(
-    async (error: unknown) => {
-      await handleCommandError(
-        context,
-        message.content.split(" ")[0].slice(BOT_PREFIX.length),
-        error,
-      );
-    },
-  );
-
-  if (!DEVMODE) void REGISTRY.testInterjections(context);
-  else void REGISTRY.testAndBenchmarknterjections(context);
+  if (message.content.startsWith(DATA.prefix)) {
+    if (DEVMODE) console.log("Identified message to be command. Running appropriate parser...");
+    detectMessageCommand(REGISTRY, DATA, message).catch(
+      async (error: unknown) => {
+        await handleCommandError(
+          context,
+          message.content.split(" ")[0].slice(BOT_PREFIX.length),
+          error,
+        );
+      }
+    );
+  //test interjections on non-commands only
+  } else {
+    if (!DEVMODE) void REGISTRY.testInterjections(context);
+    else void REGISTRY.testAndBenchmarknterjections(context);
+  }
 });
 
 //MARK: Delete

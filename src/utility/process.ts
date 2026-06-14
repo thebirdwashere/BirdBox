@@ -196,8 +196,8 @@ export async function detectMessageCommand(
   data: Data,
   message: Message,
 ): Promise<void> {
-  if (message.content.length === 0) return;
-  if (!message.content.startsWith(data.prefix)) return;
+  //We can assume the message starts with the command prefix
+  //if this function has been run.
 
   // Split arguments and extract command name.
   let args = message.content.split(/\s/).filter((str) => str.length !== 0);
