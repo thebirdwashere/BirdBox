@@ -8,7 +8,8 @@
       "Added 11 new `e;8ball` responses, for a total of 126",
       "Removed cooldown from `e;echo`",
       "Added base cooldown of half a second to every command",
-      "Reduced frequency of error logging due to malformed input",
+      "Prefixed commands are no longer tested for interjections",
+      "Malformed input error are no longer logged to the console",
       "Fixed credits command breaking due to moved information",
       "Updated internal options system to remove unecesssary checks"
     ]

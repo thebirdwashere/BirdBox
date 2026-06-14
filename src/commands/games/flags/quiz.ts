@@ -97,11 +97,10 @@ const FlagsQuiz = new Subcommand({
     }
 
     //send embed
-    await ctx.reply({embeds: [flagEmbed], components: buttonRowArray});
-    if (ctx.lastReply === null) throw new Error("Could not locate last reply.");
+    const response = await ctx.reply({embeds: [flagEmbed], components: buttonRowArray});
 
     //collect button responses
-    const buttonCollector = ctx.lastReply.createMessageComponentCollector({
+    const buttonCollector = response.createMessageComponentCollector({
       componentType: ComponentType.Button,
       time: 15000,
     });
@@ -157,7 +156,7 @@ const FlagsQuiz = new Subcommand({
       const rightFlagIndex = shuffledFlags.indexOf(rightFlagEmoji);
       buttonRowArray[Math.floor(rightFlagIndex / 4)].components[rightFlagIndex % 4].setStyle(ButtonStyle.Success);
 
-      await ctx.lastReply?.edit({embeds: [flagEmbed], components: buttonRowArray});
+      await response.edit({embeds: [flagEmbed], components: buttonRowArray});
 
       //get values of points
       const pointsEarned = selectedDifficulty.earned;
@@ -179,7 +178,7 @@ const FlagsQuiz = new Subcommand({
       responseText += !correctUsers.length ? "Nobody got it right! \n" : `${correctUserString} got it right! gg *(+${pointsEarned.toString()} points)*\n`;
       responseText += !wrongUsers.length ? "That means nobody got it wrong... pretty good ig" : `That means ${wrongUserString} got it wrong, massive L *(-${pointsLost.toString()} points)*`;
 
-      await ctx.lastReply?.reply(responseText);
+      await response.reply(responseText);
 
       // //MARK: update stats
 
@@ -237,7 +236,7 @@ const FlagsQuiz = new Subcommand({
       remainingTime -= 1;
       flagEmbed.setFooter({text: `${peopleGuessed.toString()} guessed ● ${remainingTime.toString()} seconds left`});
 
-      await ctx.lastReply.edit({ embeds: [flagEmbed] });
+      await response.edit({ embeds: [flagEmbed] });
     }
 
   },

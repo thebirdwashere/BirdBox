@@ -123,30 +123,30 @@ const Help = new Command({
           
       function updateEmbed(page: number): [EmbedBuilder] { return [embedsArray[page]]; }
 
-      function updateRow(page: number): [ActionRowBuilder<ButtonBuilder>] { // Returns the updated row
-        const backButton = new ButtonBuilder()
-          .setCustomId("backButton")
-          .setLabel("🠈")
-          .setStyle(ButtonStyle.Primary);
-          
-        const forwardButton = new ButtonBuilder()
-          .setCustomId("forwardButton")
-          .setLabel("🠊")
-          .setStyle(ButtonStyle.Primary);
+      const backButton = new ButtonBuilder()
+        .setCustomId("backButton")
+        .setLabel("🠈")
+        .setStyle(ButtonStyle.Primary);
+        
+      const forwardButton = new ButtonBuilder()
+        .setCustomId("forwardButton")
+        .setLabel("🠊")
+        .setStyle(ButtonStyle.Primary);
 
+      const infoButtonRow = new ActionRowBuilder<ButtonBuilder>()
+        .addComponents(backButton, forwardButton);
+
+      function updateRow(page: number): [ActionRowBuilder<ButtonBuilder>] { // Returns the updated row
         if(page <= 0) backButton.setDisabled(true); else backButton.setDisabled(false);
         if(page >= embedsArray.length - 1) forwardButton.setDisabled(true); else forwardButton.setDisabled(false);
 
-        const infoButtonRow = new ActionRowBuilder()
-          .addComponents(backButton, forwardButton);
-
-        return [infoButtonRow as ActionRowBuilder<ButtonBuilder>];
+        return [infoButtonRow];
       }
   
-      await ctx.reply({ embeds: updateEmbed(page), components: updateRow(page) });
-      if (ctx.lastReply == null) throw new Error("Could not locate last reply.");
+      const response = await ctx.reply({ embeds: updateEmbed(page), components: updateRow(page) });
 
       const filter = (i: Interaction): boolean => i.user.id === ctx.user.id;
+      const buttonCollector = response.createMessageComponentCollector({ componentType: ComponentType.Button, time: 3_600_000, filter });
 
       async function handleButtonInteraction(i: ButtonInteraction): Promise<void> {
         if (i.customId === "backButton") {
@@ -160,8 +160,16 @@ const Help = new Command({
         }
       }
 
-      const buttonCollector = ctx.lastReply.createMessageComponentCollector({ componentType: ComponentType.Button, time: 3_600_000, filter });
-      buttonCollector.on("collect", (i: ButtonInteraction): void => void handleButtonInteraction(i) );
+      async function handleButtonTimeout(): Promise<void> {
+        //disable the buttons
+        infoButtonRow.components.forEach(item => item.setDisabled(true));
+        await response.edit({ components: [infoButtonRow] });
+      }
+      
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
+      buttonCollector.on("collect", (i: ButtonInteraction): Promise<void> => handleButtonInteraction(i) );
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
+      buttonCollector.on("end", () => handleButtonTimeout() );
 
     }
   },

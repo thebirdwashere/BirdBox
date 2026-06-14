@@ -40,21 +40,27 @@ const Version = new Command({
       return [infoEmbed];
     }
 
-    function updateRow(p: number): [ActionRowBuilder<ButtonBuilder>, ActionRowBuilder<StringSelectMenuBuilder>] { // Returns the updated row
-      const backButton = new ButtonBuilder()
-        .setCustomId("backButton")
-        .setLabel("🠈")
-        .setStyle(ButtonStyle.Primary);
+    const backButton = new ButtonBuilder()
+      .setCustomId("backButton")
+      .setLabel("🠈")
+      .setStyle(ButtonStyle.Primary);
             
-      const forwardButton = new ButtonBuilder()
-        .setCustomId("forwardButton")
-        .setLabel("🠊")
-        .setStyle(ButtonStyle.Primary);
+    const forwardButton = new ButtonBuilder()
+      .setCustomId("forwardButton")
+      .setLabel("🠊")
+      .setStyle(ButtonStyle.Primary);
             
-      const versionSelect = new StringSelectMenuBuilder()
-        .setCustomId("versionSelect")
-        .setPlaceholder("Select version...");
+    const versionSelect = new StringSelectMenuBuilder()
+      .setCustomId("versionSelect")
+      .setPlaceholder("Select version...");
 
+    const infoButtonRow = new ActionRowBuilder<ButtonBuilder>()
+      .addComponents(backButton, forwardButton);
+          
+    const infoSelectRow = new ActionRowBuilder<StringSelectMenuBuilder>()
+      .addComponents(versionSelect);
+
+    function updateRow(p: number): [ActionRowBuilder<StringSelectMenuBuilder>, ActionRowBuilder<ButtonBuilder>] { // Returns the updated row
       patchNotes.forEach((item) => {
         versionSelect.addOptions([
           new StringSelectMenuOptionBuilder()
@@ -66,19 +72,14 @@ const Version = new Command({
       if(p <= 0) backButton.setDisabled(true); else backButton.setDisabled(false);
       if(p >= patchNotes.length - 1) forwardButton.setDisabled(true); else forwardButton.setDisabled(false);
 
-      const infoButtonRow = new ActionRowBuilder()
-        .addComponents(backButton, forwardButton);
-            
-      const infoSelectRow = new ActionRowBuilder()
-        .addComponents(versionSelect);
-
-      return [infoSelectRow as ActionRowBuilder<ButtonBuilder>, infoButtonRow as ActionRowBuilder<StringSelectMenuBuilder>];
+      return [infoSelectRow, infoButtonRow];
     }
 
-    await ctx.reply({ embeds: updateEmbed(page), components: updateRow(page) });
-    if (ctx.lastReply == null) throw new Error("Could not locate last reply.");
+    const response = await ctx.reply({ embeds: updateEmbed(page), components: updateRow(page) });
 
     const filter = (i: Interaction): boolean => i.user.id === ctx.user.id;
+    const buttonCollector = response.createMessageComponentCollector({ componentType: ComponentType.Button, time: 3_600_000, filter });
+    const selectCollector = response.createMessageComponentCollector({ componentType: ComponentType.StringSelect, time: 3_600_000, filter });
 
     async function handleButtonInteraction(i: ButtonInteraction): Promise<void> {
       if (i.customId === "backButton") {
@@ -92,8 +93,16 @@ const Version = new Command({
       }
     }
 
-    const buttonCollector = ctx.lastReply.createMessageComponentCollector({ componentType: ComponentType.Button, time: 3_600_000, filter });
-    buttonCollector.on("collect", (i: ButtonInteraction): void => void handleButtonInteraction(i) );
+    async function handleButtonTimeout(): Promise<void> {
+      //disable the buttons
+      infoButtonRow.components.forEach(item => item.setDisabled(true));
+      await response.edit({ components: [infoSelectRow, infoButtonRow] });
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+    buttonCollector.on("collect", (i: ButtonInteraction): Promise<void> => handleButtonInteraction(i) );
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+    buttonCollector.on("end", (): Promise<void> => handleButtonTimeout() );
 
     async function handleSelectorInteraction(i: StringSelectMenuInteraction): Promise<void> {
       page = parseInt(i.values[0]);
@@ -101,8 +110,16 @@ const Version = new Command({
       await i.deferUpdate();
     }
 
-    const selectCollector = ctx.lastReply.createMessageComponentCollector({ componentType: ComponentType.StringSelect, time: 3_600_000, filter });
-    selectCollector.on("collect", (i: StringSelectMenuInteraction): void => void handleSelectorInteraction(i) );
+    async function handleSelectorTimeout(): Promise<void> {
+      //disable the selector
+      infoSelectRow.components.forEach(item => item.setDisabled(true));
+      await response.edit({ components: [infoSelectRow, infoButtonRow] });
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+    selectCollector.on("collect", (i: StringSelectMenuInteraction): Promise<void> => handleSelectorInteraction(i) );
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+    buttonCollector.on("end", (): Promise<void> => handleSelectorTimeout() );
   },
 });
 

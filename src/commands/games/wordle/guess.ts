@@ -122,10 +122,10 @@ const WordleGuess = new Subcommand({
 
         //send embed
         await i.reply({embeds: [resultsEmbed], flags: ["Ephemeral"]});
-        await disableButton();
+        await handleButtonTimeout();
       }
 
-      async function disableButton(): Promise<void> {
+      async function handleButtonTimeout(): Promise<void> {
         //disable the button
         wordleActionRow.components[0].setDisabled(true);
         await response.edit({ components: [wordleActionRow] });
@@ -134,7 +134,7 @@ const WordleGuess = new Subcommand({
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
       buttonCollector.on("collect", async i => {await handleButtonInteraction(i);});
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
-      buttonCollector.on("end", async _ => {await disableButton();});
+      buttonCollector.on("end", async _ => {await handleButtonTimeout();});
 
       //remove active session
       ctx.db.user.update(ctx.user.id, "activeWordle", undefined);
@@ -188,10 +188,10 @@ const WordleGuess = new Subcommand({
       async function handleButtonInteraction(i: ButtonInteraction): Promise<void> {
         const keyboardText = handleUsedLettersDisplay(gameFields);
         await i.reply({content: keyboardText});
-        await disableButton();
+        await handleButtonTimeout();
       }
     
-      async function disableButton(): Promise<void> {
+      async function handleButtonTimeout(): Promise<void> {
         //disable the button
         wordleActionRow.components[0].setDisabled(true);
         await response.edit({ components: [wordleActionRow] });
@@ -200,7 +200,7 @@ const WordleGuess = new Subcommand({
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
       buttonCollector.on("collect", async i => {await handleButtonInteraction(i);});
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
-      buttonCollector.on("end", async _ => {await disableButton();});
+      buttonCollector.on("end", async _ => {await handleButtonTimeout();});
 
       //set new data
       ctx.db.user.update(ctx.user.id, "activeWordle", {

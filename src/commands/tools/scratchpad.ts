@@ -25,12 +25,7 @@ const Scratchpad = new Command({
       ],
       execute: async (ctx, opts) => {
         const label = opts.string.getRequired("label");
-        if (!label)
-          throw new Error("Unable to locate note label.");
-
         const text = opts.string.getRequired("text");
-        if (!text)
-          throw new Error("Unable to locate note text.");
 
         const newNote: ScratchpadNoteData = {
           label,
@@ -154,16 +149,15 @@ const Scratchpad = new Command({
 
           await i.deferUpdate();
         }
-                    
-        // eslint-disable-next-line @typescript-eslint/no-misused-promises
-        buttonCollector.on("collect", async (i) => {await handleButtonInteraction(i);});
 
         async function handleButtonTimeout(): Promise<void> {
         //disable the buttons
           buttonRow.components.forEach(item => item.setDisabled(true));
           await response.edit({ components: [buttonRow] });
         }
-
+                    
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
+        buttonCollector.on("collect", async (i) => {await handleButtonInteraction(i);});
         // eslint-disable-next-line @typescript-eslint/no-misused-promises
         buttonCollector.on("end", async () => {await handleButtonTimeout();});
       }

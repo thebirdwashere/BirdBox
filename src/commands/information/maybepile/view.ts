@@ -152,16 +152,15 @@ const MaybepileView = new Subcommand({
 
         await i.deferUpdate();
       }
-                    
-      // eslint-disable-next-line @typescript-eslint/no-misused-promises
-      buttonCollector.on("collect", async (i) => {await handleButtonInteraction(i);});
 
       async function handleButtonTimeout(): Promise<void> {
         //disable the buttons
         buttonRow.components.forEach(item => item.setDisabled(true));
         await response.edit({ components: [buttonRow] });
       }
-
+                    
+      // eslint-disable-next-line @typescript-eslint/no-misused-promises
+      buttonCollector.on("collect", async (i) => {await handleButtonInteraction(i);});
       // eslint-disable-next-line @typescript-eslint/no-misused-promises
       buttonCollector.on("end", async () => {await handleButtonTimeout();});
     }

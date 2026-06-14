@@ -191,17 +191,15 @@ export class MessageContext implements CommandContext {
         .then(async i => { await callback(i, response); })
         .catch(async (e: unknown) => { console.error(e); await response.edit("Modal interaction has timed out."); });
     }
-    
-     
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    buttonCollector.on("collect", async (i) => {await handleButtonInteraction(i);});
 
     async function handleButtonTimeout(): Promise<void> {
       //disable the buttons
       buttonRow.components[0].setDisabled(true);
       await response.edit({ components: [buttonRow] });
     }
-
+     
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+    buttonCollector.on("collect", async (i) => {await handleButtonInteraction(i);});
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     buttonCollector.on("end", async () => {await handleButtonTimeout();});
   }
@@ -338,17 +336,15 @@ export class ChatInputCommandInteractionContext implements CommandContext {
         .then(async i => { await callback(i, response); })
         .catch(async (e: unknown) => { console.error(e); await response.edit("Modal interaction has timed out."); });
     }
-    
-     
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    buttonCollector.on("collect", async (i) => {await handleButtonInteraction(i);});
 
     async function handleButtonTimeout(): Promise<void> {
       //disable the buttons
       buttonRow.components[0].setDisabled(true);
       await response.edit({ components: [buttonRow] });
     }
-
+     
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+    buttonCollector.on("collect", async (i) => {await handleButtonInteraction(i);});
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     buttonCollector.on("end", async () => {await handleButtonTimeout();});
   }
@@ -577,17 +573,15 @@ export class ContextMenuCommandContext implements CommandContext {
         .then(async i => { await callback(i, response); })
         .catch(async (e: unknown) => { console.error(e); await response.edit("Modal interaction has timed out."); });
     }
-    
-     
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    buttonCollector.on("collect", async (i) => {await handleButtonInteraction(i);});
 
     async function handleButtonTimeout(): Promise<void> {
       //disable the buttons
       buttonRow.components[0].setDisabled(true);
       await response.edit({ components: [buttonRow] });
     }
-
+     
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+    buttonCollector.on("collect", async (i) => {await handleButtonInteraction(i);});
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     buttonCollector.on("end", async () => {await handleButtonTimeout();});
   }
