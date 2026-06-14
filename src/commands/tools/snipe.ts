@@ -11,7 +11,7 @@ const Snipe = new Command({
   description: "Snipes the latest deleted message in this channel. Opt-in per user, so it may not work!",
   execute: async (ctx) => {
     if (!ctx.channel)
-      throw new Error("Error: Could not find the ID of the current channel.");
+      throw new Error("This command must be run in a valid channel.");
 
     const snipeData = ctx.db.channel.fetchOrUndefined(ctx.channel.id, "snipe");
 
