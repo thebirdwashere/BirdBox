@@ -6,7 +6,7 @@
     "devs": ["AgentNebulator"],
     "notes": [
       "Added 11 new `e;8ball` responses, for a total of 126",
-      "Removed cooldown from `e;echo`",
+      "Removed unique cooldown from `e;echo`",
       "Added base cooldown of half a second to every command",
       "Prefixed commands are no longer tested for interjections",
       "Malformed input error are no longer logged to the console",
