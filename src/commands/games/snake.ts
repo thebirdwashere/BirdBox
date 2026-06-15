@@ -1,6 +1,6 @@
 import { Command } from "@src/utility/command.js";
 import { sleep } from "@src/utility/utility.js";
-import { EmbedBuilder } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ComponentType, EmbedBuilder, Interaction } from "discord.js";
 
 const GRID_SIZE = 10;
 const INITAL_SNAKE_HEAD: [number, number] = [1, 1];
@@ -21,7 +21,51 @@ const Snake = new Command({
       .setTitle("Snake")
       .setDescription(game.renderGrid());
 
-    const response = await ctx.reply({embeds: [snakeEmbed]});
+    const buttonsRow = new ActionRowBuilder<ButtonBuilder>()
+      .addComponents([
+        new ButtonBuilder()
+          .setCustomId("snake-move-w")
+          .setEmoji("🠈"),
+        new ButtonBuilder()
+          .setCustomId("snake-move-n")
+          .setEmoji("🠉"),
+        new ButtonBuilder()
+          .setCustomId("snake-move-s")
+          .setEmoji("🠋"),
+        new ButtonBuilder()
+          .setCustomId("snake-move-e")
+          .setEmoji("🠊")
+      ]);
+
+    const response = await ctx.reply({embeds: [snakeEmbed], components: [buttonsRow]});
+
+    const filter = (i: Interaction): boolean => i.user.id === ctx.user.id;
+    const buttonCollector = response.createMessageComponentCollector({ componentType: ComponentType.Button, time: 3_600_000, filter });
+
+    function handleButtonInteraction(i: ButtonInteraction): void {
+      const newDirection = (/snake-move-(.)/.exec(i.customId))?.at(1);
+      if (
+        newDirection === undefined || (
+          newDirection !== "n" 
+          && newDirection !== "s" 
+          && newDirection !== "w" 
+          && newDirection !== "e" 
+        )
+      ) {
+        throw new Error("Error matching button ID.");
+      }
+      game.snakeDirection = newDirection;
+    }
+
+    async function handleButtonTimeout(): Promise<void> {
+      //disable the buttons
+      buttonsRow.components.forEach(item => item.setDisabled(true));
+      await response.edit({ components: [buttonsRow] });
+    }
+
+    buttonCollector.on("collect", (i: ButtonInteraction): void => { handleButtonInteraction(i); } );
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+    buttonCollector.on("end", (): Promise<void> => handleButtonTimeout() );
 
     await sleep(1000);
 
