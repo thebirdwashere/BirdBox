@@ -4,31 +4,30 @@ import { randomChoice, sleep } from "@src/utility/utility.js";
 import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, ComponentType, EmbedBuilder, Interaction } from "discord.js";
 
 const GRID_SIZE = 10;
-const INITAL_SNAKE_HEAD: CoordinatePair = [1, 1];
-const INITAL_SNAKE_TAIL: CoordinatePair = [1, 0];
-const INITIAL_FRUIT_LOCATION: CoordinatePair = [1, 2];
 const WAIT_TIME = 1000;
+const SCORE_PER_FRUIT = 200;
 
-const BLANK_TILE = "⬛";
-const SNAKE_HEAD_TILE = "🟢";
-const SNAKE_BODY_TILE = "🟩";
-const FRUIT_TILE = "🍎";
+const INITAL_SNAKE: CoordinatePair[] = [[1, 2], [1, 1], [1, 0]];
+
+const BLANK_SQUARE = "⬛";
+const SNAKE_HEAD_SQUARE = "🟢";
+const SNAKE_BODY_SQUARE = "🟩";
+const FRUIT_SQUARE = "🍎";
 
 const Snake = new Command({
   name: "snake",
   description: "The classic snake game, playable (if only barely) on BirdBox!",
   execute: async (ctx) => {
     //https://stackoverflow.com/questions/53992415/how-to-fill-multidimensional-array-in-javascript
-    let gameGrid = Array(GRID_SIZE).fill([]).map((): string[] => Array(GRID_SIZE).fill(BLANK_TILE) as string[]);
-    const snakeSegments: CoordinatePair[] = [INITAL_SNAKE_HEAD, INITAL_SNAKE_TAIL];
+    let gameGrid = Array(GRID_SIZE).fill([]).map((): string[] => Array(GRID_SIZE).fill(BLANK_SQUARE) as string[]);
+    const snakeSegments: CoordinatePair[] = INITAL_SNAKE;
     let snakeDirection: "n" | "s" | "w" | "e" | undefined;
-    let fruitLocation: CoordinatePair = INITIAL_FRUIT_LOCATION;
-    let fruitEaten = 0;
+    let fruitLocation: CoordinatePair = getNewFruitLocation(snakeSegments);
     
     gameGrid = drawElements(snakeSegments, fruitLocation);
     const snakeEmbed = new EmbedBuilder()
       .setTitle("Snake")
-      .setDescription(renderGrid(gameGrid, fruitEaten));
+      .setDescription(renderGrid(gameGrid, snakeSegments.length));
 
     const buttonsRow = new ActionRowBuilder<ButtonBuilder>()
       .addComponents([
@@ -124,28 +123,19 @@ const Snake = new Command({
         break;
       }
 
-      const targetTile = gameGrid[snakeSegments[0][0]][snakeSegments[0][1]];
+      const targetSquare = gameGrid[snakeSegments[0][0]][snakeSegments[0][1]];
 
-      if (targetTile === SNAKE_BODY_TILE) {
+      if (targetSquare === SNAKE_BODY_SQUARE) {
         break;
-      } else if (targetTile === FRUIT_TILE) {
-        fruitEaten++;
-
-        const testingSegments = snakeSegments.map(coords => coords.join(","));
-
-        const allLocations = Array(GRID_SIZE).fill([])
-          .map((_, i) => [Array(GRID_SIZE).fill([]).map((_, j) => [i, j])])
-          .flat(2)
-          .filter(coord => !testingSegments.includes(coord.join(",")));
-
-        fruitLocation = randomChoice(allLocations) as CoordinatePair;
+      } else if (targetSquare === FRUIT_SQUARE) {
+        fruitLocation = getNewFruitLocation(snakeSegments);
       } else {
         snakeSegments.pop();
       }
 
       gameGrid = drawElements(snakeSegments, fruitLocation);
 
-      snakeEmbed.setDescription(renderGrid(gameGrid, fruitEaten));
+      snakeEmbed.setDescription(renderGrid(gameGrid, snakeSegments.length - 2));
       await response.edit({embeds: [snakeEmbed]});
     }
 
@@ -154,27 +144,40 @@ const Snake = new Command({
 });
 
 function createBlankGrid(): string[][] {
-  return Array(GRID_SIZE).fill([]).map((): string[] => Array(GRID_SIZE).fill(BLANK_TILE) as string[]);
+  return Array(GRID_SIZE).fill([]).map((): string[] => Array(GRID_SIZE).fill(BLANK_SQUARE) as string[]);
 }
 
-function drawTo(grid: string[][], xy: CoordinatePair, tile: string): void {
-  grid[xy[0]][xy[1]] = tile;
+function getNewFruitLocation(snake: CoordinatePair[]): CoordinatePair {
+  //workaround to avoid comparing arrays which doesn't work in JS
+  const stringSnake = snake.map(coords => coords.join(","));
+
+  const validLocations = Array(GRID_SIZE).fill([])
+    .map((_, i) => [Array(GRID_SIZE).fill([]).map((_, j) => [i, j])])
+    .flat(2)
+    .filter(coord => !stringSnake.includes(coord.join(",")));
+
+  return randomChoice(validLocations) as CoordinatePair;
+}
+
+function drawTo(grid: string[][], xy: CoordinatePair, square: string): void {
+  grid[xy[0]][xy[1]] = square;
 }
 
 function drawElements(snake: CoordinatePair[], fruit: CoordinatePair): string[][] {
   const grid = createBlankGrid();
-  drawTo(grid, snake[0], SNAKE_HEAD_TILE);
+  drawTo(grid, snake[0], SNAKE_HEAD_SQUARE);
   for (const seg of snake.slice(1)) {
-    drawTo(grid, seg, SNAKE_BODY_TILE);
+    drawTo(grid, seg, SNAKE_BODY_SQUARE);
   }
 
-  drawTo(grid, fruit, FRUIT_TILE);
+  drawTo(grid, fruit, FRUIT_SQUARE);
 
   return grid;
 }
 
 function renderGrid(grid: string[][], fruitEaten: number): string {
-  return `Fruit eaten: ${fruitEaten.toString()}\n\n` + grid.map(row => row.join("")).reduce((acc, curr) => acc + curr + "\n", "");
+  return `Score: ${String(fruitEaten * SCORE_PER_FRUIT)}\n` 
+  + grid.map(row => row.join("")).reduce((acc, curr) => acc + curr + "\n", "");
 }
 
 export default Snake;
