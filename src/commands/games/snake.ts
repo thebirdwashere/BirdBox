@@ -1,10 +1,13 @@
 import { Command } from "@src/utility/command.js";
+import { CoordinatePair } from "@src/utility/types.js";
 import { sleep } from "@src/utility/utility.js";
 import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, ComponentType, EmbedBuilder, Interaction } from "discord.js";
 
 const GRID_SIZE = 10;
-const INITAL_SNAKE_HEAD: [number, number] = [1, 1];
-const INITAL_SNAKE_TAIL: [number, number] = [1, 0];
+const INITAL_SNAKE_HEAD: CoordinatePair = [1, 1];
+const INITAL_SNAKE_TAIL: CoordinatePair = [1, 0];
+const INITIAL_FRUIT_LOCATION: CoordinatePair = [1, 2];
+const WAIT_TIME = 1000;
 
 const BLANK_TILE = "⬛";
 const SNAKE_HEAD_TILE = "🟢";
@@ -15,11 +18,16 @@ const Snake = new Command({
   name: "snake",
   description: "The classic snake game, playable (if only barely) on BirdBox!",
   execute: async (ctx) => {
-    const game = new SnakeGame();
-
+    //https://stackoverflow.com/questions/53992415/how-to-fill-multidimensional-array-in-javascript
+    let gameGrid = Array(GRID_SIZE).fill([]).map((): string[] => Array(GRID_SIZE).fill(BLANK_TILE) as string[]);
+    const snakeSegments: CoordinatePair[] = [INITAL_SNAKE_HEAD, INITAL_SNAKE_TAIL];
+    let snakeDirection: "n" | "s" | "w" | "e" | undefined;
+    
+    gameGrid = drawSnake(snakeSegments);
+    drawTo(gameGrid, INITIAL_FRUIT_LOCATION, FRUIT_TILE);
     const snakeEmbed = new EmbedBuilder()
       .setTitle("Snake")
-      .setDescription(game.renderGrid());
+      .setDescription(renderGrid(gameGrid));
 
     const buttonsRow = new ActionRowBuilder<ButtonBuilder>()
       .addComponents([
@@ -50,18 +58,28 @@ const Snake = new Command({
       await i.deferUpdate();
       
       const newDirection = (/snake-move-(.)/.exec(i.customId))?.at(1);
-      if (
-        newDirection === undefined || (
-          newDirection !== "n" 
-          && newDirection !== "s" 
-          && newDirection !== "w" 
-          && newDirection !== "e" 
-        )
-      ) {
+      switch (newDirection) {
+      case undefined: {
+        throw new Error("Error locating button ID.");
+      } case "n": case "s": {
+        buttonsRow.components[0].setDisabled(false);
+        buttonsRow.components[1].setDisabled(true);
+        buttonsRow.components[2].setDisabled(true);
+        buttonsRow.components[3].setDisabled(false);
+        break;
+      } case "w": case "e": {
+        buttonsRow.components[0].setDisabled(true);
+        buttonsRow.components[1].setDisabled(false);
+        buttonsRow.components[2].setDisabled(false);
+        buttonsRow.components[3].setDisabled(true);
+        break;
+      } default: {
         throw new Error("Error matching button ID.");
       }
+      }
 
-      game.snakeDirection = newDirection;
+      await response.edit({ components: [buttonsRow] });
+      snakeDirection = newDirection;
     }
 
     async function handleButtonTimeout(): Promise<void> {
@@ -75,10 +93,48 @@ const Snake = new Command({
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     buttonCollector.on("end", (): Promise<void> => handleButtonTimeout() );
 
-    while (!game.gameOver) {
-      await sleep(1000);
-      game.step();
-      snakeEmbed.setDescription(game.renderGrid());
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
+    while (true) {
+      console.log("New loop run");
+      await sleep(WAIT_TIME);
+
+      const currentHeadCoords = snakeSegments[0];
+
+      switch (snakeDirection) {
+      case "n": {
+        snakeSegments.unshift([currentHeadCoords[0] - 1, currentHeadCoords[1]]);
+        break;
+      } case "s": {
+        snakeSegments.unshift([currentHeadCoords[0] + 1, currentHeadCoords[1]]);
+        break;
+      } case "e": {
+        snakeSegments.unshift([currentHeadCoords[0], currentHeadCoords[1] + 1]);
+        break;
+      } case "w": {
+        snakeSegments.unshift([currentHeadCoords[0], currentHeadCoords[1] - 1]);
+        break;
+      } case undefined: {
+        continue;
+      }
+      }
+
+      if (!snakeSegments[0].flat().every(num => 
+        num >= 0 && num < GRID_SIZE
+      )) {
+        break;
+      }
+
+      const targetTile = gameGrid[snakeSegments[0][0]][snakeSegments[0][1]];
+
+      if (targetTile === SNAKE_BODY_TILE) {
+        break;
+      } else if (targetTile !== FRUIT_TILE) {
+        snakeSegments.pop();
+      }
+
+      gameGrid = drawSnake(snakeSegments);
+
+      snakeEmbed.setDescription(renderGrid(gameGrid));
       await response.edit({embeds: [snakeEmbed]});
     }
 
@@ -86,116 +142,26 @@ const Snake = new Command({
   },
 });
 
-class SnakeGame {
-  grid: string[][];
-  snakeLength: number;
-  lastSnakeHead: [number, number];
-  snakeHead: [number, number];
-  lastSnakeTail: [number, number];
-  snakeTail: [number, number];
-  snakeDirection: "n" | "s" | "w" | "e";
-  gameOver: boolean;
+function createBlankGrid(): string[][] {
+  return Array(GRID_SIZE).fill([]).map((): string[] => Array(GRID_SIZE).fill(BLANK_TILE) as string[]);
+}
 
-  renderGrid(): string {
-    return this.grid.map(row => row.join("")).reduce((acc, curr) => acc + curr + "\n", "");
+function drawTo(grid: string[][], xy: CoordinatePair, tile: string): void {
+  grid[xy[0]][xy[1]] = tile;
+}
+
+function drawSnake(snake: CoordinatePair[]): string[][] {
+  const grid = createBlankGrid();
+  drawTo(grid, snake[0], SNAKE_HEAD_TILE);
+  for (const seg of snake.slice(1)) {
+    drawTo(grid, seg, SNAKE_BODY_TILE);
   }
 
-  drawTo(xy: [number, number], tile: string): void {
-    this.grid[xy[0]][xy[1]] = tile;
-  }
+  return grid;
+}
 
-  drawSnake(): void {
-    this.drawTo(this.lastSnakeHead, SNAKE_BODY_TILE);
-    this.drawTo(this.snakeHead, SNAKE_HEAD_TILE);
-    this.drawTo(this.lastSnakeTail, BLANK_TILE);
-  }
-
-  drawAndGrowSnake(): void {
-    this.drawTo(this.lastSnakeHead, SNAKE_BODY_TILE);
-    this.drawTo(this.snakeHead, SNAKE_HEAD_TILE);
-  }
-
-  step(): void {
-    let newHeadCoords: [number, number] = this.snakeHead;
-    let newTailCoords: [number, number] = this.snakeTail;
-
-    const direction = this.snakeDirection;
-
-    switch (direction) {
-    case "n": {
-      newHeadCoords = [this.snakeHead[0] - 1, this.snakeHead[1]];
-      break;
-    } case "s": {
-      newHeadCoords = [this.snakeHead[0] + 1, this.snakeHead[1]];
-      break;
-    } case "e": {
-      newHeadCoords = [this.snakeHead[0], this.snakeHead[1] + 1];
-      break;
-    } case "w": {
-      newHeadCoords = [this.snakeHead[0], this.snakeHead[1] - 1];
-      break;
-    }
-    }
-
-    if (!newHeadCoords.concat(newTailCoords).flat().every(num => 
-      num >= 0 && num < GRID_SIZE
-    )) {
-      this.gameOver = true;
-      return;
-    }
-
-    this.lastSnakeHead = this.snakeHead;
-    this.snakeHead = newHeadCoords;
-
-    const targetTile = this.grid[newHeadCoords[0]][newHeadCoords[1]];
-
-    if (targetTile === SNAKE_BODY_TILE || targetTile === SNAKE_HEAD_TILE) {
-      this.gameOver = true;
-      return;
-    } else if (targetTile === FRUIT_TILE) {
-      this.snakeLength++;
-      this.drawAndGrowSnake();
-    } else {
-      switch (direction) {
-      case "n": {
-        newTailCoords = [this.snakeTail[0] - 1, this.snakeTail[1]];
-        break;
-      } case "s": {
-        newTailCoords = [this.snakeTail[0] + 1, this.snakeTail[1]];
-        break;
-      } case "e": {
-        newTailCoords = [this.snakeTail[0], this.snakeTail[1] + 1];
-        break;
-      } case "w": {
-        newTailCoords = [this.snakeTail[0], this.snakeTail[1] - 1];
-        break;
-      }
-      }
-    
-      this.lastSnakeTail = this.snakeTail;
-      this.snakeTail = newTailCoords;
-
-      this.drawSnake();
-    }
-  }
-
-  constructor() {
-    //https://stackoverflow.com/questions/53992415/how-to-fill-multidimensional-array-in-javascript
-    this.grid = Array(GRID_SIZE).fill([]).map((): string[] => Array(GRID_SIZE).fill(BLANK_TILE) as string[]);
-    
-    this.lastSnakeHead = INITAL_SNAKE_HEAD;
-    this.snakeLength = 2;
-    this.snakeHead = INITAL_SNAKE_HEAD;
-    this.lastSnakeTail = INITAL_SNAKE_TAIL;
-    this.snakeTail = INITAL_SNAKE_TAIL;
-    this.snakeDirection = "e";
-    this.gameOver = false;
-
-    this.drawTo(this.snakeHead, SNAKE_HEAD_TILE);
-    this.drawTo(this.snakeTail, SNAKE_BODY_TILE);
-
-    this.drawTo([1, 2], FRUIT_TILE);
-  }
+function renderGrid(grid: string[][]): string {
+  return grid.map(row => row.join("")).reduce((acc, curr) => acc + curr + "\n", "");
 }
 
 export default Snake;
