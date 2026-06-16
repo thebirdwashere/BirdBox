@@ -15,6 +15,7 @@ const SNAKE_HEAD_SQUARE = "🟢";
 const SNAKE_BODY_SQUARE = "🟩";
 const FRUIT_SQUARE = "🍎";
 
+//MARK: Command
 const Snake = new Command({
   name: "snake",
   description: "The classic snake game, playable (if only barely) on BirdBox!",
@@ -95,6 +96,7 @@ const Snake = new Command({
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     buttonCollector.on("end", (): Promise<void> => handleButtonTimeout() );
 
+    //MARK: Game Loop
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     while (true) {
       await sleep(WAIT_TIME);
@@ -151,6 +153,9 @@ const Snake = new Command({
   },
 });
 
+export default Snake;
+
+//MARK: Utils
 function createBlankGrid(): string[][] {
   return Array(GRID_SIZE).fill([]).map((): string[] => Array(GRID_SIZE).fill(BLANK_SQUARE) as string[]);
 }
@@ -189,4 +194,4 @@ function renderGrid(grid: string[][], fruitEaten: number): string {
   + grid.map(row => row.join("")).reduce((acc, curr) => acc + curr + "\n  ", "  ");
 }
 
-export default Snake;
+
