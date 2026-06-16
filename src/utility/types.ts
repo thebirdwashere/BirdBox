@@ -11,6 +11,8 @@ export interface NameValueObject {
   value: string
 };
 
+export type CoordinatePair = [number, number];
+
 //MARK: Config
 export type ConfigScope = "user" | "server" | "bot";
 
