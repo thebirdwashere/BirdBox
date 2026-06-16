@@ -1,13 +1,13 @@
 import { Command } from "@src/utility/command.js";
 import { CoordinatePair } from "@src/utility/types.js";
 import { randomChoice, sleep } from "@src/utility/utility.js";
-import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, ComponentType, EmbedBuilder, Interaction } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, Colors, ComponentType, EmbedBuilder, Interaction } from "discord.js";
 
 const GRID_SIZE = 10;
-const WAIT_TIME = 1000;
+const WAIT_TIME = 750;
 const SCORE_PER_FRUIT = 200;
 
-const INITAL_SNAKE: CoordinatePair[] = [[1, 2], [1, 1], [1, 0]];
+const INITAL_SNAKE: CoordinatePair[] = [[1, 3], [1, 2], [1, 1]];
 const INITIAL_SNAKE_LENGTH = INITAL_SNAKE.length;
 
 const BLANK_SQUARE = "⬛";
@@ -21,13 +21,14 @@ const Snake = new Command({
   execute: async (ctx) => {
     //https://stackoverflow.com/questions/53992415/how-to-fill-multidimensional-array-in-javascript
     let gameGrid = Array(GRID_SIZE).fill([]).map((): string[] => Array(GRID_SIZE).fill(BLANK_SQUARE) as string[]);
-    const snakeSegments: CoordinatePair[] = INITAL_SNAKE;
+    const snakeSegments: CoordinatePair[] = [...INITAL_SNAKE];
     let snakeDirection: "n" | "s" | "w" | "e" | undefined;
     let fruitLocation: CoordinatePair = getNewFruitLocation(snakeSegments);
     
     gameGrid = drawElements(snakeSegments, fruitLocation);
     const snakeEmbed = new EmbedBuilder()
       .setTitle("Snake")
+      .setColor(Colors.Blue)
       .setDescription(renderGrid(gameGrid, snakeSegments.length - INITIAL_SNAKE_LENGTH));
 
     const buttonsRow = new ActionRowBuilder<ButtonBuilder>()
@@ -53,7 +54,7 @@ const Snake = new Command({
     const response = await ctx.reply({embeds: [snakeEmbed], components: [buttonsRow]});
 
     const filter = (i: Interaction): boolean => i.user.id === ctx.user.id;
-    const buttonCollector = response.createMessageComponentCollector({ componentType: ComponentType.Button, time: 3_600_000, filter });
+    const buttonCollector = response.createMessageComponentCollector({ componentType: ComponentType.Button, time: 7_200_000, filter });
 
     async function handleButtonInteraction(i: ButtonInteraction): Promise<void> {
       await i.deferUpdate();
@@ -140,7 +141,13 @@ const Snake = new Command({
       await response.edit({embeds: [snakeEmbed]});
     }
 
-    await response.reply("GAME END");
+    snakeEmbed
+      .setColor(Colors.Red)
+      .setTitle("Snake - Game Over");
+
+    buttonsRow.components.forEach(item => item.setDisabled(true));
+
+    await response.edit({ embeds: [snakeEmbed], components: [buttonsRow] });
   },
 });
 
@@ -177,8 +184,9 @@ function drawElements(snake: CoordinatePair[], fruit: CoordinatePair): string[][
 }
 
 function renderGrid(grid: string[][], fruitEaten: number): string {
-  return `Score: ${String(fruitEaten * SCORE_PER_FRUIT)}\n` 
-  + grid.map(row => row.join("")).reduce((acc, curr) => acc + curr + "\n", "");
+  // eslint-disable-next-line no-irregular-whitespace
+  return `Score: ${String(fruitEaten * SCORE_PER_FRUIT)}\n                 \n` 
+  + grid.map(row => row.join("")).reduce((acc, curr) => acc + curr + "\n  ", "  ");
 }
 
 export default Snake;
