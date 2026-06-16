@@ -1,6 +1,6 @@
 import { Command } from "@src/utility/command.js";
 import { sleep } from "@src/utility/utility.js";
-import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ComponentType, EmbedBuilder, Interaction } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, ComponentType, EmbedBuilder, Interaction } from "discord.js";
 
 const GRID_SIZE = 10;
 const INITAL_SNAKE_HEAD: [number, number] = [1, 1];
@@ -24,17 +24,21 @@ const Snake = new Command({
     const buttonsRow = new ActionRowBuilder<ButtonBuilder>()
       .addComponents([
         new ButtonBuilder()
+          .setStyle(ButtonStyle.Primary)
           .setCustomId("snake-move-w")
-          .setEmoji("🠈"),
+          .setLabel("🠈"),
         new ButtonBuilder()
+          .setStyle(ButtonStyle.Primary)
           .setCustomId("snake-move-n")
-          .setEmoji("🠉"),
+          .setLabel("🠉"),
         new ButtonBuilder()
+          .setStyle(ButtonStyle.Primary)
           .setCustomId("snake-move-s")
-          .setEmoji("🠋"),
+          .setLabel("🠋"),
         new ButtonBuilder()
+          .setStyle(ButtonStyle.Primary)
           .setCustomId("snake-move-e")
-          .setEmoji("🠊")
+          .setLabel("🠊")
       ]);
 
     const response = await ctx.reply({embeds: [snakeEmbed], components: [buttonsRow]});
@@ -42,7 +46,9 @@ const Snake = new Command({
     const filter = (i: Interaction): boolean => i.user.id === ctx.user.id;
     const buttonCollector = response.createMessageComponentCollector({ componentType: ComponentType.Button, time: 3_600_000, filter });
 
-    function handleButtonInteraction(i: ButtonInteraction): void {
+    async function handleButtonInteraction(i: ButtonInteraction): Promise<void> {
+      await i.deferUpdate();
+      
       const newDirection = (/snake-move-(.)/.exec(i.customId))?.at(1);
       if (
         newDirection === undefined || (
@@ -54,6 +60,7 @@ const Snake = new Command({
       ) {
         throw new Error("Error matching button ID.");
       }
+
       game.snakeDirection = newDirection;
     }
 
@@ -63,21 +70,25 @@ const Snake = new Command({
       await response.edit({ components: [buttonsRow] });
     }
 
-    buttonCollector.on("collect", (i: ButtonInteraction): void => { handleButtonInteraction(i); } );
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+    buttonCollector.on("collect", (i: ButtonInteraction): Promise<void> => handleButtonInteraction(i) );
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     buttonCollector.on("end", (): Promise<void> => handleButtonTimeout() );
 
-    await sleep(1000);
+    while (!game.gameOver) {
+      await sleep(1000);
+      game.step();
+      snakeEmbed.setDescription(game.renderGrid());
+      await response.edit({embeds: [snakeEmbed]});
+    }
 
-    game.step();
-    snakeEmbed.setDescription(game.renderGrid());
-
-    await response.reply({embeds: [snakeEmbed]});
+    await response.reply("GAME END");
   },
 });
 
 class SnakeGame {
   grid: string[][];
+  snakeLength: number;
   lastSnakeHead: [number, number];
   snakeHead: [number, number];
   lastSnakeTail: [number, number];
@@ -104,25 +115,24 @@ class SnakeGame {
     this.drawTo(this.snakeHead, SNAKE_HEAD_TILE);
   }
 
-  step(): boolean {
-    let newHeadCoords: [number, number], newTailCoords: [number, number];
+  step(): void {
+    let newHeadCoords: [number, number] = this.snakeHead;
+    let newTailCoords: [number, number] = this.snakeTail;
 
-    switch (this.snakeDirection) {
+    const direction = this.snakeDirection;
+
+    switch (direction) {
     case "n": {
       newHeadCoords = [this.snakeHead[0] - 1, this.snakeHead[1]];
-      newTailCoords = [this.snakeTail[0] - 1, this.snakeTail[1]];
       break;
     } case "s": {
       newHeadCoords = [this.snakeHead[0] + 1, this.snakeHead[1]];
-      newTailCoords = [this.snakeTail[0] + 1, this.snakeTail[1]];
       break;
     } case "e": {
       newHeadCoords = [this.snakeHead[0], this.snakeHead[1] + 1];
-      newTailCoords = [this.snakeTail[0], this.snakeTail[1] + 1];
       break;
     } case "w": {
       newHeadCoords = [this.snakeHead[0], this.snakeHead[1] - 1];
-      newTailCoords = [this.snakeTail[0], this.snakeTail[1] - 1];
       break;
     }
     }
@@ -131,25 +141,42 @@ class SnakeGame {
       num >= 0 && num < GRID_SIZE
     )) {
       this.gameOver = true;
-      return false;
+      return;
     }
 
     this.lastSnakeHead = this.snakeHead;
-    this.lastSnakeTail = this.snakeTail;
     this.snakeHead = newHeadCoords;
-    this.snakeTail = newTailCoords;
 
     const targetTile = this.grid[newHeadCoords[0]][newHeadCoords[1]];
+
     if (targetTile === SNAKE_BODY_TILE || targetTile === SNAKE_HEAD_TILE) {
       this.gameOver = true;
-      return false;
+      return;
     } else if (targetTile === FRUIT_TILE) {
+      this.snakeLength++;
       this.drawAndGrowSnake();
     } else {
+      switch (direction) {
+      case "n": {
+        newTailCoords = [this.snakeTail[0] - 1, this.snakeTail[1]];
+        break;
+      } case "s": {
+        newTailCoords = [this.snakeTail[0] + 1, this.snakeTail[1]];
+        break;
+      } case "e": {
+        newTailCoords = [this.snakeTail[0], this.snakeTail[1] + 1];
+        break;
+      } case "w": {
+        newTailCoords = [this.snakeTail[0], this.snakeTail[1] - 1];
+        break;
+      }
+      }
+    
+      this.lastSnakeTail = this.snakeTail;
+      this.snakeTail = newTailCoords;
+
       this.drawSnake();
     }
-
-    return true;
   }
 
   constructor() {
@@ -157,6 +184,7 @@ class SnakeGame {
     this.grid = Array(GRID_SIZE).fill([]).map((): string[] => Array(GRID_SIZE).fill(BLANK_TILE) as string[]);
     
     this.lastSnakeHead = INITAL_SNAKE_HEAD;
+    this.snakeLength = 2;
     this.snakeHead = INITAL_SNAKE_HEAD;
     this.lastSnakeTail = INITAL_SNAKE_TAIL;
     this.snakeTail = INITAL_SNAKE_TAIL;
