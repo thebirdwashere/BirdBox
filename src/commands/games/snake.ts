@@ -8,6 +8,7 @@ const WAIT_TIME = 1000;
 const SCORE_PER_FRUIT = 200;
 
 const INITAL_SNAKE: CoordinatePair[] = [[1, 2], [1, 1], [1, 0]];
+const INITIAL_SNAKE_LENGTH = INITAL_SNAKE.length;
 
 const BLANK_SQUARE = "⬛";
 const SNAKE_HEAD_SQUARE = "🟢";
@@ -27,7 +28,7 @@ const Snake = new Command({
     gameGrid = drawElements(snakeSegments, fruitLocation);
     const snakeEmbed = new EmbedBuilder()
       .setTitle("Snake")
-      .setDescription(renderGrid(gameGrid, snakeSegments.length));
+      .setDescription(renderGrid(gameGrid, snakeSegments.length - INITIAL_SNAKE_LENGTH));
 
     const buttonsRow = new ActionRowBuilder<ButtonBuilder>()
       .addComponents([
@@ -135,7 +136,7 @@ const Snake = new Command({
 
       gameGrid = drawElements(snakeSegments, fruitLocation);
 
-      snakeEmbed.setDescription(renderGrid(gameGrid, snakeSegments.length - 2));
+      snakeEmbed.setDescription(renderGrid(gameGrid, snakeSegments.length - INITIAL_SNAKE_LENGTH));
       await response.edit({embeds: [snakeEmbed]});
     }
 
