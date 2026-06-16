@@ -1,6 +1,6 @@
 import { Command } from "@src/utility/command.js";
 import { CoordinatePair } from "@src/utility/types.js";
-import { sleep } from "@src/utility/utility.js";
+import { randomChoice, sleep } from "@src/utility/utility.js";
 import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, ComponentType, EmbedBuilder, Interaction } from "discord.js";
 
 const GRID_SIZE = 10;
@@ -22,12 +22,13 @@ const Snake = new Command({
     let gameGrid = Array(GRID_SIZE).fill([]).map((): string[] => Array(GRID_SIZE).fill(BLANK_TILE) as string[]);
     const snakeSegments: CoordinatePair[] = [INITAL_SNAKE_HEAD, INITAL_SNAKE_TAIL];
     let snakeDirection: "n" | "s" | "w" | "e" | undefined;
+    let fruitLocation: CoordinatePair = INITIAL_FRUIT_LOCATION;
+    let fruitEaten = 0;
     
-    gameGrid = drawSnake(snakeSegments);
-    drawTo(gameGrid, INITIAL_FRUIT_LOCATION, FRUIT_TILE);
+    gameGrid = drawElements(snakeSegments, fruitLocation);
     const snakeEmbed = new EmbedBuilder()
       .setTitle("Snake")
-      .setDescription(renderGrid(gameGrid));
+      .setDescription(renderGrid(gameGrid, fruitEaten));
 
     const buttonsRow = new ActionRowBuilder<ButtonBuilder>()
       .addComponents([
@@ -95,7 +96,6 @@ const Snake = new Command({
 
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     while (true) {
-      console.log("New loop run");
       await sleep(WAIT_TIME);
 
       const currentHeadCoords = snakeSegments[0];
@@ -128,13 +128,24 @@ const Snake = new Command({
 
       if (targetTile === SNAKE_BODY_TILE) {
         break;
-      } else if (targetTile !== FRUIT_TILE) {
+      } else if (targetTile === FRUIT_TILE) {
+        fruitEaten++;
+
+        const testingSegments = snakeSegments.map(coords => coords.join(","));
+
+        const allLocations = Array(GRID_SIZE).fill([])
+          .map((_, i) => [Array(GRID_SIZE).fill([]).map((_, j) => [i, j])])
+          .flat(2)
+          .filter(coord => !testingSegments.includes(coord.join(",")));
+
+        fruitLocation = randomChoice(allLocations) as CoordinatePair;
+      } else {
         snakeSegments.pop();
       }
 
-      gameGrid = drawSnake(snakeSegments);
+      gameGrid = drawElements(snakeSegments, fruitLocation);
 
-      snakeEmbed.setDescription(renderGrid(gameGrid));
+      snakeEmbed.setDescription(renderGrid(gameGrid, fruitEaten));
       await response.edit({embeds: [snakeEmbed]});
     }
 
@@ -150,18 +161,20 @@ function drawTo(grid: string[][], xy: CoordinatePair, tile: string): void {
   grid[xy[0]][xy[1]] = tile;
 }
 
-function drawSnake(snake: CoordinatePair[]): string[][] {
+function drawElements(snake: CoordinatePair[], fruit: CoordinatePair): string[][] {
   const grid = createBlankGrid();
   drawTo(grid, snake[0], SNAKE_HEAD_TILE);
   for (const seg of snake.slice(1)) {
     drawTo(grid, seg, SNAKE_BODY_TILE);
   }
 
+  drawTo(grid, fruit, FRUIT_TILE);
+
   return grid;
 }
 
-function renderGrid(grid: string[][]): string {
-  return grid.map(row => row.join("")).reduce((acc, curr) => acc + curr + "\n", "");
+function renderGrid(grid: string[][], fruitEaten: number): string {
+  return `Fruit eaten: ${fruitEaten.toString()}\n\n` + grid.map(row => row.join("")).reduce((acc, curr) => acc + curr + "\n", "");
 }
 
 export default Snake;
