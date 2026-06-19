@@ -1,8 +1,8 @@
 [
   {
     "version": "7.0.2",
-    "type": "Beta",
-    "date": "TBD",
+    "type": "Release",
+    "date": "6/19/2026",
     "devs": ["AgentNebulator"],
     "notes": [
       "Added 11 new `e;8ball` responses, for a total of 126",
