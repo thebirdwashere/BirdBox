@@ -11,7 +11,7 @@
       "Prefixed commands are no longer tested for interjections",
       "Malformed input error are no longer logged to the console",
       "Fixed credits command breaking due to moved information",
-      "Updated internal options system to remove unecesssary checks"
+      "Updated internal options system to remove unnecessary checks"
     ]
   },
   {
