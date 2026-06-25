@@ -1,4 +1,4 @@
-import { ActionRowBuilder, Colors, ComponentType, EmbedBuilder, StringSelectMenuBuilder, StringSelectMenuInteraction, StringSelectMenuOptionBuilder } from "discord.js";
+import { ActionRowBuilder, Colors, ComponentType, EmbedBuilder, Message, StringSelectMenuBuilder, StringSelectMenuInteraction, StringSelectMenuOptionBuilder } from "discord.js";
 import { CommandOption, Subcommand } from "@src/utility/command.js";
 import { NonEmptyArray, UserWordleStats } from "@src/utility/types.js";
 
@@ -172,52 +172,47 @@ const flagsBoard = new Subcommand({
     await statisticDisplays[statisticChoice]();
     
     //MARK: selector
-    const boardSelector = new StringSelectMenuBuilder()
-      .setCustomId("boardSelector")
-      .setPlaceholder("Select leaderboard statistic...")
-      .addOptions([
-        new StringSelectMenuOptionBuilder()
-          .setLabel("points")
-          .setValue("points"),
-        new StringSelectMenuOptionBuilder()
-          .setLabel("win%")
-          .setValue("win%"),
-        new StringSelectMenuOptionBuilder()
-          .setLabel("streak")
-          .setValue("streak"),
-      ]);
+    const selectorRow = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
+      new StringSelectMenuBuilder()
+        .setCustomId("boardSelector")
+        .setPlaceholder("Select leaderboard statistic...")
+        .addOptions([
+          new StringSelectMenuOptionBuilder()
+            .setLabel("points")
+            .setValue("points"),
+          new StringSelectMenuOptionBuilder()
+            .setLabel("win%")
+            .setValue("win%"),
+          new StringSelectMenuOptionBuilder()
+            .setLabel("streak")
+            .setValue("streak"),
+        ])
+    );
+    
+    await ctx.reply({ embeds: [leaderboardEmbed], components: [selectorRow] });
 
-    //boilerplate for sending the message
-    const selectorRow = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(boardSelector);
-
-    const response = await ctx.reply({ embeds: [leaderboardEmbed], components: [selectorRow] });
-
-    const menuCollector = response.createMessageComponentCollector({
-      componentType: ComponentType.StringSelect,
-      time: 60000,
+    ctx.collectInteractions({
+      type: ComponentType.StringSelect,
+      idleTimeLimit: 60_000,
+      onInteraction,
+      onTimeout,
     });
 
-    async function handleSelectorInteraction(i: StringSelectMenuInteraction): Promise<void> {
+    async function onInteraction(msg: Message, i: StringSelectMenuInteraction): Promise<void> {
       //update for new statistic
       const newStatisticChoice = i.values[0] as StatisticString;
       await statisticDisplays[newStatisticChoice]();
 
       //update message
-      await response.edit({ embeds: [leaderboardEmbed] });
+      await msg.edit({ embeds: [leaderboardEmbed] });
       await i.deferUpdate();
     };
 
-    async function handleSelectorTimeout(): Promise<void> {
-    //disable the selector
+    async function onTimeout(msg: Message): Promise<void> {
       selectorRow.components[0].setDisabled(true);
-      await response.edit({ components: [selectorRow] });
+      await msg.edit({ components: [selectorRow] });
     }
-
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    menuCollector.on("collect", async (i: StringSelectMenuInteraction) => { await handleSelectorInteraction(i); });
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    menuCollector.on("end", async (_) => { await handleSelectorTimeout(); });
-  },
+  }
 });
 
 export default flagsBoard;

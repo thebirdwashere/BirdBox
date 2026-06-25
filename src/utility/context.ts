@@ -499,7 +499,6 @@ async function baseReplyModal(
   }
 
   async function onTimeout(msg: Message): Promise<void> {
-    //disable the button
     buttonRow.components[0].setDisabled(true);
     await msg.edit({ components: [buttonRow] });
   }

@@ -2,7 +2,7 @@ import { Subcommand, CommandOption } from "@src/utility/command.js";
 import flags from "@src/data/flags.json" with { type: "json" };
 import { Flags, NonEmptyArray, UserFlagStats } from "@src/utility/types.js";
 import { randomChoice, sleep } from "@src/utility/utility.js";
-import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, Colors, ComponentType, EmbedBuilder } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, Colors, ComponentType, EmbedBuilder, Message } from "discord.js";
 
 const FLAGS = flags as Flags;
 const DIFFICULTIES = FLAGS.difficulties.map(difficulty => difficulty.name);
@@ -97,19 +97,20 @@ const FlagsQuiz = new Subcommand({
     }
 
     //send embed
-    const response = await ctx.reply({embeds: [flagEmbed], components: buttonRowArray});
+    const quizMessage = await ctx.reply({embeds: [flagEmbed], components: buttonRowArray});
 
-    //collect button responses
-    const buttonCollector = response.createMessageComponentCollector({
-      componentType: ComponentType.Button,
-      time: 15000,
+    ctx.collectInteractions({
+      type: ComponentType.Button,
+      timeLimit: 15_000,
+      onInteraction,
+      onTimeout,
     });
 
     //initialize arrays of correct and wrong users; used for point changes later
     const correctUsers: string[] = [];
     const wrongUsers: string[] = [ctx.user.id]; //automatically a loser, just in case you don't answer
 		
-    async function handleButtonInteraction(i: ButtonInteraction): Promise<void> { //MARK: handle guess
+    async function onInteraction(msg: Message, i: ButtonInteraction): Promise<void> { //MARK: handle guess
       const userId = i.user.id;
 
       //if user is correct
@@ -138,11 +139,11 @@ const FlagsQuiz = new Subcommand({
       peopleGuessed = correctUsers.length + wrongUsers.length;
       flagEmbed.setFooter({text: `${peopleGuessed.toString()} guessed ● ${remainingTime.toString()} seconds left`});
 			
-      await i.message.edit({ embeds: [flagEmbed] });
+      await msg.edit({ embeds: [flagEmbed] });
       await i.deferUpdate();
     }
 
-    async function handleButtonTimeout(): Promise<void> { //MARK: game ended
+    async function onTimeout(msg: Message): Promise<void> { //MARK: game ended
       //for every button, disable it and make it red
       buttonRowArray.forEach((row) => {
         row.components.forEach(
@@ -156,7 +157,7 @@ const FlagsQuiz = new Subcommand({
       const rightFlagIndex = shuffledFlags.indexOf(rightFlagEmoji);
       buttonRowArray[Math.floor(rightFlagIndex / 4)].components[rightFlagIndex % 4].setStyle(ButtonStyle.Success);
 
-      await response.edit({embeds: [flagEmbed], components: buttonRowArray});
+      await msg.edit({embeds: [flagEmbed], components: buttonRowArray});
 
       //get values of points
       const pointsEarned = selectedDifficulty.earned;
@@ -178,7 +179,7 @@ const FlagsQuiz = new Subcommand({
       responseText += !correctUsers.length ? "Nobody got it right! \n" : `${correctUserString} got it right! gg *(+${pointsEarned.toString()} points)*\n`;
       responseText += !wrongUsers.length ? "That means nobody got it wrong... pretty good ig" : `That means ${wrongUserString} got it wrong, massive L *(-${pointsLost.toString()} points)*`;
 
-      await response.reply(responseText);
+      await msg.reply(responseText);
 
       // //MARK: update stats
 
@@ -220,11 +221,6 @@ const FlagsQuiz = new Subcommand({
       	ctx.db.user.update(userId, "flagStats", userStats);
       }
     }
-		
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    buttonCollector.on("collect", async (i: ButtonInteraction) => {await handleButtonInteraction(i);});
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    buttonCollector.on("end", async () => {await handleButtonTimeout();});
 
     while (remainingTime) { //MARK: handle timer
       //sleep for less than a second because of slight timer delay
@@ -235,8 +231,8 @@ const FlagsQuiz = new Subcommand({
       //subtract time and update on embed
       remainingTime -= 1;
       flagEmbed.setFooter({text: `${peopleGuessed.toString()} guessed ● ${remainingTime.toString()} seconds left`});
-
-      await response.edit({ embeds: [flagEmbed] });
+      
+      await quizMessage.edit({ embeds: [flagEmbed] });
     }
 
   },

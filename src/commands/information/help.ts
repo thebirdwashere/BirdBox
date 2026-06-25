@@ -1,5 +1,5 @@
 import { Command, CommandOption } from "@src/utility/command.js";
-import { EmbedBuilder, Colors, ButtonBuilder, ButtonStyle, ActionRowBuilder, Interaction, ButtonInteraction, ComponentType } from "discord.js";
+import { EmbedBuilder, Colors, ButtonBuilder, ButtonStyle, ActionRowBuilder, Interaction, ButtonInteraction, ComponentType, Message } from "discord.js";
 import footers from "@src/data/footers.json" with { type: "json" };
 import { Footers } from "@src/utility/types.js";
 import { randomChoice } from "@src/utility/utility.js";
@@ -143,34 +143,32 @@ const Help = new Command({
         return [infoButtonRow];
       }
   
-      const response = await ctx.reply({ embeds: updateEmbed(page), components: updateRow(page) });
+      await ctx.reply({ embeds: updateEmbed(page), components: updateRow(page) });
 
-      const filter = (i: Interaction): boolean => i.user.id === ctx.user.id;
-      const buttonCollector = response.createMessageComponentCollector({ componentType: ComponentType.Button, time: 3_600_000, filter });
+      ctx.collectInteractions({
+        type: ComponentType.Button,
+        idleTimeLimit: 60_000,
+        filter: (i: Interaction): boolean => i.user.id === ctx.user.id,
+        onInteraction,
+        onTimeout,
+      });
 
-      async function handleButtonInteraction(i: ButtonInteraction): Promise<void> {
+      async function onInteraction(msg: Message, i: ButtonInteraction): Promise<void> {
         if (i.customId === "backButton") {
           page -= 1; if(page < 0) page = 0; if(page + 1 > embedsArray.length) page = embedsArray.length - 1;
           await i.deferUpdate();
-          await i.message.edit({ embeds: updateEmbed(page), components: updateRow(page) });
+          await msg.edit({ embeds: updateEmbed(page), components: updateRow(page) });
         } else if (i.customId === "forwardButton") {
           page += 1; if(page < 0) page = 0; if(page + 1 > embedsArray.length) page = embedsArray.length - 1;
           await i.deferUpdate();
-          await i.message.edit({ embeds: updateEmbed(page), components: updateRow(page) });
+          await msg.edit({ embeds: updateEmbed(page), components: updateRow(page) });
         }
       }
 
-      async function handleButtonTimeout(): Promise<void> {
-        //disable the buttons
+      async function onTimeout(msg: Message): Promise<void> {
         infoButtonRow.components.forEach(item => item.setDisabled(true));
-        await response.edit({ components: [infoButtonRow] });
+        await msg.edit({ components: [infoButtonRow] });
       }
-      
-      // eslint-disable-next-line @typescript-eslint/no-misused-promises
-      buttonCollector.on("collect", (i: ButtonInteraction): Promise<void> => handleButtonInteraction(i) );
-      // eslint-disable-next-line @typescript-eslint/no-misused-promises
-      buttonCollector.on("end", () => handleButtonTimeout() );
-
     }
   },
 });

@@ -1,6 +1,6 @@
 import { Subcommand, CommandOption } from "@src/utility/command.js";
 import wordle from "@src/data/wordle.json" with { type: "json" };
-import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, ComponentType, EmbedBuilder } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, ComponentType, EmbedBuilder, Message } from "discord.js";
 import { Wordle, WordleGameData, WordleGameFields, WordleGuessNum, UserWordleStats } from "@src/utility/types.js";
 import { encryptWordCode, createWordleEmbed, handleUsedLettersDisplay, getLetterColors } from "./utils.js";
 
@@ -109,9 +109,14 @@ const WordleGuess = new Subcommand({
         await response.reply({content: `bruh it was \`${solutionWord.toLowerCase()}\` how did you not get that`});
       }
 
-      const buttonCollector = response.createMessageComponentCollector({ componentType: ComponentType.Button, time: 600000 });
+      ctx.collectInteractions({
+        type: ComponentType.Button,
+        timeLimit: 60_000,
+        onInteraction,
+        onTimeout,
+      });
 
-      async function handleButtonInteraction(i: ButtonInteraction): Promise<void> {
+      async function onInteraction(msg: Message, i: ButtonInteraction): Promise<void> {
         //create string of wordle results (looks weird but is fine in output)
         const resultsString = `\`\`\`\nBirdBox Wordle \nCode: ${encryptedSolution}\n${updatedGameFields.map(field => field.boxes.join("")).join("\n")}\n\`\`\``;
 
@@ -122,19 +127,13 @@ const WordleGuess = new Subcommand({
 
         //send embed
         await i.reply({embeds: [resultsEmbed], flags: ["Ephemeral"]});
-        await handleButtonTimeout();
+        await onTimeout(msg);
       }
 
-      async function handleButtonTimeout(): Promise<void> {
-        //disable the button
+      async function onTimeout(msg: Message): Promise<void> {
         wordleActionRow.components[0].setDisabled(true);
-        await response.edit({ components: [wordleActionRow] });
+        await msg.edit({ components: [wordleActionRow] });
       }
-
-      // eslint-disable-next-line @typescript-eslint/no-misused-promises
-      buttonCollector.on("collect", async i => {await handleButtonInteraction(i);});
-      // eslint-disable-next-line @typescript-eslint/no-misused-promises
-      buttonCollector.on("end", async _ => {await handleButtonTimeout();});
 
       //remove active session
       ctx.db.user.update(ctx.user.id, "activeWordle", undefined);
@@ -181,26 +180,25 @@ const WordleGuess = new Subcommand({
         .addComponents(usedLettersButton);
                     
       //send message
-      const response = await ctx.reply({embeds: [wordleEmbed], components: [wordleActionRow]});
+      await ctx.reply({embeds: [wordleEmbed], components: [wordleActionRow]});
 
-      const buttonCollector = response.createMessageComponentCollector({ componentType: ComponentType.Button, time: 60000 });
+      ctx.collectInteractions({
+        type: ComponentType.Button,
+        timeLimit: 60_000,
+        onInteraction,
+        onTimeout,
+      });
 
-      async function handleButtonInteraction(i: ButtonInteraction): Promise<void> {
+      async function onInteraction(msg: Message, i: ButtonInteraction): Promise<void> {
         const keyboardText = handleUsedLettersDisplay(gameFields);
         await i.reply({content: keyboardText});
-        await handleButtonTimeout();
+        await onTimeout(msg);
       }
     
-      async function handleButtonTimeout(): Promise<void> {
-        //disable the button
+      async function onTimeout(msg: Message): Promise<void> {
         wordleActionRow.components[0].setDisabled(true);
-        await response.edit({ components: [wordleActionRow] });
+        await msg.edit({ components: [wordleActionRow] });
       }
-
-      // eslint-disable-next-line @typescript-eslint/no-misused-promises
-      buttonCollector.on("collect", async i => {await handleButtonInteraction(i);});
-      // eslint-disable-next-line @typescript-eslint/no-misused-promises
-      buttonCollector.on("end", async _ => {await handleButtonTimeout();});
 
       //set new data
       ctx.db.user.update(ctx.user.id, "activeWordle", {

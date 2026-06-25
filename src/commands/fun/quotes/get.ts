@@ -1,7 +1,7 @@
 import { Subcommand, CommandOption } from "@src/utility/command.js";
 import { handleCommandError } from "@src/utility/error.js";
 import { QuoteData } from "@src/utility/types.js";
-import { ButtonBuilder, ButtonStyle, ActionRowBuilder, ButtonInteraction, ComponentType } from "discord.js";
+import { ButtonBuilder, ButtonStyle, ActionRowBuilder, ButtonInteraction, ComponentType, Message } from "discord.js";
 import { quotesAutocomplete, formatQuoteEmbed } from "./utils.js";
 
 const QuotesGet = new Subcommand({
@@ -66,21 +66,21 @@ const QuotesGet = new Subcommand({
       buttonRow.components[1].setDisabled(false);
     }
 
-    const response = await ctx.reply({ 
+    await ctx.reply({ 
       embeds: [await formatQuoteEmbed(ctx, requestedQuote, displayQuoteIndex, "specific")],
       components: [buttonRow]
     });
 
-    const buttonFilter = (i: ButtonInteraction): boolean => i.user.id === ctx.user.id;
-
-    const buttonCollector = response.createMessageComponentCollector({
-      componentType: ComponentType.Button,
-      time: 120_000,
-      filter: buttonFilter,
+    ctx.collectInteractions({
+      type: ComponentType.Button,
+      idleTimeLimit: 120_000,
+      filter: (i: ButtonInteraction): boolean => i.user.id === ctx.user.id,
+      onInteraction,
+      onTimeout,
     });
 
     //MARK: button handlers
-    async function handleButtonInteraction(i: ButtonInteraction): Promise<void> {
+    async function onInteraction(msg: Message, i: ButtonInteraction): Promise<void> {
       const customId = i.customId;
       if (customId == "scratchpad-left") {
         pageNum--;
@@ -111,7 +111,7 @@ const QuotesGet = new Subcommand({
         buttonRow.components[1].setDisabled(false);
       }
 
-      await response.edit({
+      await msg.edit({
         embeds: [await formatQuoteEmbed(ctx, requestedQuote, displayQuoteIndex, "specific")], 
         components: [buttonRow]
       });
@@ -119,16 +119,10 @@ const QuotesGet = new Subcommand({
       await i.deferUpdate();
     }
 
-    async function handleButtonTimeout(): Promise<void> {
-      //disable the buttons
+    async function onTimeout(msg: Message): Promise<void> {
       buttonRow.components.forEach(item => item.setDisabled(true));
-      await response.edit({ components: [buttonRow] });
+      await msg.edit({ components: [buttonRow] });
     }
-                    
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    buttonCollector.on("collect", async (i) => {await handleButtonInteraction(i);});
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    buttonCollector.on("end", async () => {await handleButtonTimeout();});
   }
 });
 
