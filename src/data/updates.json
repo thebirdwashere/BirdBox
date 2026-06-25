@@ -1,8 +1,20 @@
 [
   {
-    "version": "7.0.2",
+    "version": "7.0.3",
     "type": "Beta",
     "date": "TBD",
+    "devs": ["AgentNebulator"],
+    "notes": [
+      "Implemented a component handler to reduce duplicated code",
+      "Added `e;debug actionrow` to test the component handler",
+      "Fixed some components timing out when actively in use",
+      "Optimized `e;version` to not regenerate patch notes each page"
+    ]
+  },
+  {
+    "version": "7.0.2",
+    "type": "Release",
+    "date": "6/19/2026",
     "devs": ["AgentNebulator"],
     "notes": [
       "Added 11 new `e;8ball` responses, for a total of 126",
@@ -11,7 +23,7 @@
       "Prefixed commands are no longer tested for interjections",
       "Malformed input error are no longer logged to the console",
       "Fixed credits command breaking due to moved information",
-      "Updated internal options system to remove unecesssary checks"
+      "Updated internal options system to remove unnecessary checks"
     ]
   },
   {

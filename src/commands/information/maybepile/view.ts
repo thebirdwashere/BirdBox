@@ -1,4 +1,4 @@
-import { EmbedBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder, ComponentType, Colors, ButtonInteraction } from "discord.js";
+import { EmbedBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder, ComponentType, Colors, ButtonInteraction, Message } from "discord.js";
 import { Subcommand, CommandOption } from "@src/utility/command.js";
 import { handleCommandError } from "@src/utility/error.js";
 import { MaybepileEntry } from "@src/utility/types.js";
@@ -110,15 +110,17 @@ const MaybepileView = new Subcommand({
         buttonRow.components[1].setDisabled(false);
       }
                     
-      const response = await ctx.reply({embeds: [generateItemEmbed(chosenItem)], components: [buttonRow]});
+      await ctx.reply({embeds: [generateItemEmbed(chosenItem)], components: [buttonRow]});
 
-      const buttonCollector = response.createMessageComponentCollector({
-        componentType: ComponentType.Button,
-        time: 120_000,
+      ctx.collectInteractions({
+        type: ComponentType.Button,
+        idleTimeLimit: 60_000,
+        onInteraction,
+        onTimeout,
       });
 
       //MARK: button handlers
-      async function handleButtonInteraction(i: ButtonInteraction): Promise<void> {
+      async function onInteraction(msg: Message, i: ButtonInteraction): Promise<void> {
         const customId = i.customId;
         if (customId == "maybepile-left") {
           pageNum--;
@@ -148,21 +150,15 @@ const MaybepileView = new Subcommand({
           buttonRow.components[1].setDisabled(false);
         }
 
-        await response.edit({embeds: [generateItemEmbed(chosenItem)], components: [buttonRow]});
+        await msg.edit({embeds: [generateItemEmbed(chosenItem)], components: [buttonRow]});
 
         await i.deferUpdate();
       }
 
-      async function handleButtonTimeout(): Promise<void> {
-        //disable the buttons
+      async function onTimeout(msg: Message): Promise<void> {
         buttonRow.components.forEach(item => item.setDisabled(true));
-        await response.edit({ components: [buttonRow] });
+        await msg.edit({ components: [buttonRow] });
       }
-                    
-      // eslint-disable-next-line @typescript-eslint/no-misused-promises
-      buttonCollector.on("collect", async (i) => {await handleButtonInteraction(i);});
-      // eslint-disable-next-line @typescript-eslint/no-misused-promises
-      buttonCollector.on("end", async () => {await handleButtonTimeout();});
     }
   },
 });

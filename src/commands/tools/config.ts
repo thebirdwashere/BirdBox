@@ -117,6 +117,11 @@ const Config = new Command({
       await response.edit({components: await updateRow(settingId, ctx.db, scope, name)});
     });
 
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+    buttonCollector.on("end", async () => {
+      await response.edit({ components: [] });
+    });
+
     //MARK: selector response
     const selectCollector = response.createMessageComponentCollector({
       componentType: ComponentType.StringSelect,

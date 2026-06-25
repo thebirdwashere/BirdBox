@@ -7,6 +7,7 @@ import { randomChoice, sleep } from "@src/utility/utility.js";
 const FOOTERS = footers as Footers;
 
 const GRID_SIZE = 3;
+const AI_MOVE_TIME = 1500;
 
 const TicTacToe = new Command({
   name: "tictactoe",
@@ -28,7 +29,6 @@ const TicTacToe = new Command({
     //MARK: opponent setup
     let opponentId = opts.user.getOptional("opponent")?.id;
     
-    let previousReply = undefined;
     if (opponentId == null) {
 
       const setupEmbed = new EmbedBuilder()
@@ -48,8 +48,7 @@ const TicTacToe = new Command({
       const joinRow = new ActionRowBuilder<ButtonBuilder>()
         .addComponents(joinButton, botButton);
 
-      const setupResponse = await ctx.reply({ embeds: [setupEmbed], components: [joinRow] });
-      previousReply = setupResponse;
+      const response = await ctx.reply({ embeds: [setupEmbed], components: [joinRow] });
 
       try {
         const filter = (i: Interaction): boolean => (
@@ -57,7 +56,7 @@ const TicTacToe = new Command({
           //make sure, if they selected the bot button, they're the same person who requested to play
           (i.customId !== "bot-tictactoe-button" || i.user.id === ctx.user.id) 
         );
-        const i = await setupResponse.awaitMessageComponent({ filter, time: 60_000 }) as ButtonInteraction;
+        const i = await response.awaitMessageComponent({ filter, time: 60_000 }) as ButtonInteraction;
         await i.deferUpdate();
 
         if (i.customId === "bot-tictactoe-button") {
@@ -67,7 +66,7 @@ const TicTacToe = new Command({
         }
         
       } catch {
-        await setupResponse.edit({ content: `Nobody joined <@${ctx.user.id}>'s game :(`, components: [] });
+        await response.edit({ content: `Nobody joined <@${ctx.user.id}>'s game :(`, components: [] });
         return;
       }
     }
@@ -113,17 +112,18 @@ const TicTacToe = new Command({
       })
       .setFooter({ text: randomChoice(FOOTERS.tictactoe.start) });
     
-    let response: Message;
-    if (previousReply === undefined) {
-      response = await ctx.reply({ embeds: [gameEmbed], components: buttonRowArray });
+    if (ctx.lastReply == null) {
+      await ctx.reply({ embeds: [gameEmbed], components: buttonRowArray });
     } else {
-      response = await previousReply.edit({ embeds: [gameEmbed], components: buttonRowArray });
+      await ctx.lastReply.edit({ embeds: [gameEmbed], components: buttonRowArray });
     }
 
     //collect button responses
-    const buttonCollector = response.createMessageComponentCollector({
-      componentType: ComponentType.Button,
-      time: 180_000,
+    ctx.collectInteractions({
+      type: ComponentType.Button,
+      idleTimeLimit: 120_000,
+      onInteraction,
+      onTimeout
     });
 
     //MARK: execute move
@@ -154,7 +154,7 @@ const TicTacToe = new Command({
     }
 
     //MARK: handle win/tie
-    async function handleWinOrTie(): Promise<void> {
+    async function handleWinOrTie(msg: Message): Promise<void> {
       const winnerData = detectWinner(boardArray);
       if (winnerData !== undefined) {
         const winnerId = players[winnerData[0]];
@@ -162,7 +162,7 @@ const TicTacToe = new Command({
         let extraComment = "";
         if (winnerId === ctx.data.id) extraComment = " get smoked fr";
         if (players[Number(!winnerData[0])] === ctx.data.id) extraComment = " not bad";
-        await response.reply(`<@${winnerId.toString()}> wins!${extraComment}`);
+        await msg.reply(`<@${winnerId.toString()}> wins!${extraComment}`);
 
         for (const [x, y] of winnerData[1]) {
           buttonRowArray[x].components[y]
@@ -189,7 +189,7 @@ const TicTacToe = new Command({
 
           let extraComment = "";
           if (players.includes(ctx.data.id)) extraComment = " ggs tough one";
-          await response.reply(`It's a cat game!${extraComment}`);
+          await msg.reply(`It's a cat game!${extraComment}`);
           gameEmbed
             .setColor(Colors.Red)
             .setFields({
@@ -205,7 +205,7 @@ const TicTacToe = new Command({
     }
 
     //MARK: handle play
-    async function handleButtonInteraction(i: ButtonInteraction): Promise<void> {
+    async function onInteraction(msg: Message, i: ButtonInteraction): Promise<void> {
       const currentPlayerId = players[currentPlayer];
       if (i.user.id !== currentPlayerId) {
         if (!players.includes(i.user.id)) {
@@ -218,19 +218,19 @@ const TicTacToe = new Command({
       }
 
       executeMove(Number(i.customId[0]), Number(i.customId[1]));
-      await handleWinOrTie();
+      await handleWinOrTie(msg);
 
       await i.deferUpdate();
-      await response.edit({ embeds: [gameEmbed], components: buttonRowArray });
+      await msg.edit({ embeds: [gameEmbed], components: buttonRowArray });
 
       if (!gameOver && players[currentPlayer] === ctx.data.id) {
-        await sleep(1500);
+        await sleep(AI_MOVE_TIME);
         const move = birdboxAI(boardArray);
 
         executeMove(...move);
-        await handleWinOrTie();
+        await handleWinOrTie(msg);
 
-        await response.edit({ embeds: [gameEmbed], components: buttonRowArray });
+        await msg.edit({ embeds: [gameEmbed], components: buttonRowArray });
       }
     }
 
@@ -244,7 +244,7 @@ const TicTacToe = new Command({
       });
     }
 
-    async function handleButtonTimeout(): Promise<void> {
+    async function onTimeout(msg: Message): Promise<void> {
       disableButtons();
 
       if (!gameOver) {
@@ -253,14 +253,9 @@ const TicTacToe = new Command({
           .setFooter({ text: randomChoice(FOOTERS.tictactoe.nowin) });
       }
 
-      await response.edit({ embeds: [gameEmbed], components: buttonRowArray });
+      await msg.edit({ embeds: [gameEmbed], components: buttonRowArray });
     }
-
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    buttonCollector.on("collect", async (i: ButtonInteraction) => {await handleButtonInteraction(i);});
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    buttonCollector.on("end", async () => {await handleButtonTimeout();});
-  },
+  }
 });
 
 export default TicTacToe;

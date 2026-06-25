@@ -1,5 +1,5 @@
 import { Command, CommandOption } from "@src/utility/command.js";
-import { EmbedBuilder, Colors, ButtonBuilder, ActionRowBuilder, StringSelectMenuBuilder, ButtonStyle, StringSelectMenuOptionBuilder, Interaction, ComponentType, ButtonInteraction, StringSelectMenuInteraction } from "discord.js";
+import { EmbedBuilder, Colors, ButtonBuilder, ActionRowBuilder, StringSelectMenuBuilder, ButtonStyle, StringSelectMenuOptionBuilder, Interaction, ComponentType, ButtonInteraction, StringSelectMenuInteraction, Message } from "discord.js";
 import patchNotes from "@src/data/updates.json" with { type: "json" };
 import { PatchNotes } from "@src/utility/types.js";
 
@@ -60,67 +60,68 @@ const Version = new Command({
     const infoSelectRow = new ActionRowBuilder<StringSelectMenuBuilder>()
       .addComponents(versionSelect);
 
-    function updateRow(p: number): [ActionRowBuilder<StringSelectMenuBuilder>, ActionRowBuilder<ButtonBuilder>] { // Returns the updated row
-      patchNotes.forEach((item) => {
-        versionSelect.addOptions([
-          new StringSelectMenuOptionBuilder()
-            .setLabel(item.version)
-            .setValue(patchNotes.indexOf(item).toString())
-        ]);
-      });
+    PATCH_NOTES.forEach((item) => {
+      versionSelect.addOptions([
+        new StringSelectMenuOptionBuilder()
+          .setLabel(item.version)
+          .setValue(PATCH_NOTES.indexOf(item).toString())
+      ]);
+    });
 
+    function updateRow(p: number): [ActionRowBuilder<StringSelectMenuBuilder>, ActionRowBuilder<ButtonBuilder>] { // Returns the updated row
       if(p <= 0) backButton.setDisabled(true); else backButton.setDisabled(false);
-      if(p >= patchNotes.length - 1) forwardButton.setDisabled(true); else forwardButton.setDisabled(false);
+      if(p >= PATCH_NOTES.length - 1) forwardButton.setDisabled(true); else forwardButton.setDisabled(false);
 
       return [infoSelectRow, infoButtonRow];
     }
 
-    const response = await ctx.reply({ embeds: updateEmbed(page), components: updateRow(page) });
+    await ctx.reply({ embeds: updateEmbed(page), components: updateRow(page) });
 
     const filter = (i: Interaction): boolean => i.user.id === ctx.user.id;
-    const buttonCollector = response.createMessageComponentCollector({ componentType: ComponentType.Button, time: 3_600_000, filter });
-    const selectCollector = response.createMessageComponentCollector({ componentType: ComponentType.StringSelect, time: 3_600_000, filter });
 
-    async function handleButtonInteraction(i: ButtonInteraction): Promise<void> {
+    ctx.collectInteractions({
+      type: ComponentType.Button,
+      idleTimeLimit: 60_000,
+      filter,
+      onInteraction: handleButtonInteraction,
+      onTimeout: handleButtonTimeout,
+    });
+
+    async function handleButtonInteraction(_: Message, i: ButtonInteraction): Promise<void> {
       if (i.customId === "backButton") {
-        page -= 1; if(page < 0) page = 0; if(page + 1 > patchNotes.length) page = patchNotes.length - 1;
-        await i.deferUpdate();
-        await i.message.edit({ embeds: updateEmbed(page), components: updateRow(page) });
+        page -= 1; if(page < 0) page = 0; if(page + 1 > PATCH_NOTES.length) page = PATCH_NOTES.length - 1;
       } else if (i.customId === "forwardButton") {
-        page += 1; if(page < 0) page = 0; if(page + 1 > patchNotes.length) page = patchNotes.length - 1;
-        await i.deferUpdate();
-        await i.message.edit({ embeds: updateEmbed(page), components: updateRow(page) });
+        page += 1; if(page < 0) page = 0; if(page + 1 > PATCH_NOTES.length) page = PATCH_NOTES.length - 1;
       }
-    }
 
-    async function handleButtonTimeout(): Promise<void> {
-      //disable the buttons
-      infoButtonRow.components.forEach(item => item.setDisabled(true));
-      await response.edit({ components: [infoSelectRow, infoButtonRow] });
-    }
-
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    buttonCollector.on("collect", (i: ButtonInteraction): Promise<void> => handleButtonInteraction(i) );
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    buttonCollector.on("end", (): Promise<void> => handleButtonTimeout() );
-
-    async function handleSelectorInteraction(i: StringSelectMenuInteraction): Promise<void> {
-      page = parseInt(i.values[0]);
+      await i.deferUpdate();
       await i.message.edit({ embeds: updateEmbed(page), components: updateRow(page) });
+    }
+
+    async function handleButtonTimeout(msg: Message): Promise<void> {
+      infoButtonRow.components.forEach(item => item.setDisabled(true));
+      await msg.edit({ components: [infoSelectRow, infoButtonRow] });
+    }
+
+    ctx.collectInteractions({
+      type: ComponentType.StringSelect,
+      idleTimeLimit: 60_000,
+      filter,
+      onInteraction: handleSelectorInteraction,
+      onTimeout: handleSelectorTimeout,
+    });
+
+    async function handleSelectorInteraction(msg: Message, i: StringSelectMenuInteraction): Promise<void> {
+      page = parseInt(i.values[0]);
+      await msg.edit({ embeds: updateEmbed(page), components: updateRow(page) });
       await i.deferUpdate();
     }
 
-    async function handleSelectorTimeout(): Promise<void> {
-      //disable the selector
+    async function handleSelectorTimeout(msg: Message): Promise<void> {
       infoSelectRow.components.forEach(item => item.setDisabled(true));
-      await response.edit({ components: [infoSelectRow, infoButtonRow] });
+      await msg.edit({ components: [infoSelectRow, infoButtonRow] });
     }
-
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    selectCollector.on("collect", (i: StringSelectMenuInteraction): Promise<void> => handleSelectorInteraction(i) );
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    buttonCollector.on("end", (): Promise<void> => handleSelectorTimeout() );
-  },
+  }
 });
 
 export default Version;
