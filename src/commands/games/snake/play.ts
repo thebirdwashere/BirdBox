@@ -1,4 +1,4 @@
-import { Command } from "@src/utility/command.js";
+import { Subcommand } from "@src/utility/command.js";
 import { CoordinatePair } from "@src/utility/types.js";
 import { randomChoice, sleep } from "@src/utility/utility.js";
 import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, Colors, ComponentType, EmbedBuilder, Interaction, Message } from "discord.js";
@@ -16,9 +16,9 @@ const SNAKE_BODY_SQUARE = "🟩";
 const FRUIT_SQUARE = "🍎";
 
 //MARK: Command
-const Snake = new Command({
-  name: "snake",
-  description: "The classic snake game, playable (if only barely) on BirdBox!",
+const SnakePlay = new Subcommand({
+  name: "play",
+  description: "Start a new game of Snake.",
   execute: async (ctx) => {
     //https://stackoverflow.com/questions/53992415/how-to-fill-multidimensional-array-in-javascript
     let gameGrid = Array(GRID_SIZE).fill([]).map((): string[] => Array(GRID_SIZE).fill(BLANK_SQUARE) as string[]);
@@ -153,7 +153,7 @@ const Snake = new Command({
   },
 });
 
-export default Snake;
+export default SnakePlay;
 
 //MARK: Utils
 function createBlankGrid(): string[][] {
