@@ -8,7 +8,8 @@
       "Implemented a component handler to reduce duplicated code",
       "Added `e;debug actionrow` to test the component handler",
       "Fixed some components timing out when actively in use",
-      "Optimized `e;version` to not regenerate patch notes each page"
+      "Optimized `e;version` to not regenerate patch notes each page",
+      "Improved documentation comments for codebase functions"
     ]
   },
   {
