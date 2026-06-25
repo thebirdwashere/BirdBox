@@ -1,5 +1,15 @@
 [
   {
+    "version": "7.0.3",
+    "type": "Beta",
+    "date": "TBD",
+    "devs": ["AgentNebulator"],
+    "notes": [
+      "Implemented a component handler to reduce duplicated code",
+      "Added `e;debug actionrow` to test the component handler"
+    ]
+  },
+  {
     "version": "7.0.2",
     "type": "Release",
     "date": "6/19/2026",

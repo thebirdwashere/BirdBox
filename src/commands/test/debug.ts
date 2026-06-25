@@ -1,4 +1,4 @@
-import { ActionRowBuilder, TextInputBuilder, TextInputStyle, ModalBuilder, ModalSubmitInteraction } from "discord.js";
+import { ActionRowBuilder, TextInputBuilder, TextInputStyle, ModalBuilder, ModalSubmitInteraction, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, ButtonBuilder, ButtonStyle, ComponentType, StringSelectMenuInteraction, Message, ButtonInteraction } from "discord.js";
 import { Command, CommandOption, Subcommand } from "@src/utility/command.js";
 import { DatabaseTableManager } from "@src/utility/database.js";
 
@@ -183,6 +183,92 @@ const Debug = new Command({
       cooldown: 300_000,
       execute: async (ctx) => {
         await ctx.reply("Cooldown is not active!");
+      }
+    }),
+    new Subcommand({ //MARK: debug buttons
+      name: "actionrow",
+      description: "Test the system that handles buttons and select menus.",
+      execute: async (ctx) => {
+        const selectMenuRow = new ActionRowBuilder<StringSelectMenuBuilder>()
+          .addComponents(
+            new StringSelectMenuBuilder()
+              .setCustomId("debug-actionrow-select")
+              .setOptions([
+                new StringSelectMenuOptionBuilder()
+                  .setLabel("option 1")
+                  .setDescription("the first option")
+                  .setValue("1"),
+                new StringSelectMenuOptionBuilder()
+                  .setLabel("option 2")
+                  .setDescription("the second option")
+                  .setValue("2"),
+                new StringSelectMenuOptionBuilder()
+                  .setLabel("option 3")
+                  .setDescription("the third option")
+                  .setValue("3")
+              ])
+          );
+        
+        const buttonRow = new ActionRowBuilder<ButtonBuilder>()
+          .addComponents(
+            new ButtonBuilder()
+              .setLabel("Red")
+              .setStyle(ButtonStyle.Danger)
+              .setCustomId("debug-actionrow-red"),
+            new ButtonBuilder()
+              .setLabel("Green")
+              .setStyle(ButtonStyle.Success)
+              .setCustomId("debug-actionrow-green"),
+            new ButtonBuilder()
+              .setLabel("Blue")
+              .setStyle(ButtonStyle.Primary)
+              .setCustomId("debug-actionrow-blue")
+          );
+
+        await ctx.reply({components: [selectMenuRow, buttonRow]});
+
+        ctx.collectInteractions({
+          type: ComponentType.StringSelect,
+          filter: (i: StringSelectMenuInteraction) => i.user.id === ctx.user.id,
+          idleTimeLimit: 60_000,
+          onInteraction: onSelectInteraction,
+          onTimeout: onSelectTimeout
+        });
+
+        async function onSelectInteraction(_: Message, i: StringSelectMenuInteraction): Promise<void> {
+          await i.deferUpdate();
+          const responseVal = i.values[0];
+          await ctx.send(`You selected option ${responseVal}!`);
+        }
+
+        async function onSelectTimeout(msg: Message): Promise<void> {
+          //deactivate buttons
+          selectMenuRow.components.forEach(item => item.setDisabled(true));
+          await msg.edit({ components: [selectMenuRow, buttonRow] });
+        }
+
+        ctx.collectInteractions({
+          type: ComponentType.Button,
+          filter: (i: ButtonInteraction) => i.user.id === ctx.user.id,
+          idleTimeLimit: 60_000,
+          onInteraction: onButtonInteraction,
+          onTimeout: onButtonTimeout
+        });
+
+        async function onButtonInteraction(_: Message, i: ButtonInteraction): Promise<void> {
+          await i.deferUpdate();
+          const responseVal = /debug-actionrow-(.+)/.exec(i.customId)?.at(1);
+          if (responseVal === undefined)
+            throw new Error("Could not locate color in button ID.");
+
+          await ctx.send(`You selected the ${responseVal} button!`);
+        }
+
+        async function onButtonTimeout(msg: Message): Promise<void> {
+          //deactivate buttons
+          buttonRow.components.forEach(item => item.setDisabled(true));
+          await msg.edit({ components: [selectMenuRow, buttonRow] });
+        }
       }
     }),
     new Subcommand({ //MARK: debug modal

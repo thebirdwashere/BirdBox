@@ -17,6 +17,9 @@ import {
   ButtonStyle,
   ComponentType,
   ButtonInteraction,
+  CollectorFilter,
+  MessageComponentType,
+  Interaction,
 } from "discord.js";
 import { Data } from "./types.js";
 import { Database } from "./database.js";
@@ -72,6 +75,26 @@ export interface CommandContext extends BaseContext {
    * Attempts to send a typing indicator in the same channel as the command.
    */
   sendTyping: () => Promise<void>;
+
+  /**
+   * Attempts to capture ActionRow data from the context's most recent reply.
+   * Responds based on the provided callback functions.
+   */
+  collectInteractions: (
+    params: {
+      type: MessageComponentType,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      filter?: CollectorFilter<[any]>,
+      maxInteractions?: number,
+      maxComponents?: number,
+      maxUsers?: number,
+      timeLimit?: number,
+      idleTimeLimit?: number,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      onInteraction: (msg: Message, i: any) => Promise<void>,
+      onTimeout?: (msg: Message) => Promise<void>,
+    }
+  ) => void;
 
   /**
    * Attempts to reply with a button that opens the provided modal. 
@@ -136,72 +159,33 @@ export class MessageContext implements CommandContext {
   }
 
   async sendTyping(): Promise<void> {
-    if (this.channel?.isSendable()) {
-      await this.channel.sendTyping();
-    } else
-      throw new Error(
-        "Tried to send typing indicator in a unsendable channel.",
-      );
+    await baseSendTyping(this);
   }
+
+  collectInteractions(
+    params: {
+      type: MessageComponentType,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      filter?: CollectorFilter<[any]>,
+      maxInteractions?: number,
+      maxComponents?: number,
+      maxUsers?: number,
+      timeLimit?: number,
+      idleTimeLimit?: number,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      onInteraction: (msg: Message, i: any) => Promise<void>,
+      onTimeout?: (msg: Message) => Promise<void>,
+    }
+  ): void {
+    baseCollectInteractions(this, params);
+  };
 
   async replyModal(
     modal: ModalBuilder, 
     callback: ((i: ModalSubmitInteraction) => Promise<void>)
     | ((i: ModalSubmitInteraction, msg: Message) => Promise<void>)
   ): Promise<void> {
-    if (!this.channel?.isSendable())
-      throw new Error("Tried to send a modal in a unsendable channel.");
-
-    const modalId = modal.data.custom_id;
-    const modalTitle = modal.data.title;
-    if (modalId == null || modalTitle == null)
-      throw new Error("Custom ID and title are required to display modal.");
-
-    const modalButton = new ButtonBuilder()
-      .setCustomId(`${modalId}-modal-button`)
-      .setLabel(modalTitle)
-      .setStyle(ButtonStyle.Success);
-    const buttonRow = new ActionRowBuilder<ButtonBuilder>()
-      .addComponents(modalButton);
-
-    const response = await this.reply({ components: [buttonRow]});
-
-    const thisUserID = this.user.id;
-
-    const buttonFilter = (i: ButtonInteraction): boolean => i.user.id === thisUserID;
-
-    const buttonCollector = response.createMessageComponentCollector({
-      componentType: ComponentType.Button,
-      time: 300_000,
-      filter: buttonFilter,
-    });
-
-    async function handleButtonInteraction(i: ButtonInteraction): Promise<void> {
-      await i.showModal(modal);
-
-      buttonRow.components[0].setDisabled(true);
-      await response.edit({ components: [buttonRow]});
-      
-      const modalFilter = (i: ModalSubmitInteraction): boolean => (
-        i.user.id === thisUserID
-        && i.customId === modalId
-      );
-
-      await i.awaitModalSubmit({ filter: modalFilter, time: 300_000 })
-        .then(async i => { await callback(i, response); })
-        .catch(async (e: unknown) => { console.error(e); await response.edit("Modal interaction has timed out."); });
-    }
-
-    async function handleButtonTimeout(): Promise<void> {
-      //disable the buttons
-      buttonRow.components[0].setDisabled(true);
-      await response.edit({ components: [buttonRow] });
-    }
-     
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    buttonCollector.on("collect", async (i) => {await handleButtonInteraction(i);});
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    buttonCollector.on("end", async () => {await handleButtonTimeout();});
+    await baseReplyModal(this, modal, callback);
   }
 }
 
@@ -281,72 +265,33 @@ export class ChatInputCommandInteractionContext implements CommandContext {
   }
 
   async sendTyping(): Promise<void> {
-    if (this.channel?.isSendable()) {
-      await this.channel.sendTyping();
-    } else
-      throw new Error(
-        "Tried to send typing indicator in a unsendable channel.",
-      );
+    await baseSendTyping(this);
   }
+
+  collectInteractions(
+    params: {
+      type: MessageComponentType,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      filter?: CollectorFilter<[any]>,
+      maxInteractions?: number,
+      maxComponents?: number,
+      maxUsers?: number,
+      timeLimit?: number,
+      idleTimeLimit?: number,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      onInteraction: (msg: Message, i: any) => Promise<void>,
+      onTimeout?: (msg: Message) => Promise<void>,
+    }
+  ): void {
+    baseCollectInteractions(this, params);
+  };
 
   async replyModal(
     modal: ModalBuilder, 
     callback: ((i: ModalSubmitInteraction) => Promise<void>)
     | ((i: ModalSubmitInteraction, msg: Message) => Promise<void>)
   ): Promise<void> {
-    if (!this.channel?.isSendable())
-      throw new Error("Tried to send a modal in a unsendable channel.");
-
-    const modalId = modal.data.custom_id;
-    const modalTitle = modal.data.title;
-    if (modalId == null || modalTitle == null)
-      throw new Error("Custom ID and title are required to display modal.");
-
-    const modalButton = new ButtonBuilder()
-      .setCustomId(`${modalId}-modal-button`)
-      .setLabel(modalTitle)
-      .setStyle(ButtonStyle.Success);
-    const buttonRow = new ActionRowBuilder<ButtonBuilder>()
-      .addComponents(modalButton);
-
-    const response = await this.reply({ components: [buttonRow]});
-
-    const thisUserID = this.user.id;
-
-    const buttonFilter = (i: ButtonInteraction): boolean => i.user.id === thisUserID;
-
-    const buttonCollector = response.createMessageComponentCollector({
-      componentType: ComponentType.Button,
-      time: 300_000,
-      filter: buttonFilter,
-    });
-
-    async function handleButtonInteraction(i: ButtonInteraction): Promise<void> {
-      await i.showModal(modal);
-
-      buttonRow.components[0].setDisabled(true);
-      await response.edit({ components: [buttonRow]});
-      
-      const modalFilter = (i: ModalSubmitInteraction): boolean => (
-        i.user.id === thisUserID
-        && i.customId === modalId
-      );
-
-      await i.awaitModalSubmit({ filter: modalFilter, time: 300_000 })
-        .then(async i => { await callback(i, response); })
-        .catch(async (e: unknown) => { console.error(e); await response.edit("Modal interaction has timed out."); });
-    }
-
-    async function handleButtonTimeout(): Promise<void> {
-      //disable the buttons
-      buttonRow.components[0].setDisabled(true);
-      await response.edit({ components: [buttonRow] });
-    }
-     
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    buttonCollector.on("collect", async (i) => {await handleButtonInteraction(i);});
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    buttonCollector.on("end", async () => {await handleButtonTimeout();});
+    await baseReplyModal(this, modal, callback);
   }
 }
 
@@ -359,6 +304,213 @@ export class ChatInputCommandInteractionSubcommandContext extends ChatInputComma
     this.currentSubcommand = subcommand;
     this.parentCommand = parent;
   }
+}
+
+//MARK: ContextMenuCommandContext
+export class ContextMenuCommandContext implements CommandContext {
+  interaction: ContextMenuCommandInteraction;
+
+  data: Data;
+  channel: TextBasedChannel | null;
+  lastReply: Message | null;
+  guild: Guild | null;
+  user: User;
+  timestamp: number;
+  db: Database;
+  prefix: string;
+
+  constructor(interaction: ContextMenuCommandInteraction, data: Data) {
+    this.interaction = interaction;
+    this.data = data;
+    this.lastReply = null;
+    this.user = interaction.user;
+    this.guild = interaction.guild;
+    this.channel = interaction.channel;
+    this.timestamp = interaction.createdTimestamp;
+    this.db = data.db;
+    this.prefix = "/";
+  }
+
+  async reply(
+    content:
+    | string
+    | {
+      content?: string;
+      embeds?: EmbedBuilder[];
+      components?: ActionRowBuilder<MessageActionRowComponentBuilder>[];
+        },
+  ): Promise<Message> {
+    let callbackResponse;
+
+    if (typeof content === "object") {
+      callbackResponse = await this.interaction.reply({ 
+        content: content.content, 
+        embeds: content.embeds,
+        components: content.components,
+        withResponse: true 
+      });
+      this.lastReply = callbackResponse.resource?.message ?? null;
+    } else {
+      callbackResponse = await this.interaction.reply({ content, withResponse: true });
+      this.lastReply = callbackResponse.resource?.message ?? null;
+    }
+    if (this.lastReply === null)
+      throw new Error(`Interaction reply failed to create message in command ${this.interaction.commandName}.`);
+
+    return this.lastReply;
+  }
+
+  async send(
+    content:
+      | string
+      | {
+          content?: string;
+          embeds?: EmbedBuilder[];
+          components?: ActionRowBuilder<MessageActionRowComponentBuilder>[];
+        },
+  ): Promise<Message> {
+    if (this.channel?.isSendable()) {
+      return await this.channel.send(content);
+    } else throw new Error("Tried to send message in a unsendable channel.");
+  }
+
+  collectInteractions(
+    params: {
+      type: MessageComponentType,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      filter?: CollectorFilter<[any]>,
+      maxInteractions?: number,
+      maxComponents?: number,
+      maxUsers?: number,
+      timeLimit?: number,
+      idleTimeLimit?: number,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      onInteraction: (msg: Message, i: any) => Promise<void>,
+      onTimeout?: (msg: Message) => Promise<void>,
+    }
+  ): void {
+    baseCollectInteractions(this, params);
+  };
+
+  async sendTyping(): Promise<void> {
+    await baseSendTyping(this);
+  }
+
+  async replyModal(
+    modal: ModalBuilder, 
+    callback: ((i: ModalSubmitInteraction) => Promise<void>)
+    | ((i: ModalSubmitInteraction, msg: Message) => Promise<void>)
+  ): Promise<void> {
+    await baseReplyModal(this, modal, callback);
+  }
+}
+
+//MARK: Base Functions
+async function baseSendTyping(ctx: CommandContext): Promise<void> {
+  if (ctx.channel?.isSendable()) {
+    await ctx.channel.sendTyping();
+  } else {
+    throw new Error("Tried to send typing indicator in a unsendable channel.");
+  }
+}
+
+function baseCollectInteractions(
+  ctx: CommandContext,
+  params: {
+    type: MessageComponentType,
+    //a shame I have to use any in this signature, but
+    //typescript doesn't narrow function parameters
+    //even when they conform just fine to the desired type
+    filter?: CollectorFilter<[Interaction]>,
+    maxInteractions?: number,
+    maxComponents?: number,
+    maxUsers?: number,
+    timeLimit?: number,
+    idleTimeLimit?: number,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    onInteraction: (msg: Message, i: any) => Promise<void>,
+    onTimeout?: (msg: Message) => Promise<void>,
+  }
+): void {
+  const response = ctx.lastReply;
+  if (response === null)
+    throw new Error("Tried to collect responses with no recent reply.");
+  
+  const buttonCollector = response.createMessageComponentCollector({ 
+    componentType: params.type, 
+    filter: params.filter,
+    max: params.maxInteractions,
+    maxComponents: params.maxComponents,
+    maxUsers: params.maxUsers,
+    time: "timeLimit" in params ? params.timeLimit : undefined,
+    idle: "idleTimeLimit" in params ? params.idleTimeLimit : undefined,
+  });
+  
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
+  buttonCollector.on("collect", async i => {await params.onInteraction(response, i);});
+
+  if ("onTimeout" in params) {
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
+    buttonCollector.on("end", async _ => {await params.onTimeout?.(response);});
+  }
+}
+
+const DEFAULT_MODAL_TIME_LIMIT = 600_000;
+
+async function baseReplyModal(
+  ctx: CommandContext,
+  modal: ModalBuilder, 
+  callback: ((i: ModalSubmitInteraction) => Promise<void>)
+    | ((i: ModalSubmitInteraction, msg: Message) => Promise<void>)
+): Promise<void> {
+  if (!ctx.channel?.isSendable())
+    throw new Error("Tried to send a modal in a unsendable channel.");
+
+  const modalId = modal.data.custom_id;
+  const modalTitle = modal.data.title;
+  if (modalId == null || modalTitle == null)
+    throw new Error("Custom ID and title are required to display modal.");
+
+  const modalButton = new ButtonBuilder()
+    .setCustomId(`${modalId}-modal-button`)
+    .setLabel(modalTitle)
+    .setStyle(ButtonStyle.Success);
+  const buttonRow = new ActionRowBuilder<ButtonBuilder>()
+    .addComponents(modalButton);
+
+  await ctx.reply({ components: [buttonRow]});
+
+  const thisUserID = ctx.user.id;
+
+  async function onInteraction(msg: Message, i: ButtonInteraction): Promise<void> {
+    await i.showModal(modal);
+
+    buttonRow.components[0].setDisabled(true);
+    await msg.edit({ components: [buttonRow]});
+      
+    const modalFilter = (i: ModalSubmitInteraction): boolean => (
+      i.user.id === thisUserID
+        && i.customId === modalId
+    );
+
+    await i.awaitModalSubmit({ filter: modalFilter, time: 300_000 })
+      .then(async i => { await callback(i, msg); })
+      .catch(async (e: unknown) => { console.error(e); await msg.edit("Modal interaction has timed out."); });
+  }
+
+  async function onTimeout(msg: Message): Promise<void> {
+    //disable the button
+    buttonRow.components[0].setDisabled(true);
+    await msg.edit({ components: [buttonRow] });
+  }
+
+  baseCollectInteractions(ctx, {
+    type: ComponentType.Button,
+    filter: (i: Interaction): boolean => i.user.id === thisUserID,
+    timeLimit: DEFAULT_MODAL_TIME_LIMIT,
+    onInteraction,
+    onTimeout
+  });
 }
 
 //MARK: AutocompleteContext
@@ -446,143 +598,5 @@ export class AutocompleteContext implements BaseContext {
     choices: ApplicationCommandOptionChoiceData[]
   ): Promise<void> {
     await this.interaction.respond(choices);
-  }
-}
-
-//MARK: ContextMenuCommandContext
-export class ContextMenuCommandContext implements CommandContext {
-  interaction: ContextMenuCommandInteraction;
-
-  data: Data;
-  channel: TextBasedChannel | null;
-  lastReply: Message | null;
-  guild: Guild | null;
-  user: User;
-  timestamp: number;
-  db: Database;
-  prefix: string;
-
-  constructor(interaction: ContextMenuCommandInteraction, data: Data) {
-    this.interaction = interaction;
-    this.data = data;
-    this.lastReply = null;
-    this.user = interaction.user;
-    this.guild = interaction.guild;
-    this.channel = interaction.channel;
-    this.timestamp = interaction.createdTimestamp;
-    this.db = data.db;
-    this.prefix = "/";
-  }
-
-  async reply(
-    content:
-    | string
-    | {
-      content?: string;
-      embeds?: EmbedBuilder[];
-      components?: ActionRowBuilder<MessageActionRowComponentBuilder>[];
-        },
-  ): Promise<Message> {
-    let callbackResponse;
-
-    if (typeof content === "object") {
-      callbackResponse = await this.interaction.reply({ 
-        content: content.content, 
-        embeds: content.embeds,
-        components: content.components,
-        withResponse: true 
-      });
-      this.lastReply = callbackResponse.resource?.message ?? null;
-    } else {
-      callbackResponse = await this.interaction.reply({ content, withResponse: true });
-      this.lastReply = callbackResponse.resource?.message ?? null;
-    }
-    if (this.lastReply === null)
-      throw new Error(`Interaction reply failed to create message in command ${this.interaction.commandName}.`);
-
-    return this.lastReply;
-  }
-
-  async send(
-    content:
-      | string
-      | {
-          content?: string;
-          embeds?: EmbedBuilder[];
-          components?: ActionRowBuilder<MessageActionRowComponentBuilder>[];
-        },
-  ): Promise<Message> {
-    if (this.channel?.isSendable()) {
-      return await this.channel.send(content);
-    } else throw new Error("Tried to send message in a unsendable channel.");
-  }
-
-  async sendTyping(): Promise<void> {
-    if (this.channel?.isSendable()) {
-      await this.channel.sendTyping();
-    } else
-      throw new Error(
-        "Tried to send typing indicator in a unsendable channel.",
-      );
-  }
-
-  async replyModal(
-    modal: ModalBuilder, 
-    callback: ((i: ModalSubmitInteraction) => Promise<void>)
-    | ((i: ModalSubmitInteraction, msg: Message) => Promise<void>)
-  ): Promise<void> {
-    if (!this.channel?.isSendable())
-      throw new Error("Tried to send a modal in a unsendable channel.");
-
-    const modalId = modal.data.custom_id;
-    const modalTitle = modal.data.title;
-    if (modalId == null || modalTitle == null)
-      throw new Error("Custom ID and title are required to display modal.");
-
-    const modalButton = new ButtonBuilder()
-      .setCustomId(`${modalId}-modal-button`)
-      .setLabel(modalTitle)
-      .setStyle(ButtonStyle.Success);
-    const buttonRow = new ActionRowBuilder<ButtonBuilder>()
-      .addComponents(modalButton);
-
-    const response = await this.reply({ components: [buttonRow]});
-
-    const thisUserID = this.user.id;
-
-    const buttonFilter = (i: ButtonInteraction): boolean => i.user.id === thisUserID;
-
-    const buttonCollector = response.createMessageComponentCollector({
-      componentType: ComponentType.Button,
-      time: 300_000,
-      filter: buttonFilter,
-    });
-
-    async function handleButtonInteraction(i: ButtonInteraction): Promise<void> {
-      await i.showModal(modal);
-
-      buttonRow.components[0].setDisabled(true);
-      await response.edit({ components: [buttonRow]});
-      
-      const modalFilter = (i: ModalSubmitInteraction): boolean => (
-        i.user.id === thisUserID
-        && i.customId === modalId
-      );
-
-      await i.awaitModalSubmit({ filter: modalFilter, time: 300_000 })
-        .then(async i => { await callback(i, response); })
-        .catch(async (e: unknown) => { console.error(e); await response.edit("Modal interaction has timed out."); });
-    }
-
-    async function handleButtonTimeout(): Promise<void> {
-      //disable the buttons
-      buttonRow.components[0].setDisabled(true);
-      await response.edit({ components: [buttonRow] });
-    }
-     
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    buttonCollector.on("collect", async (i) => {await handleButtonInteraction(i);});
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    buttonCollector.on("end", async () => {await handleButtonTimeout();});
   }
 }
