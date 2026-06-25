@@ -364,14 +364,20 @@ class OptionManager<T> {
   }
 
   /**
-   * Sets the provided value.
+   * Sets this option to the provided value.
+   * 
+   * @param key The key of the option to set.
+   * @param value The value you want to set the option to.
    */
   set(key: string, value: T | null): void {
     this.inner.set(key, value);
   }
 
   /**
-   * Returns the value, throwing an error if it is `null`.
+   * Returns the value of this option, throwing an error if it is `null`.
+   * 
+   * @param key The key of the option to get.
+   * @returns The value provided in the user's query.
    */
   getRequired(key: string): T {
     const value = this.inner.get(key);
@@ -382,7 +388,10 @@ class OptionManager<T> {
   }
 
   /**
-   * Returns the value if it exists, otherwise returns `null`.
+   * Returns the value of this option.
+   * 
+   * @param key The key of the option to get.
+   * @returns The value provided in the user's query, or `null` if it was not provided.
    */
   getOptional(key: string): T | null {
     const value = this.inner.get(key);

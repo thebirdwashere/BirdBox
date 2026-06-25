@@ -45,7 +45,11 @@ export interface CommandContext extends BaseContext {
   prefix: string;
 
   /**
-   * Attempts to respond to the command. Returns the message after completion.
+   * Attempts to respond to the command.
+   * 
+   * @param content The content of your response. Either a simple string, 
+   * or an object containing your message's content, embeds, and/or components.
+   * @returns The Message object of the bot's response.
    */
   reply: (
     content:
@@ -58,8 +62,11 @@ export interface CommandContext extends BaseContext {
   ) => Promise<Message>;
 
   /**
-   * Attempts to send a message in the same channel as the command. Returns the
-   * message after completion.
+   * Attempts to send a message in the same channel as the command.
+   * 
+   * @param content The content of your response. Either a simple string, 
+   * or an object containing your message's content, embeds, and/or components.
+   * @returns The Message object of the bot's response.
    */
   send: (
     content:
@@ -79,6 +86,10 @@ export interface CommandContext extends BaseContext {
   /**
    * Attempts to capture ActionRow data from the context's most recent reply.
    * Responds based on the provided callback functions.
+   * 
+   * @param params An object containing a minimum the type of interaction you 
+   * expect, and a callback function to be executed when the user interacts.
+   * Maximums, time limits, and an interaction filter can also be optionally provided.
    */
   collectInteractions: (
     params: {
@@ -99,6 +110,9 @@ export interface CommandContext extends BaseContext {
   /**
    * Attempts to reply with a button that opens the provided modal. 
    * Runs the provided callback function on modal submit.
+   * 
+   * @param modal The modal you want to show the user.
+   * @param callback The callback function to be executed when the user submits the modal.
    */
   replyModal: (
     modal: ModalBuilder, 

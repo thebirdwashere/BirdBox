@@ -61,6 +61,11 @@ export class DatabaseTableManager {
 
   /**
    * Returns the property if it exists in the database, otherwise returns `undefined`.
+   * 
+   * @param id The ID you are fetching. Corresponds to the Discord ID of 
+   * a user, channel, or server, or should always be "global" in global scope.
+   * @param property The property name you want to fetch from the database.
+   * @returns The property value, or `undefined` if it could not be found.
    */
   fetchOrUndefined(id: string, property: string): unknown {
     const data = parseDataAsJSON(this.data.fetch.get({id}));
@@ -71,6 +76,12 @@ export class DatabaseTableManager {
   /**
    * Returns the property if it exists in the database, otherwise returns the default
    * value provided by `def`.
+   * 
+   * @param id The ID you are fetching. Corresponds to the Discord ID of 
+   * a user, channel, or server, or should always be "global" in global scope.
+   * @param property The property name you want to fetch from the database.
+   * @param def The default value, used if the database property does not exist for that ID.
+   * @returns The property value, or the default value if it could not be found.
    */
   fetchOr(id: string, property: string, def: unknown): unknown {
     const data = parseDataAsJSON(this.data.fetch.get({id}));
@@ -86,7 +97,14 @@ export class DatabaseTableManager {
 
   /**
    * Returns the property if it exists in the database, otherwise returns the default
-   * value provided by the `def` closure.
+   * value provided by the `def` callback function.
+   * 
+   * @param id The ID you are fetching. Corresponds to the Discord ID of 
+   * a user, channel, or server, or should always be "global" in global scope.
+   * @param property The property name you want to fetch from the database.
+   * @param def A callback function which returns the default value, 
+   * used if the database property does not exist for that ID.
+   * @returns The property value, or the default value if it could not be found.
    */
   fetchOrElse(id: string, property: string, def: () => unknown): unknown {
     const data = parseDataAsJSON(this.data.fetch.get({id}));
@@ -100,6 +118,10 @@ export class DatabaseTableManager {
 
   /**
    * Returns all JSON for the provided ID.
+   * 
+   * @param id The ID you are fetching. Corresponds to the Discord ID of 
+   * a user, channel, or server, or should always be "global" in global scope.
+   * @returns A JSON object containing all database data for that ID.
    */
   fetchFull(id: string): unknown {
     const data = parseDataAsJSON(this.data.fetch.get({id}));
@@ -110,6 +132,9 @@ export class DatabaseTableManager {
   /**
    * Returns the property for all rows in the database, 
    * omitting rows where the property does not exist.
+   * 
+   * @param property The property name you want to fetch from the database.
+   * @returns An array of values containing each instance of that property in the database.
    */
   fetchEvery(property: string): unknown[] {
     const dataAll = this.data.fetchUnconstrained.iterate();
@@ -126,8 +151,11 @@ export class DatabaseTableManager {
   }
 
   /**
-   * Returns the property for all rows in the database, using the `def` value for
-   * rows that do not exist.
+   * Returns the property for all rows in the database, using the `def` value in place of
+   * rows that do not have the requested property.
+   * @param property The property name you want to fetch from the database.
+   * @param def The default value, used if the database property does not exist for a given row.
+   * @returns An array of values containing each instance of that property in the database.
    */
   fetchEveryOr(property: string, def: unknown): unknown[] {
     const dataAll = this.data.fetchUnconstrained.iterate();
@@ -148,6 +176,10 @@ export class DatabaseTableManager {
   /**
    * Returns a map of the database with ID as the keys and the property as the values,  
    * omitting rows where the property does not exist.
+   * 
+   * @param property The property name you want to fetch from the database.
+   * @returns A Map object where the keys are the database IDs and the values are the
+   * property values.
    */
   fetchMap(property: string): Map<string, unknown> {
     const dataAll = this.data.fetchKeyValue.iterate();
@@ -168,6 +200,11 @@ export class DatabaseTableManager {
 
   /**
    * Updates the value of the property to a new value. Creates the row or the property if necessary.
+   * 
+   * @param id The ID you are fetching. Corresponds to the Discord ID of 
+   * a user, channel, or server, or should always be "global" in global scope.
+   * @param property The property name you want to fetch from the database.
+   * @param value The new value for the requested property.
    */
   update(id: string, property: string, value: unknown): void {
     this.data.createIfNotExists.run({id});
