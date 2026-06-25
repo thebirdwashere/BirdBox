@@ -1,7 +1,7 @@
 import { Command } from "@src/utility/command.js";
 import { CoordinatePair } from "@src/utility/types.js";
 import { randomChoice, sleep } from "@src/utility/utility.js";
-import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, Colors, ComponentType, EmbedBuilder, Interaction } from "discord.js";
+import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, Colors, ComponentType, EmbedBuilder, Interaction, Message } from "discord.js";
 
 const GRID_SIZE = 10;
 const WAIT_TIME = 750;
@@ -33,7 +33,7 @@ const Snake = new Command({
       .setDescription(renderGrid(gameGrid, snakeSegments.length - INITIAL_SNAKE_LENGTH));
 
     const buttonsRow = new ActionRowBuilder<ButtonBuilder>()
-      .addComponents([
+      .addComponents(
         new ButtonBuilder()
           .setStyle(ButtonStyle.Primary)
           .setCustomId("snake-move-w")
@@ -50,14 +50,19 @@ const Snake = new Command({
           .setStyle(ButtonStyle.Primary)
           .setCustomId("snake-move-e")
           .setLabel("🠊")
-      ]);
+      );
 
-    const response = await ctx.reply({embeds: [snakeEmbed], components: [buttonsRow]});
+    const gameMessage = await ctx.reply({embeds: [snakeEmbed], components: [buttonsRow]});
+    
+    ctx.collectInteractions({
+      type: ComponentType.Button,
+      idleTimeLimit: 60_000,
+      filter: (i: Interaction): boolean => i.user.id === ctx.user.id,
+      onInteraction,
+      onTimeout
+    });
 
-    const filter = (i: Interaction): boolean => i.user.id === ctx.user.id;
-    const buttonCollector = response.createMessageComponentCollector({ componentType: ComponentType.Button, time: 7_200_000, filter });
-
-    async function handleButtonInteraction(i: ButtonInteraction): Promise<void> {
+    async function onInteraction(msg: Message, i: ButtonInteraction): Promise<void> {
       await i.deferUpdate();
       
       const newDirection = (/snake-move-(.)/.exec(i.customId))?.at(1);
@@ -81,20 +86,15 @@ const Snake = new Command({
       }
       }
 
-      await response.edit({ components: [buttonsRow] });
+      await msg.edit({ components: [buttonsRow] });
       snakeDirection = newDirection;
     }
 
-    async function handleButtonTimeout(): Promise<void> {
+    async function onTimeout(msg: Message): Promise<void> {
       //disable the buttons
       buttonsRow.components.forEach(item => item.setDisabled(true));
-      await response.edit({ components: [buttonsRow] });
+      await msg.edit({ components: [buttonsRow] });
     }
-
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    buttonCollector.on("collect", (i: ButtonInteraction): Promise<void> => handleButtonInteraction(i) );
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    buttonCollector.on("end", (): Promise<void> => handleButtonTimeout() );
 
     //MARK: Game Loop
     // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
@@ -140,7 +140,7 @@ const Snake = new Command({
       gameGrid = drawElements(snakeSegments, fruitLocation);
 
       snakeEmbed.setDescription(renderGrid(gameGrid, snakeSegments.length - INITIAL_SNAKE_LENGTH));
-      await response.edit({embeds: [snakeEmbed]});
+      await gameMessage.edit({embeds: [snakeEmbed]});
     }
 
     snakeEmbed
@@ -149,7 +149,7 @@ const Snake = new Command({
 
     buttonsRow.components.forEach(item => item.setDisabled(true));
 
-    await response.edit({ embeds: [snakeEmbed], components: [buttonsRow] });
+    await gameMessage.edit({ embeds: [snakeEmbed], components: [buttonsRow] });
   },
 });
 
