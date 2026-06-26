@@ -1,6 +1,6 @@
 import { Subcommand } from "@src/utility/command.js";
 import { CoordinatePair } from "@src/utility/types.js";
-import { randomChoice, sleep } from "@src/utility/utility.js";
+import { create2DArray, randomChoice, sleep } from "@src/utility/utility.js";
 import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, Colors, ComponentType, EmbedBuilder, Interaction, Message } from "discord.js";
 
 const GRID_SIZE = 10;
@@ -156,10 +156,6 @@ const SnakePlay = new Subcommand({
 export default SnakePlay;
 
 //MARK: Utils
-function createBlankGrid(): string[][] {
-  return Array(GRID_SIZE).fill([]).map((): string[] => Array(GRID_SIZE).fill(BLANK_SQUARE) as string[]);
-}
-
 function getNewFruitLocation(snake: CoordinatePair[]): CoordinatePair {
   //workaround to avoid comparing arrays which doesn't work in JS
   const stringSnake = snake.map(coords => coords.join(","));
@@ -177,7 +173,7 @@ function drawTo(grid: string[][], xy: CoordinatePair, square: string): void {
 }
 
 function drawElements(snake: CoordinatePair[], fruit: CoordinatePair): string[][] {
-  const grid = createBlankGrid();
+  const grid = create2DArray(GRID_SIZE, GRID_SIZE, BLANK_SQUARE);
   drawTo(grid, snake[0], SNAKE_HEAD_SQUARE);
   for (const seg of snake.slice(1)) {
     drawTo(grid, seg, SNAKE_BODY_SQUARE);
