@@ -77,8 +77,8 @@ export function randomChoice<T>(array: T[]): T {
  * @param fill A value to fill each cell with when created.
  * @returns A 2D array with the specified parameters.
  */
-function create2DArray<T>(width: number, height: number, fill: T): T[][] {
-  return Array(height).fill([]).map((): string[] => Array(width).fill(fill) as string[]);
+export function create2DArray<T>(width: number, height: number, fill: T): T[][] {
+  return Array(height).fill([]).map((): T[] => Array(width).fill(fill) as T[]);
 }
 
 /**
