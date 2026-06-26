@@ -1,7 +1,7 @@
 import { Command, CommandOption } from "@src/utility/command.js";
 import { EmbedBuilder, Colors, ActionRowBuilder, ButtonBuilder, ButtonStyle, ComponentType, ButtonInteraction, Interaction, Message } from "discord.js";
 import footers from "@src/data/footers.json" with { type: "json" };
-import { Footers } from "@src/utility/types.js";
+import { CoordinatePair, Footers } from "@src/utility/types.js";
 import { randomChoice, sleep } from "@src/utility/utility.js";
 
 const FOOTERS = footers as Footers;
@@ -259,8 +259,6 @@ const TicTacToe = new Command({
 });
 
 export default TicTacToe;
-
-type CoordinatePair = [number, number];
 
 //MARK: detect winner
 function detectWinner(board: number[][]): 
