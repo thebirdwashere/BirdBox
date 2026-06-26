@@ -69,6 +69,19 @@ export function randomChoice<T>(array: T[]): T {
 }
 
 /**
+ * Returns a 2D array filled with the provided value. Creates unique 
+ * arrays for each row, so each cell can be manipulated independently.
+ * 
+ * @param width The width of the 2D array, or the length of the inner arrays.
+ * @param height The height of the 2D array, or the length of the outer array.
+ * @param fill A value to fill each cell with when created.
+ * @returns A 2D array with the specified parameters.
+ */
+function create2DArray<T>(width: number, height: number, fill: T): T[][] {
+  return Array(height).fill([]).map((): string[] => Array(width).fill(fill) as string[]);
+}
+
+/**
  * Returns a config option from the database, or the default from config.json if not present.
  * 
  * @param db The Database object to search.
