@@ -11,6 +11,8 @@ const CONFIG = config as Config;
 /**
  * Brings the program to a complete halt with the provided error message. Avoid
  * using unless critical failure has occured or the program should not proceed.
+ * 
+ * @param errorMessage The message to log in the console.
  */
 export function panic(errorMessage = "A fatal error has occured."): never {
   console.error(errorMessage);
@@ -28,6 +30,9 @@ export function TODO<T>(): T {
 
 /**
  * Converts a Windows-style path to a POSIX-style path.
+ * 
+ * @param pathString The Windows-style path to convert.
+ * @returns The converted POSIX-style path.
  */
 export function toPosixPath(pathString: string): string {
   return pathString.split(path.sep).join(path.posix.sep);
@@ -36,6 +41,8 @@ export function toPosixPath(pathString: string): string {
 /**
  * Halts execution for the given number of milliseconds. Must be run in an
  * asynchronous context.
+ * 
+ * @param ms The number of milliseconds to halt for.
  */
 export async function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -43,6 +50,9 @@ export async function sleep(ms: number): Promise<void> {
 
 /**
  * Tests if a command context is of a subcomamnd.
+ * 
+ * @param ctx The context to be tested.
+ * @returns A boolean representing whether the commannd originates from a subcommand.
  */
 export function isSubcommand(ctx: CommandContext): boolean {
   return "currentSubcommand" in ctx;
@@ -50,13 +60,35 @@ export function isSubcommand(ctx: CommandContext): boolean {
 
 /**
  * Returns a random element from the provided array.
+ * 
+ * @param array The array to return an element from. Must be non-empty.
+ * @returns A randomly-selected element from the array.
  */
 export function randomChoice<T>(array: T[]): T {
   return array[Math.floor(Math.random() * array.length)];
 }
 
 /**
+ * Returns a 2D array filled with the provided value. Creates unique 
+ * arrays for each row, so each cell can be manipulated independently.
+ * 
+ * @param width The width of the 2D array, or the length of the inner arrays.
+ * @param height The height of the 2D array, or the length of the outer array.
+ * @param fill A value to fill each cell with when created.
+ * @returns A 2D array with the specified parameters.
+ */
+function create2DArray<T>(width: number, height: number, fill: T): T[][] {
+  return Array(height).fill([]).map((): string[] => Array(width).fill(fill) as string[]);
+}
+
+/**
  * Returns a config option from the database, or the default from config.json if not present.
+ * 
+ * @param db The Database object to search.
+ * @param scope The scope to get a config option from.
+ * @param option The name of the config option to fetch.
+ * @param id The Discord ID of the user or server to fetch. Not needed for bot-scoped options.
+ * @returns The value fetched from the database.
  */
 export function fetchConfigOption<ConfigScopeType extends ConfigScope>(
   db: Database, 
@@ -122,8 +154,6 @@ export class NonLoggedError extends Error {
   }
 }
 
-
-
 /**
  * Map wrapper with various utility methods to ensure values exist or optionally
  * return defaults.
@@ -167,7 +197,7 @@ export class EnsureMap<T> { //MARK: EnsureMap
 
   /**
    * Returns the (nullable) value if it exists, otherwise returns the default
-   * value provided by the `def` closure.
+   * value provided by the `def` callback function.
    */
   fetchOrElse(key: string, def: () => T): T | null {
     const inner = this.inner.get(key);
@@ -187,7 +217,7 @@ export class EnsureMap<T> { //MARK: EnsureMap
 
   /**
    * Returns the value if it exists and is non-null, otherwise returns the
-   * default value provided by the `def` closure.
+   * default value provided by the `def` callback function.
    */
   fetchNonNullOrElse(key: string, def: () => T): T {
     const inner = this.inner.get(key);
