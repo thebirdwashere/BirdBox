@@ -48,7 +48,7 @@ const TicTacToe = new Command({
       const joinRow = new ActionRowBuilder<ButtonBuilder>()
         .addComponents(joinButton, botButton);
 
-      const response = await ctx.reply({ embeds: [setupEmbed], components: [joinRow] });
+      const joinMessage = await ctx.reply({ embeds: [setupEmbed], components: [joinRow] });
 
       try {
         const filter = (i: Interaction): boolean => (
@@ -56,7 +56,7 @@ const TicTacToe = new Command({
           //make sure, if they selected the bot button, they're the same person who requested to play
           (i.customId !== "bot-tictactoe-button" || i.user.id === ctx.user.id) 
         );
-        const i = await response.awaitMessageComponent({ filter, time: 60_000 }) as ButtonInteraction;
+        const i = await joinMessage.awaitMessageComponent({ filter, time: 60_000 }) as ButtonInteraction;
         await i.deferUpdate();
 
         if (i.customId === "bot-tictactoe-button") {
@@ -66,7 +66,7 @@ const TicTacToe = new Command({
         }
         
       } catch {
-        await response.edit({ content: `Nobody joined <@${ctx.user.id}>'s game :(`, components: [] });
+        await joinMessage.edit({ content: `Nobody joined <@${ctx.user.id}>'s game :(`, components: [] });
         return;
       }
     }
