@@ -23,6 +23,7 @@ import {
 } from "discord.js";
 import { Data } from "./types.js";
 import { Database } from "./database.js";
+import { handleCommandError } from "./error.js";
 
 export interface BaseContext {
   data: Data;
@@ -43,6 +44,7 @@ export interface CommandContext extends BaseContext {
   timestamp: number;
   db: Database;
   prefix: string;
+  command: string;
 
   /**
    * Attempts to respond to the command.
@@ -121,6 +123,10 @@ export interface CommandContext extends BaseContext {
   ) => Promise<void>;
 }
 
+export interface SubcommandContext {
+  subcommand: string;
+}
+
 //MARK: MessageContext
 export class MessageContext implements CommandContext {
   message: Message;
@@ -133,8 +139,9 @@ export class MessageContext implements CommandContext {
   timestamp: number;
   db: Database;
   prefix: string;
+  command: string;
   
-  constructor(message: Message, data: Data) {
+  constructor(message: Message, data: Data, command: string) {
     this.message = message;
     this.data = data;
     this.channel = message.channel;
@@ -144,6 +151,7 @@ export class MessageContext implements CommandContext {
     this.timestamp = message.createdTimestamp;
     this.db = data.db;
     this.prefix = data.prefix;
+    this.command = command;
   }
   
   async reply(
@@ -203,20 +211,12 @@ export class MessageContext implements CommandContext {
   }
 }
 
-
-export interface SubcommandContext {
-  currentSubcommand: string;
-  parentCommand: string;
-}
-
 export class MessageSubcommandContext extends MessageContext implements SubcommandContext {
-  currentSubcommand: string;
-  parentCommand: string;
+  subcommand: string;
 
-  constructor(message: Message, data: Data, subcommand: string, parent: string) {
-    super(message, data);
-    this.currentSubcommand = subcommand;
-    this.parentCommand = parent;
+  constructor(message: Message, data: Data, command: string, subcommand: string) {
+    super(message, data, command);
+    this.subcommand = subcommand;
   }
 }
 
@@ -232,8 +232,9 @@ export class ChatInputCommandInteractionContext implements CommandContext {
   timestamp: number;
   db: Database;
   prefix: string;
+  command: string;
 
-  constructor(interaction: ChatInputCommandInteraction, data: Data) {
+  constructor(interaction: ChatInputCommandInteraction, data: Data, command: string) {
     this.interaction = interaction;
     this.data = data;
     this.lastReply = null;
@@ -243,6 +244,7 @@ export class ChatInputCommandInteractionContext implements CommandContext {
     this.timestamp = interaction.createdTimestamp;
     this.db = data.db;
     this.prefix = "/";
+    this.command = command;
   }
 
   async reply(
@@ -310,13 +312,11 @@ export class ChatInputCommandInteractionContext implements CommandContext {
 }
 
 export class ChatInputCommandInteractionSubcommandContext extends ChatInputCommandInteractionContext implements SubcommandContext {
-  currentSubcommand: string;
-  parentCommand: string;
+  subcommand: string;
 
-  constructor(interaction: ChatInputCommandInteraction, data: Data, subcommand: string, parent: string) {
-    super(interaction, data);
-    this.currentSubcommand = subcommand;
-    this.parentCommand = parent;
+  constructor(interaction: ChatInputCommandInteraction, data: Data, commmand: string, subcommand: string) {
+    super(interaction, data, commmand);
+    this.subcommand = subcommand;
   }
 }
 
@@ -332,8 +332,9 @@ export class ContextMenuCommandContext implements CommandContext {
   timestamp: number;
   db: Database;
   prefix: string;
+  command: string;
 
-  constructor(interaction: ContextMenuCommandInteraction, data: Data) {
+  constructor(interaction: ContextMenuCommandInteraction, data: Data, command: string) {
     this.interaction = interaction;
     this.data = data;
     this.lastReply = null;
@@ -343,6 +344,7 @@ export class ContextMenuCommandContext implements CommandContext {
     this.timestamp = interaction.createdTimestamp;
     this.db = data.db;
     this.prefix = "/";
+    this.command = command;
   }
 
   async reply(
@@ -432,15 +434,15 @@ function baseCollectInteractions(
   ctx: CommandContext,
   params: {
     type: MessageComponentType,
-    //a shame I have to use any in this signature, but
-    //typescript doesn't narrow function parameters
-    //even when they conform just fine to the desired type
     filter?: CollectorFilter<[Interaction]>,
     maxInteractions?: number,
     maxComponents?: number,
     maxUsers?: number,
     timeLimit?: number,
     idleTimeLimit?: number,
+    //a shame I have to use any in this signature, but
+    //typescript doesn't narrow function parameters
+    //even when they conform just fine to the desired type
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onInteraction: (msg: Message, i: any) => Promise<void>,
     onTimeout?: (msg: Message) => Promise<void>,
@@ -461,11 +463,23 @@ function baseCollectInteractions(
   });
   
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
-  buttonCollector.on("collect", async i => {await params.onInteraction(response, i);});
+  buttonCollector.on("collect", async i => {
+    try {
+      await params.onInteraction(response, i);
+    } catch (e: unknown) {
+      await handleCommandError(ctx, e);
+    }
+  });
 
-  if ("onTimeout" in params) {
+  if ("onTimeout" in params && params.onTimeout !== undefined) {
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    buttonCollector.on("end", async _ => {await params.onTimeout?.(response);});
+    buttonCollector.on("end", async _ => {
+      try {
+        await params.onTimeout?.(response);
+      } catch (e: unknown) {
+        await handleCommandError(ctx, e);
+      }
+    });
   }
 }
 

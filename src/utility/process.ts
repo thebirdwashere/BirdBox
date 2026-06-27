@@ -49,7 +49,7 @@ export async function detectChatInputInteractionCommand(
   if (command.body !== undefined && isOptionArray(command.body)) {
     options = parseCommandOptions(command, interaction, options);
 
-    const context = new ChatInputCommandInteractionContext(interaction, data);
+    const context = new ChatInputCommandInteractionContext(interaction, data, command.data.name);
 
     // Handle commands accordingly.
     if (command.execute !== undefined) {
@@ -75,11 +75,11 @@ export async function detectChatInputInteractionCommand(
       options = parseCommandOptions(subcommand, interaction, options);
     }
 
-    const context = new ChatInputCommandInteractionSubcommandContext(interaction, data, subcommandName, commandName);
+    const context = new ChatInputCommandInteractionSubcommandContext(interaction, data, commandName, subcommandName);
 
     await subcommand.execute(context, options);
   } else if (command.execute !== undefined) {
-    const context = new ChatInputCommandInteractionContext(interaction, data);
+    const context = new ChatInputCommandInteractionContext(interaction, data, commandName);
 
     await command.execute(context, options);
   } else {
@@ -235,7 +235,7 @@ export async function detectMessageCommand(
   if (command.execute !== undefined) {
     let options = new Options();
 
-    const context = new MessageContext(message, data);
+    const context = new MessageContext(message, data, commandName);
 
     // Populate options if they exist.
     if (command.body !== undefined && isOptionArray(command.body)) {
@@ -265,7 +265,7 @@ export async function detectMessageCommand(
 
     let options = new Options();
 
-    const context = new MessageSubcommandContext(message, data, subcommandName, commandName);
+    const context = new MessageSubcommandContext(message, data, commandName, subcommandName);
 
     // Attempt to find and execute subcommand.
     const subcommand = command.body.find(
@@ -491,7 +491,6 @@ export async function handleAutocomplete(
 
     const context = new AutocompleteContext(interaction, data);
     await subcommand.autocomplete(context);
-
   }
   
   await sleep(1);
@@ -516,7 +515,7 @@ export async function detectContextMenuCommand(
     if (command.execute === undefined) 
       throw new Error("Malformed context menu command is missing an execute function.");
 
-    const context = new ContextMenuCommandContext(interaction, data);
+    const context = new ContextMenuCommandContext(interaction, data, commandName);
 
     const options = new Options();
     if (contextMenuData.contextOption) {
@@ -569,7 +568,7 @@ export async function detectContextMenuCommand(
     if (contextMenuData === undefined)
       throw new Error(`Could not locate context menu command with name: ${commandName}`);
     
-    const context = new ContextMenuCommandContext(interaction, data);
+    const context = new ContextMenuCommandContext(interaction, data, commandName);
 
     const options = new Options();
     if (contextMenuData.contextOption) {

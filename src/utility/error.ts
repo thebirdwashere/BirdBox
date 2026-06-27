@@ -4,7 +4,6 @@ import { InputError, NonLoggedError } from "./utility.js";
 
 async function handleError(
   ctx: CommandContext,
-  originCommand: string,
   error: unknown,
   type: string,
 ): Promise<void> {
@@ -17,7 +16,7 @@ async function handleError(
       .setTitle(`${type} Error`)
       .addFields( 
         { name: "Message", value: String(error), inline: true },
-        { name: `In ${type.toLowerCase()}:`, value: originCommand, inline: true },
+        { name: `In ${type.toLowerCase()}:`, value: ctx.command, inline: true },
       )
       .setColor(Colors.Red),
   ];
@@ -33,23 +32,21 @@ async function handleError(
 
 export async function handleCommandError(
   ctx: CommandContext,
-  originCommand: string,
   error: unknown,
 ): Promise<void> {
-  await handleError(ctx, originCommand, error, "Command");
+  await handleError(ctx, error, "Command");
 }
 
 export async function handleInterjectionError(
   ctx: MessageContext,
-  originCommand: string,
   error: unknown,
 ): Promise<void> {
-  await handleError(ctx, originCommand, error, "Interjection");
+  await handleError(ctx, error, "Interjection");
 }
 
+//uncessary variables included in case we need them in future
 export function handleAutocompleteError(
   _ctx: AutocompleteContext,
-  _originCommand: string,
   error: unknown,
 ): void {
   console.error(error);

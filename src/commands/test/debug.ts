@@ -169,6 +169,14 @@ const Debug = new Command({
         }
       },
     }),
+    new Subcommand({
+      name: "error",
+      description: "This command always throws an error.",
+      // eslint-disable-next-line @typescript-eslint/require-await
+      execute: async (_) => {
+        throw new Error("Error message.");
+      }
+    }),
     new Subcommand({ //MARK: debug permissions
       name: "permissions",
       description: "Only the bot host (TheBirdWasHere) should be able to run this command!",
@@ -185,7 +193,7 @@ const Debug = new Command({
         await ctx.reply("Cooldown is not active!");
       }
     }),
-    new Subcommand({ //MARK: debug buttons
+    new Subcommand({ //MARK: debug actionrow
       name: "actionrow",
       description: "Test the system that handles buttons and select menus.",
       execute: async (ctx) => {

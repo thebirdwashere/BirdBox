@@ -1,5 +1,4 @@
 import { Subcommand, CommandOption } from "@src/utility/command.js";
-import { handleCommandError } from "@src/utility/error.js";
 import { QuoteData } from "@src/utility/types.js";
 import { ButtonBuilder, ButtonStyle, ActionRowBuilder, ButtonInteraction, ComponentType, Message } from "discord.js";
 import { quotesAutocomplete, formatQuoteEmbed } from "./utils.js";
@@ -87,16 +86,14 @@ const QuotesGet = new Subcommand({
       } else if (customId == "scratchpad-right") {
         pageNum++;
       } else { //huh what
-        await handleCommandError(ctx, "scratchpad", new Error("what did you just press. how did this happen."));
-        return;
+        throw new Error("what did you just press. how did this happen.");
       }
 
       requestedQuote = serverQuotes.at(pageNum);
       displayQuoteIndex = pageNum >= 0 ? pageNum + 1 : serverQuotes.length + pageNum + 1;
 
       if (requestedQuote === undefined) {
-        await handleCommandError(ctx, "scratchpad", new Error("Could not find an item at the requested index."));
-        return;
+        throw new Error("Could not find an item at the requested index.");
       }
 
       if (pageNum === 0) {
