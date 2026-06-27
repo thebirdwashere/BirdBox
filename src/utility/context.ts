@@ -432,15 +432,15 @@ function baseCollectInteractions(
   ctx: CommandContext,
   params: {
     type: MessageComponentType,
-    //a shame I have to use any in this signature, but
-    //typescript doesn't narrow function parameters
-    //even when they conform just fine to the desired type
     filter?: CollectorFilter<[Interaction]>,
     maxInteractions?: number,
     maxComponents?: number,
     maxUsers?: number,
     timeLimit?: number,
     idleTimeLimit?: number,
+    //a shame I have to use any in this signature, but
+    //typescript doesn't narrow function parameters
+    //even when they conform just fine to the desired type
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     onInteraction: (msg: Message, i: any) => Promise<void>,
     onTimeout?: (msg: Message) => Promise<void>,
