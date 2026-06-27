@@ -97,8 +97,9 @@ CLIENT.on(Events.InteractionCreate, (interaction) => {
         const context = new ChatInputCommandInteractionContext(
           interaction,
           DATA,
+          interaction.commandName,
         );
-        await handleCommandError(context, interaction.commandName, error);
+        await handleCommandError(context, error);
       },
     );
   } else if (interaction.isAutocomplete()) {
@@ -110,7 +111,7 @@ CLIENT.on(Events.InteractionCreate, (interaction) => {
           interaction,
           DATA,
         );
-        handleAutocompleteError(context, interaction.commandName, error);
+        handleAutocompleteError(context, error);
       },
     );
   } else if (interaction.isContextMenuCommand()) {
@@ -121,8 +122,9 @@ CLIENT.on(Events.InteractionCreate, (interaction) => {
         const context = new ContextMenuCommandContext(
           interaction,
           DATA,
+          interaction.commandName
         );
-        await handleCommandError(context, interaction.commandName, error);
+        await handleCommandError(context, error);
       },
     );
   } else {
@@ -139,7 +141,7 @@ CLIENT.on(Events.MessageCreate, (message) => {
     console.log(`\nReceived message from ${message.author.username} with content: \n"\x1b[33m${message.content.substring(0, 50)}${message.content.length > 50 ? "..." : ""}\x1b[0m"`);
   }
 
-  const context = new MessageContext(message, DATA);
+  const context = new MessageContext(message, DATA, message.content.split(" ")[0].slice(BOT_PREFIX.length));
   
   if (message.content.startsWith(DATA.prefix)) {
     if (DEVMODE) console.log("Identified message to be command. Running appropriate parser...");
@@ -147,7 +149,6 @@ CLIENT.on(Events.MessageCreate, (message) => {
       async (error: unknown) => {
         await handleCommandError(
           context,
-          message.content.split(" ")[0].slice(BOT_PREFIX.length),
           error,
         );
       }
