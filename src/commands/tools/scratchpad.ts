@@ -2,7 +2,6 @@ import { Command, CommandOption, Subcommand } from "@src/utility/command.js";
 import { ActionRowBuilder, ButtonBuilder, ButtonInteraction, ButtonStyle, Colors, ComponentType, EmbedBuilder, Message, ModalBuilder, ModalSubmitInteraction, TextInputBuilder, TextInputStyle } from "discord.js";
 import { ScratchpadNoteData } from "@src/utility/types.js";
 import { AutocompleteContext, CommandContext } from "@src/utility/context.js";
-import { handleCommandError } from "@src/utility/error.js";
 
 const Scratchpad = new Command({
   name: "scratchpad",
@@ -121,15 +120,14 @@ const Scratchpad = new Command({
           } else if (customId == "scratchpad-right") {
             pageNum++;
           } else { //huh what
-            await handleCommandError(ctx, "scratchpad", new Error("what did you just press. how did this happen."));
-            return;
+            throw new Error("what did you just press. how did this happen.");
           }
 
           requestedNote = userNotes.at(pageNum);
           displayNoteIndex = pageNum >= 0 ? pageNum + 1 : userNotes.length + pageNum + 1;
 
           if (requestedNote === undefined) {
-            await handleCommandError(ctx, "scratchpad", new Error("Could not find an item at the requested index."));
+            throw new Error("Could not find an item at the requested index.");
             return;
           }
 

@@ -1,6 +1,5 @@
 import { EmbedBuilder, ButtonBuilder, ButtonStyle, ActionRowBuilder, ComponentType, Colors, ButtonInteraction, Message } from "discord.js";
 import { Subcommand, CommandOption } from "@src/utility/command.js";
-import { handleCommandError } from "@src/utility/error.js";
 import { MaybepileEntry } from "@src/utility/types.js";
 import { getMaybepile, getPageNumber, maybepileAutocomplete } from "./utils.js";
 
@@ -127,15 +126,13 @@ const MaybepileView = new Subcommand({
         } else if (customId == "maybepile-right") {
           pageNum++;
         } else { //huh what
-          await handleCommandError(ctx, "maybepile", new Error("what did you just press. how did this happen."));
-          return;
+          throw new Error("what did you just press. how did this happen.");
         }
 
         chosenItem = pileArray.at(pageNum) as MaybepileEntry | undefined;
 
         if (chosenItem === undefined) {
-          await handleCommandError(ctx, "maybepile", new Error("Could not find an item at the requested index."));
-          return;
+          throw new Error("Could not find an item at the requested index.");
         }
 
         if (pageNum === 1) {
