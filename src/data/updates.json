@@ -1,4 +1,4 @@
-[
+{
   {
     "version": "7.0.3",
     "type": "Beta",
@@ -7,9 +7,11 @@
     "notes": [
       "Implemented a component handler to reduce duplicated code",
       "Added `e;debug actionrow` to test the component handler",
+      "Fixed negative indices in `e;quotes`",
       "Fixed some components timing out when actively in use",
       "Optimized `e;version` to not regenerate patch notes each page",
-      "Improved documentation comments for codebase functions"
+      "Improved documentation comments for codebase functions",
+      "Minor changes to linter"
     ]
   },
   {
