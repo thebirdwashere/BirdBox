@@ -44,9 +44,9 @@ const QuotesAdd = new Subcommand({
     if (quoteDate === null) {
       const currentDate = new Date(new Date(ctx.timestamp).toDateString());
 
-      quoteDate = currentDate.toLocaleDateString(undefined, { 
-        month: "long", 
-        day: "numeric", 
+      quoteDate = currentDate.toLocaleDateString(undefined, {
+        month: "long",
+        day: "numeric",
         year: "numeric"
       });
     }
@@ -61,8 +61,8 @@ const QuotesAdd = new Subcommand({
     const currentQuotes = ctx.db.server.fetchOr(ctx.guild.id, "quotes", []) as QuoteData[];
     currentQuotes.push(newQuote);
     ctx.db.server.update(ctx.guild.id, "quotes", currentQuotes);
-        
-    await ctx.reply({ content: `New quote added from **${quotedUser.displayName}**!`, embeds: [await formatQuoteEmbed(ctx, newQuote, currentQuotes.length, "new")] });
+
+    await ctx.reply({ content: `New quote added from **${quotedUser.displayName}**!`, embeds: [await formatQuoteEmbed(ctx, newQuote, currentQuotes.length - 1, "new")] });
   },
 });
 

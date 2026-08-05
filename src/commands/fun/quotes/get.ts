@@ -28,19 +28,17 @@ const QuotesGet = new Subcommand({
       return;
     }
 
-    const requestedQuoteIndex = Number(opts.string.getRequired("quote"));
-    let pageNum = requestedQuoteIndex - 1;
+    const requestedIndex = Number(opts.string.getRequired("quote"));
 
-    if (isNaN(requestedQuoteIndex))
+    if (isNaN(requestedIndex))
       throw new Error("Index is not a number.");
 
+    //support negative numbers indexing from the end instead of the start
+    let pageNum = requestedIndex > 0 ? requestedIndex - 1 : serverQuotes.length + requestedIndex;
     let requestedQuote = serverQuotes.at(pageNum);
 
-    if (requestedQuoteIndex === 0 || requestedQuote === undefined)
+    if (requestedIndex === 0 || requestedQuote === undefined)
       throw new Error("Couldn't find a quote at the requested index.");
-
-    //support negative numbers indexing from the end instead of the start
-    let displayQuoteIndex = pageNum >= 0 ? pageNum + 1 : serverQuotes.length + pageNum + 1;
 
     const leftButton = new ButtonBuilder()
       .setStyle(ButtonStyle.Primary)
@@ -52,7 +50,7 @@ const QuotesGet = new Subcommand({
       .setLabel("🡪");
     const buttonRow = new ActionRowBuilder<ButtonBuilder>()
       .addComponents(leftButton, rightButton);
-                    
+
     if (pageNum === 0) {
       buttonRow.components[0].setDisabled(true);
     } else {
@@ -65,8 +63,8 @@ const QuotesGet = new Subcommand({
       buttonRow.components[1].setDisabled(false);
     }
 
-    await ctx.reply({ 
-      embeds: [await formatQuoteEmbed(ctx, requestedQuote, displayQuoteIndex, "specific")],
+    await ctx.reply({
+      embeds: [await formatQuoteEmbed(ctx, requestedQuote, pageNum, "specific")],
       components: [buttonRow]
     });
 
@@ -90,7 +88,7 @@ const QuotesGet = new Subcommand({
       }
 
       requestedQuote = serverQuotes.at(pageNum);
-      displayQuoteIndex = pageNum >= 0 ? pageNum + 1 : serverQuotes.length + pageNum + 1;
+      pageNum = pageNum >= 0 ? pageNum : serverQuotes.length + pageNum;
 
       if (requestedQuote === undefined) {
         throw new Error("Could not find an item at the requested index.");
@@ -109,7 +107,7 @@ const QuotesGet = new Subcommand({
       }
 
       await msg.edit({
-        embeds: [await formatQuoteEmbed(ctx, requestedQuote, displayQuoteIndex, "specific")], 
+        embeds: [await formatQuoteEmbed(ctx, requestedQuote, pageNum, "specific")],
         components: [buttonRow]
       });
 

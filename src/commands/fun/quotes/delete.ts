@@ -25,7 +25,7 @@ const QuotesDelete = new Subcommand({
       await ctx.reply("Sorry, editing quotes requires the Manage Messages permission.");
       return;
     }
-        
+
     const serverQuotes = ctx.db.server.fetchOr(ctx.guild.id, "quotes", []) as QuoteData[];
 
     if (serverQuotes.length === 0) {
@@ -33,24 +33,23 @@ const QuotesDelete = new Subcommand({
       return;
     }
 
-    const requestedQuoteIndex = Number(opts.string.getRequired("quote"));
+    const requestedIndex = Number(opts.string.getRequired("quote"));
 
-    if (isNaN(requestedQuoteIndex))
+    if (isNaN(requestedIndex))
       throw new Error("Index is not a number.");
 
-    const requestedQuote = serverQuotes.at(requestedQuoteIndex-1);
+    //support negative numbers indexing from the end instead of the start
+    const pageNum = requestedIndex > 0 ? requestedIndex - 1 : serverQuotes.length + requestedIndex;
+    const requestedQuote = serverQuotes.at(pageNum);
 
-    if (requestedQuoteIndex === 0 || requestedQuote === undefined)
+    if (requestedIndex === 0 || requestedQuote === undefined)
       throw new Error("Couldn't find a quote at the requested index.");
 
-    //support negative numbers indexing from the end instead of the start
-    const displayQuoteIndex = requestedQuoteIndex >= 1 ? requestedQuoteIndex : serverQuotes.length + requestedQuoteIndex;
-
-    serverQuotes.splice(requestedQuoteIndex-1);
+    serverQuotes.splice(pageNum);
     ctx.db.server.update(ctx.guild.id, "quotes", serverQuotes);
 
-    await ctx.reply({ content: "The following quote was successfully deleted!", embeds: [await formatQuoteEmbed(ctx, requestedQuote, displayQuoteIndex, "specific")] });
+    await ctx.reply({ content: "The following quote was successfully deleted!", embeds: [await formatQuoteEmbed(ctx, requestedQuote, pageNum, "specific")] });
   }
 });
-    
+
 export default QuotesDelete;

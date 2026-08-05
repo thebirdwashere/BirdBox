@@ -34,18 +34,17 @@ const QuotesEdit = new Subcommand({
       return;
     }
 
-    const requestedQuoteIndex = Number(opts.string.getRequired("quote"));
+    const requestedIndex = Number(opts.string.getRequired("quote"));
 
-    if (isNaN(requestedQuoteIndex))
+    if (isNaN(requestedIndex))
       throw new Error("Index is not a number.");
 
-    const requestedQuote = serverQuotes.at(requestedQuoteIndex-1);
-
-    if (requestedQuoteIndex === 0 || requestedQuote === undefined)
-      throw new Error("Couldn't find a quote at the requested index.");
-
     //support negative numbers indexing from the end instead of the start
-    const displayQuoteIndex = requestedQuoteIndex >= 1 ? requestedQuoteIndex : serverQuotes.length + requestedQuoteIndex;
+    const pageNum = requestedIndex > 0 ? requestedIndex - 1 : serverQuotes.length + requestedIndex;
+    const requestedQuote = serverQuotes.at(pageNum);
+
+    if (requestedIndex === 0 || requestedQuote === undefined)
+      throw new Error("Couldn't find a quote at the requested index.");
 
     //MARK: modal fields
     const modalFields = [
@@ -109,7 +108,7 @@ const QuotesEdit = new Subcommand({
       const newText = i.fields.getTextInputValue("quotes-edit-text");
       const newUsername = i.fields.getTextInputValue("quotes-edit-username");
       const newId = i.fields.getTextInputValue("quotes-edit-userid");
-          
+
       const newQuote: QuoteData = {
         date: newDate,
         text: newText,
@@ -117,10 +116,11 @@ const QuotesEdit = new Subcommand({
         userid: newId,
       };
 
-      serverQuotes[requestedQuoteIndex-1] = newQuote;
+      serverQuotes[pageNum] = newQuote;
+      console.log(serverQuotes);
       ctx.db.server.update(guildId, "quotes", serverQuotes);
 
-      await i.reply({ content: "The following quote was successfully edited!", embeds: [await formatQuoteEmbed(ctx, newQuote, displayQuoteIndex, "specific")] });
+      await i.reply({ content: "The following quote was successfully edited!", embeds: [await formatQuoteEmbed(ctx, newQuote, pageNum, "specific")] });
     }
 
     await ctx.replyModal(editModal, onModalSubmit);

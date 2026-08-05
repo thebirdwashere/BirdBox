@@ -17,9 +17,9 @@ export async function quotesAutocomplete(ctx: AutocompleteContext): Promise<void
 
   await ctx.respond(
     serverQuotes.map((quote, i) => (
-      { 
-        name: `${(i+1).toString()}: ${quote.text.replaceAll("\n", " ")}`, 
-        value: (i+1).toString()
+      {
+        name: `${(i + 1).toString()}: ${quote.text.replaceAll("\n", " ")}`,
+        value: (i + 1).toString()
       }
     ))
   );
@@ -29,7 +29,7 @@ export async function quotesAutocomplete(ctx: AutocompleteContext): Promise<void
 export async function checkPermissions(ctx: CommandContext): Promise<boolean> {
   if (!ctx.guild)
     throw new Error("Checked permissions outside guild.");
-  
+
   const serverMember = await ctx.guild.members.fetch(ctx.user.id);
 
   return serverMember.permissions.has(PermissionFlagsBits.ManageMessages);
@@ -45,43 +45,43 @@ export async function formatQuoteEmbed(ctx: CommandContext, quote: QuoteData, in
     .setColor(Colors.Blue);
 
   switch (type) {
-  case "new": {
-    quoteEmbed.
-      setTitle(`New Quote from ${ctx.guild.name}`)
-      .setFooter({ text: `Quote ${String(index)}`});
-    
-    break;
-  } case "random": {
-    quoteEmbed
-      .setTitle(`Random Quote from ${ctx.guild.name}`)
-      .setFooter({ text: `Quote ${String(index)} ● ${randomChoice(FOOTERS.quotes)}` });
-    
-    break;
-  } case "specific": {
-    quoteEmbed
-      .setTitle(`Quote from ${ctx.guild.name}`)
-      .setFooter({ text: `Quote ${String(index)} ● ${randomChoice(FOOTERS.quotes)}` });
-    
-    break;
+    case "new": {
+      quoteEmbed.
+        setTitle(`New Quote from ${ctx.guild.name}`)
+        .setFooter({ text: `Quote ${String(index + 1)}` });
+
+      break;
+    } case "random": {
+      quoteEmbed
+        .setTitle(`Random Quote from ${ctx.guild.name}`)
+        .setFooter({ text: `Quote ${String(index + 1)} ● ${randomChoice(FOOTERS.quotes)}` });
+
+      break;
+    } case "specific": {
+      quoteEmbed
+        .setTitle(`Quote from ${ctx.guild.name}`)
+        .setFooter({ text: `Quote ${String(index + 1)} ● ${randomChoice(FOOTERS.quotes)}` });
+
+      break;
+    }
   }
-  }
-        
+
   try {
     //try to grab the user in the server
     const quotedMember = await ctx.guild.members.fetch(quote.userid);
     quoteEmbed
-      .setFields({ name: `-${quotedMember.displayName} (${quote.date})`, value: ""})
+      .setFields({ name: `-${quotedMember.displayName} (${quote.date})`, value: "" })
       .setThumbnail(quotedMember.displayAvatarURL());
   } catch {
     try {
       //if that fails, grab them outside the server
       const quotedUser = await ctx.data.client.users.fetch(quote.userid);
       quoteEmbed
-        .setFields({ name: `-${quotedUser.displayName} (${quote.date})`, value: ""})
+        .setFields({ name: `-${quotedUser.displayName} (${quote.date})`, value: "" })
         .setThumbnail(quotedUser.displayAvatarURL());
     } catch {
       quoteEmbed
-        .setFields({ name: `-${quote.username} (${quote.date})`, value: ""})
+        .setFields({ name: `-${quote.username} (${quote.date})`, value: "" })
         .setThumbnail("https://cdn.discordapp.com/embed/avatars/2.png");
     }
   }
