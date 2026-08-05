@@ -41,49 +41,49 @@ const MaybepileClaim = new Subcommand({
     const claimerNotDev = !ctx.data.admins.includes(ctx.user.id);
 
     if (claimedItem.claim.status === "claimed" && ctx.user.id !== claimedItem.claim.id && claimerNotDev) {
-      await ctx.reply({content: "sorry, that's already been claimed"});
+      await ctx.reply({ content: "sorry, that's already been claimed" });
       return;
     }
 
     const updatedItem = claimedItem;
 
     switch (claimStatus) {
-    case "claim": {
-      claimedItem.claim = {
-        status: "claimed",
-        user: ctx.user.username,
-        id: ctx.user.id,
-      };
-      await ctx.reply(`${ctx.user.username} has claimed "${claimedItem.title}"!`);
+      case "claim": {
+        claimedItem.claim = {
+          status: "claimed",
+          user: ctx.user.username,
+          id: ctx.user.id,
+        };
+        await ctx.reply(`${ctx.user.username} has claimed "${claimedItem.title}"!`);
 
-      break;
-    }
-    case "in development": {
-      claimedItem.claim = {
-        status: "in development",
-        user: ctx.user.username,
-        id: ctx.user.id,
-      };
-      await ctx.reply(`${ctx.user.username} has started work on "${claimedItem.title}"!`);
+        break;
+      }
+      case "in development": {
+        claimedItem.claim = {
+          status: "in development",
+          user: ctx.user.username,
+          id: ctx.user.id,
+        };
+        await ctx.reply(`${ctx.user.username} has started work on "${claimedItem.title}"!`);
 
-      break;
-    }
-    case "deprioritized": {
-      claimedItem.claim = {
-        status: "deprioritized"
-      };
-      await ctx.reply(`${ctx.user.username} has deprioritzed "${claimedItem.title}"!`);
+        break;
+      }
+      case "deprioritized": {
+        claimedItem.claim = {
+          status: "deprioritized"
+        };
+        await ctx.reply(`${ctx.user.username} has deprioritzed "${claimedItem.title}"!`);
 
-      break;
-    }
-    case "unclaimed": {
-      claimedItem.claim = {
-        status: "unclaimed"
-      };
-      await ctx.reply(`${ctx.user.username} has unclaimed **${claimedItem.title}**!`);
+        break;
+      }
+      case "unclaimed": {
+        claimedItem.claim = {
+          status: "unclaimed"
+        };
+        await ctx.reply(`${ctx.user.username} has unclaimed **${claimedItem.title}**!`);
 
-      break;
-    }
+        break;
+      }
     }
 
     pileArray[itemNum] = updatedItem;

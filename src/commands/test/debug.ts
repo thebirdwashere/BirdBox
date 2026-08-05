@@ -83,7 +83,7 @@ const Debug = new Command({
         if (channel == null) {
           await ctx.send("undefined");
         } else {
-          await ctx.send(`<#${channel.id.toString()}>` );
+          await ctx.send(`<#${channel.id.toString()}>`);
         }
       },
     }),
@@ -117,23 +117,23 @@ const Debug = new Command({
         let databaseTable: DatabaseTableManager;
 
         switch (scope) {
-        case "user": {
-          databaseTable = ctx.db.user;
-          break;
-        } case "channel": {
-          databaseTable = ctx.db.channel;
-          break;
-        } case "server": {
-          databaseTable = ctx.db.server;
-          break;
-        } case "global": {
-          databaseTable = ctx.db.global;
-          break;
-        } default: {
-          throw new Error("Scope not among required values.");
+          case "user": {
+            databaseTable = ctx.db.user;
+            break;
+          } case "channel": {
+            databaseTable = ctx.db.channel;
+            break;
+          } case "server": {
+            databaseTable = ctx.db.server;
+            break;
+          } case "global": {
+            databaseTable = ctx.db.global;
+            break;
+          } default: {
+            throw new Error("Scope not among required values.");
+          }
         }
-        }
-        
+
         let returnValue: string;
         if (property !== null) {
           const databaseReturn = databaseTable.fetchOrUndefined(id, property);
@@ -216,7 +216,7 @@ const Debug = new Command({
                   .setValue("3")
               ])
           );
-        
+
         const buttonRow = new ActionRowBuilder<ButtonBuilder>()
           .addComponents(
             new ButtonBuilder()
@@ -233,7 +233,7 @@ const Debug = new Command({
               .setCustomId("debug-actionrow-blue")
           );
 
-        await ctx.reply({components: [selectMenuRow, buttonRow]});
+        await ctx.reply({ components: [selectMenuRow, buttonRow] });
 
         ctx.collectInteractions({
           type: ComponentType.StringSelect,

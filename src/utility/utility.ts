@@ -91,39 +91,39 @@ export function create2DArray<T>(width: number, height: number, fill: T): T[][] 
  * @returns The value fetched from the database.
  */
 export function fetchConfigOption<ConfigScopeType extends ConfigScope>(
-  db: Database, 
-  scope: ConfigScopeType, 
-  option: keyof Config[ConfigScopeType], 
+  db: Database,
+  scope: ConfigScopeType,
+  option: keyof Config[ConfigScopeType],
   id: string | undefined
 ): Exclude<unknown, undefined> {
   const setting = CONFIG[scope][option];
 
   switch (scope) {
-  case "user": {
-    if (id === undefined)
-      throw new Error(`Attempted to get server config option ${setting.name} without a valid ID.`);
-    
-    const fetchedData = db.user.fetchOr(id, `config_${setting.value}`, setting.default);
-    if (fetchedData === "enable" || fetchedData === "disable") {
-      return fetchedData === "enable";
-    } else {
-      return fetchedData;
+    case "user": {
+      if (id === undefined)
+        throw new Error(`Attempted to get server config option ${setting.name} without a valid ID.`);
+
+      const fetchedData = db.user.fetchOr(id, `config_${setting.value}`, setting.default);
+      if (fetchedData === "enable" || fetchedData === "disable") {
+        return fetchedData === "enable";
+      } else {
+        return fetchedData;
+      }
+
+    } case "server": {
+      if (id === undefined)
+        throw new Error(`Attempted to get user config option ${setting.name} without a valid ID.`);
+
+      const fetchedData = db.server.fetchOr(id, `config_${setting.value}`, setting.default);
+      if (fetchedData === "enable" || fetchedData === "disable") {
+        return fetchedData === "enable";
+      } else {
+        return fetchedData;
+      }
+
+    } case "bot": {
+      return db.global.fetchOr("global", `config_${setting.value}`, setting.default);
     }
-
-  } case "server": {
-    if (id === undefined)
-      throw new Error(`Attempted to get user config option ${setting.name} without a valid ID.`);
-
-    const fetchedData = db.server.fetchOr(id, `config_${setting.value}`, setting.default);
-    if (fetchedData === "enable" || fetchedData === "disable") {
-      return fetchedData === "enable";
-    } else {
-      return fetchedData;
-    }
-
-  } case "bot": {
-    return db.global.fetchOr("global", `config_${setting.value}`, setting.default);
-  }
   }
 }
 

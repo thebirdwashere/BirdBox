@@ -38,7 +38,7 @@ export async function detectChatInputInteractionCommand(
   if (command === undefined)
     throw new Error(`Command \`/${commandName}\` does not exist.`);
 
-  if (command.permissions) 
+  if (command.permissions)
     testUserPermissions(command.permissions, PERMS, interaction.user.id);
 
   handleCooldown(command, data.admins, interaction.user.id, interaction.createdTimestamp);
@@ -98,92 +98,92 @@ function parseCommandOptions(
 
   for (const option of command.body) {
     switch (option.type) {
-    case "number":
-      {
-        const opt = interaction.options.getInteger(
-          option.data.name,
-          option.data.required,
-        );
+      case "number":
+        {
+          const opt = interaction.options.getInteger(
+            option.data.name,
+            option.data.required,
+          );
 
-        if (opt === null && option.data.required)
-          throw new Error(`Required option missing: \`${option.data.name}\``);
+          if (opt === null && option.data.required)
+            throw new Error(`Required option missing: \`${option.data.name}\``);
 
-        options.number.set(option.data.name, opt);
-      }
-      break;
-    case "boolean":
-      {
-        const opt = interaction.options.getBoolean(
-          option.data.name,
-          option.data.required,
-        );
+          options.number.set(option.data.name, opt);
+        }
+        break;
+      case "boolean":
+        {
+          const opt = interaction.options.getBoolean(
+            option.data.name,
+            option.data.required,
+          );
 
-        if (opt === null && option.data.required)
-          throw new Error(`Required option missing: \`${option.data.name}\``);
+          if (opt === null && option.data.required)
+            throw new Error(`Required option missing: \`${option.data.name}\``);
 
-        options.boolean.set(option.data.name, opt);
-      }
-      break;
-    case "string":
-      {
-        const opt = interaction.options.getString(
-          option.data.name,
-          option.data.required,
-        );
-        if (opt === null && option.data.required)
-          throw new Error(`Required option missing: \`${option.data.name}\``);
+          options.boolean.set(option.data.name, opt);
+        }
+        break;
+      case "string":
+        {
+          const opt = interaction.options.getString(
+            option.data.name,
+            option.data.required,
+          );
+          if (opt === null && option.data.required)
+            throw new Error(`Required option missing: \`${option.data.name}\``);
 
-        options.string.set(option.data.name, opt);
-      }
-      break;
-    case "user":
-      {
-        const opt = interaction.options.getUser(
-          option.data.name,
-          option.data.required,
-        );
-        if (opt === null && option.data.required)
-          throw new Error(`Required option missing: \`${option.data.name}\``);
+          options.string.set(option.data.name, opt);
+        }
+        break;
+      case "user":
+        {
+          const opt = interaction.options.getUser(
+            option.data.name,
+            option.data.required,
+          );
+          if (opt === null && option.data.required)
+            throw new Error(`Required option missing: \`${option.data.name}\``);
 
-        options.user.set(option.data.name, opt);
-      }
-      break;
-    case "role":
-      {
-        const opt = interaction.options.getRole(
-          option.data.name,
-          option.data.required,
-        );
-        if (opt === null && option.data.required)
-          throw new Error(`Required option missing: \`${option.data.name}\``);
+          options.user.set(option.data.name, opt);
+        }
+        break;
+      case "role":
+        {
+          const opt = interaction.options.getRole(
+            option.data.name,
+            option.data.required,
+          );
+          if (opt === null && option.data.required)
+            throw new Error(`Required option missing: \`${option.data.name}\``);
 
-        options.role.set(option.data.name, opt);
-      }
-      break;
-    case "mentionable":
-      {
-        const opt = interaction.options.getMentionable(
-          option.data.name,
-          option.data.required,
-        );
-        if (opt === null && option.data.required) 
-          throw new Error(`Required option missing: \`${option.data.name}\``);
+          options.role.set(option.data.name, opt);
+        }
+        break;
+      case "mentionable":
+        {
+          const opt = interaction.options.getMentionable(
+            option.data.name,
+            option.data.required,
+          );
+          if (opt === null && option.data.required)
+            throw new Error(`Required option missing: \`${option.data.name}\``);
 
-        options.mentionable.set(option.data.name, opt);
-      }
-      break;
-    case "channel":
-      {
-        const opt = interaction.options.getChannel(
-          option.data.name,
-          option.data.required,
-        );
-        if (opt === null && option.data.required) 
-          throw new Error(`Required option missing: \`${option.data.name}\``);
+          options.mentionable.set(option.data.name, opt);
+        }
+        break;
+      case "channel":
+        {
+          const opt = interaction.options.getChannel(
+            option.data.name,
+            option.data.required,
+          );
+          if (opt === null && option.data.required)
+            throw new Error(`Required option missing: \`${option.data.name}\``);
 
-        options.channel.set(option.data.name, opt);
-      }
-      break;
+          options.channel.set(option.data.name, opt);
+        }
+        break;
     }
   }
 
@@ -204,7 +204,7 @@ export async function detectMessageCommand(
 
   // Unify arguments delimited by quotation marks.
   let first: number, last: number;
-  for (;;) {
+  for (; ;) {
     first = args.findIndex((str) => /^["“”]/.test(str));
     last = args.findIndex((str) => /["“”]$/.test(str));
 
@@ -226,7 +226,7 @@ export async function detectMessageCommand(
     throw new Error(`Command \`${data.prefix}${commandName}\` does not exist.`);
   // command: Command
 
-  if (command.permissions) 
+  if (command.permissions)
     testUserPermissions(command.permissions, PERMS, message.author.id);
 
   handleCooldown(command, data.admins, message.author.id, message.createdTimestamp);
@@ -258,7 +258,7 @@ export async function detectMessageCommand(
   } else if (command.body !== undefined && isSubcommandArray(command.body)) {
     const subcommandName = args.shift();
     if (subcommandName === undefined) {
-      const subcommandsFormatter = new Intl.ListFormat("en", {type: "conjunction",});
+      const subcommandsFormatter = new Intl.ListFormat("en", { type: "conjunction", });
       const subcommandsList = subcommandsFormatter.format(command.body.map(sub => `\`${sub.data.name}\``));
       throw new InputError(`Subcommand missing in command \`${data.prefix}${commandName}\`. Available subcommands are ${subcommandsList}.`);
     }
@@ -349,8 +349,8 @@ function populateMessageOptions(
     if (sourceType !== targetType && sourceType !== "optional") {
       throw new InputError(
         `Argument at position ${String(index + 1)} ` +
-          `is of type \`${sourceType}\` ` +
-          `when type \`${targetType}\` was expected.`,
+        `is of type \`${sourceType}\` ` +
+        `when type \`${targetType}\` was expected.`,
       );
     }
 
@@ -365,87 +365,87 @@ function populateMessageOptions(
       const pingedThing = message.mentions[`${type}s`].get(pingedID);
       if (pingedThing === undefined)
         throw new Error(`Error locating pinged ${type} for command option "${option.data.name}".`);
-      
+
       return pingedThing;
     }
 
     switch (sourceType) {
-    case "number":
-      options.number.set(option.data.name, Number(source));
-      break;
-    case "boolean":
-      options.boolean.set(option.data.name, source === "true");
-      break;
-    case "string": {
-      if (option.choices && !option.choices.map(e => e.toLowerCase()).includes(source.toLowerCase())) {
-        const optionsFormatter = new Intl.ListFormat("en", {type: "disjunction"});
-        const choicesList = optionsFormatter.format(option.choices.map(choice => `\`${choice}\``));
-        throw new InputError(`Provided "${source}" is invalid for option "${option.data.name}". Option must be one of ${choicesList}.`);
-      }
-      if (option.length && (
-        source.length < option.length[0] ||
-        source.length > option.length[1]
-      )) {
-        throw new InputError(`Option ${option.data.name} must be between ${option.length[0].toString()} and ${option.length[1].toString()} characters (${source.length.toString()} characters provided).`);
-      }
-
-      options.string.set(option.data.name, source);
-      break;
-    }
-    case "user": {
-      const pingedUser = getMentionableFromID(USER_PING_REGEX, "user");
-      options.user.set(option.data.name, pingedUser);
-      break;
-    } case "role": {
-      const pingedRole = getMentionableFromID(ROLE_PING_REGEX, "role");
-      options.role.set(option.data.name, pingedRole);
-      break;
-    } case "mentionable": {
-      if (isUserPing) {
-        const pingedUser = getMentionableFromID(USER_PING_REGEX, "user");
-        options.mentionable.set(option.data.name, pingedUser);
-        break;
-      } else if (isRolePing) {
-        const pingedRole = getMentionableFromID(ROLE_PING_REGEX, "role");
-        options.mentionable.set(option.data.name, pingedRole);
-        break;
-      } else {
-        //this should not happen.
-        throw new Error("Unexpected issue occured parsing mentionable.");
-      }
-    } case "channel": {
-      const linkedChannel = getMentionableFromID(CHANNEL_LINK_REGEX, "channel");
-      options.channel.set(option.data.name, linkedChannel);
-      break;
-    }
-    case "optional":
-      if (option.data.required)
-        throw new InputError(`Argument "${option.data.name}" (position ${String(index + 1)}) is required.`);
-
-      switch (option.type) {
       case "number":
-        options.number.set(option.data.name, null);
+        options.number.set(option.data.name, Number(source));
         break;
       case "boolean":
-        options.boolean.set(option.data.name, null);
+        options.boolean.set(option.data.name, source === "true");
         break;
-      case "string":
-        options.string.set(option.data.name, null);
-        break;
-      case "user":
-        options.user.set(option.data.name, null);
-        break;
-      case "role":
-        options.role.set(option.data.name, null);
-        break;
-      case "mentionable":
-        options.mentionable.set(option.data.name, null);
-        break;
-      case "channel":
-        options.channel.set(option.data.name, null);
+      case "string": {
+        if (option.choices && !option.choices.map(e => e.toLowerCase()).includes(source.toLowerCase())) {
+          const optionsFormatter = new Intl.ListFormat("en", { type: "disjunction" });
+          const choicesList = optionsFormatter.format(option.choices.map(choice => `\`${choice}\``));
+          throw new InputError(`Provided "${source}" is invalid for option "${option.data.name}". Option must be one of ${choicesList}.`);
+        }
+        if (option.length && (
+          source.length < option.length[0] ||
+          source.length > option.length[1]
+        )) {
+          throw new InputError(`Option ${option.data.name} must be between ${option.length[0].toString()} and ${option.length[1].toString()} characters (${source.length.toString()} characters provided).`);
+        }
+
+        options.string.set(option.data.name, source);
         break;
       }
-      break;
+      case "user": {
+        const pingedUser = getMentionableFromID(USER_PING_REGEX, "user");
+        options.user.set(option.data.name, pingedUser);
+        break;
+      } case "role": {
+        const pingedRole = getMentionableFromID(ROLE_PING_REGEX, "role");
+        options.role.set(option.data.name, pingedRole);
+        break;
+      } case "mentionable": {
+        if (isUserPing) {
+          const pingedUser = getMentionableFromID(USER_PING_REGEX, "user");
+          options.mentionable.set(option.data.name, pingedUser);
+          break;
+        } else if (isRolePing) {
+          const pingedRole = getMentionableFromID(ROLE_PING_REGEX, "role");
+          options.mentionable.set(option.data.name, pingedRole);
+          break;
+        } else {
+          //this should not happen.
+          throw new Error("Unexpected issue occured parsing mentionable.");
+        }
+      } case "channel": {
+        const linkedChannel = getMentionableFromID(CHANNEL_LINK_REGEX, "channel");
+        options.channel.set(option.data.name, linkedChannel);
+        break;
+      }
+      case "optional":
+        if (option.data.required)
+          throw new InputError(`Argument "${option.data.name}" (position ${String(index + 1)}) is required.`);
+
+        switch (option.type) {
+          case "number":
+            options.number.set(option.data.name, null);
+            break;
+          case "boolean":
+            options.boolean.set(option.data.name, null);
+            break;
+          case "string":
+            options.string.set(option.data.name, null);
+            break;
+          case "user":
+            options.user.set(option.data.name, null);
+            break;
+          case "role":
+            options.role.set(option.data.name, null);
+            break;
+          case "mentionable":
+            options.mentionable.set(option.data.name, null);
+            break;
+          case "channel":
+            options.channel.set(option.data.name, null);
+            break;
+        }
+        break;
     }
   }
 
@@ -462,7 +462,7 @@ export async function handleAutocomplete(
 
   if (command === undefined)
     throw new Error(`Command \`/${commandName}\` does not exist.`);
-  
+
   if (command.body === undefined) {
     throw new Error(`Autocomplete call on command \`/${commandName}\` without provided options.`);
   } else if (isOptionArray(command.body)) {
@@ -485,14 +485,14 @@ export async function handleAutocomplete(
         `Subcommand \`/${commandName} ${subcommandName}\` does not exist.`,
       );
     }
-  
+
     if (subcommand.autocomplete === undefined)
       throw new Error(`Missing autocomplete handler in command \`/${commandName} ${subcommandName}\``);
 
     const context = new AutocompleteContext(interaction, data);
     await subcommand.autocomplete(context);
   }
-  
+
   await sleep(1);
 }
 
@@ -508,11 +508,11 @@ export async function detectContextMenuCommand(
 
   if (command !== undefined) {
     const contextMenuData = command.contextmenu;
-  
+
     if (contextMenuData === undefined)
       throw new Error(`Could not locate context menu command with name: ${commandName}`);
 
-    if (command.execute === undefined) 
+    if (command.execute === undefined)
       throw new Error("Malformed context menu command is missing an execute function.");
 
     const context = new ContextMenuCommandContext(interaction, data, commandName);
@@ -520,20 +520,20 @@ export async function detectContextMenuCommand(
     const options = new Options();
     if (contextMenuData.contextOption) {
       switch (contextMenuData.type) {
-      case "message": {
-        if (!interaction.isMessageContextMenuCommand())
-          throw new Error("Invalid data for user-type context menu option.");
+        case "message": {
+          if (!interaction.isMessageContextMenuCommand())
+            throw new Error("Invalid data for user-type context menu option.");
 
-        options.string.set(contextMenuData.contextOption, interaction.targetMessage.content);
+          options.string.set(contextMenuData.contextOption, interaction.targetMessage.content);
 
-        break;
-      } case "user": {
-        if (!interaction.isUserContextMenuCommand())
-          throw new Error("Invalid data for message-type context menu option.");
-      
-        options.user.set(contextMenuData.contextOption, interaction.targetUser);
-        break;
-      }
+          break;
+        } case "user": {
+          if (!interaction.isUserContextMenuCommand())
+            throw new Error("Invalid data for message-type context menu option.");
+
+          options.user.set(contextMenuData.contextOption, interaction.targetUser);
+          break;
+        }
       }
     }
 
@@ -559,33 +559,33 @@ export async function detectContextMenuCommand(
         break;
       }
     }
-    
+
     if (command === undefined || subcommand === undefined)
       throw new Error("Could not locate context menu command.");
-    
+
     const contextMenuData = subcommand.contextmenu;
-  
+
     if (contextMenuData === undefined)
       throw new Error(`Could not locate context menu command with name: ${commandName}`);
-    
+
     const context = new ContextMenuCommandContext(interaction, data, commandName);
 
     const options = new Options();
     if (contextMenuData.contextOption) {
       switch (contextMenuData.type) {
-      case "message": {
-        if (!interaction.isMessageContextMenuCommand())
-          throw new Error("Invalid data for user-type context menu option.");
+        case "message": {
+          if (!interaction.isMessageContextMenuCommand())
+            throw new Error("Invalid data for user-type context menu option.");
 
-        options.string.set(contextMenuData.contextOption, interaction.targetMessage.content);
-        break;
-      } case "user": {
-        if (!interaction.isUserContextMenuCommand())
-          throw new Error("Invalid data for message-type context menu option.");
-      
-        options.user.set(contextMenuData.contextOption, interaction.targetUser);
-        break;
-      }
+          options.string.set(contextMenuData.contextOption, interaction.targetMessage.content);
+          break;
+        } case "user": {
+          if (!interaction.isUserContextMenuCommand())
+            throw new Error("Invalid data for message-type context menu option.");
+
+          options.user.set(contextMenuData.contextOption, interaction.targetUser);
+          break;
+        }
       }
     }
 

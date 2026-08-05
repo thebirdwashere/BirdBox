@@ -1,5 +1,6 @@
 import { Command, CommandOption } from "@src/utility/command.js";
-import { ActionRowBuilder, ActivityType, ButtonBuilder, ButtonInteraction, ButtonStyle, ChannelSelectMenuBuilder, ChannelType, Colors, ComponentType, EmbedBuilder, MentionableSelectMenuBuilder, MessageActionRowComponentBuilder, MessageComponentInteraction, ModalBuilder, ModalSubmitInteraction, RoleSelectMenuBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, TextInputBuilder, TextInputStyle, UserSelectMenuBuilder 
+import {
+  ActionRowBuilder, ActivityType, ButtonBuilder, ButtonInteraction, ButtonStyle, ChannelSelectMenuBuilder, ChannelType, Colors, ComponentType, EmbedBuilder, MentionableSelectMenuBuilder, MessageActionRowComponentBuilder, MessageComponentInteraction, ModalBuilder, ModalSubmitInteraction, RoleSelectMenuBuilder, StringSelectMenuBuilder, StringSelectMenuOptionBuilder, TextInputBuilder, TextInputStyle, UserSelectMenuBuilder
 } from "discord.js";
 import config from "@src/data/config.json" with { type: "json" };
 import { Config, ConfigOptions, ConfigScope } from "@src/utility/types.js";
@@ -53,7 +54,7 @@ const Config = new Command({
       await ctx.reply("sorry, you must be a BirdBox admin to modify those settings");
       return;
     }
-    
+
     if (scope === "server") {
       // Reject the user if they are illegitimately modifying server config.
       if (ctx.guild === null) {
@@ -63,7 +64,7 @@ const Config = new Command({
 
       const guildMember = await ctx.guild.members.fetch(ctx.user.id);
       const hasManageRoles = guildMember.permissions.has("ManageRoles");
-      
+
       if (!hasManageRoles && !!ctx.data.admins.includes(ctx.user.id)
       ) {
         await ctx.reply("sorry, you need the Manage Roles permission to modify server config");
@@ -105,8 +106,8 @@ const Config = new Command({
 
             setSetting(ctx, scope, CONFIG[scope][name], submittedValue);
           })
-          .catch(async () => {await i.followUp("Modal submit timed out.");});
-        
+          .catch(async () => { await i.followUp("Modal submit timed out."); });
+
         return;
       }
 
@@ -114,7 +115,7 @@ const Config = new Command({
 
       const settingId = scope == "user" ? i.user.id : i.guild?.id;
       setSetting(ctx, scope, CONFIG[scope][name], i.customId);
-      await response.edit({components: await updateRow(settingId, ctx.db, scope, name)});
+      await response.edit({ components: await updateRow(settingId, ctx.db, scope, name) });
     });
 
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
@@ -149,7 +150,7 @@ const Config = new Command({
         setSetting(ctx, scope, CONFIG[scope][name], i.customId);
       }
     });
-    
+
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
     selectCollector.on("end", async () => {
       await response.edit({ components: [] });
@@ -178,7 +179,7 @@ const Config = new Command({
     });
 
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    MentionableCollector.on("collect", async (i) => { 
+    MentionableCollector.on("collect", async (i) => {
       const collectedValue = i.values[0];
       await i.deferUpdate();
 
@@ -193,7 +194,7 @@ const Config = new Command({
     });
 
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    RoleCollector.on("collect", async (i) => { 
+    RoleCollector.on("collect", async (i) => {
       const collectedValue = i.values[0];
       await i.deferUpdate();
 
@@ -208,7 +209,7 @@ const Config = new Command({
     });
 
     // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    UserCollector.on("collect", async (i) => { 
+    UserCollector.on("collect", async (i) => {
       const collectedValue = i.values[0];
       await i.deferUpdate();
 
@@ -226,7 +227,7 @@ function updateEmbed(scope: ConfigScope, name: string): EmbedBuilder { //MARK: u
     .setColor(Colors.White)
     .setTitle(`${scope.charAt(0).toUpperCase() + scope.slice(1)} Config`)
     .setFooter({ text: "Made by TheBirdWasHere, with help from friends." });
-  
+
   if (name == NO_DEFAULT_SELECTION) {
     configEmbed.setDescription("Use the menu below to select a setting.");
   } else {
@@ -241,12 +242,12 @@ function updateEmbed(scope: ConfigScope, name: string): EmbedBuilder { //MARK: u
 
 //MARK: update row
 async function updateRow<T extends ConfigScope>(
-  id: string | undefined, 
-  db: Database, 
-  scope: T, 
+  id: string | undefined,
+  db: Database,
+  scope: T,
   name: keyof Config[T]
 ): Promise<
-  [ActionRowBuilder<StringSelectMenuBuilder>, ActionRowBuilder<MessageActionRowComponentBuilder>] 
+  [ActionRowBuilder<StringSelectMenuBuilder>, ActionRowBuilder<MessageActionRowComponentBuilder>]
   | [ActionRowBuilder<StringSelectMenuBuilder>]
 > {
   // Returns an updated row on request.
@@ -285,81 +286,81 @@ async function updateRow<T extends ConfigScope>(
 
 //MARK: options builder
 async function optionsBuilder<ScopeType extends ConfigScope>(
-  id: string | undefined, 
-  db: Database, 
-  scope: ScopeType, 
+  id: string | undefined,
+  db: Database,
+  scope: ScopeType,
   name: keyof Config[ScopeType],
 ): Promise<MessageActionRowComponentBuilder[]> {
   const currentSetting = CONFIG[scope][name];
   const currentSelection = await fetchConfigOption(db, scope, name, id);
-  
+
   // Switch by preset option  
   //TODO: IN FUTURE ADD OPTION FOR ADDING CUSTOM MULTI-ROW OPTIONS
-  switch (currentSetting.displayOptionsAs) { 
-  case "toggle": { 
-    const disableButton = new ButtonBuilder()
-      .setCustomId("disable")
-      .setLabel("Disable")
-      .setStyle(ButtonStyle.Danger)
-      .setDisabled(currentSelection === false);
-    const enableButton = new ButtonBuilder()
-      .setCustomId("enable")
-      .setLabel("Enable")
-      .setStyle(ButtonStyle.Success)
-      .setDisabled(currentSelection === true);
-    return [disableButton, enableButton]; 
-  } case "buttons": {
-    const buttonArray: ButtonBuilder[] = [];
-    currentSetting.options.forEach((item) => {
-      buttonArray.push(
-        new ButtonBuilder()
-          .setCustomId(item.value)
-          .setLabel(item.name)
-          .setStyle(ButtonStyle.Primary)
-          .setDisabled(currentSelection == item.value)
-      );
-    });
-    return buttonArray;
-  } case "select": { 
-    const settingOptionsSelect = new StringSelectMenuBuilder()
-      .setCustomId("settingOptionsSelect")
-      .setPlaceholder("Select an option...");
-    currentSetting.options.forEach((item) => {
-      settingOptionsSelect.addOptions([
-        new StringSelectMenuOptionBuilder()
-          .setLabel(item.name)
-          .setValue(item.value),
-      ]);
-    });
-    return [settingOptionsSelect];
-  } case "channel": {
-    const channelSelect = new ChannelSelectMenuBuilder()
-      .setCustomId("channelSelect")
-      .setChannelTypes(ChannelType.GuildText)
-      .setPlaceholder("Select a channel...");
-    return [channelSelect];
-  } case "user": {
-    const userSelect = new UserSelectMenuBuilder()
-      .setCustomId("userSelect")
-      .setPlaceholder("Select a user...");
-    return [userSelect];
-  } case "role": {
-    const roleSelect = new RoleSelectMenuBuilder()
-      .setCustomId("roleSelect")
-      .setPlaceholder("Select a role...");
-    return [roleSelect];
-  } case "mentionable": {
-    const mentionableSelect = new MentionableSelectMenuBuilder()
-      .setCustomId("mentionableSelect")
-      .setPlaceholder("Select a user or role...");
-    return [mentionableSelect];
-  } case "modal": {
-    const modalButton = new ButtonBuilder()
-      .setCustomId("modal")
-      .setLabel("Open Modal")
-      .setStyle(ButtonStyle.Primary);
-    return [modalButton];
-  }
+  switch (currentSetting.displayOptionsAs) {
+    case "toggle": {
+      const disableButton = new ButtonBuilder()
+        .setCustomId("disable")
+        .setLabel("Disable")
+        .setStyle(ButtonStyle.Danger)
+        .setDisabled(currentSelection === false);
+      const enableButton = new ButtonBuilder()
+        .setCustomId("enable")
+        .setLabel("Enable")
+        .setStyle(ButtonStyle.Success)
+        .setDisabled(currentSelection === true);
+      return [disableButton, enableButton];
+    } case "buttons": {
+      const buttonArray: ButtonBuilder[] = [];
+      currentSetting.options.forEach((item) => {
+        buttonArray.push(
+          new ButtonBuilder()
+            .setCustomId(item.value)
+            .setLabel(item.name)
+            .setStyle(ButtonStyle.Primary)
+            .setDisabled(currentSelection == item.value)
+        );
+      });
+      return buttonArray;
+    } case "select": {
+      const settingOptionsSelect = new StringSelectMenuBuilder()
+        .setCustomId("settingOptionsSelect")
+        .setPlaceholder("Select an option...");
+      currentSetting.options.forEach((item) => {
+        settingOptionsSelect.addOptions([
+          new StringSelectMenuOptionBuilder()
+            .setLabel(item.name)
+            .setValue(item.value),
+        ]);
+      });
+      return [settingOptionsSelect];
+    } case "channel": {
+      const channelSelect = new ChannelSelectMenuBuilder()
+        .setCustomId("channelSelect")
+        .setChannelTypes(ChannelType.GuildText)
+        .setPlaceholder("Select a channel...");
+      return [channelSelect];
+    } case "user": {
+      const userSelect = new UserSelectMenuBuilder()
+        .setCustomId("userSelect")
+        .setPlaceholder("Select a user...");
+      return [userSelect];
+    } case "role": {
+      const roleSelect = new RoleSelectMenuBuilder()
+        .setCustomId("roleSelect")
+        .setPlaceholder("Select a role...");
+      return [roleSelect];
+    } case "mentionable": {
+      const mentionableSelect = new MentionableSelectMenuBuilder()
+        .setCustomId("mentionableSelect")
+        .setPlaceholder("Select a user or role...");
+      return [mentionableSelect];
+    } case "modal": {
+      const modalButton = new ButtonBuilder()
+        .setCustomId("modal")
+        .setLabel("Open Modal")
+        .setStyle(ButtonStyle.Primary);
+      return [modalButton];
+    }
   }
 }
 
@@ -371,20 +372,20 @@ async function customModal(i: ButtonInteraction, setting: ConfigOptions): Promis
   const modal = new ModalBuilder()
     .setCustomId("settings-modal")
     .setTitle(setting.name);
-  
+
   const optionInput = new TextInputBuilder()
     .setCustomId(setting.options.value)
     .setLabel(setting.options.name)
     .setPlaceholder(setting.options.placeholder);
-  
+
   switch (setting.options.type) {
-  case "short": {
-    optionInput.setStyle(TextInputStyle.Short);
-    break;
-  } case "paragraph": {
-    optionInput.setStyle(TextInputStyle.Paragraph);
-    break;
-  }
+    case "short": {
+      optionInput.setStyle(TextInputStyle.Short);
+      break;
+    } case "paragraph": {
+      optionInput.setStyle(TextInputStyle.Paragraph);
+      break;
+    }
   }
 
   modal.addComponents(new ActionRowBuilder<TextInputBuilder>().addComponents(optionInput));
@@ -395,30 +396,30 @@ async function customModal(i: ButtonInteraction, setting: ConfigOptions): Promis
 //MARK: set config
 function setSetting(ctx: CommandContext, scope: ConfigScope, setting: ConfigOptions, value: unknown): void {
   switch (scope) {
-  case "user": {
-    ctx.db.user.update(ctx.user.id, `config_${setting.value}`, value);
-    break;
-  } case "server": {
-    if (ctx.guild == null)
-      throw new Error("Attempted to set server config outside a server.");
+    case "user": {
+      ctx.db.user.update(ctx.user.id, `config_${setting.value}`, value);
+      break;
+    } case "server": {
+      if (ctx.guild == null)
+        throw new Error("Attempted to set server config outside a server.");
 
-    ctx.db.server.update(ctx.guild.id, `config_${setting.value}`, value);
-    break;
-  } case "bot": {
-    ctx.db.global.update("global", `config_${setting.value}`, value);
-    
-    //manual extra code for specific configs
-    switch (setting.value) {
-    case "status": {
-      if (typeof value !== "string") break;
-      if (ctx.data.client.user == null) break;
+      ctx.db.server.update(ctx.guild.id, `config_${setting.value}`, value);
+      break;
+    } case "bot": {
+      ctx.db.global.update("global", `config_${setting.value}`, value);
 
-      ctx.data.client.user.setPresence({ activities: [{ name: value, type: ActivityType.Custom }] });
+      //manual extra code for specific configs
+      switch (setting.value) {
+        case "status": {
+          if (typeof value !== "string") break;
+          if (ctx.data.client.user == null) break;
+
+          ctx.data.client.user.setPresence({ activities: [{ name: value, type: ActivityType.Custom }] });
+          break;
+        }
+      }
+
       break;
     }
-    }
-
-    break;
-  }
   }
 }

@@ -1,6 +1,6 @@
 import eslint from "@eslint/js";
 import tseslint from "typescript-eslint";
-import { defineConfig, globalIgnores } from "eslint/config"
+//import { defineConfig, globalIgnores } from "eslint/config"
 
 export default tseslint.config({
   files: ["src/**/*.{ts,js}"],
@@ -18,7 +18,7 @@ export default tseslint.config({
   rules: {
     quotes: ["warn", "double"],
     semi: ["warn", "always"],
-    "indent": ["warn", 2],
+    "indent": ["warn", 2, { "SwitchCase": 1 }],
     "@typescript-eslint/no-unused-vars": [
       "error",
       {
