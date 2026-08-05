@@ -294,7 +294,7 @@ async function optionsBuilder<ScopeType extends ConfigScope>(
   const currentSetting = CONFIG[scope][name];
   const currentSelection = await fetchConfigOption(db, scope, name, id);
 
-  // Switch by preset option  
+  // Switch by preset option
   //TODO: IN FUTURE ADD OPTION FOR ADDING CUSTOM MULTI-ROW OPTIONS
   switch (currentSetting.displayOptionsAs) {
     case "toggle": {
