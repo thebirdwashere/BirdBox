@@ -7,6 +7,7 @@
     "notes": [
       "Implemented a component handler to reduce duplicated code",
       "Added `e;debug actionrow` to test the component handler",
+      "Fixed trailing spaces making some lyrics untriggerable",
       "Fixed negative indices in `e;quotes`",
       "Fixed some components timing out when actively in use",
       "Optimized `e;version` to not regenerate patch notes each page",
