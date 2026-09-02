@@ -5,6 +5,7 @@
     "date": "TBD",
     "devs": ["AgentNebulator"],
     "notes": [
+      "Added `e;wordle resume` subcommand to view an ongoing game",
       "Implemented a component handler to reduce duplicated code",
       "Added `e;debug actionrow` to test the component handler",
       "Fixed trailing spaces making some lyrics untriggerable",
