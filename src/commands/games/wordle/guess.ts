@@ -8,7 +8,7 @@ const WORDLE = wordle as Wordle;
 
 const WordleGuess = new Subcommand({
   name: "guess",
-  description: "Given a country, guess its flag.",
+  description: "Place a guess in the current Wordle game!",
   options: [
     new CommandOption({
       name: "word",
@@ -50,7 +50,7 @@ const WordleGuess = new Subcommand({
       await ctx.reply("how bout you start a game before trying to guess lol");
       return;
     }
-                
+
     //get guess and set to lower case
     const guess = opts.string.getRequired("word").toLowerCase();
 
@@ -73,7 +73,7 @@ const WordleGuess = new Subcommand({
 
     //get box colors for new guess and set them
     const letterColors = getLetterColors(solutionWord, guess);
-    gameFields[guesses - 1] = {boxes: letterColors, word: guess.toUpperCase()};
+    gameFields[guesses - 1] = { boxes: letterColors, word: guess.toUpperCase() };
 
     //get solution code for display
     const encryptedSolution = encryptWordCode(solutionWord);
@@ -99,14 +99,14 @@ const WordleGuess = new Subcommand({
         .setCustomId("wordle-copy-results")
         .setLabel("Copy Results")
         .setStyle(ButtonStyle.Success);
-                    
+
       const wordleActionRow = new ActionRowBuilder<ButtonBuilder>()
         .addComponents(copyResultsButton);
 
       //reply to message
-      const response = await ctx.reply({embeds: [wordleEmbed], components: [wordleActionRow]});
+      const response = await ctx.reply({ embeds: [wordleEmbed], components: [wordleActionRow] });
       if (userHasLost) {
-        await response.reply({content: `bruh it was \`${solutionWord.toLowerCase()}\` how did you not get that`});
+        await response.reply({ content: `bruh it was \`${solutionWord.toLowerCase()}\` how did you not get that` });
       }
 
       ctx.collectInteractions({
@@ -126,7 +126,7 @@ const WordleGuess = new Subcommand({
           .setDescription(`Copy in the top right corner! \n${resultsString}`);
 
         //send embed
-        await i.reply({embeds: [resultsEmbed], flags: ["Ephemeral"]});
+        await i.reply({ embeds: [resultsEmbed], flags: ["Ephemeral"] });
         await onTimeout(msg);
       }
 
@@ -137,7 +137,7 @@ const WordleGuess = new Subcommand({
 
       //remove active session
       ctx.db.user.update(ctx.user.id, "activeWordle", undefined);
-                    
+
       //update statistics, but only if there was no word code (to avoid cheating)
       if (!currentSession.usedCode) { //MARK: update statistics
         const userStats = ctx.db.user.fetchOr(ctx.user.id, "wordleStats", {
@@ -163,7 +163,7 @@ const WordleGuess = new Subcommand({
           userStats.guessStats.loss++;
           userStats.currentStreak = 0;
         }
-                        
+
         //set new statistics
         ctx.db.user.update(ctx.user.id, "wordleStats", userStats);
       }
@@ -175,12 +175,12 @@ const WordleGuess = new Subcommand({
         .setCustomId("wordle-used-letters")
         .setLabel("See Used Letters")
         .setStyle(ButtonStyle.Secondary);
-            
+
       const wordleActionRow = new ActionRowBuilder<ButtonBuilder>()
         .addComponents(usedLettersButton);
-                    
+
       //send message
-      await ctx.reply({embeds: [wordleEmbed], components: [wordleActionRow]});
+      await ctx.reply({ embeds: [wordleEmbed], components: [wordleActionRow] });
 
       ctx.collectInteractions({
         type: ComponentType.Button,
@@ -191,10 +191,10 @@ const WordleGuess = new Subcommand({
 
       async function onInteraction(msg: Message, i: ButtonInteraction): Promise<void> {
         const keyboardText = handleUsedLettersDisplay(gameFields);
-        await i.reply({content: keyboardText});
+        await i.reply({ content: keyboardText });
         await onTimeout(msg);
       }
-    
+
       async function onTimeout(msg: Message): Promise<void> {
         wordleActionRow.components[0].setDisabled(true);
         await msg.edit({ components: [wordleActionRow] });
@@ -202,7 +202,7 @@ const WordleGuess = new Subcommand({
 
       //set new data
       ctx.db.user.update(ctx.user.id, "activeWordle", {
-        solution: solutionWord, 
+        solution: solutionWord,
         guesses: guesses,
         fields: gameFields,
         usedCode: currentSession.usedCode
