@@ -33,14 +33,14 @@ const ConnectFour = new Command({
   execute: async (ctx, opts) => {
     //MARK: opponent setup
     let opponentId = opts.user.getOptional("opponent")?.id;
-    
+
     if (opponentId == null) {
 
       const setupEmbed = new EmbedBuilder()
         .setTitle("Connect Four Setup")
         .setColor(Colors.White)
         .setDescription(`<@${ctx.user.id}> wants to play Connect Four. Care to join?`);
-      
+
       const joinButton = new ButtonBuilder()
         .setStyle(ButtonStyle.Success)
         .setLabel("Join")
@@ -49,7 +49,7 @@ const ConnectFour = new Command({
         .setStyle(ButtonStyle.Secondary)
         .setLabel("Play Against Bot")
         .setCustomId("bot-connectfour-button");
-      
+
       const joinRow = new ActionRowBuilder<ButtonBuilder>()
         .addComponents(joinButton, botButton);
 
@@ -59,7 +59,7 @@ const ConnectFour = new Command({
         const filter = (i: Interaction): boolean => (
           i.isButton() &&
           //make sure, if they selected the bot button, they're the same person who requested to play
-          (i.customId !== "bot-connectfour-button" || i.user.id === ctx.user.id) 
+          (i.customId !== "bot-connectfour-button" || i.user.id === ctx.user.id)
         );
         const i = await joinMessage.awaitMessageComponent({ filter, time: 60_000 }) as ButtonInteraction;
         await i.deferUpdate();
@@ -69,7 +69,7 @@ const ConnectFour = new Command({
         } else {
           opponentId = i.user.id;
         }
-        
+
       } catch {
         await joinMessage.edit({ content: `Nobody joined <@${ctx.user.id}>'s game :(`, components: [] });
         return;
@@ -81,23 +81,25 @@ const ConnectFour = new Command({
 
     const players = [ctx.user.id, opponentId] as const;
     let currentPlayer: 0 | 1 = 0;
-    let turnIndex = 0;
+    // let turnIndex = 0;
     let gameOver = false;
 
-    const versusText = `<@${players[currentPlayer]}> vs. <@${players[currentPlayer+1]}>`;
+    const versusText = `<@${players[currentPlayer]}> vs. <@${players[currentPlayer + 1]}>`;
 
     const gameEmbed = new EmbedBuilder()
       .setTitle("Connect Four")
       .setColor(Colors.Red)
       .setDescription(versusText)
-      .setFields({
-        name: `Player ${String(currentPlayer+1)}'s Turn`,
-        value: `<@${players[currentPlayer]}> [${PLAYER_CHECKERS[currentPlayer]}]`
-      },
-      {
-        name: "",
-        value: renderGrid(gameGrid)
-      })
+      .setFields(
+        {
+          name: `Player ${String(currentPlayer + 1)}'s Turn`,
+          value: `<@${players[currentPlayer]}> [${PLAYER_CHECKERS[currentPlayer]}]`
+        },
+        {
+          name: "",
+          value: renderGrid(gameGrid)
+        }
+      )
       .setFooter({ text: randomChoice(FOOTERS.tictactoe.start) });
 
     const buttonRowArray = [
@@ -136,7 +138,7 @@ const ConnectFour = new Command({
             .setStyle(ButtonStyle.Secondary)
         )
     ];
-    
+
     if (ctx.lastReply == null) {
       await ctx.reply({ embeds: [gameEmbed], components: buttonRowArray });
     } else {
@@ -151,38 +153,38 @@ const ConnectFour = new Command({
       onTimeout
     });
 
-    function executeMove(i: ButtonInteraction): void {
-      turnIndex++;
-
-      const columnInput = /connectfour-button(.)/.exec(i.customId)?.at(1);
-      if (columnInput == undefined) {
-        throw new Error("Unable to locate button number.");
-      }
-
-      const columnNum = Number(columnInput);
-      if (isNaN(columnNum)) {
-        throw new Error("Unable to parse column number.");
-      } else if (0 > columnNum || columnNum > 6) {
-        throw new Error("Column number out of range.");
-      }
+    function executeMove(i: number): void {
+      // turnIndex++;
 
       const currentChecker = PLAYER_CHECKERS[currentPlayer];
-      gameGrid = addToColumn(gameGrid, columnNum, currentChecker);
+      gameGrid = addToColumn(gameGrid, i, currentChecker, BLANK_CELL);
 
-      if (gameGrid[columnNum].every(cell => cell !== BLANK_CELL)) {
-        buttonRowArray[+(columnNum > 3)].components[columnNum % 4].setDisabled(true);
+      if (columnIsFull(gameGrid[i], BLANK_CELL)) {
+        buttonRowArray[+(i > 3)].components[i % 4].setDisabled(true);
       }
 
       //binary negation by inverting as boolean and then casting back to number
-      currentPlayer = Number(!currentPlayer) as 0 | 1; 
-      gameEmbed.setFields({
-        name: `Player ${String(currentPlayer+1)}'s Turn`,
-        value: `<@${players[currentPlayer]}> [${PLAYER_CHECKERS[currentPlayer]}]`
-      },
-      {
-        name: "",
-        value: renderGrid(gameGrid)
-      });
+      currentPlayer = Number(!currentPlayer) as 0 | 1;
+      gameEmbed.setFields(
+        {
+          name: `Player ${String(currentPlayer + 1)}'s Turn`,
+          value: `<@${players[currentPlayer]}> [${PLAYER_CHECKERS[currentPlayer]}]`
+        },
+        {
+          name: "",
+          value: renderGrid(gameGrid)
+        }
+      );
+
+      const tallestColumn = Math.max(...gameGrid.map(col => col.filter(cell => cell !== BLANK_CELL).length));
+
+      if (tallestColumn <= 2) {
+        gameEmbed.setFooter({ text: randomChoice(FOOTERS.connectfour.early) });
+      } else if (tallestColumn <= 4) {
+        gameEmbed.setFooter({ text: randomChoice(FOOTERS.connectfour.mid) });
+      } else {
+        gameEmbed.setFooter({ text: randomChoice(FOOTERS.connectfour.late) });
+      }
     }
 
     async function handleWinOrTie(msg: Message): Promise<void> {
@@ -203,7 +205,7 @@ const ConnectFour = new Command({
           .setColor(Colors.Green)
           .setFields([
             {
-              name: `Player ${String(currentPlayer+1)} Wins`,
+              name: `Player ${String(currentPlayer + 1)} Wins`,
               value: `Congrats <@${winnerId.toString()}>!`
             },
             {
@@ -258,11 +260,24 @@ const ConnectFour = new Command({
         }
       }
 
-      executeMove(i);
+      const move = columnFromButton(i);
+      executeMove(move);
       await handleWinOrTie(msg);
 
       await i.deferUpdate();
       await msg.edit({ embeds: [gameEmbed], components: buttonRowArray });
+
+      if (!gameOver && players[currentPlayer] === ctx.data.id) {
+        await sleep(AI_MOVE_TIME);
+
+        const playerNumGrid = gameGrid.map(col => col.map(cell => PLAYER_CHECKERS.indexOf(cell)));
+        const birdboxMove = birdboxAI(playerNumGrid);
+
+        executeMove(birdboxMove);
+        await handleWinOrTie(msg);
+
+        await msg.edit({ embeds: [gameEmbed], components: buttonRowArray });
+      }
     }
 
     function disableButtons(): void {
@@ -293,30 +308,45 @@ export default ConnectFour;
 
 type XYDirection = [-1 | 0 | 1, -1 | 0 | 1];
 
-function detectWinner(numGrid: number[][]):
-  [number, [CoordinatePair, CoordinatePair, CoordinatePair, CoordinatePair]] | undefined
-{
-  console.log(numGrid);
+function columnFromButton(i: ButtonInteraction): number {
+  const columnInput = /connectfour-button(.)/.exec(i.customId)?.at(1);
+  if (columnInput == undefined) {
+    throw new Error("Unable to locate button number.");
+  }
 
-  for (let col = 0; col < numGrid[0].length; col++) {
-    if (numGrid[3][col] === -1)
+  const columnNum = Number(columnInput);
+  if (isNaN(columnNum)) {
+    throw new Error("Unable to parse column number.");
+  } else if (0 > columnNum || columnNum > 6) {
+    throw new Error("Column number out of range.");
+  }
+
+  return columnNum;
+}
+
+function detectWinner(numGrid: number[][]):
+  [number, [CoordinatePair, CoordinatePair, CoordinatePair, CoordinatePair]] | undefined {
+  //console.log(numGrid);
+
+  for (let row = 0; row < numGrid[0].length; row++) {
+    if (numGrid[3][row] === -1)
       continue;
 
-    const horizontalTest = testWinnerAt(numGrid, [3, col], [-1, 0], [1, 0]);
+    const horizontalTest = testWinnerAt(numGrid, [3, row], [-1, 0], [1, 0]);
     if (horizontalTest !== undefined) return horizontalTest;
 
-    const frontDiagonalTest = testWinnerAt(numGrid, [3, col], [-1, -1], [1, 1]);
+    const frontDiagonalTest = testWinnerAt(numGrid, [3, row], [-1, -1], [1, 1]);
     if (frontDiagonalTest !== undefined) return frontDiagonalTest;
 
-    const backDiagonalTest = testWinnerAt(numGrid, [3, col], [-1, 1], [1, -1]);
+    const backDiagonalTest = testWinnerAt(numGrid, [3, row], [-1, 1], [1, -1]);
     if (backDiagonalTest !== undefined) return backDiagonalTest;
   }
 
-  for (let row = 0; row < numGrid.length; row++) {
-    if (numGrid[row][3] === -1)
+  for (let col = 0; col < numGrid.length; col++) {
+    if (numGrid[col][3] === -1)
       continue;
 
-    const verticalTest = testWinnerAt(numGrid, [row, 3], [0, -1], [0, 1]);
+    const verticalTest = testWinnerAt(numGrid, [col, 3], [0, -1], [0, 1]);
     if (verticalTest !== undefined) return verticalTest;
   }
 
@@ -324,10 +354,9 @@ function detectWinner(numGrid: number[][]):
 }
 
 function testWinnerAt(numGrid: number[][], coords: CoordinatePair, leftDirection: XYDirection, rightDirection: XYDirection):
-  [number, [CoordinatePair, CoordinatePair, CoordinatePair, CoordinatePair]] | undefined
-{
-  const [scoreLeft, visitedLeft] = testWinnerRecursive(0, [], numGrid, coords, leftDirection);
-  const [scoreRight, visitedRight] = testWinnerRecursive(0, [], numGrid, coords, rightDirection);
+  [number, [CoordinatePair, CoordinatePair, CoordinatePair, CoordinatePair]] | undefined {
+  const [scoreLeft, visitedLeft] = getLengthRecursive(0, [], numGrid, coords, leftDirection);
+  const [scoreRight, visitedRight] = getLengthRecursive(0, [], numGrid, coords, rightDirection);
 
   if ((scoreLeft + scoreRight + 1) >= 4) {
     const allInRow: CoordinatePair[] = [coords].concat(visitedLeft).concat(visitedRight);
@@ -341,14 +370,14 @@ function testWinnerAt(numGrid: number[][], coords: CoordinatePair, leftDirection
   return undefined;
 }
 
-function testWinnerRecursive(
+function getLengthRecursive(
   tally: number,
   visited: CoordinatePair[],
-  numGrid: number[][], 
-  current: CoordinatePair, 
+  numGrid: number[][],
+  current: CoordinatePair,
   direction: XYDirection
 ): [number, CoordinatePair[]] {
-  const next: [number, number] = [current[0]+direction[0], current[1]+direction[1]];
+  const next: [number, number] = [current[0] + direction[0], current[1] + direction[1]];
 
   //failsafe if indexing goes too far
   if (
@@ -365,59 +394,72 @@ function testWinnerRecursive(
 
   if (numGrid[current[0]][current[1]] === numGrid[next[0]][next[1]]) {
     visited.push(next);
-    return testWinnerRecursive(tally+1, visited, numGrid, next, direction);
+    return getLengthRecursive(tally + 1, visited, numGrid, next, direction);
   } else {
     return [tally, visited];
   }
+}
+
+//MARK: AI handler
+function birdboxAI(
+  numGrid: number[][]
+): number {
+  let foundMove: number | undefined;
+  let foundPlayer: 0 | 1 = 0;
+
+  //awful idea
+  //drop either piece in every column. if anyone win as a result, it's a good move
+  for (const player of [0, 1]) {
+    for (const colIndex of numGrid.keys()) {
+      if (!columnIsFull(numGrid[colIndex], -1)) {
+        const gridCopy = structuredClone(numGrid);
+        const hypothetical = addToColumn(gridCopy, colIndex, player, -1);
+        // console.log(hypothetical);
+        if (detectWinner(hypothetical)) {
+          if (foundPlayer !== 1) {
+            foundMove = colIndex;
+            foundPlayer = player as 0 | 1;
+          }
+        }
+      }
+    }
+  }
+
+  // console.log("found move: ", foundMove);
+
+  //choose randomly if nothing was found
+  return foundMove ?? randomChoice(
+    [
+      [0],
+      [1, 1],
+      [2, 2, 2],
+      [3, 3, 3, 3],
+      [4, 4, 4],
+      [5, 5],
+      [6],
+    ].filter(col => !columnIsFull(numGrid[col[0]], -1)).flat()
+  );
 }
 
 function renderGrid(grid: string[][]): string {
   return grid.map((_, i) => grid.map(row => row[i]).join(" ")).join("\n") + BOTTOM_ROW;
 }
 
-function addToColumn(grid: string[][], col: number, checker: string): string[][] {
-  const column = grid[col];
+function columnIsFull<T>(c: T[], blank: T): boolean {
+  return c.every(cell => cell !== blank);
+}
+
+function addToColumn<T>(grid: T[][], col: number, checker: T, blank: T): T[][] {
+  const newGrid = Array.from(grid);
+  const column = newGrid[col];
 
   for (let i = column.length - 1; i >= 0; i--) {
-    if (column[i] === BLANK_CELL) {
-      grid[col][i] = checker;
-      return grid;
+    if (column[i] === blank) {
+      newGrid[col][i] = checker;
+      return newGrid;
     }
   }
 
   throw new Error("Couldn't insert into column.");
 }
 
-// function oldDetectWinner() {
-//   //index down from the top of the grid until it becomes impossible to have a vertical four-in-a-row
-//   for (let i = playerNumGrid[0].length - 1; i > 2; i--) {
-//     for (let j = 0; j < playerNumGrid.length; j++) {
-//       const checkedCell = playerNumGrid[j][i];
-//       if (checkedCell === -1) {
-//         continue;
-//       }
-
-//       if ( //straight down
-//         checkedCell == playerNumGrid[j][i-1]
-//         && checkedCell == playerNumGrid[j][i-2]
-//         && checkedCell == playerNumGrid[j][i-3]
-//       ) {
-//         return [checkedCell, [[j, i], [j, i-1], [j, i-2], [j, i-3]]];
-//       } else if ( // this diagonal: /
-//         j > 2 && 
-//         checkedCell == playerNumGrid[j-1][i-1]
-//         && checkedCell == playerNumGrid[j-2][i-2]
-//         && checkedCell == playerNumGrid[j-3][i-3]
-//       ) {
-//         return [checkedCell, [[j, i], [j-1, i-1], [j-2, i-2], [j-3, i-3]]];
-//       } else if ( // this diagonal: \
-//         j < 4 &&
-//         checkedCell == playerNumGrid[j+1][i-1]
-//         && checkedCell == playerNumGrid[j+2][i-2]
-//         && checkedCell == playerNumGrid[j+3][i-3]
-//       ) {
-//         return [checkedCell, [[j, i], [j+1, i-1], [j+2, i-2], [j+3, i-3]]];
-//       }
-//     };
-//   }
-// }

@@ -28,14 +28,14 @@ const TicTacToe = new Command({
   execute: async (ctx, opts) => {
     //MARK: opponent setup
     let opponentId = opts.user.getOptional("opponent")?.id;
-    
+
     if (opponentId == null) {
 
       const setupEmbed = new EmbedBuilder()
         .setTitle("Tic-Tac-Toe Setup")
         .setColor(Colors.White)
         .setDescription(`<@${ctx.user.id}> wants to play Tic-Tac-Toe. Care to join?`);
-      
+
       const joinButton = new ButtonBuilder()
         .setStyle(ButtonStyle.Success)
         .setLabel("Join")
@@ -44,7 +44,7 @@ const TicTacToe = new Command({
         .setStyle(ButtonStyle.Secondary)
         .setLabel("Play Against Bot")
         .setCustomId("bot-tictactoe-button");
-      
+
       const joinRow = new ActionRowBuilder<ButtonBuilder>()
         .addComponents(joinButton, botButton);
 
@@ -54,7 +54,7 @@ const TicTacToe = new Command({
         const filter = (i: Interaction): boolean => (
           i.isButton() &&
           //make sure, if they selected the bot button, they're the same person who requested to play
-          (i.customId !== "bot-tictactoe-button" || i.user.id === ctx.user.id) 
+          (i.customId !== "bot-tictactoe-button" || i.user.id === ctx.user.id)
         );
         const i = await joinMessage.awaitMessageComponent({ filter, time: 60_000 }) as ButtonInteraction;
         await i.deferUpdate();
@@ -64,7 +64,7 @@ const TicTacToe = new Command({
         } else {
           opponentId = i.user.id;
         }
-        
+
       } catch {
         await joinMessage.edit({ content: `Nobody joined <@${ctx.user.id}>'s game :(`, components: [] });
         return;
@@ -84,7 +84,7 @@ const TicTacToe = new Command({
           .setCustomId(`${i.toString()}${j.toString()}-tictactoe-button`)
           .setStyle(ButtonStyle.Secondary)
           .setEmoji("➖");
-        
+
         newActionRow.addComponents(button);
         newValueRow.push(-1);
       }
@@ -99,7 +99,7 @@ const TicTacToe = new Command({
     let turnIndex = 0;
     let gameOver = false;
 
-    const versusText = `<@${players[currentPlayer]}> vs. <@${players[currentPlayer+1]}>`;
+    const versusText = `<@${players[currentPlayer]}> vs. <@${players[currentPlayer + 1]}>`;
 
     const gameEmbed = new EmbedBuilder()
       .setTitle("Tic-Tac-Toe")
@@ -107,11 +107,11 @@ const TicTacToe = new Command({
       .setDescription(versusText)
       .setFields({
         inline: true,
-        name: `Player ${String(currentPlayer+1)}'s Turn`,
+        name: `Player ${String(currentPlayer + 1)}'s Turn`,
         value: `<@${players[currentPlayer]}> [${playerSymbols[currentPlayer]}]`
       })
       .setFooter({ text: randomChoice(FOOTERS.tictactoe.start) });
-    
+
     if (ctx.lastReply == null) {
       await ctx.reply({ embeds: [gameEmbed], components: buttonRowArray });
     } else {
@@ -138,10 +138,10 @@ const TicTacToe = new Command({
       boardArray[i][j] = currentPlayer;
 
       //binary negation by inverting as boolean and then casting back to number
-      currentPlayer = Number(!currentPlayer) as 0 | 1; 
+      currentPlayer = Number(!currentPlayer) as 0 | 1;
       gameEmbed.setFields({
         inline: true,
-        name: `Player ${String(currentPlayer+1)}'s Turn`,
+        name: `Player ${String(currentPlayer + 1)}'s Turn`,
         value: `<@${players[currentPlayer]}> [${playerSymbols[currentPlayer]}]`
       });
 
@@ -173,7 +173,7 @@ const TicTacToe = new Command({
           .setColor(Colors.Green)
           .setFields({
             inline: true,
-            name: `Player ${String(currentPlayer+1)} Wins`,
+            name: `Player ${String(currentPlayer + 1)} Wins`,
             value: `Congrats <@${winnerId.toString()}>!`
           })
           .setFooter({ text: randomChoice(FOOTERS.tictactoe.win) });
@@ -261,11 +261,10 @@ const TicTacToe = new Command({
 export default TicTacToe;
 
 //MARK: detect winner
-function detectWinner(board: number[][]): 
-  [number, [CoordinatePair, CoordinatePair, CoordinatePair]] | undefined 
-{
+function detectWinner(board: number[][]):
+  [number, [CoordinatePair, CoordinatePair, CoordinatePair]] | undefined {
   const middlePlayer = board[1][1];
-  
+
   if (middlePlayer !== -1) {
     if (board[0][0] === middlePlayer && board[2][2] === middlePlayer) { //back diagonal
       return [middlePlayer, [[0, 0], [1, 1], [2, 2]]];
@@ -343,7 +342,7 @@ function birdboxAI(board: number[][]): CoordinatePair {
     .flat()
     .map((value, index) => {
       if (value === -1) {
-        const rowNum = Math.floor(index/3);
+        const rowNum = Math.floor(index / 3);
         const colNum = index % 3;
         return [colNum, rowNum];
       }
@@ -352,7 +351,7 @@ function birdboxAI(board: number[][]): CoordinatePair {
 
   if (potentialMoves.length === 0)
     throw new Error("Could not find a suitable move.");
-  
+
   const moveChoice = randomChoice(potentialMoves);
   return moveChoice as CoordinatePair;
 }

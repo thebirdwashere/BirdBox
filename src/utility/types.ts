@@ -7,7 +7,7 @@ import { Database } from "./database.js";
 export type NonEmptyArray<T> = [T, ...T[]];
 
 export interface NameValueObject {
-  name: string, 
+  name: string,
   value: string
 };
 
@@ -150,7 +150,7 @@ export interface Wordle {
 export type WordleGameFields = { boxes: string[]; word: string; }[];
 
 export interface WordleGameData {
-  solution: string, 
+  solution: string,
   guesses: number,
   fields: WordleGameFields,
   usedCode: boolean,
@@ -159,7 +159,7 @@ export interface WordleGameData {
 export type WordleGuessNum = | "1" | "2" | "3" | "4" | "5" | "6" | "loss";
 
 export interface UserWordleStats {
-  guessStats: Record<WordleGuessNum, number>, 
+  guessStats: Record<WordleGuessNum, number>,
   currentStreak: number,
   bestStreak: number,
 }
@@ -167,9 +167,9 @@ export interface UserWordleStats {
 
 //MARK: Misc JSON
 export type EightBallResponses = (string | {
-  text: string; 
-  credit?: string; 
-  url?: string; 
+  text: string;
+  credit?: string;
+  url?: string;
   image?: string;
 })[];
 
@@ -185,6 +185,13 @@ export interface Footers {
     win: string[];
     nowin: string[];
   },
+  connectfour: {
+    start: string[];
+    early: string[];
+    mid: string[];
+    late: string[];
+    win: string[];
+  }
   interjections: {
     generic: string[];
     alphabetical: string[];

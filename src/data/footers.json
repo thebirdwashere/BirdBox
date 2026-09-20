@@ -38,7 +38,8 @@
     "we were all thinking it, someone had to say it",
     "you gotta respect it",
     "who could forget about this one",
-    "oh i remember this, good times"
+    "oh i remember this, good times",
+    "im crine bro really said that"
   ],
   "tictactoe": {
     "start": [
@@ -52,12 +53,14 @@
       "off to a great start",
       "can't wait to see how this ends",
       "interesting strategy...",
-      "ah yes, the classic Kravchenko Gambit",
+      "ah yes, the classic Cvdfgspfvdrvls Gambit",
       "hard to say who has the advantage",
       "yikes, huge blunder there",
       "excellent defensive play",
       "not so sure about that move",
-      "looking good, but anything can happen"
+      "looking good, but anything can happen",
+      "TUFF MOVE FR",
+      "absolute cinema"
     ],
     "late": [
       "really closing down the grid here",
@@ -68,7 +71,8 @@
       "just trading blows now",
       "it's not over until it's over",
       "the momentum is shifting, or is it?",
-      "running out of time..."
+      "running out of time...",
+      "im crine that move was so cringe fr"
     ],
     "win": [
       "WHATTTT A GAME",
@@ -79,7 +83,8 @@
       "gg no re",
       "well, you win some you lose some",
       "one for the record books",
-      "a game for the ages"
+      "a game for the ages",
+      "🥀💀🔥🪫🤞💯"
     ],
     "nowin": [
       "BORINGGGG",
@@ -91,6 +96,75 @@
       "everyone played hard there",
       "really dropped the ball",
       "cat game? more like bunny game"
+    ]
+  },
+  "connectfour": {
+    "start": [
+      "exciting prospects for this one",
+      "better give 110% here",
+      "this is a make or break game",
+      "gotta bring your A game here",
+      "we are SEATED for this matchup 🍿🍿",
+      "does anyone know the rules i lowk forgor ngl",
+      "this game better be quick cuz i got something scheduled"
+    ],
+    "early": [
+      "off to a great start",
+      "can't wait to see how this ends",
+      "hard to say who has the advantage",
+      "looking good, but anything can happen",
+      "this is a classic opening",
+      "great setup by both players",
+      "still anybody's game (well it's hasbro's game)",
+      "it's definitely too early to call",
+      "absolute cinema",
+      "TUFF MOVE FR",
+      "i'm predicting a victory for red or blue",
+      "this better be good the tickets were like 1 grand"
+    ],
+    "mid": [
+      "interesting strategy...",
+      "ah yes, the classic Cvdfgspfvdrvls Gambit",
+      "yikes, huge blunder there",
+      "ooh, but do they see it?",
+      "excellent defensive play",
+      "not so sure about that move",
+      "the momentum is shifting, or is it?",
+      "im crine that move was so cringe fr",
+      "the tables are turning, hope the board doesn't fall over",
+      "nice blocks so far",
+      "+10000 aura for that move",
+      "nice work to, uh, whoever that was"
+    ],
+    "late": [
+      "really closing down the board here",
+      "those columns are filling up quickly",
+      "the suspense is killing me",
+      "i still don't know who's winning",
+      "it's not over until it's over",
+      "running out of time...",
+      "yeah i think it's basically over",
+      "looking like green won't be winning this one",
+      "HOW IS THIS STILL GOING",
+      "it just keeps getting crazier"
+    ],
+    "win": [
+      "WHATTTT A GAME",
+      "i did NOT see that coming",
+      "bro that strategy needs to be nerfed",
+      "nice work chump",
+      "too ez bro",
+      "gg no re",
+      "well, you win some you lose some",
+      "one for the record books",
+      "a game for the ages",
+      "🥀💀🔥🪫🤞💯"
+    ],
+    "nowin": [
+      "BORINGGGG",
+      "aw man, i was on the edge of my seat",
+      "rematch?",
+      "really dropped the ball"
     ]
   },
   "interjections": {
