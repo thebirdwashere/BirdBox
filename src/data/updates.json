@@ -8,7 +8,7 @@
       "Added `e;connectfour` command",
       "Added `e;wordle resume` subcommand to view an ongoing game",
       "Adjusted footers of tictactoe to match connectfour",
-      "Added 4 new `e;8ball` responses, for a total of 130",
+      "Added 5 new `e;8ball` responses, for a total of 131",
       "Reduced conditions for palindrome interjection",
       "Implemented a component handler to reduce duplicated code",
       "Added `e;debug actionrow` to test the component handler",
