@@ -6,8 +6,8 @@ import { Footers } from "@src/utility/types.js";
 const FOOTERS = footers as Footers;
 
 const FILTER_REGEX = /[^a-z]/g;
-const MIN_CHAR_LENGTH = 10;
-const MIN_UNIQUE_LETTERS = 5;
+const MIN_CHAR_LENGTH = 7;
+const MIN_UNIQUE_LETTERS = 3;
 
 const Palindrome = new Interjection({
   name: "palindromes",
@@ -19,7 +19,7 @@ const Palindrome = new Interjection({
     if (content.length && content.length > 1935) return false; //message is too long for embeds
 
     if (content.length < MIN_CHAR_LENGTH) return false;
-    
+
     const contentLetters = content.split("");
 
     if (new Set(contentLetters).size < MIN_UNIQUE_LETTERS) return false;
@@ -38,7 +38,7 @@ const Palindrome = new Interjection({
 
     //get the random footer for the embed
     const randomFooter = randomChoice(FOOTERS.interjections.palindromes.concat(FOOTERS.interjections.generic));
-    
+
     await notifyOfInterjection(ctx, {
       "color": 0x3b88c3,
       "description": "is a palindrome",
