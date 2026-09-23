@@ -47,7 +47,7 @@ export class Registry {
     const contextMenuCommands = this.commands
       .mapValues(command => command.contextmenu)
       .filter(command => command !== undefined);
-    
+
     //this is awful i'm so sorry to whoever has to edit this next, 
     //i'll try to comment well but there's no saving this gibberish
 
@@ -61,7 +61,7 @@ export class Registry {
 
       //for each subcommand, if it has a context menu, add it to the list
       for (const subcommand of command.body) {
-        if (subcommand.contextmenu) 
+        if (subcommand.contextmenu)
           contextMenuSubcommands.set(subcommand.contextmenu.label, subcommand.contextmenu);
       }
     }
@@ -107,7 +107,6 @@ export class Registry {
       } catch (error: unknown) {
         await handleInterjectionError(
           ctx,
-          interjection.name,
           error
         );
       };
@@ -115,13 +114,13 @@ export class Registry {
   }
 
   async testAndBenchmarknterjections(ctx: MessageContext): Promise<void> {
-    if (!ctx.data.devMode) 
+    if (!ctx.data.devMode)
       throw new Error("Benchmarking expects dev mode.");
     console.log("\nBeginning to benchmark interjections...");
 
     const timesArray = new Collection<string, [number, boolean]>();
     const overallStart = performance.now();
-  
+
     for (const interjection of this.interjections.values()) {
       try {
         const startTime = performance.now();
@@ -133,7 +132,6 @@ export class Registry {
       } catch (error: unknown) {
         await handleInterjectionError(
           ctx,
-          interjection.name,
           error
         );
       };
